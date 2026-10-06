@@ -14,7 +14,7 @@
 ---
 
 Drift diagnoses a program that passes in one environment and fails in another. It records each
-environment as a capsule, ranks what differs between a passing run and a failing one, proposes the
+environment, ranks what differs between a passing run and a failing one, proposes the
 experiment that would remove the most uncertainty, runs it, and writes a certificate that a second
 command can verify. It is written in Kotlin Multiplatform and runs as a command line tool, a desktop
 app, a web app, an Android app and an iOS app from the same shared code.
