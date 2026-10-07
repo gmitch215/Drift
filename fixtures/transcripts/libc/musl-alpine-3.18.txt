@@ -1,0 +1,5 @@
+musl libc (aarch64)
+Version 1.2.4
+Dynamic Program Loader
+Usage: /lib/ld-musl-aarch64.so.1 [options] [--] pathname
+exit 1
