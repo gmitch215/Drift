@@ -1,0 +1,478 @@
+name: Release Project
+
+on:
+  workflow_dispatch:
+    inputs:
+      changelog:
+        type: string
+        description: 'Changelog to replace the auto-generated one'
+      suffix:
+        type: string
+        description: 'Suffix to append to the version'
+        default: ''
+      dry-run:
+        type: boolean
+        description: 'Build every asset and skip attestation and publishing'
+        default: false
+
+jobs:
+  cli:
+    name: Build CLI (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-x64
+            os: ubuntu-24.04
+            link: linkReleaseExecutableLinuxX64
+            exe: cli/build/bin/linuxX64/releaseExecutable/drift.kexe
+            ext: tar.gz
+            check: true
+          - name: linux-arm64
+            os: ubuntu-24.04
+            link: linkReleaseExecutableLinuxArm64
+            exe: cli/build/bin/linuxArm64/releaseExecutable/drift.kexe
+            ext: tar.gz
+            check: false
+          - name: macos-arm64
+            os: macos-15
+            link: linkReleaseExecutableMacosArm64
+            exe: cli/build/bin/macosArm64/releaseExecutable/drift.kexe
+            ext: tar.gz
+            check: true
+          - name: windows-x64
+            os: windows-2025
+            link: linkReleaseExecutableMingwX64
+            exe: cli/build/bin/mingwX64/releaseExecutable/drift.exe
+            ext: zip
+            check: true
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: gradle/actions/wrapper-validation@v5
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Cache Kotlin/Native
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.konan/caches
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-prebuilt-*
+          key: konan-${{ matrix.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
+      - name: Extract Version
+        run: echo "VERSION=$(grep '^version=' gradle.properties | cut -d= -f2)" >> "$GITHUB_ENV"
+      - name: Build Executable
+        run: ./gradlew ${{ matrix.link }}
+      - name: Check Executable
+        if: ${{ matrix.check }}
+        run: ${{ matrix.exe }} --version
+      - name: Stage Release Files
+        run: .github/release/stage.sh archive "${{ matrix.exe }}" "drift-${VERSION}-${{ matrix.name }}.${{ matrix.ext }}"
+      - name: Archive Release Files
+        uses: actions/upload-artifact@v7
+        with:
+          name: drift-release-cli-${{ matrix.name }}
+          path: dist/*
+          if-no-files-found: error
+      - name: Attest Release Files
+        if: ${{ !inputs.dry-run }}
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: dist/*
+      - name: Stop Gradle
+        if: success() || failure()
+        run: ./gradlew --stop
+
+  cli-arm64:
+    name: Check CLI (linux-arm64)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
+    needs: cli
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Download Release Files
+        uses: actions/download-artifact@v8
+        with:
+          name: drift-release-cli-linux-arm64
+          path: release
+      - name: Verify and Run
+        run: |
+          cd release
+          sha256sum -c ./*.sha256
+          tar -xzf ./*.tar.gz
+          ./drift --version
+
+  studio:
+    name: Build Studio (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macos-arm64
+            os: macos-15
+          - name: windows-x64
+            os: windows-2025
+          - name: linux-x64
+            os: ubuntu-24.04
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: gradle/actions/wrapper-validation@v5
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Extract Version
+        run: echo "VERSION=$(grep '^version=' gradle.properties | cut -d= -f2)" >> "$GITHUB_ENV"
+      - name: Package macOS
+        if: ${{ matrix.name == 'macos-arm64' }}
+        run: |
+          ./gradlew :studio:packageDmg :studio:packagePkg
+          .github/release/stage.sh file studio/build/compose/binaries/main/dmg/*.dmg "drift-${VERSION}-macos-arm64.dmg"
+          .github/release/stage.sh file studio/build/compose/binaries/main/pkg/*.pkg "drift-${VERSION}-macos-arm64.pkg"
+      - name: Locate WiX
+        if: ${{ matrix.name == 'windows-x64' }}
+        run: |
+          if ! command -v candle > /dev/null 2>&1; then
+            echo "${WIX}bin" >> "$GITHUB_PATH"
+          fi
+      - name: Package Windows
+        if: ${{ matrix.name == 'windows-x64' }}
+        run: |
+          ./gradlew :studio:packageMsi :studio:packageExe
+          .github/release/stage.sh file studio/build/compose/binaries/main/msi/*.msi "drift-${VERSION}-windows-x64.msi"
+          .github/release/stage.sh file studio/build/compose/binaries/main/exe/*.exe "drift-${VERSION}-windows-x64.exe"
+      - name: Install Linux Packaging Tools
+        if: ${{ matrix.name == 'linux-x64' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fakeroot rpm
+          curl -fsSL -o appimagetool https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage
+          echo 'ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0  appimagetool' | sha256sum -c
+          chmod +x appimagetool
+      - name: Package Linux
+        if: ${{ matrix.name == 'linux-x64' }}
+        env:
+          APPIMAGETOOL: ${{ github.workspace }}/appimagetool
+        run: |
+          ./gradlew :studio:packageDeb :studio:packageRpm :studio:packageAppImage
+          .github/release/stage.sh file studio/build/compose/binaries/main/deb/*.deb "drift-${VERSION}-linux-x64.deb"
+          .github/release/stage.sh file studio/build/compose/binaries/main/rpm/*.rpm "drift-${VERSION}-linux-x64.rpm"
+          .github/release/stage.sh file studio/build/compose/binaries/main/appimage/*.AppImage "drift-${VERSION}-linux-x64.AppImage"
+      - name: Check Packages
+        run: |
+          case "${{ matrix.name }}" in
+            macos-arm64) pkgutil --payload-files dist/*.pkg | head -n 5 ;;
+            linux-x64)
+              dpkg-deb --info dist/*.deb
+              rpm -qp --info dist/*.rpm
+              for f in dist/*.AppImage; do
+                chmod +x "$f"
+                "$f" --appimage-extract > /dev/null
+              done
+              ls squashfs-root
+              ;;
+            *) ls -l dist ;;
+          esac
+      - name: Archive Release Files
+        uses: actions/upload-artifact@v7
+        with:
+          name: drift-release-studio-${{ matrix.name }}
+          path: dist/*
+          if-no-files-found: error
+      - name: Attest Release Files
+        if: ${{ !inputs.dry-run }}
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: dist/*
+      - name: Stop Gradle
+        if: success() || failure()
+        run: ./gradlew --stop
+
+  android:
+    name: Build Android
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: gradle/actions/wrapper-validation@v5
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Extract Version
+        run: echo "VERSION=$(grep '^version=' gradle.properties | cut -d= -f2)" >> "$GITHUB_ENV"
+      - name: Install Android Platform
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install 'platforms;android-37.0'
+      - name: Build APK
+        run: ./gradlew -Pdrift.mobile=true :androidApp:packageApk
+      - name: Verify APK Signature
+        run: |
+          tools=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 | sort -V | tail -n 1)
+          "$tools/apksigner" verify --verbose androidApp/build/distributions/*.apk
+      - name: Stage Release Files
+        run: .github/release/stage.sh file androidApp/build/distributions/*.apk "drift-${VERSION}-android.apk"
+      - name: Archive Release Files
+        uses: actions/upload-artifact@v7
+        with:
+          name: drift-release-android
+          path: dist/*
+          if-no-files-found: error
+      - name: Attest Release Files
+        if: ${{ !inputs.dry-run }}
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: dist/*
+      - name: Stop Gradle
+        if: success() || failure()
+        run: ./gradlew --stop
+
+  release:
+    name: Publish Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [cli, cli-arm64, studio, android]
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Extract Version
+        run: echo "VERSION=$(grep '^version=' gradle.properties | cut -d= -f2)" >> "$GITHUB_ENV"
+      - name: Retrieve Latest Tag
+        run: echo "LATEST_TAG=$(git describe --tags --abbrev=0 2> /dev/null || echo '')" >> "$GITHUB_ENV"
+      - name: Download Release Files
+        uses: actions/download-artifact@v8
+        with:
+          pattern: drift-release-*
+          path: release
+          merge-multiple: true
+      - name: Build Checksums
+        run: .github/release/stage.sh sums release
+      - name: Archive Dry Run Files
+        if: ${{ inputs.dry-run }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: drift-dry-run
+          path: release/*
+          if-no-files-found: error
+      - name: Generate Changelog
+        if: ${{ inputs.changelog == '' }}
+        id: changelog
+        uses: mikepenz/release-changelog-builder-action@v6
+        with:
+          configuration: '.github/release.json'
+          mode: 'HYBRID'
+          fromTag: ${{ env.LATEST_TAG }}
+          toTag: ${{ github.ref_name }}
+      - name: Create Release
+        if: ${{ !inputs.dry-run }}
+        uses: softprops/action-gh-release@v3
+        with:
+          files: release/*
+          tag_name: v${{ env.VERSION }}${{ inputs.suffix }}
+          name: drift v${{ env.VERSION }}${{ inputs.suffix }}
+          body: ${{ steps.changelog.outputs.changelog || inputs.changelog }}
+          draft: false
+          prerelease: ${{ inputs.suffix != '' }}
+
+  homebrew:
+    name: Update Homebrew Tap
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: release
+    if: ${{ inputs.suffix == '' }}
+
+    permissions:
+      contents: read
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Require Tap Token
+        if: ${{ !inputs.dry-run }}
+        env:
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: test -n "$HOMEBREW_TAP_TOKEN" || { echo "::error::the HOMEBREW_TAP_TOKEN secret is not set"; exit 1; }
+      - uses: actions/checkout@v6
+      - uses: gradle/actions/wrapper-validation@v5
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Extract Version
+        run: echo "VERSION=$(grep '^version=' gradle.properties | cut -d= -f2)" >> "$GITHUB_ENV"
+      - name: Check Wait Script
+        run: .github/release/test-wait-assets.sh
+      - name: Wait for Release Assets
+        if: ${{ !inputs.dry-run }}
+        run: |
+          .github/release/wait-assets.sh "$GITHUB_REPOSITORY" "v${VERSION}" release \
+            "drift-${VERSION}-macos-arm64.tar.gz" \
+            "drift-${VERSION}-linux-x64.tar.gz" \
+            "drift-${VERSION}-linux-arm64.tar.gz" \
+            "drift-${VERSION}-macos-arm64.dmg"
+      - name: Download Dry Run Files
+        if: ${{ inputs.dry-run }}
+        uses: actions/download-artifact@v8
+        with:
+          name: drift-dry-run
+          path: release
+      - name: Render Formula and Cask
+        run: ./gradlew renderPackaging "-Pdrift.sums=$GITHUB_WORKSPACE/release/SHA256SUMS"
+      - name: Check Rendered Files
+        run: ruby -c build/packaging/homebrew/Formula/drift.rb build/packaging/homebrew/Casks/drift-studio.rb
+      - name: Archive Rendered Files
+        uses: actions/upload-artifact@v7
+        with:
+          name: drift-packaging-homebrew
+          path: build/packaging/homebrew
+          if-no-files-found: error
+      - name: Check Out Tap
+        if: ${{ !inputs.dry-run }}
+        uses: actions/checkout@v6
+        with:
+          repository: gmitch215/homebrew-tap
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: tap
+      - name: Commit to Tap
+        if: ${{ !inputs.dry-run }}
+        working-directory: tap
+        run: |
+          cp -R "$GITHUB_WORKSPACE/build/packaging/homebrew/." .
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "tap already up to date"
+          else
+            git commit -m "chore: update drift to ${VERSION}"
+            git push origin HEAD
+          fi
+      - name: Stop Gradle
+        if: success() || failure()
+        run: ./gradlew --stop
+
+  chocolatey:
+    name: Publish Chocolatey (${{ matrix.package }})
+    runs-on: windows-2025
+    timeout-minutes: 30
+    needs: release
+    if: ${{ inputs.suffix == '' }}
+
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [drift, drift-studio]
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Require API Key
+        if: ${{ !inputs.dry-run }}
+        env:
+          CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+        run: test -n "$CHOCOLATEY_API_KEY" || { echo "::error::the CHOCOLATEY_API_KEY secret is not set"; exit 1; }
+      - uses: actions/checkout@v6
+      - uses: gradle/actions/wrapper-validation@v5
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Extract Version
+        run: echo "VERSION=$(grep '^version=' gradle.properties | cut -d= -f2)" >> "$GITHUB_ENV"
+      - name: Wait for Release Assets
+        if: ${{ !inputs.dry-run }}
+        run: |
+          .github/release/wait-assets.sh "$GITHUB_REPOSITORY" "v${VERSION}" release \
+            "drift-${VERSION}-windows-x64.zip" \
+            "drift-${VERSION}-windows-x64.msi"
+      - name: Download Dry Run Files
+        if: ${{ inputs.dry-run }}
+        uses: actions/download-artifact@v8
+        with:
+          name: drift-dry-run
+          path: release
+      - name: Render Packages
+        run: ./gradlew renderPackaging "-Pdrift.sums=$GITHUB_WORKSPACE/release/SHA256SUMS"
+      - name: Check Install Scripts
+        shell: pwsh
+        run: ./packaging/chocolatey/verify.ps1 -Root build/packaging/chocolatey -Version $env:VERSION -Sums release/SHA256SUMS
+      - name: Pack
+        run: choco pack "build/packaging/chocolatey/${{ matrix.package }}/${{ matrix.package }}.nuspec" --outputdirectory build/nupkg
+      - name: Archive Packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: drift-packaging-chocolatey-${{ matrix.package }}
+          path: build/nupkg/*.nupkg
+          if-no-files-found: error
+      - name: Push
+        if: ${{ !inputs.dry-run }}
+        env:
+          CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+        run: choco push "build/nupkg/${{ matrix.package }}.${VERSION}.nupkg" --source https://push.chocolatey.org/ --api-key "$CHOCOLATEY_API_KEY"
+      - name: Stop Gradle
+        if: success() || failure()
+        run: ./gradlew --stop
