@@ -13,6 +13,8 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class RunnerTest {
+	private val windows = System.getProperty("os.name").startsWith("Windows")
+
 	private val template = """
 		schema: 1
 		templates:
@@ -74,6 +76,9 @@ class RunnerTest {
 		val docker = bin.resolve("docker")
 		docker.writeText(fakeDocker)
 		Files.setPosixFilePermissions(docker, PosixFilePermissions.fromString("rwxr-xr-x"))
+		val timeout = bin.resolve("timeout")
+		timeout.writeText("#!/bin/sh\nshift\nexec \"\$@\"\n")
+		Files.setPosixFilePermissions(timeout, PosixFilePermissions.fromString("rwxr-xr-x"))
 		val pb = ProcessBuilder(
 			"sh",
 			prepared.resolve("run-batch.sh").toString(),
@@ -90,6 +95,7 @@ class RunnerTest {
 
 	@Test
 	fun theBatchRunsBothArmsThroughTheFakeDockerAndIngestValidates() {
+		if (windows) return
 		val work = Work(root())
 		work.writeGenerated()
 		val ids = work.devIds().toList()
@@ -109,6 +115,7 @@ class RunnerTest {
 
 	@Test
 	fun aBatchSkipsFinishedArms() {
+		if (windows) return
 		val work = Work(root())
 		work.writeGenerated()
 		val prepared = Files.createTempDirectory("bench-prepared")
@@ -120,6 +127,7 @@ class RunnerTest {
 
 	@Test
 	fun aTamperedOutputIsDroppedAndListed() {
+		if (windows) return
 		val work = Work(root())
 		work.writeGenerated()
 		val prepared = Files.createTempDirectory("bench-prepared")

@@ -49,9 +49,12 @@ class WriteTextFileTest {
 				"red.json" to Fixtures.text("36995781138.json"),
 			),
 		)
-		val result = DriftCommand(host, files).test("diagnose green.json red.json --case $dir/out")
+		val out = "${dir.invariantSeparatorsPath}/out"
+		val result = DriftCommand(host, files).test("diagnose green.json red.json --case $out")
 		assertEquals(0, result.statusCode, result.stderr)
-		val back = (CaseStore.read(files, "$dir/out") as CaseRead.Loaded).case
+		val read = CaseStore.read(files, "$dir/out")
+		assertTrue(read is CaseRead.Loaded, read.toString())
+		val back = read.case
 		assertEquals(emptyList(), back.check())
 		assertEquals(11, back.files.size)
 		assertEquals(back.files.getValue("case.json"), File("$dir/out/case.json").readText())
