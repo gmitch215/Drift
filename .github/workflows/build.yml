@@ -1,0 +1,257 @@
+name: Build Project
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint:
+    name: Lint Project
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - uses: gradle/actions/wrapper-validation@v5
+      - name: Check Style and Coverage Rules
+        run: ./gradlew spotlessCheck checkLineLength sharedRatio :build-core:check
+      - name: Compile Every Target
+        run: ./gradlew compileKotlinJvm compileKotlinLinuxX64 compileKotlinLinuxArm64 compileKotlinMingwX64 compileKotlinWasmJs
+      - name: Stop Gradle
+        run: ./gradlew --stop
+
+  test:
+    name: Test Project (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    needs: lint
+
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-x64
+            os: ubuntu-24.04
+            tasks: jvmTest linuxX64Test wasmJsNodeTest
+            exe: cli/build/bin/linuxX64/releaseExecutable/drift.kexe
+            link: linkReleaseExecutableLinuxX64
+            coverage: true
+          - name: macos-arm64
+            os: macos-15
+            tasks: jvmTest macosArm64Test
+            exe: cli/build/bin/macosArm64/releaseExecutable/drift.kexe
+            link: linkReleaseExecutableMacosArm64
+            coverage: false
+          - name: windows-x64
+            os: windows-2025
+            tasks: jvmTest mingwX64Test
+            exe: cli/build/bin/mingwX64/releaseExecutable/drift.exe
+            link: linkReleaseExecutableMingwX64
+            coverage: false
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Cache Kotlin/Native
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.konan/caches
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-prebuilt-*
+          key: konan-${{ matrix.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
+      - name: Run Tests
+        run: ./gradlew ${{ matrix.tasks }} ${{ matrix.link }} --continue
+      - name: Check Executable
+        run: ${{ matrix.exe }} --version
+      - name: Collect Coverage
+        if: ${{ matrix.coverage && !cancelled() }}
+        run: ./gradlew jvmJacocoAggregateReport verifyCoverage coverageSummary
+      - name: Coverage to Job Summary
+        if: ${{ matrix.coverage && !cancelled() }}
+        run: |
+          {
+            echo '## Coverage'
+            echo '```'
+            cat build/coverage/summary.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload Coverage to Codecov
+        if: ${{ matrix.coverage && !cancelled() }}
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+          report_type: coverage
+          flags: jvm
+          files: build/jacoco.xml
+      - name: Upload Test Results to Codecov
+        if: ${{ matrix.coverage && !cancelled() }}
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+          report_type: test_results
+          flags: jvm
+          files: '*/build/test-results/jvmTest/*.xml'
+      - name: Archive Coverage
+        if: ${{ matrix.coverage && !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-${{ github.sha }}
+          path: |
+            build/jacocoHtml
+            build/jacoco.xml
+            build/coverage
+          if-no-files-found: ignore
+      - name: Stop Gradle
+        run: ./gradlew --stop
+
+  link-arm64:
+    name: Link Tests (linux-arm64)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    needs: lint
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Cache Kotlin/Native
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.konan/caches
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-prebuilt-*
+          key: konan-ubuntu-24.04-${{ hashFiles('gradle/libs.versions.toml') }}
+      - name: Link Binaries
+        run: ./gradlew linkDebugTestLinuxArm64 linkReleaseExecutableLinuxArm64
+      - name: Archive Binaries
+        uses: actions/upload-artifact@v7
+        with:
+          name: linux-arm64-binaries
+          path: |
+            */build/bin/linuxArm64/debugTest/test.kexe
+            cli/build/bin/linuxArm64/releaseExecutable/drift.kexe
+          if-no-files-found: error
+      - name: Stop Gradle
+        run: ./gradlew --stop
+
+  test-arm64:
+    name: Test Project (linux-arm64)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+    needs: link-arm64
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Download Binaries
+        uses: actions/download-artifact@v8
+        with:
+          name: linux-arm64-binaries
+          path: .
+      - name: Run JVM Tests
+        run: ./gradlew jvmTest
+      - name: Run Native Tests
+        run: |
+          chmod +x ./*/build/bin/linuxArm64/debugTest/test.kexe cli/build/bin/linuxArm64/releaseExecutable/drift.kexe
+          for module in core scan host cli bench; do
+            (cd "$module" && ./build/bin/linuxArm64/debugTest/test.kexe)
+          done
+      - name: Check Executable
+        run: cli/build/bin/linuxArm64/releaseExecutable/drift.kexe --version
+      - name: Stop Gradle
+        run: ./gradlew --stop
+
+  browsers:
+    name: Test Browsers
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    needs: lint
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24.20.0'
+          cache: 'npm'
+          cache-dependency-path: tools/browsers/package-lock.json
+      - name: Build Studio Web
+        run: ./gradlew :studio:wasmJsBrowserDistribution
+      - name: Install Playwright Browsers
+        working-directory: tools/browsers
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium firefox webkit
+      - name: Run Browser Smoke Test
+        working-directory: tools/browsers
+        run: >
+          xvfb-run -a node run.mjs --headed
+          --dist ../../studio/build/dist/wasmJs/productionExecutable
+          --out ../../build/browsers
+          --reference ../../fixtures/atlas/wasm.txt
+      - name: Test Studio in Firefox
+        run: ./gradlew :studio:wasmJsBrowserTest -Pdrift.browser=firefox
+      - name: Archive Browser Results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: browsers-${{ github.sha }}
+          path: build/browsers
+          if-no-files-found: ignore
+      - name: Stop Gradle
+        run: ./gradlew --stop

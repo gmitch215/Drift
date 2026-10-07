@@ -1,0 +1,69 @@
+name: Deploy Documentation
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy Documentation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Build Documentation
+        run: ./gradlew dokkaGenerate atlasSite
+      - name: Assemble Site
+        run: |
+          cp -R build/atlas-site "$RUNNER_TEMP/site"
+          mkdir -p "$RUNNER_TEMP/site/engine"
+          cp -R build/dokka/html/. "$RUNNER_TEMP/site/engine/"
+          touch "$RUNNER_TEMP/site/.nojekyll"
+      - name: Check Site Layout
+        run: |
+          test -f "$RUNNER_TEMP/site/index.html"
+          test -f "$RUNNER_TEMP/site/probe/index.html"
+          test -f "$RUNNER_TEMP/site/data/dataset.json"
+          test -f "$RUNNER_TEMP/site/engine/index.html"
+          test -f "$RUNNER_TEMP/site/.nojekyll"
+          if find "$RUNNER_TEMP/site" \( -name build -o -name .gradle -o -name .kotlin -o -name '*.kexe' \) | grep -q .; then
+            echo "build output outside the two site outputs"
+            exit 1
+          fi
+      - name: Deploy Documentation
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            git fetch origin gh-pages
+            git worktree add -B gh-pages "$RUNNER_TEMP/pages" origin/gh-pages
+          else
+            git worktree add --orphan -b gh-pages "$RUNNER_TEMP/pages"
+          fi
+          cd "$RUNNER_TEMP/pages"
+          git rm -rf . >/dev/null 2>&1 || true
+          cp -R "$RUNNER_TEMP/site/." .
+          git add .
+          if git diff --cached --quiet; then
+            echo "No changes to deploy"
+          else
+            git commit -m "Update documentation (${GITHUB_SHA::7})"
+            git push -f origin gh-pages
+          fi
+      - name: Stop Gradle
+        run: ./gradlew --stop
