@@ -941,7 +941,7 @@ curl -s -o /dev/null -w '%{http_code} %{content_type}\n' http://localhost:PORT/p
 200 text/html; charset=utf-8
 ```
 
-The `docs.yml` workflow runs `./gradlew dokkaGenerate atlasSite` and pushes the site, with the engine documentation under `engine/`, to the `gh-pages` branch. It builds on pushes to `master`, `ver/*`, `feat/*` and `renovate/*` and deploys only from `master`. It has not run yet.
+The `docs.yml` workflow runs `./gradlew dokkaGenerate atlasSite` and pushes the site, with the engine documentation under `engine/`, to the `gh-pages` branch. It builds on pushes to `master`, `ver/*`, `feat/*` and `renovate/*` and deploys only from `master`, with a `CNAME` file for `drift.gmitch215.dev`. It has not run yet.
 
 ## Install and Uninstall
 

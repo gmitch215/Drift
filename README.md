@@ -76,7 +76,7 @@ target, then shows the recorded one.
 `drift atlas record`, `build`, `compare` and `show` do the same work from the command line.
 `./gradlew atlasSite` builds the static site: Studio at the root, a page per probe and the dataset
 as JSON. The `docs.yml` workflow builds that site and the engine documentation on every push and
-publishes them to GitHub Pages from `master`.
+publishes them to GitHub Pages from `master`, with the custom domain `drift.gmitch215.dev`.
 
 ---
 

@@ -34,6 +34,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/site/engine"
           cp -R build/dokka/html/. "$RUNNER_TEMP/site/engine/"
           touch "$RUNNER_TEMP/site/.nojekyll"
+          echo "drift.gmitch215.dev" > "$RUNNER_TEMP/site/CNAME"
       - name: Check Site Layout
         run: |
           test -f "$RUNNER_TEMP/site/index.html"
@@ -41,6 +42,7 @@ jobs:
           test -f "$RUNNER_TEMP/site/data/dataset.json"
           test -f "$RUNNER_TEMP/site/engine/index.html"
           test -f "$RUNNER_TEMP/site/.nojekyll"
+          test "$(cat "$RUNNER_TEMP/site/CNAME")" = "drift.gmitch215.dev"
           if find "$RUNNER_TEMP/site" \( -name build -o -name .gradle -o -name .kotlin -o -name '*.kexe' \) | grep -q .; then
             echo "build output outside the two site outputs"
             exit 1
