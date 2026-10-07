@@ -1,0 +1,943 @@
+schema: '1'
+measured:
+  date: '2026-10-07'
+  versions: [2.4.20, 2.5.0-Beta1]
+  issuesRead: [KT-13575, KT-18067, KT-21235, KT-44746, KT-49557, KT-50777, KT-51859, KT-53212, KT-53258,
+    KT-57189, KT-58195, KT-58678, KT-61028, KT-63088, KT-68310, KT-68395, KT-69456, KT-71003, KT-78708,
+    KT-80664, KT-81626, KT-88035, KT-88036, KT-88414, KT-88775, KT-88829, KT-89031, KT-89072, KT-89074,
+    KT-89187]
+probes:
+- id: kotlin.char.bmp-case-mapping
+  classification: platform-defined
+  basis: inferred
+  causes: [e]
+  references:
+  - url: https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Character.html
+    quote: Character information is based on the Unicode Standard, version 13.0.
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Character.html
+    quote: Character information is based on the Unicode Standard, version 15.0.
+  - url: https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Character.html
+    quote: Character information is based on the Unicode Standard, version 16.0.
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/is-letter.html
+    quote: A character is considered to be a letter if its category is CharCategory.UPPERCASE_LETTER
+  issues:
+  - id: KT-58195
+    state: Open
+    summary: 'Native: Use the same unicode version for regex canonicalization'
+  columns:
+    2.4.20:
+    - [android]
+    - [ios, jvm-17, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [jvm, jvm-21]
+    - [jvm-25]
+    2.5.0-Beta1:
+    - [android]
+    - [ios, macos, wasm]
+    - [jvm]
+  note: 'JDK 17, 21, 25 columns split exactly as their Character Javadocs name Unicode 13.0, 15.0, 16.0
+    (verified). Native, Wasm, iOS, linux, mingw-wine and the browsers print the JDK 17 numbers (observed):
+    that they use Unicode 13.0 tables is inferred; no FULL doc names the Native table version and KT-58195
+    (created 2023-04-24) says UnicodeData 12.0 for Native, which does not match the observed numbers (stale
+    or other tables). Android prints its own numbers and the Android Character page read names no Unicode
+    version. The Kotlin isLetter KDoc defines letters by category and names no version, so the version
+    is left to the platform.'
+- id: kotlin.char.bmp-categories
+  classification: platform-defined
+  basis: inferred
+  causes: [e]
+  references:
+  - url: https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Character.html
+    quote: Character information is based on the Unicode Standard, version 13.0.
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Character.html
+    quote: Character information is based on the Unicode Standard, version 15.0.
+  - url: https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Character.html
+    quote: Character information is based on the Unicode Standard, version 16.0.
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/is-letter.html
+    quote: A character is considered to be a letter if its category is CharCategory.UPPERCASE_LETTER
+  issues:
+  - id: KT-58195
+    state: Open
+    summary: 'Native: Use the same unicode version for regex canonicalization'
+  columns:
+    2.4.20:
+    - [android]
+    - [ios, jvm-17, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [jvm, jvm-21]
+    - [jvm-25]
+    2.5.0-Beta1:
+    - [android]
+    - [ios, macos, wasm]
+    - [jvm]
+  note: Same evidence and same limits as char.bmp-case-mapping (UNASSIGNED 1585, 1454, 1432 for JDK 17,
+    21, 25).
+- id: kotlin.char.case-special
+  classification: documented
+  basis: verified
+  causes: [a]
+  references:
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/uppercase.html
+    quote: Converts this character to upper case using Unicode mapping rules of the invariant locale.
+  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Probe notes:
+    Identical on every column measured. uppercase and lowercase use the Unicode mapping rules of the invariant
+    locale and allow one-to-many mappings (KDoc, read), so sharp s becomes SS and i stays I without a
+    Turkish locale.'
+- id: kotlin.char.whitespace-set
+  classification: documented
+  basis: verified
+  causes: [a]
+  references:
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/is-whitespace.html
+    quote: A character is considered whitespace if either its Unicode category is one of
+  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Probe notes:
+    Identical on every column measured and equal to the KDoc rule (read): SPACE_SEPARATOR, LINE_SEPARATOR,
+    PARAGRAPH_SEPARATOR, and controls U+0009..U+000D and U+001C..U+001F. NBSP is whitespace; the zero
+    width space and the BOM are not.'
+- id: kotlin.collections.equality-hashing
+  classification: documented
+  basis: verified
+  causes: [a]
+  references:
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/
+    quote: List.equals should consider two lists equal if and only if they contain the same number of
+      elements
+  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Probe notes:
+    Identical on every column measured. The List and Set pages (read) define equals by size and element-wise
+    match; the pages read give no hash formula, so the hash lines have no documented value.'
+- id: kotlin.collections.hash-order
+  classification: documented
+  basis: verified
+  causes: [a]
+  references:
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-hash-map/
+    quote: HashMap does not guarantee any particular order for iteration over its keys, values, or entries.
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-hash-set/
+    quote: HashSet does not guarantee any particular order for iteration over its elements.
+  columns:
+    2.4.20:
+    - [android, jvm, jvm-17, jvm-21, jvm-25]
+    - [ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    2.5.0-Beta1:
+    - [android, jvm]
+    - [ios, macos, wasm]
+  note: JVM and Android iterate in bucket order, Native, Wasm and browsers in insertion order (observed).
+    The KDoc says no order is guaranteed, which is why either result is allowed; the insertion order is
+    not promised either.
+- id: kotlin.collections.iterator-modification
+  classification: platform-defined
+  basis: verified
+  causes: [b]
+  references:
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayList.html
+    quote: the fail-fast behavior of an iterator cannot be guaranteed
+  - url: https://developer.android.com/reference/java/util/ArrayList
+    quote: the fail-fast behavior of an iterator cannot be guaranteed
+  issues:
+  - id: KT-88775
+    state: Open
+    summary: MutableIterator.remove and MutableListIterator.set throw different exceptions on different
+      platforms when next was not called
+  - id: KT-89031
+    state: To be discussed
+    summary: 'AbstractMutableList.SubList: addAll(index, emptyList()) on a stale sub list throws CME on
+      Native/Wasm, returns false on JVM'
+  columns:
+    2.4.20:
+    - [android]
+    - [ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [jvm, jvm-17, jvm-21, jvm-25]
+    2.5.0-Beta1:
+    - [android]
+    - [ios, macos, wasm]
+    - [jvm]
+  lines:
+  - line: list-remove-last
+    cause: b
+    columns: jvm family throw; others ok
+  - line: list-remove-second
+    cause: b
+    columns: android throws; others ok
+  note: 'Two lines differ, not one: list-remove-last (JVM throws, others and Android finish) and list-remove-second
+    (Android throws ConcurrentModificationException, JVM and Native finish). The probe notes mention only
+    the first. KT-88775 and KT-89031 are other iterator and sub list cases, not these two lines.'
+- id: kotlin.collections.sorting
+  classification: documented
+  basis: inferred
+  causes: [a]
+  references:
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Comparator.html
+    quote: The implementor must ensure that signum (compare(x, y)) == -signum(compare(y, x)) for all x
+      and y.
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html
+    quote: (optional) if the comparator is found to violate the Comparator contract
+  columns:
+    2.4.20:
+    - [android, jvm, jvm-17, jvm-21, jvm-25]
+    - [ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    2.5.0-Beta1:
+    - [android, jvm]
+    - [ios, macos, wasm]
+  note: Only the four lines with a broken comparator differ (always-positive, always-negative, parity,
+    broken-40); stability and total-order lines are identical. The JDK Comparator Javadoc says the implementor
+    must keep signum(compare(x, y)) == -signum(compare(y, x)); all four comparators break it. No FULL
+    page says the result for a contract-violating comparator is undefined, so "documented" rests on the
+    precondition being broken (inference). No YouTrack match for this behavior.
+- id: kotlin.collections.tostring-forms
+  classification: unclassified
+  basis: verified
+  causes: [a, c, g]
+  references:
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-exception/
+    quote: actual typealias Exception = java.lang.Exception
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Throwable.html
+    quote: 'Returns a short description of this throwable. The result is the concatenation of: the name
+      of the class of this object'
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/list-of.html
+    quote: Returns a new read-only list of given elements.
+  issues:
+  - id: KT-88414
+    state: Fixed
+    resolved: '2026-08-30'
+    summary: '[Wasm] Make FP parse and toString alighed with JVM and Native targets'
+  - id: KT-69456
+    state: Open
+    summary: Unify KClass.toString() on different platforms
+  - id: KT-78708
+    state: Fixed
+    resolved: '2025-10-03'
+    summary: 'Wasm: Throwable.toString uses simple class name'
+  searched: 'YouTrack (KT project, text search, first 8 results of each query read): "KClass toString",
+    "Result toString exception", "Throwable toString Native". Pages read in full: Kotlin Exception typealias
+    page, JDK 21 Throwable.toString, Kotlin listOf. No page or issue gives the string form of kclass-list
+    (a platform class name).'
+  repro: atlas/repros/kotlin.collections.tostring-forms.md
+  columns:
+    2.4.20:
+    - [android, jvm, jvm-17, jvm-21, jvm-25]
+    - [ios, linux, linux-arm64, macos]
+    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    2.5.0-Beta1:
+    - [android, jvm]
+    - [ios, macos, wasm]
+  lines:
+  - line: list-doubles
+    cause: c
+    columns: wasm family 10000000000.0, others 1.0E10
+    issue: KT-88414 Fixed; equal on 2.5.0-Beta1
+  - line: result-failure
+    cause: a
+    columns: jvm family java.lang.IllegalStateException, others kotlin.
+    issue: KT-78708 Fixed (expects the fully qualified name)
+  - line: kclass-int
+    cause: c
+    columns: jvm family "int (Kotlin reflection is not available)"
+    issue: 'KT-69456 Open (meta: KClass.toString differs by platform)'
+  - line: kclass-list
+    cause: g
+    columns: jvm family SingletonList, others ArrayList
+    issue: none found; listOf KDoc promises no runtime class
+  note: Four lines, three causes; the probe stays unclassified because kclass-list has none.
+- id: kotlin.double.equality-order
+  classification: documented
+  basis: verified
+  causes: [a]
+  references:
+  - url: https://kotlinlang.org/docs/numbers.html
+    quote: NaN is considered equal to itself
+  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Probe notes:
+    Identical on every column measured. The numbers page (read) says generic and Any typed comparison
+    uses equals and compareTo: NaN equals itself, NaN is greater than every element and -0.0 is less than
+    0.0; statically typed comparison follows IEEE 754.'
+- id: kotlin.double.extremes
+  classification: unclassified
+  basis: verified
+  causes: [c]
+  references:
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Double.html
+    quote: This decimal is (almost always) the shortest one that rounds to m according to the round to
+      nearest rounding policy
+  issues:
+  - id: KT-88414
+    state: Fixed
+    resolved: '2026-08-30'
+    summary: '[Wasm] Make FP parse and toString alighed with JVM and Native targets'
+  - id: KT-88035
+    state: Open
+    summary: 'K/JS: Double.toString does not always return a shortest representation'
+  - id: KT-88036
+    state: Open
+    summary: 'K/JS: Double.MIN_VALUE.toString returns a rounded value'
+  searched: 'YouTrack: "Wasm Double toString". KT-88414 read in full (Fixed; the Wasm line differences
+    are its subject). Pages read in full: ECMAScript Number::toString, JDK 21 Double.toString. No Kotlin
+    page specifies the Double.toString format.'
+  repro: atlas/repros/kotlin.double.extremes.md
+  columns:
+    2.4.20:
+    - [android, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos]
+    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+  note: Wasm family only. KT-88414 Fixed 2026-08-30; Wasm equals JVM on the 2.5.0-Beta1 transcript. No
+    Kotlin page specifies the Double.toString format.
+- id: kotlin.double.nan-bits
+  classification: unclassified
+  basis: inferred
+  causes: [d, g]
+  references:
+  - url: https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.2.3
+    quote: IEEE 754 allows multiple distinct NaN values for each of its binary32 and binary64 floating-point
+      formats.
+  - url: https://webassembly.github.io/spec/core/exec/numerics.html
+    quote: Some operators are non-deterministic, because they can return one of several possible results
+      (such as different NaN values).
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/to-raw-bits.html
+    quote: preserving NaN values exact layout
+  issues:
+  - id: KT-53258
+    state: In Progress
+    summary: NaN toBits()/toRawBits() doesn't always return the canonical bit pattern
+  searched: 'YouTrack: "NaN toRawBits", "Double toBits NaN canonical", "NaN unaryMinus sign Native", "Double.NaN
+    raw bits negative", "unaryMinus NaN", "NaN sign bit", "toRawBits". Pages read in full: JLS 4.2.3,
+    WebAssembly numerics appendix, Kotlin toRawBits and unaryMinus pages. 0/0 and sqrt follow the CPU;
+    no page, issue or commit explains the Native result for neg-nan-raw.'
+  repro: atlas/repros/kotlin.double.nan-bits.md
+  columns:
+    2.4.20:
+    - [android, jvm, wasm]
+    - [ios, linux-arm64, macos]
+    - [jvm-17, jvm-21, jvm-25]
+    - [linux]
+    - [wasm-chromium, wasm-firefox, wasm-webkit]
+    2.5.0-Beta1:
+    - [android, jvm, wasm]
+    - [ios, macos]
+  lines:
+  - line: 0/0-raw
+    cause: d
+    columns: x86 hosts fff8 (jvm-17, jvm-21, jvm-25, linux, linux-ubuntu, mingw-wine, 3 browsers); arm64
+      hosts 7ff8
+    issue: JLS 4.2.3 and Wasm numerics quoted; KT-53258 In Progress
+  - line: sqrt-neg-raw
+    cause: d
+    columns: 'x86: jvm-17/21/25, linux, linux-ubuntu, mingw-wine fff8; 3 browsers 7ff8 although x86; arm64
+      7ff8'
+    issue: browsers are not explained by the CPU alone
+  - line: neg-nan-raw
+    cause: g
+    columns: Native (macos, ios, linux x3, mingw-wine) 7ff8; jvm family, android, wasm, browsers fff8
+    issue: KT-53258 lists constant folding as a candidate; not confirmed for this line
+  note: 'Three lines differ at 2.4.20. 0/0-raw follows the CPU in every column (x86 fff8..., arm64 7ff8...;
+    the browsers on x86 print fff8 like x86 JVM and Linux, Node on arm64 prints 7ff8; checked for Wasm
+    with a hand-assembled f64.div module on Node arm64 and Node x64). sqrt-neg-raw follows the CPU on
+    JVM and Native but not in the three x86 browsers (7ff8). neg-nan-raw follows the Kotlin target: Native
+    7ff8 on every host, JVM, Android and Wasm fff8 on every host; no FULL doc explains it. The source
+    is the constant expression -Double.NaN; whether the compiler folds it was not checked. The ladder
+    fixtures show Native neg-nan-raw fff8 on 1.6.21 and 7ff8 from 1.9.25 on macos and linux.'
+- id: kotlin.double.parse
+  classification: unclassified
+  basis: verified
+  causes: [c]
+  references:
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Double.html
+    quote: This decimal is (almost always) the shortest one that rounds to m according to the round to
+      nearest rounding policy
+  issues:
+  - id: KT-88414
+    state: Fixed
+    resolved: '2026-08-30'
+    summary: '[Wasm] Make FP parse and toString alighed with JVM and Native targets'
+  searched: 'YouTrack: "Wasm Double toString". KT-88414 read in full (Fixed, states Wasm used a different
+    parser). Kotlin toDoubleOrNull page read in full: it gives no grammar.'
+  repro: atlas/repros/kotlin.double.parse.md
+  columns:
+    2.4.20:
+    - [android, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos]
+    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+  note: Wasm family returns null for 0x1p3, 1d, 1f. KT-88414 Fixed; equal on 2.5.0-Beta1.
+- id: kotlin.double.shortest-digits
+  classification: unclassified
+  basis: verified
+  causes: [c, e]
+  references:
+  - url: https://www.oracle.com/java/technologies/javase/19-relnote-issues.html
+    quote: One example is Double.toString(2e23), which now returns "2.0E23", whereas in earlier releases
+      it returns "1.9999999999999998E23"
+  - url: https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Double.html
+    quote: as many, but only as many, more digits as are needed to uniquely distinguish the argument value
+      from adjacent values of type double
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Double.html
+    quote: This decimal is (almost always) the shortest one that rounds to m according to the round to
+      nearest rounding policy
+  issues:
+  - id: KT-88414
+    state: Fixed
+    resolved: '2026-08-30'
+    summary: '[Wasm] Make FP parse and toString alighed with JVM and Native targets'
+  searched: 'YouTrack: "Wasm Double toString". Pages read in full: JDK 17 Double, JDK 18 to 21 release
+    notes (JDK-4511638 in the JDK 19 note), Android Double. Android printing the pre-JDK-19 digits is
+    observed; no page states it.'
+  repro: atlas/repros/kotlin.double.shortest-digits.md
+  columns:
+    2.4.20:
+    - [android, jvm-17]
+    - [ios, jvm, jvm-21, jvm-25, linux, linux-arm64, macos]
+    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    2.5.0-Beta1:
+    - [android]
+    - [ios, jvm, macos, wasm]
+  lines:
+  - line: 2e23, 1e23, 8.41e21, 5e-324, 1e16/3
+    cause: e
+    columns: jvm-17, android
+  - line: same lines
+    cause: c
+    columns: wasm family
+    issue: KT-88414 Fixed
+  note: 'Two groups of cells differ from the majority: jvm-17 and android print the pre-JDK-19 digits
+    (1.9999999999999998E23 for 2e23), explained by the JDK 19 release note JDK-4511638 (verified for jvm-17;
+    Android matching the old algorithm is observed, the Android Double page read carries the old spec
+    text); Wasm family prints 1.9999999999999998e+23 and plain form (KT-88414, Fixed, equal on 2.5.0-Beta1).
+    Android is still the odd column on 2.5.0-Beta1.'
+- id: kotlin.double.tostring-boundaries
+  classification: unclassified
+  basis: verified
+  causes: [c]
+  references:
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Double.html
+    quote: This decimal is (almost always) the shortest one that rounds to m according to the round to
+      nearest rounding policy
+  issues:
+  - id: KT-88414
+    state: Fixed
+    resolved: '2026-08-30'
+    summary: '[Wasm] Make FP parse and toString alighed with JVM and Native targets'
+  searched: 'YouTrack: "Wasm Double toString". KT-88414 read in full (Fixed). Pages read in full: ECMAScript
+    Number::toString, JDK 21 Double.toString.'
+  repro: atlas/repros/kotlin.double.tostring-boundaries.md
+  columns:
+    2.4.20:
+    - [android, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos]
+    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+  note: Wasm family only; 7 lines; equal on 2.5.0-Beta1.
+- id: kotlin.exceptions.messages
+  classification: unclassified
+  basis: inferred
+  causes: [e, g]
+  issues:
+  - id: KT-88829
+    state: Open
+    summary: 'Wasm: null cast to a non-null type parameter throws ClassCastException instead of NullPointerException'
+  searched: 'YouTrack: "exception message Native", "NumberFormatException message", "ArithmeticException
+    message", "ClassCastException Wasm", "StringIndexOutOfBoundsException Native", "IndexOutOfBoundsException
+    message differs", "string index out of bounds Wasm message". JDK 18, 19, 20 and 21 release notes searched
+    for StringIndexOutOfBounds, "index out of bounds" and Preconditions: no entry found (a negative result
+    for that query only). Kotlin Throwable page read in full: it names no message text.'
+  repro: atlas/repros/kotlin.exceptions.messages.md
+  columns:
+    2.4.20:
+    - [android]
+    - [ios, linux, linux-arm64, macos]
+    - [jvm, jvm-21, jvm-25]
+    - [jvm-17]
+    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    2.5.0-Beta1:
+    - [android]
+    - [ios, macos]
+    - [jvm]
+    - [wasm]
+  note: 'No page read gives message text, so no line has a documented expectation. Class differences:
+    Native string-index, substring and substring-range throw ArrayIndexOutOfBoundsException(null); Wasm
+    throws IndexOutOfBoundsException; null-cast is ClassCastException on Wasm and NullPointerException
+    elsewhere (KT-88829 Open is the generic-cast sibling, not this exact line). jvm-17 differs from jvm-21
+    in string-index, substring (message text) and removeFirst-empty (harness artefact: compiled on JDK
+    21, run on 17); no JDK release note for 18, 19, 20, 21 mentions the message change (searched). Android
+    prints ART texts (length=3; index=10).'
+- id: kotlin.exceptions.tostring-cause
+  classification: documented
+  basis: verified
+  causes: [a]
+  references:
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-exception/
+    quote: actual typealias Exception = java.lang.Exception
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-illegal-state-exception/
+    quote: actual typealias IllegalStateException = java.lang.IllegalStateException
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Throwable.html
+    quote: 'Returns a short description of this throwable. The result is the concatenation of: the name
+      of the class of this object'
+  issues:
+  - id: KT-78708
+    state: Fixed
+    resolved: '2025-10-03'
+    summary: 'Wasm: Throwable.toString uses simple class name'
+  columns:
+    2.4.20:
+    - [android, jvm, jvm-17, jvm-21, jvm-25]
+    - [ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    2.5.0-Beta1:
+    - [android, jvm]
+    - [ios, macos, wasm]
+  note: JVM and Android print java.lang.X because Exception, IllegalStateException and the others are
+    typealiases to the java.lang classes on JVM, and Throwable.toString prints the class name. Native
+    and Wasm print kotlin.X; KT-78708 (Fixed 2025-10-03) states the intent that toString includes the
+    fully qualified name.
+- id: kotlin.float.tostring
+  classification: unclassified
+  basis: verified
+  causes: [c]
+  references:
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Double.html
+    quote: This decimal is (almost always) the shortest one that rounds to m according to the round to
+      nearest rounding policy
+  issues:
+  - id: KT-88414
+    state: Fixed
+    resolved: '2026-08-30'
+    summary: '[Wasm] Make FP parse and toString alighed with JVM and Native targets'
+  searched: 'YouTrack: "Wasm Double toString". KT-88414 read in full (Fixed). Pages read in full: ECMAScript
+    Number::toString, JDK 21 Double.toString.'
+  repro: atlas/repros/kotlin.float.tostring.md
+  columns:
+    2.4.20:
+    - [android, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos]
+    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+  note: Wasm family only; 6 lines; equal on 2.5.0-Beta1.
+- id: kotlin.int.division-modulo
+  classification: documented
+  basis: verified
+  causes: [a]
+  references:
+  - url: https://kotlinlang.org/docs/numbers.html
+    quote: Division between integer values always returns an integer result.
+  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Probe notes:
+    Identical on every column measured and matches the independently computed values in the test. The
+    numbers page (read) says integer division discards the fractional part; mod and floorDiv are not covered
+    by a page read.'
+- id: kotlin.int.overflow
+  classification: documented
+  basis: verified
+  causes: [a]
+  references:
+  - url: https://kotlinlang.org/docs/numbers.html
+    quote: If the result of an operation falls outside that range, overflow occurs.
+  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Probe notes:
+    Identical on every column measured. The numbers page (read) documents wrap-around on overflow, including
+    negation of Int.MIN_VALUE. The Long.MIN_VALUE divided by -1 and shift-count lines have no page read.'
+- id: kotlin.int.radix
+  classification: documented
+  basis: verified
+  causes: [a]
+  references:
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/to-string.html
+    quote: Returns a string representation of this Byte value in the specified radix.
+  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Probe notes:
+    Identical on every column measured. The toString page (read) documents IllegalArgumentException for
+    an invalid radix. Parsing of Unicode digits, signs and spaces has no page read.'
+- id: kotlin.long.bit-ops
+  classification: documented
+  basis: inferred
+  causes: [a]
+  references:
+  - url: https://kotlinlang.org/docs/numbers.html
+    quote: Kotlin provides bitwise operations for Int and Long.
+  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. The quote
+    names the operations but does not state their results; inferred. Probe notes: Identical on every column
+    measured and matches the values computed independently in the test. The numbers page (read) documents
+    the bitwise operations.'
+- id: kotlin.math.pow-special-cases
+  classification: unclassified
+  basis: verified
+  causes: [a, c, d]
+  downgradedFrom: documented
+  references:
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.math/pow.html
+    quote: b.pow(NaN) is NaN
+  - url: https://developer.android.com/reference/java/lang/Math
+    quote: If the second argument is NaN, then the result is NaN except where the first argument is 1.0.
+  - url: https://developer.android.com/reference/java/lang/Math
+    quote: If the absolute value of the first argument equals 1 and the second argument is infinite, then
+      the result is 1.0.
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Math.html
+    quote: all implementations of the equivalent functions of class Math are not defined to return the
+      bit-for-bit same results
+  issues:
+  - id: KT-89072
+    state: Open
+    summary: 'Kotlin/Native: 1.0.pow(NaN) returns 1.0 instead of NaN from the contract'
+  - id: KT-88414
+    state: Fixed
+    resolved: '2026-08-30'
+    summary: '[Wasm] Make FP parse and toString alighed with JVM and Native targets'
+  searched: 'YouTrack: "pow NaN", "Math.pow Android". KT-89072 read in full (Open). Kotlin pow KDoc and
+    Android Math.pow page read in full. Native 1.0 for 1^NaN violates the KDoc; Android 1.0 is documented
+    by its own Math.pow page.'
+  repro: atlas/repros/kotlin.math.pow-special-cases.md
+  columns:
+    2.4.20:
+    - [android]
+    - [ios, linux, linux-arm64, macos]
+    - [jvm]
+    - [jvm-17, jvm-21, jvm-25]
+    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    2.5.0-Beta1:
+    - [android]
+    - [ios, macos]
+    - [jvm, wasm]
+  lines:
+  - line: 1^nan
+    cause: c
+    columns: native family 1.0, android 1.0, others NaN
+    issue: 'KT-89072 Open (Native); Android: Android Math.pow doc'
+  - line: 1^inf, -1^inf
+    cause: a
+    columns: android 1.0, others NaN
+    issue: Android Math.pow doc quoted
+  - line: 2^-1074
+    cause: c
+    columns: wasm family 5e-324
+    issue: KT-88414 Fixed
+  - line: 10^-5 bits
+    cause: d
+    columns: jvm (arm64), jvm-21-arm64, wasm family end f0; others f1
+    issue: JDK Math allows 1 ulp; jvm-21 x86 vs jvm-21-arm64 differ on the same JDK
+  note: 'Downgraded from documented: the Kotlin KDoc states b.pow(NaN) is NaN, so Native violates a documented
+    contract (open defect, not a documented difference). The Android column is also off the Kotlin contract,
+    but its own Math.pow page documents the 1.0 results (verified).'
+- id: kotlin.math.rounding
+  classification: unclassified
+  basis: verified
+  causes: [c]
+  downgradedFrom: documented
+  references:
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.math/round-to-int.html
+    quote: Rounds this Double value to the nearest integer and converts the result to Int
+  issues:
+  - id: KT-89074
+    state: Open
+    summary: 'Kotlin/Native and Kotlin/Wasm: roundToInt, roundToLong do not follow contract'
+  searched: 'YouTrack: "roundToInt Native". KT-89074 read in full (Open). Kotlin roundToInt KDoc read
+    in full: the inputs are not ties and the results violate "nearest integer".'
+  repro: atlas/repros/kotlin.math.rounding.md
+  columns:
+    2.4.20:
+    - [android, jvm, jvm-17, jvm-21, jvm-25]
+    - [ios, linux, linux-arm64, macos]
+    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    2.5.0-Beta1:
+    - [android, jvm]
+    - [ios, macos, wasm]
+  note: 'Downgraded from documented: the KDoc says "nearest integer" and the inputs are not ties, so Native
+    and Wasm results (1, 4503599627370498, 8388610) violate it. KT-89074 Open. Unchanged on 2.5.0-Beta1.'
+- id: kotlin.math.transcendental-bits
+  classification: platform-defined
+  basis: verified
+  causes: [b, d, f]
+  references:
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Math.html
+    quote: all implementations of the equivalent functions of class Math are not defined to return the
+      bit-for-bit same results
+  - url: https://developer.android.com/reference/java/lang/Math
+    quote: all implementations of the equivalent functions of class Math are not defined to return the
+      bit-for-bit same results
+  - url: https://tc39.es/ecma262/#sec-math.acos
+    quote: Return an implementation-approximated Number value representing the inverse cosine
+  columns:
+    2.4.20:
+    - [android]
+    - [ios, macos]
+    - [jvm]
+    - [jvm-17, jvm-21, jvm-25]
+    - [linux, linux-arm64]
+    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    2.5.0-Beta1:
+    - [android]
+    - [ios, macos]
+    - [jvm]
+    - [wasm]
+  note: Last-bit differences in tan, exp, log2, asin, acos, cosh, cbrt, expm1. The JDK and Android Math
+    pages allow 1 ulp and say Math is not defined to return bit-for-bit results; ECMAScript returns an
+    implementation-approximated value. That Native calls libm and Wasm calls the JS engine is NOT verified.
+    linux x86 and arm64 differ from macos on cbrt2 and cbrt27; mingw-wine differs on expm1-tiny.
+    Build host also matters (measured 2026-10-07), two linuxX64 executables from the same sources,
+    one cross-linked on macOS and one built on Ubuntu 24.04, printed different last bits for tan1,
+    asin-half and acos-half when run in the same debian and ubuntu containers; the macOS-linked one
+    matches the macos column on those lines. The mechanism, for example constant folding by the build host, was not
+    established.
+- id: kotlin.numbers.float-conversions
+  classification: unclassified
+  basis: verified
+  causes: [c, e]
+  downgradedFrom: documented
+  references:
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-u-long/to-double.html
+    quote: The resulting value is the closest Double to this ULong value.
+  - url: https://www.oracle.com/java/technologies/javase/19-relnote-issues.html
+    quote: One example is Double.toString(2e23), which now returns "2.0E23", whereas in earlier releases
+      it returns "1.9999999999999998E23"
+  issues:
+  - id: KT-88414
+    state: Fixed
+    resolved: '2026-08-30'
+    summary: '[Wasm] Make FP parse and toString alighed with JVM and Native targets'
+  searched: 'YouTrack: "ULong toDouble Native", "ULong.MAX_VALUE toDouble", "toDouble ULong", "ULong Double
+    conversion rounding", "unsigned toDouble", "ULong toDouble Native precision", "UInt toFloat rounding",
+    "ULong toFloat"; GitHub commit search in JetBrains/kotlin, three phrasings, 0 results. Kotlin ULong.toDouble
+    KDoc and JDK 19 release note read in full. No issue or commit explains the Native fix between 2.4.20
+    and 2.5.0-Beta1.'
+  repro: atlas/repros/kotlin.numbers.float-conversions.md
+  columns:
+    2.4.20:
+    - [android, jvm, jvm-21, jvm-25]
+    - [ios, linux, linux-arm64, macos]
+    - [jvm-17]
+    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+  lines:
+  - line: long-max-double, long-max-float, int-max-float, ulong-max-double (plain form)
+    cause: c
+    columns: wasm family
+    issue: KT-88414 Fixed
+  - line: ulong-max-double
+    cause: c
+    columns: native family 1.844674407370955E19
+    issue: no issue found; fixed on 2.5.0-Beta1 (measured)
+  - line: int-max-float
+    cause: e
+    columns: jvm-17
+    issue: JDK-4511638, release 19
+  note: 'Downgraded from documented: the ULong.toDouble KDoc says "closest Double", Native 2.4.20 printed
+    1.844674407370955E19 (not the closest double to 2^64-1) and prints 1.8446744073709552E19 on 2.5.0-Beta1;
+    no YouTrack issue and no GitHub commit found for that fix (queries listed). Wasm lines: KT-88414.
+    jvm-17 int-max-float 2.14748365E9 versus 2.1474836E9: JDK 19 note (Float.toString too).'
+- id: kotlin.numbers.type-checks
+  classification: unclassified
+  basis: inferred
+  causes: []
+  searched: 'Not searched: no column differs, so there is no divergence to explain.'
+  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Not researched:
+    nothing to explain.'
+- id: kotlin.random.seeded
+  classification: documented
+  basis: verified
+  causes: [a]
+  references:
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.random/-random.html
+    quote: Two generators with the same seed produce the same sequence of values within the same version
+      of Kotlin runtime.
+  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Probe notes:
+    Identical on every column measured. The Random(seed) KDoc (read) promises the same sequence only within
+    the same version of the Kotlin runtime and allows later versions to change it, so the Kotlin version
+    is recorded with every capture.'
+- id: kotlin.regex.anchors-lines
+  classification: unclassified
+  basis: inferred
+  causes: []
+  searched: 'Not searched: no column differs, so there is no divergence to explain.'
+  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Not researched:
+    nothing to explain.'
+- id: kotlin.regex.groups-replace
+  classification: documented
+  basis: verified
+  causes: [a]
+  references:
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/replace.html
+    quote: Occurrences of ${name} or $index in the replacement string will be substituted
+  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Probe notes:
+    Identical on every column measured. The replace page (read) documents dollar-index and dollar-brace-name
+    group references in the replacement; the other lines have no page read.'
+- id: kotlin.regex.syntax-support
+  classification: documented
+  basis: verified
+  causes: [a]
+  references:
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/
+    quote: Note that the pattern syntax and the option set has differences on each platform.
+  - url: https://developer.android.com/reference/java/util/regex/Pattern
+    quote: Starting from Android 2.3 Gingerbread, ICU4C becomes the backend of the regular expression
+      implementation.
+  issues:
+  - id: KT-49557
+    state: Open
+    summary: Different dialects of regular expressions in JS and other platforms
+  - id: KT-71003
+    state: Submitted
+    summary: 'K/Wasm and K/N: Regex does not fully support unicode properties syntax'
+  columns:
+    2.4.20:
+    - [android]
+    - [ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [jvm, jvm-17, jvm-21, jvm-25]
+    2.5.0-Beta1:
+    - [android]
+    - [ios, macos, wasm]
+    - [jvm]
+  note: The Regex KDoc says the pattern syntax differs on each platform; the Android Pattern page says
+    ICU4C is the backend and names the literal right brace as an example. The seven differing lines are
+    not each named in a doc; the classification rests on the general statement.
+- id: kotlin.regex.unicode-matching
+  classification: unclassified
+  basis: inferred
+  causes: [a, e, g]
+  references:
+  - url: https://developer.android.com/reference/java/util/regex/Pattern
+    quote: This flag is not supported on Android, and Unicode character classes are always used.
+  - url: https://www.oracle.com/java/technologies/javase/19-relnote-issues.html
+    quote: The \b metacharacter now matches ASCII word characters by default in the same way that the
+      \w metacharacter does.
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/
+    quote: Note that the pattern syntax and the option set has differences on each platform.
+  issues:
+  - id: KT-51859
+    state: Open
+    summary: 'Kotlin/Native: Regex does not support turning off UNICODE_CASE'
+  - id: KT-58195
+    state: Open
+    summary: 'Native: Use the same unicode version for regex canonicalization'
+  - id: KT-53212
+    state: As Designed
+    resolved: '2022-08-02'
+    summary: Kotlin Regex IGNORE_CASE giving incorrect results for lowercase Turkish "i" and dotless i
+  - id: KT-58678
+    state: Open
+    summary: Native Regex inconsistency with JVM / Native Regex
+  searched: 'YouTrack: "Regex Native Unicode", "Regex IGNORE_CASE Native Unicode case folding", "Regex
+    case insensitive sigma", "Regex IGNORE_CASE", "Regex case-insensitive Unicode", "Regex Android". Pages
+    read in full: Kotlin Regex and RegexOption, Android Pattern, JDK 19 release note. Native and Wasm
+    results for ic-final-sigma, ic-dotless-i and ic-deseret are not explained by any of them.'
+  repro: atlas/repros/kotlin.regex.unicode-matching.md
+  columns:
+    2.4.20:
+    - [android]
+    - [ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [jvm, jvm-21, jvm-25]
+    - [jvm-17]
+    2.5.0-Beta1:
+    - [android]
+    - [ios, macos, wasm]
+    - [jvm]
+  lines:
+  - line: digit-arabic, digit-fullwidth, word-accent, word-greek, space-nbsp, space-em, space-nel, ic-sharp-s
+    cause: a
+    columns: android true, others false
+  - line: boundary-accent
+    cause: e
+    columns: jvm-21, jvm-25, jvm true; jvm-17, native, wasm, android false
+  - line: ic-final-sigma, ic-deseret
+    cause: g
+    columns: native family and wasm family false; jvm family and android true
+  - line: ic-dotless-i
+    cause: g
+    columns: native, wasm and android false; jvm family true
+  - line: ic-dotted-i
+    cause: g
+    columns: android false; all others true
+  note: 'Three groups of lines. Android: Unicode classes always on (documented). jvm-17 versus jvm-21
+    and jvm-25 on boundary-accent: JDK 19 note on \b (consistent with the note; Native, Wasm and Android
+    match JDK 17). Native and Wasm versus JVM on ic-final-sigma, ic-dotless-i, ic-deseret: unexplained.
+    KT-51859 says UNICODE_CASE is always on in Native, which does not predict these three lines.'
+- id: kotlin.string.compare-order
+  classification: documented
+  basis: verified
+  causes: [a]
+  references:
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/compare-to.html
+    quote: Returns zero if this object is equal to the specified other object, a negative number if it's
+      less than other
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/compare-to.html
+    quote: If ignoreCase is true, the result of Char.uppercaseChar().lowercaseChar() on each character
+      is compared.
+  columns:
+    2.4.20:
+    - [android, jvm, jvm-17, jvm-21, jvm-25]
+    - [ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    2.5.0-Beta1:
+    - [android, jvm]
+    - [ios, macos, wasm]
+  note: Magnitude only (108, -6 on JVM family and Android; 1, -1 elsewhere); the sign is identical. The
+    KDoc promises only the sign class.
+- id: kotlin.string.hashcode
+  classification: unclassified
+  basis: inferred
+  causes: []
+  issues:
+  - id: KT-44746
+    state: Fixed
+    resolved: '2021-02-09'
+    summary: Different hashCode() results for Kotlin/Native stdlib
+  - id: KT-61028
+    state: Fixed
+    resolved: '2023-08-07'
+    summary: Behavioural changes to the Native stdlib API
+  searched: 'Not searched: no column differs at 2.4.20, so there is no divergence to explain. The ladder
+    (fixtures/atlas-ladder) shows changes on older Kotlin versions; KT-44746 and KT-61028 were read for
+    that.'
+  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Changed across
+    older versions (ladder): KT-44746 Fixed (Available in 1.5.0-M1), KT-61028 Fixed (Available in 1.9.20).
+    Not researched further.'
+- id: kotlin.string.padding
+  classification: documented
+  basis: verified
+  causes: [a]
+  references:
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/pad-start.html
+    quote: Returns a char sequence with content of this char sequence padded at the beginning to the specified
+      length
+  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Probe notes:
+    Identical on every column measured. padStart is documented to return a string of at least the requested
+    length (read). The negative length and repeat error messages are identical here.'
+- id: kotlin.string.split-replace-lines
+  classification: unclassified
+  basis: verified
+  causes: [g]
+  downgradedFrom: documented
+  references:
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html#indexOf(java.lang.String,int)
+    quote: k >= Math.min(fromIndex, this.length()) && this.startsWith(str, k)
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html#indexOf(java.lang.String,int)
+    quote: it returns -1 when fromIndex is larger than the length of the string
+  issues:
+  - id: KT-63088
+    state: Answered
+    resolved: '2023-11-02'
+    summary: indexOf doesn't return -1 when searching for an empty string with startIndex > str.length
+  - id: KT-50777
+    state: Open
+    summary: String.lastIndexOf("") doesn't return length
+  searched: 'YouTrack: "indexOf empty string startIndex Wasm", "indexOf empty string startIndex greater
+    than length", "indexOf startIndex Wasm", "indexOf empty string", "Wasm String.indexOf". Pages read
+    in full: Kotlin indexOf KDoc, JDK 21 String.indexOf. KT-63088 and KT-50777 read in full: they point
+    to the JVM behavior and do not cover Wasm.'
+  repro: atlas/repros/kotlin.string.split-replace-lines.md
+  columns:
+    2.4.20:
+    - [android, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos]
+    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    2.5.0-Beta1:
+    - [android, ios, jvm, macos]
+    - [wasm]
+  note: 'Downgraded from documented: the cited doc covers lines(), the divergent line is indexOf("", 10)
+    on a 3-char string (3 on every column except the Wasm family: -1). The Kotlin indexOf KDoc gives no
+    rule for startIndex past the end. JDK 21 gives the formula that yields 3 and an API note that says
+    -1 for fromIndex past the end; KT-63088 (Answered) points to the JDK behavior. Unchanged on 2.5.0-Beta1.'
+- id: kotlin.string.supplementary
+  classification: documented
+  basis: verified
+  causes: [a]
+  references:
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/compare-to.html
+    quote: Returns zero if this object is equal to the specified other object, a negative number if it's
+      less than other
+  columns:
+    2.4.20:
+    - [android, jvm, jvm-17, jvm-21, jvm-25]
+    - [ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    2.5.0-Beta1:
+    - [android, jvm]
+    - [ios, macos, wasm]
+  note: Magnitude only (-10178, -1987 versus -1); same quote as compare-order.
+- id: kotlin.time.duration-format
+  classification: documented
+  basis: verified
+  causes: [a]
+  references:
+  - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/-duration/
+    quote: Returns a string representation of this duration value expressed as a combination of numeric
+      components, each in its own unit.
+  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Probe notes:
+    Identical on every column measured, including decimals and rounding in toString(unit, decimals). The
+    Duration KDoc (read) describes the component form and the unit and decimals form.'

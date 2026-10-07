@@ -1,0 +1,311 @@
+name: Record Atlas
+
+on:
+  workflow_dispatch:
+
+jobs:
+  record:
+    name: Record Transcripts (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-x64
+            target: linux
+            os: ubuntu-24.04
+            link: linkReleaseExecutableLinuxX64
+            exe: cli/build/bin/linuxX64/releaseExecutable/drift.kexe
+          - name: macos-arm64
+            target: macos
+            os: macos-15
+            link: linkReleaseExecutableMacosArm64
+            exe: cli/build/bin/macosArm64/releaseExecutable/drift.kexe
+          - name: windows-x64
+            target: mingw
+            os: windows-2025
+            link: linkReleaseExecutableMingwX64
+            exe: cli/build/bin/mingwX64/releaseExecutable/drift.exe
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Cache Kotlin/Native
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.konan/caches
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-prebuilt-*
+          key: konan-${{ matrix.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
+      - name: Build Executable
+        run: ./gradlew :cli:${{ matrix.link }}
+      - name: Record Transcripts
+        run: ${{ matrix.exe }} atlas record --out transcripts --target ${{ matrix.target }}
+      - name: Archive Transcripts
+        uses: actions/upload-artifact@v7
+        with:
+          name: atlas-${{ matrix.target }}
+          path: transcripts/${{ matrix.target }}.txt
+          if-no-files-found: error
+      - name: Stop Gradle
+        run: ./gradlew --stop
+
+  link-arm64:
+    name: Link Executable (linux-arm64)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Cache Kotlin/Native
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.konan/caches
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-prebuilt-*
+          key: konan-ubuntu-24.04-${{ hashFiles('gradle/libs.versions.toml') }}
+      - name: Build Executable
+        run: ./gradlew :cli:linkReleaseExecutableLinuxArm64
+      - name: Archive Executable
+        uses: actions/upload-artifact@v7
+        with:
+          name: drift-linux-arm64
+          path: cli/build/bin/linuxArm64/releaseExecutable/drift.kexe
+          if-no-files-found: error
+      - name: Stop Gradle
+        run: ./gradlew --stop
+
+  record-arm64:
+    name: Record Transcripts (linux-arm64)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    needs: link-arm64
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Download Executable
+        uses: actions/download-artifact@v8
+        with:
+          name: drift-linux-arm64
+          path: bin
+      - name: Record Transcripts
+        run: |
+          chmod +x bin/drift.kexe
+          bin/drift.kexe atlas record --out transcripts --target linux-arm64
+      - name: Archive Transcripts
+        uses: actions/upload-artifact@v7
+        with:
+          name: atlas-linux-arm64
+          path: transcripts/linux-arm64.txt
+          if-no-files-found: error
+
+  link-jvm:
+    name: Build JVM Classes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Build Classes for JDK 17
+        run: ./gradlew atlasRuntime -Pdrift.jvmTarget=17
+      - name: Archive Classes
+        uses: actions/upload-artifact@v7
+        with:
+          name: drift-jvm-classes
+          path: build/atlas-runtime
+          if-no-files-found: error
+      - name: Stop Gradle
+        run: ./gradlew --stop
+
+  record-jvm:
+    name: Record Transcripts (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    needs: link-jvm
+
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: jvm-17
+            os: ubuntu-24.04
+            java: '17'
+          - target: jvm-21
+            os: ubuntu-24.04
+            java: '21'
+          - target: jvm-25
+            os: ubuntu-24.04
+            java: '25'
+          - target: jvm
+            os: macos-15
+            java: '21'
+          - target: jvm-windows
+            os: windows-2025
+            java: '21'
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java }}
+      - name: Download Classes
+        uses: actions/download-artifact@v8
+        with:
+          name: drift-jvm-classes
+          path: classes
+      - name: Record Transcripts
+        run: >
+          java -cp "classes/*" dev.gmitch215.drift.cli.MainKt
+          atlas record --out transcripts --target ${{ matrix.target }}
+      - name: Archive Transcripts
+        uses: actions/upload-artifact@v7
+        with:
+          name: atlas-${{ matrix.target }}
+          path: transcripts/${{ matrix.target }}.txt
+          if-no-files-found: error
+
+  record-browsers:
+    name: Record Transcripts (browsers)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24.20.0'
+          cache: 'npm'
+          cache-dependency-path: tools/browsers/package-lock.json
+      - name: Build Studio Web
+        run: ./gradlew :studio:wasmJsBrowserDistribution
+      - name: Install Playwright Browsers
+        working-directory: tools/browsers
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium firefox webkit
+      - name: Record Transcripts
+        working-directory: tools/browsers
+        run: >
+          xvfb-run -a node run.mjs --headed
+          --dist ../../studio/build/dist/wasmJs/productionExecutable
+          --out ../../build/browsers
+          --reference ../../fixtures/atlas/wasm.txt
+      - name: Archive Transcripts
+        uses: actions/upload-artifact@v7
+        with:
+          name: atlas-browsers
+          path: build/browsers/wasm-*.txt
+          if-no-files-found: error
+      - name: Stop Gradle
+        run: ./gradlew --stop
+
+  site:
+    name: Build Atlas Site
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    needs: [record, record-arm64, record-jvm, record-browsers]
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Download Transcripts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: atlas-*
+          path: transcripts
+          merge-multiple: true
+      - name: Replace Recorded Columns
+        run: cp transcripts/*.txt fixtures/atlas/
+      - name: Build Site
+        run: ./gradlew atlasSite
+      - name: Check Site
+        run: |
+          test -f build/atlas-site/index.html
+          test -f build/atlas-site/data/dataset.json
+          test -f build/atlas-site/probe/index.html
+      - name: Matrix to Job Summary
+        run: |
+          ./gradlew atlasRuntime
+          {
+            echo '```'
+            java -cp "build/atlas-runtime/*" dev.gmitch215.drift.cli.MainKt atlas show build/atlas-work/dataset.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Pack Fixtures
+        run: tar -czf atlas-fixtures.tar.gz -C fixtures atlas
+      - name: Archive Site
+        uses: actions/upload-artifact@v7
+        with:
+          name: atlas-site
+          path: build/atlas-site
+          if-no-files-found: error
+      - name: Archive Fixtures
+        uses: actions/upload-artifact@v7
+        with:
+          name: atlas-fixtures
+          path: atlas-fixtures.tar.gz
+          if-no-files-found: error
+      - name: Stop Gradle
+        run: ./gradlew --stop

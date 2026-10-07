@@ -1,0 +1,65 @@
+schema: 1
+columns:
+  - target: jvm
+    how: >-
+      The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas
+      record.
+  - target: jvm-17
+    how: >-
+      The CLI JVM classes (jvmTarget 17) on Temurin 17.0.20.1, x86-64 Linux container, recorded with
+      --target jvm-17.
+  - target: jvm-21
+    how: >-
+      The same classes on Temurin 21.0.12.1, x86-64 Linux container. Differs from the jvm column in
+      hardware only.
+  - target: jvm-25
+    how: The same classes on Temurin 25.0.4.1, x86-64 Linux container.
+  - target: linux
+    how: >-
+      The Kotlin/Native linuxX64 release executable, cross-linked on macOS, run in a
+      debian:bookworm-slim container (glibc 2.36), x86-64. The same executable on ubuntu:24.04
+      (glibc 2.39) recorded identical results, kept in fixtures/atlas-extra. A release executable
+      linked on macOS prints Apple libm values for three math constants (tan1, asin-half and
+      acos-half); one linked on Ubuntu, or a debug build, prints glibc values. The Ubuntu-linked
+      transcript is in fixtures/atlas-variants.
+  - target: linux-arm64
+    how: >-
+      The Kotlin/Native linuxArm64 release executable, cross-linked on macOS and run in an arm64
+      debian:bookworm-slim container. The Ubuntu-linked transcript, which differs on the same three
+      math lines, is in fixtures/atlas-variants.
+  - target: macos
+    how: >-
+      The Kotlin/Native macosArm64 executable on macOS, Apple Silicon (arm64). Recorded with drift
+      atlas record.
+  - target: wasm
+    how: >-
+      Kotlin/Wasm (wasmJs) on Node 26.8.2, macOS, Apple Silicon. Recorded through the wasm test
+      harness because the wasm CLI has no file writer.
+  - target: wasm-chromium
+    how: >-
+      The Studio web build in Chromium 153.0.8010.12 (V8), driven by Playwright 1.63.0 on x86-64
+      Linux in a container.
+  - target: wasm-firefox
+    how: >-
+      The Studio web build in Firefox 155.0 (SpiderMonkey), driven by Playwright 1.63.0 on x86-64
+      Linux in a container.
+  - target: wasm-webkit
+    how: >-
+      The Studio web build in WebKit 26.6 (JavaScriptCore, the Playwright build for Linux), driven by
+      Playwright 1.63.0 on x86-64 Linux in a container. Not Safari.
+  - target: android
+    how: >-
+      The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with
+      an intent that writes the transcript.
+  - target: ios
+    how: >-
+      The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an
+      environment variable that writes the transcript.
+  - target: mingw
+    how: >-
+      The Kotlin/Native mingwX64 release executable on a GitHub-hosted Windows runner. Recorded by
+      the atlas workflow; not in the committed fixtures yet.
+  - target: jvm-windows
+    how: >-
+      The CLI JVM classes on Temurin 21 on a GitHub-hosted Windows runner. Recorded by the atlas
+      workflow; not in the committed fixtures yet.
