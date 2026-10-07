@@ -226,7 +226,7 @@ jobs:
       - name: Install Graphics Libraries
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgl1 libfontconfig1 libfreetype6
+          sudo apt-get install -y libgl1 libegl1 libfontconfig1 libfreetype6
       - name: Run JVM Tests
         run: ./gradlew jvmTest
       - name: Run Native Tests
