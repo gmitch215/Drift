@@ -1,0 +1,54 @@
+schema: 1
+id: do-sqlite-record-size
+title: Durable Object SQLite caps a record near 2 MB
+applies:
+  - runtime
+  - limits
+difference: the failing side is a deployed Durable Object with SQLite storage
+symptoms:
+  - text: a single value or row larger than the cap fails to write
+    basis: verified
+mechanism: >-
+  A record, counting its key and integer columns, is capped at 2,199,995 bytes as measured while the
+  vendor limits page states 2 MB.
+detect:
+  all:
+    - a: runtime.platform
+      ne: cloudflare-deployed
+    - b: runtime.platform
+      eq: cloudflare-deployed
+severity: medium
+provenance:
+  - url: https://developers.cloudflare.com/durable-objects/platform/limits/
+    kind: vendor-doc
+    verified: '2026-10-06'
+    section: 'SQL storage limits: Maximum string, BLOB or table row size is 2 MB'
+  - url: https://github.com/drupflare/worker/blob/master/TECHNICAL_REPORT.md
+    kind: measurement
+    verified: '2026-10-06'
+    section: 'Platform limits table: bytes per record 2,199,995 (measured)'
+fixtures:
+  positive:
+    - name: a local or VPS baseline to a deployed Durable Object
+      a:
+        attrs:
+          runtime.platform: linux-native
+      b:
+        attrs:
+          runtime.platform: cloudflare-deployed
+  negative:
+    - name: both deployed
+      a:
+        attrs:
+          runtime.platform: cloudflare-deployed
+      b:
+        attrs:
+          runtime.platform: cloudflare-deployed
+    - name: failing side is not deployed
+      a:
+        attrs:
+          runtime.platform: cloudflare-deployed
+      b:
+        attrs:
+          runtime.platform: linux-native
+status: active

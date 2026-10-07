@@ -1,0 +1,73 @@
+schema: 1
+id: jdk-18-utf8-default-charset
+title: Default charset is UTF-8 from JDK 18 and locale-dependent before
+applies:
+  - runtime
+  - locale
+difference: >-
+  the JDK is 18 or newer on the passing side and older on the failing side, and the failing side
+  runs in a POSIX C locale or on Windows
+symptoms:
+  - text: non-ASCII text read or written without an explicit charset is corrupted or replaced
+    basis: verified
+mechanism: >-
+  JDK 17 and earlier pick the default charset from the operating system and locale (a codepage on
+  Windows, ASCII in the POSIX C locale) while JDK 18 fixes it to UTF-8.
+probe: resources.locale-env
+detect:
+  all:
+    - a: tool.java.version
+      ver: '>=18'
+    - b: tool.java.version
+      ver: '<18'
+    - any:
+        - b: env.LC_ALL
+          in:
+            - C
+            - POSIX
+        - b: env.LANG
+          in:
+            - C
+            - POSIX
+        - b: os.name
+          starts: windows
+severity: medium
+provenance:
+  - url: https://openjdk.org/jeps/400
+    kind: spec
+    verified: '2026-10-06'
+    section: >-
+      Description: In JDK 17 and earlier, the default charset is determined when the Java runtime
+      starts
+fixtures:
+  positive:
+    - name: temurin 21 in a UTF-8 locale to temurin 8 in the C locale
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+          env.LANG: en_US.UTF-8
+      b:
+        attrs:
+          tool.java.version: '1.8.0_504'
+          env.LANG: C
+  negative:
+    - name: temurin 8 in a UTF-8 locale
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+          env.LANG: en_US.UTF-8
+      b:
+        attrs:
+          tool.java.version: '1.8.0_504'
+          env.LANG: en_US.UTF-8
+          os.name: linux
+    - name: both JDK 21 in the C locale
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+          env.LANG: C
+      b:
+        attrs:
+          tool.java.version: '25.0.4.1'
+          env.LANG: C
+status: active

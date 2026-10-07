@@ -1,0 +1,78 @@
+schema: 1
+id: git-safe-directory-ownership
+title: Git refuses repositories owned by another user
+applies:
+  - userland
+difference: >-
+  the failing side runs a Git release that includes the CVE-2022-24765 fix and the passing side runs
+  one without it
+symptoms:
+  - text: >-
+      git commands fail in a repository whose owner differs from the current user, typically a bind
+      mount or a checkout made by another user
+    basis: inferred
+mechanism: >-
+  Git releases carrying the CVE-2022-24765 fix refuse to parse the config of a repository owned by
+  someone else unless safe.directory lists it.
+detect:
+  all:
+    - b: tool.git.version
+      ver:
+        - '>=2.30.3,<2.31.0'
+        - '>=2.31.2,<2.32.0'
+        - '>=2.32.1,<2.33.0'
+        - '>=2.33.2,<2.34.0'
+        - '>=2.34.2,<2.35.0'
+        - '>=2.35.2'
+    - not:
+        a: tool.git.version
+        ver:
+          - '>=2.30.3,<2.31.0'
+          - '>=2.31.2,<2.32.0'
+          - '>=2.32.1,<2.33.0'
+          - '>=2.33.2,<2.34.0'
+          - '>=2.34.2,<2.35.0'
+          - '>=2.35.2'
+severity: medium
+provenance:
+  - url: https://github.com/git/git/blob/v2.35.2/Documentation/RelNotes/2.35.2.txt
+    kind: release-note
+    verified: '2026-10-06'
+    section: >-
+      merges the fixes from v2.30.3, v2.31.2, v2.32.1, v2.33.2 and v2.34.2 for CVE-2022-24765
+  - url: https://github.com/git/git/blob/master/Documentation/config/safe.adoc
+    kind: vendor-doc
+    verified: '2026-10-06'
+    section: safe.directory
+fixtures:
+  positive:
+    - name: git 2.30.2 to git 2.45.4
+      a:
+        attrs:
+          tool.git.version: '2.30.2'
+      b:
+        attrs:
+          tool.git.version: '2.45.4'
+    - name: git 2.34.1 to patched 2.34.2
+      a:
+        attrs:
+          tool.git.version: '2.34.1'
+      b:
+        attrs:
+          tool.git.version: '2.34.2'
+  negative:
+    - name: both sides patched
+      a:
+        attrs:
+          tool.git.version: '2.34.2'
+      b:
+        attrs:
+          tool.git.version: '2.45.4'
+    - name: 'unparsed git version is unknown, not a match'
+      a:
+        attrs:
+          tool.git.version: unparsed
+      b:
+        attrs:
+          tool.git.version: '2.45.4'
+status: active

@@ -1,0 +1,55 @@
+schema: 1
+id: gcc-14-configure-probe-fails
+title: GCC 14 makes configure probes fail and drops features silently
+applies:
+  - compiler
+  - build
+difference: >-
+  the C compiler is GCC 14 or newer on the failing side and older on the passing side, and the build
+  runs configure-style feature probes
+symptoms:
+  - text: a build succeeds but a feature or test is missing from the result
+    basis: verified
+  - text: config.log shows probe programs failing on the new errors
+    basis: verified
+mechanism: >-
+  Autoconf, CMake and Meson probes are written to fail on a compiler error, so the new GCC 14 errors
+  make a probe fail for an unrelated reason and the feature behind it is switched off.
+detect:
+  all:
+    - a: tool.cc.family
+      eq: gcc
+    - b: tool.cc.family
+      eq: gcc
+    - a: tool.cc.version
+      ver: '<14'
+    - b: tool.cc.version
+      ver: '>=14'
+severity: medium
+provenance:
+  - url: https://gcc.gnu.org/gcc-14/porting_to.html
+    kind: vendor-doc
+    verified: '2026-10-06'
+    section: Impact on Autoconf and build environment probing in general
+fixtures:
+  positive:
+    - name: gcc 13.2.1 to 14.2.0
+      a:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '13.2.1'
+      b:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '14.2.0'
+  negative:
+    - name: gcc 14.2.0 to 14.2.0
+      a:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '14.2.0'
+      b:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '14.2.0'
+status: active

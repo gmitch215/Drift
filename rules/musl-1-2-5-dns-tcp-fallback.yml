@@ -1,0 +1,56 @@
+schema: 1
+id: musl-1-2-5-dns-tcp-fallback
+title: musl before 1.2.5 mishandles large DNS answers
+applies:
+  - os
+  - network
+difference: >-
+  the C library is musl older than 1.2.5 on the failing side and 1.2.5 or newer on the passing side
+symptoms:
+  - text: >-
+      a name with a large DNS record set fails to resolve inside an Alpine container but resolves
+      elsewhere
+    basis: inferred
+mechanism: >-
+  musl added TCP fallback for large DNS record lookups in 1.2.4 and fixed long answers being wrongly
+  rejected in 1.2.5, so earlier releases cannot use an answer that does not fit in one UDP response.
+detect:
+  all:
+    - a: tool.libc.family
+      eq: musl
+    - b: tool.libc.family
+      eq: musl
+    - a: tool.libc.version
+      ver: '>=1.2.5'
+    - b: tool.libc.version
+      ver: '<1.2.5'
+severity: medium
+provenance:
+  - url: https://git.musl-libc.org/cgit/musl/tree/WHATSNEW
+    kind: release-note
+    verified: '2026-10-06'
+    section: >-
+      1.2.4 release notes: large dns record lookups via tcp fallback; 1.2.5 bugs fixed: some long
+      DNS answers were wrongly rejected despite new TCP support
+fixtures:
+  positive:
+    - name: musl 1.2.5 to musl 1.2.3
+      a:
+        attrs:
+          tool.libc.family: musl
+          tool.libc.version: '1.2.5'
+      b:
+        attrs:
+          tool.libc.family: musl
+          tool.libc.version: '1.2.3'
+  negative:
+    - name: glibc on the failing side
+      a:
+        attrs:
+          tool.libc.family: musl
+          tool.libc.version: '1.2.5'
+      b:
+        attrs:
+          tool.libc.family: glibc
+          tool.libc.version: '2.31'
+status: active

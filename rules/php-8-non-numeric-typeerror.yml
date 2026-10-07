@@ -1,0 +1,42 @@
+schema: 1
+id: php-8-non-numeric-typeerror
+title: PHP 8 throws TypeError for arithmetic on non-numeric strings
+applies:
+  - runtime
+difference: the PHP version is 8.0 or newer on the failing side and 7.x on the passing side
+symptoms:
+  - text: Unsupported operand types or TypeError where PHP 7 printed a non-numeric value warning
+    basis: verified
+mechanism: >-
+  PHP 8 raises a TypeError for arithmetic and bitwise operations on strings that PHP 7 only warned
+  about, and warns where PHP 7 raised a notice.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '<8.0.0'
+    - b: tool.php.version
+      ver: '>=8.0.0'
+severity: high
+provenance:
+  - url: https://github.com/php/doc-en/blob/master/appendices/migration80/incompatible.xml
+    kind: vendor-doc
+    verified: '2026-10-06'
+    section: 'Other incompatible Changes: numeric string handling'
+fixtures:
+  positive:
+    - name: php 7.4.33 to php 8.4.26
+      a:
+        attrs:
+          tool.php.version: '7.4.33'
+      b:
+        attrs:
+          tool.php.version: '8.4.26'
+  negative:
+    - name: php 8.4.26 to php 7.4.33 (reverse direction)
+      a:
+        attrs:
+          tool.php.version: '8.4.26'
+      b:
+        attrs:
+          tool.php.version: '7.4.33'
+status: active

@@ -1,0 +1,56 @@
+schema: 1
+id: ubuntu-latest-moves-to-26-04
+title: The ubuntu-latest label moves from Ubuntu 24.04 to 26.04 in November 2026
+applies:
+  - os
+  - build
+difference: >-
+  the passing run used a runner on Ubuntu 24.04 and the failing run used one on Ubuntu 26.04 under
+  the same ubuntu-latest label
+symptoms:
+  - text: >-
+      a workflow with no change fails after the label repoint because the OS, kernel and installed
+      toolset are different
+    basis: inferred
+mechanism: >-
+  GitHub repoints the ubuntu-latest label to the Ubuntu 26.04 image, replacing the OS release and
+  the preinstalled tool versions under an unchanged workflow file.
+detect:
+  all:
+    - a: ci.runner.label
+      eq: ubuntu-latest
+    - b: ci.runner.label
+      eq: ubuntu-latest
+    - a: os.release.VERSION_ID
+      eq: '24.04'
+    - b: os.release.VERSION_ID
+      eq: '26.04'
+severity: high
+provenance:
+  - url: https://github.com/actions/runner-images/releases/tag/ubuntu24/20260927.320
+    kind: release-note
+    verified: '2026-10-06'
+    section: >-
+      Announcements: ubuntu-latest label will use Ubuntu 26.04 in November 2026 (issue 14748)
+fixtures:
+  positive:
+    - name: ubuntu-latest on 24.04 then 26.04
+      a:
+        attrs:
+          ci.runner.label: ubuntu-latest
+          os.release.VERSION_ID: '24.04'
+      b:
+        attrs:
+          ci.runner.label: ubuntu-latest
+          os.release.VERSION_ID: '26.04'
+  negative:
+    - name: pinned ubuntu-24.04 label
+      a:
+        attrs:
+          ci.runner.label: ubuntu-24.04
+          os.release.VERSION_ID: '24.04'
+      b:
+        attrs:
+          ci.runner.label: ubuntu-24.04
+          os.release.VERSION_ID: '24.04'
+status: active

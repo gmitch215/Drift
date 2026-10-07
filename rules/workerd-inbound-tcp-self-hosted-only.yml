@@ -1,0 +1,52 @@
+schema: 1
+id: workerd-inbound-tcp-self-hosted-only
+title: "Inbound TCP exists in a self-hosted workerd and not on Cloudflare's deployed network"
+applies:
+  - runtime
+  - network
+difference: >-
+  the passing side is a self-hosted workerd with a tcp socket configured and the failing side is a
+  deployed Worker
+symptoms:
+  - text: >-
+      a service that accepts raw inbound TCP works against a private workerd and cannot be reached
+      when deployed
+    basis: inferred
+mechanism: >-
+  workerd's configuration schema has a tcp socket kind that a private deployment can expose, while
+  Cloudflare's deployed network offers no inbound TCP to a Worker.
+detect:
+  all:
+    - a: runtime.platform
+      eq: workerd-self-hosted
+    - b: runtime.platform
+      eq: cloudflare-deployed
+severity: medium
+provenance:
+  - url: https://github.com/cloudflare/workerd/blob/main/src/workerd/server/workerd.capnp
+    kind: spec
+    verified: '2026-10-06'
+    section: 'struct Socket: union with http, https and tcp'
+  - url: fixture:memory/drupflare-bastion/workerd-inbound-tcp-udp
+    kind: measurement
+    verified: '2026-10-06'
+    section: >-
+      deployed network has no inbound TCP; recorded 2026-09-26, deployed half not re-verified here
+fixtures:
+  positive:
+    - name: self-hosted workerd to deployed Worker
+      a:
+        attrs:
+          runtime.platform: workerd-self-hosted
+      b:
+        attrs:
+          runtime.platform: cloudflare-deployed
+  negative:
+    - name: deployed to self-hosted
+      a:
+        attrs:
+          runtime.platform: cloudflare-deployed
+      b:
+        attrs:
+          runtime.platform: workerd-self-hosted
+status: active

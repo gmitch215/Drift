@@ -1,0 +1,43 @@
+schema: 1
+id: busybox-vs-gnu-coreutils
+title: BusyBox applets reject GNU long options
+applies:
+  - userland
+difference: the passing side has GNU coreutils and the failing side has BusyBox applets
+symptoms:
+  - text: 'ls: unrecognized option: version'
+    basis: verified
+mechanism: >-
+  BusyBox applets implement a subset of GNU options, so a script that passes GNU long options such
+  as --version works on GNU coreutils and exits 1 on BusyBox.
+detect:
+  all:
+    - a: tool.coreutils.flavor
+      eq: gnu
+    - b: tool.coreutils.flavor
+      eq: busybox
+severity: medium
+provenance:
+  - url: fixture:transcripts/coreutils/alpine-3.20.txt
+    kind: measurement
+    verified: '2026-10-06'
+    section: "ls --version on BusyBox v1.36.1 exits 1 with 'ls: unrecognized option: version'"
+fixtures:
+  positive:
+    - name: debian bookworm coreutils 9.1 to alpine 3.20 BusyBox
+      a:
+        attrs:
+          tool.coreutils.flavor: gnu
+          tool.coreutils.version: '9.1'
+      b:
+        attrs:
+          tool.coreutils.flavor: busybox
+  negative:
+    - name: both BusyBox
+      a:
+        attrs:
+          tool.coreutils.flavor: busybox
+      b:
+        attrs:
+          tool.coreutils.flavor: busybox
+status: active

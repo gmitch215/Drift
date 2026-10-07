@@ -1,0 +1,54 @@
+schema: 1
+id: do-sqlite-refused-sql
+title: 'Durable Object SQLite refuses transaction SQL, temporary tables and user functions'
+applies:
+  - runtime
+  - limits
+difference: the failing side is a deployed Durable Object with SQLite storage
+symptoms:
+  - text: >-
+      BEGIN or SAVEPOINT as SQL fails, CREATE TEMPORARY TABLE returns SQLITE_AUTH, REGEXP and
+      user-defined functions do not exist
+    basis: verified
+mechanism: >-
+  The runtime authorizes only a subset of SQLite statements and functions and routes transactions
+  through transactionSync.
+detect:
+  all:
+    - a: runtime.platform
+      ne: cloudflare-deployed
+    - b: runtime.platform
+      eq: cloudflare-deployed
+severity: high
+provenance:
+  - url: https://github.com/drupflare/rom/blob/master/README.md
+    kind: measurement
+    verified: '2026-10-06'
+    section: >-
+      Platform Limits: no UDFs, no collations, no REGEXP, TEMPORARY TABLE refused, BEGIN as SQL
+      refused
+fixtures:
+  positive:
+    - name: a local or VPS baseline to a deployed Durable Object
+      a:
+        attrs:
+          runtime.platform: linux-native
+      b:
+        attrs:
+          runtime.platform: cloudflare-deployed
+  negative:
+    - name: both deployed
+      a:
+        attrs:
+          runtime.platform: cloudflare-deployed
+      b:
+        attrs:
+          runtime.platform: cloudflare-deployed
+    - name: failing side is not deployed
+      a:
+        attrs:
+          runtime.platform: cloudflare-deployed
+      b:
+        attrs:
+          runtime.platform: linux-native
+status: active

@@ -1,0 +1,50 @@
+schema: 1
+id: do-sqlite-integer-read-2-53
+title: Durable Object SQLite reads integers above 2^53 as doubles
+applies:
+  - runtime
+  - limits
+difference: the failing side is a deployed Durable Object with SQLite storage
+symptoms:
+  - text: a 64-bit integer id written as 9007199254740993 reads back as 9007199254740992
+    basis: verified
+mechanism: >-
+  The storage API returns INTEGER columns as JavaScript doubles, so precision is lost on read
+  although the stored value is exact.
+detect:
+  all:
+    - a: runtime.platform
+      ne: cloudflare-deployed
+    - b: runtime.platform
+      eq: cloudflare-deployed
+severity: medium
+provenance:
+  - url: https://github.com/drupflare/rom/blob/master/README.md
+    kind: measurement
+    verified: '2026-10-06'
+    section: 'Platform Limits: Reading an integer above 2^53 is lossy; writing is exact'
+fixtures:
+  positive:
+    - name: a local or VPS baseline to a deployed Durable Object
+      a:
+        attrs:
+          runtime.platform: linux-native
+      b:
+        attrs:
+          runtime.platform: cloudflare-deployed
+  negative:
+    - name: both deployed
+      a:
+        attrs:
+          runtime.platform: cloudflare-deployed
+      b:
+        attrs:
+          runtime.platform: cloudflare-deployed
+    - name: failing side is not deployed
+      a:
+        attrs:
+          runtime.platform: cloudflare-deployed
+      b:
+        attrs:
+          runtime.platform: linux-native
+status: active

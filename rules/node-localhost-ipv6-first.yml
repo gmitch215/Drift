@@ -1,0 +1,61 @@
+schema: 1
+id: node-localhost-ipv6-first
+title: Node 17 to 18.17 connects to localhost over the first resolved address only
+applies:
+  - runtime
+  - network
+difference: >-
+  the Node version on the failing side is in 17.0.0 up to 18.18.0 and the passing side is older or
+  newer
+symptoms:
+  - text: >-
+      connecting to localhost fails with ECONNREFUSED when the server listens on 127.0.0.1 but
+      localhost resolves to ::1 first
+    basis: inferred
+mechanism: >-
+  Node 17 changed dns.lookup to return addresses in resolver order and family auto-selection (trying
+  every address) only became the default in Node 18.18 and 20, so a client uses the first address
+  alone in between.
+detect:
+  all:
+    - b: tool.node.version
+      ver: '>=17.0.0,<18.18.0'
+    - a: tool.node.version
+      ver:
+        - '<17.0.0'
+        - '>=18.18.0'
+severity: medium
+provenance:
+  - url: https://github.com/nodejs/node/blob/main/doc/api/dns.md
+    kind: vendor-doc
+    verified: '2026-10-06'
+    section: 'dns.lookup history: v17.0.0 The verbatim options defaults to true now'
+  - url: https://github.com/nodejs/node/blob/main/doc/api/net.md
+    kind: vendor-doc
+    verified: '2026-10-06'
+    section: 'socket.connect history: v20.0.0 and v18.18.0 autoSelectFamily defaults to true'
+fixtures:
+  positive:
+    - name: node 20.20.2 to node 18.12.1
+      a:
+        attrs:
+          tool.node.version: '20.20.2'
+      b:
+        attrs:
+          tool.node.version: '18.12.1'
+  negative:
+    - name: node 18.20.8 (past 18.18) to node 24.21.0
+      a:
+        attrs:
+          tool.node.version: '18.20.8'
+      b:
+        attrs:
+          tool.node.version: '24.21.0'
+    - name: passing side inside the window too
+      a:
+        attrs:
+          tool.node.version: '18.12.1'
+      b:
+        attrs:
+          tool.node.version: '18.12.1'
+status: active

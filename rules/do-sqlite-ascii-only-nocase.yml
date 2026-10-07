@@ -1,0 +1,50 @@
+schema: 1
+id: do-sqlite-ascii-only-nocase
+title: Durable Object SQLite folds case for ASCII only
+applies:
+  - runtime
+  - limits
+difference: the failing side is a deployed Durable Object with SQLite storage
+symptoms:
+  - text: a case-insensitive match of non-ASCII text such as Unicode against unicode fails
+    basis: verified
+mechanism: >-
+  The runtime has no user-defined collations, so the builtin NOCASE collation, which folds ASCII
+  only, replaces a Unicode-aware one.
+detect:
+  all:
+    - a: runtime.platform
+      ne: cloudflare-deployed
+    - b: runtime.platform
+      eq: cloudflare-deployed
+severity: medium
+provenance:
+  - url: https://github.com/drupflare/rom/blob/master/README.md
+    kind: measurement
+    verified: '2026-10-06'
+    section: 'Platform Limits: Case-insensitive matching is ASCII-only (measured)'
+fixtures:
+  positive:
+    - name: a local or VPS baseline to a deployed Durable Object
+      a:
+        attrs:
+          runtime.platform: linux-native
+      b:
+        attrs:
+          runtime.platform: cloudflare-deployed
+  negative:
+    - name: both deployed
+      a:
+        attrs:
+          runtime.platform: cloudflare-deployed
+      b:
+        attrs:
+          runtime.platform: cloudflare-deployed
+    - name: failing side is not deployed
+      a:
+        attrs:
+          runtime.platform: cloudflare-deployed
+      b:
+        attrs:
+          runtime.platform: linux-native
+status: active

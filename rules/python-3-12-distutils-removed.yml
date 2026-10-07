@@ -1,0 +1,45 @@
+schema: 1
+id: python-3-12-distutils-removed
+title: Python 3.12 removes distutils and stops installing setuptools in venvs
+applies:
+  - runtime
+  - build
+difference: the Python version is 3.12 or newer on the failing side and older on the passing side
+symptoms:
+  - text: 'ModuleNotFoundError for distutils, pkg_resources or setuptools at import or build time'
+    basis: inferred
+  - text: a freshly created venv has no setuptools
+    basis: verified
+mechanism: >-
+  Python 3.12 deletes the distutils package from the standard library and venv no longer
+  pre-installs setuptools, which still provides distutils when installed.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '<3.12'
+    - b: tool.python.version
+      ver: '>=3.12'
+severity: high
+provenance:
+  - url: https://docs.python.org/3.12/whatsnew/3.12.html
+    kind: release-note
+    verified: '2026-10-06'
+    section: 'PEP 632: Remove the distutils package; gh-95299'
+fixtures:
+  positive:
+    - name: python 3.9.25 to python 3.12.15
+      a:
+        attrs:
+          tool.python.version: '3.9.25'
+      b:
+        attrs:
+          tool.python.version: '3.12.15'
+  negative:
+    - name: python 3.12.15 to python 3.13.16
+      a:
+        attrs:
+          tool.python.version: '3.12.15'
+      b:
+        attrs:
+          tool.python.version: '3.13.16'
+status: active

@@ -1,0 +1,52 @@
+schema: 1
+id: do-sqlite-like-pattern-50-bytes
+title: Durable Object SQLite caps LIKE and GLOB patterns at 50 bytes
+applies:
+  - runtime
+  - limits
+difference: the failing side is a deployed Durable Object with SQLite storage
+symptoms:
+  - text: pattern too complex from a LIKE or GLOB longer than 50 bytes
+    basis: verified
+mechanism: "The runtime lowers SQLite's default LIKE and GLOB pattern length of 50,000 bytes to 50."
+detect:
+  all:
+    - a: runtime.platform
+      ne: cloudflare-deployed
+    - b: runtime.platform
+      eq: cloudflare-deployed
+severity: medium
+provenance:
+  - url: https://developers.cloudflare.com/durable-objects/platform/limits/
+    kind: vendor-doc
+    verified: '2026-10-06'
+    section: 'SQL storage limits: Maximum characters (bytes) in a LIKE or GLOB pattern is 50 bytes'
+  - url: https://github.com/drupflare/rom/blob/master/README.md
+    kind: measurement
+    verified: '2026-10-06'
+    section: 'Platform Limits: exactly 50 bytes (51 throws)'
+fixtures:
+  positive:
+    - name: a local or VPS baseline to a deployed Durable Object
+      a:
+        attrs:
+          runtime.platform: linux-native
+      b:
+        attrs:
+          runtime.platform: cloudflare-deployed
+  negative:
+    - name: both deployed
+      a:
+        attrs:
+          runtime.platform: cloudflare-deployed
+      b:
+        attrs:
+          runtime.platform: cloudflare-deployed
+    - name: failing side is not deployed
+      a:
+        attrs:
+          runtime.platform: cloudflare-deployed
+      b:
+        attrs:
+          runtime.platform: linux-native
+status: active

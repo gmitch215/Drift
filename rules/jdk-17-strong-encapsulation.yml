@@ -1,0 +1,44 @@
+schema: 1
+id: jdk-17-strong-encapsulation
+title: JDK 17 denies reflective access to JDK internals by default
+applies:
+  - runtime
+difference: the JDK is 17 or newer on the failing side and older on the passing side
+symptoms:
+  - text: >-
+      code or a library that reflects into JDK internals fails at run time where JDK 16 and earlier
+      allowed it
+    basis: inferred
+mechanism: >-
+  JDK 17 strongly encapsulates JDK internals and removes the single command-line option that relaxed
+  it in JDK 9 through 16.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<17'
+    - b: tool.java.version
+      ver: '>=17'
+severity: high
+provenance:
+  - url: https://openjdk.org/jeps/403
+    kind: spec
+    verified: '2026-10-06'
+    section: Summary
+fixtures:
+  positive:
+    - name: temurin 8 to temurin 21
+      a:
+        attrs:
+          tool.java.version: '1.8.0_504'
+      b:
+        attrs:
+          tool.java.version: '21.0.12.1'
+  negative:
+    - name: temurin 21 to temurin 25
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+      b:
+        attrs:
+          tool.java.version: '25.0.4.1'
+status: active

@@ -1,0 +1,52 @@
+schema: 1
+id: gcc-13-cxx-missing-headers
+title: GCC 13 libstdc++ stops including headers transitively
+applies:
+  - compiler
+difference: the C++ compiler is GCC 13 or newer on the failing side and older on the passing side
+symptoms:
+  - text: >-
+      C++ code using std::string, std::int32_t, std::printf or std::malloc without its own include
+      no longer compiles
+    basis: verified
+mechanism: >-
+  Several libstdc++ headers (string, system_error, cstdint, cstdio, cstdlib) are no longer pulled in
+  by other standard headers, so code that relied on the indirect include fails.
+detect:
+  all:
+    - a: tool.cc.family
+      eq: gcc
+    - b: tool.cc.family
+      eq: gcc
+    - a: tool.cc.version
+      ver: '<13'
+    - b: tool.cc.version
+      ver: '>=13'
+severity: high
+provenance:
+  - url: https://gcc.gnu.org/gcc-13/porting_to.html
+    kind: vendor-doc
+    verified: '2026-10-06'
+    section: 'C++ language issues: Header dependency changes'
+fixtures:
+  positive:
+    - name: alpine 3.18 gcc 12.2.1 to alpine 3.20 gcc 13.2.1
+      a:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '12.2.1'
+      b:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '13.2.1'
+  negative:
+    - name: gcc 13.2.1 to 14.2.0 stays on the same side of 13
+      a:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '13.2.1'
+      b:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '14.2.0'
+status: active

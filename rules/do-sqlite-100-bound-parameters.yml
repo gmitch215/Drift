@@ -1,0 +1,52 @@
+schema: 1
+id: do-sqlite-100-bound-parameters
+title: Durable Object SQLite caps a statement at 100 bound parameters
+applies:
+  - runtime
+  - limits
+difference: the failing side is a deployed Durable Object with SQLite storage
+symptoms:
+  - text: 'too many SQL variables: SQLITE_ERROR on the 101st binding, including reads'
+    basis: verified
+mechanism: "The runtime lowers SQLite's default of 32,766 bound parameters per statement to 100."
+detect:
+  all:
+    - a: runtime.platform
+      ne: cloudflare-deployed
+    - b: runtime.platform
+      eq: cloudflare-deployed
+severity: high
+provenance:
+  - url: https://developers.cloudflare.com/durable-objects/platform/limits/
+    kind: vendor-doc
+    verified: '2026-10-06'
+    section: 'SQL storage limits: Maximum bound parameters per query is 100'
+  - url: https://github.com/drupflare/rom/blob/master/README.md
+    kind: measurement
+    verified: '2026-10-06'
+    section: 'Platform Limits: 100 binds succeed, 101 throws (bisected on a deployed object)'
+fixtures:
+  positive:
+    - name: a local or VPS baseline to a deployed Durable Object
+      a:
+        attrs:
+          runtime.platform: linux-native
+      b:
+        attrs:
+          runtime.platform: cloudflare-deployed
+  negative:
+    - name: both deployed
+      a:
+        attrs:
+          runtime.platform: cloudflare-deployed
+      b:
+        attrs:
+          runtime.platform: cloudflare-deployed
+    - name: failing side is not deployed
+      a:
+        attrs:
+          runtime.platform: cloudflare-deployed
+      b:
+        attrs:
+          runtime.platform: linux-native
+status: active

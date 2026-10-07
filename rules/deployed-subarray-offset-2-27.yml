@@ -1,0 +1,49 @@
+schema: 1
+id: deployed-subarray-offset-2-27
+title: Deployed workerd throws on TypedArray.subarray above 2^27 bytes
+applies:
+  - runtime
+  - memory
+difference: >-
+  the failing side is a deployed Worker whose wasm memory has grown past 128 MiB and the passing
+  side is a local workerd
+symptoms:
+  - text: >-
+      RangeError: Invalid array buffer length from subarray, set(subarray) or
+      TextDecoder.decode(subarray) at byte offsets from 134,217,728
+    basis: verified
+mechanism: >-
+  The deployed runtime rejects subarray begin offsets of 2^27 bytes or more once linear memory
+  exceeds 128 MiB, and a local workerd does not enforce it.
+detect:
+  all:
+    - a: runtime.platform
+      eq: workerd-local
+    - b: runtime.platform
+      eq: cloudflare-deployed
+severity: high
+provenance:
+  - url: https://github.com/drupflare/worker/blob/master/TECHNICAL_REPORT.md
+    kind: measurement
+    verified: '2026-10-06'
+    section: >-
+      Compatibility section: subarray throws above 2^27 bytes on the platform; a local workerd does
+      not enforce it (measured 2026-09-29)
+fixtures:
+  positive:
+    - name: local workerd to deployed Worker
+      a:
+        attrs:
+          runtime.platform: workerd-local
+      b:
+        attrs:
+          runtime.platform: cloudflare-deployed
+  negative:
+    - name: deployed to local workerd (reverse direction)
+      a:
+        attrs:
+          runtime.platform: cloudflare-deployed
+      b:
+        attrs:
+          runtime.platform: workerd-local
+status: active

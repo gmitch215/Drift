@@ -1,0 +1,53 @@
+schema: 1
+id: hash-collection-iteration-order
+title: Hash collection iteration order is unspecified
+applies:
+  - runtime
+difference: >-
+  a probe that prints hash-ordered collections gives a different transcript on the two sides
+symptoms:
+  - text: >-
+      output that depends on HashSet or HashMap iteration order (cache keys, golden files,
+      serialized JSON) differs between environments
+    basis: inferred
+mechanism: >-
+  HashSet and HashMap make no guarantee about iteration order or its stability, so two runtimes may
+  order the same elements differently.
+probe: collections.hash-order
+detect:
+  changed: probe:collections.hash-order
+severity: low
+provenance:
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashSet.html
+    kind: spec
+    verified: '2026-10-06'
+    section: 'class description: makes no guarantees as to the iteration order of the set'
+fixtures:
+  positive:
+    - name: two runtimes order the same ints differently
+      a:
+        attrs: {}
+        probes:
+          collections.hash-order: "hashset-ints = [3, 100, 17]\n"
+      b:
+        attrs: {}
+        probes:
+          collections.hash-order: "hashset-ints = [100, 17, 3]\n"
+  negative:
+    - name: identical transcripts
+      a:
+        attrs: {}
+        probes:
+          collections.hash-order: "hashset-ints = [3, 100, 17]\n"
+      b:
+        attrs: {}
+        probes:
+          collections.hash-order: "hashset-ints = [3, 100, 17]\n"
+    - name: probe unavailable on one side is unknown
+      a:
+        attrs: {}
+        probes:
+          collections.hash-order: "hashset-ints = [3, 100, 17]\n"
+      b:
+        attrs: {}
+status: active

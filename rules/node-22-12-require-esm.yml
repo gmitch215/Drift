@@ -1,0 +1,51 @@
+schema: 1
+id: node-22-12-require-esm
+title: require() of an ES module works by default from Node 22.12
+applies:
+  - runtime
+difference: >-
+  the Node version is 22.12 or newer on the passing side and a 22.x release before 22.12 on the
+  failing side
+symptoms:
+  - text: ERR_REQUIRE_ESM when require() loads a native ES module
+    basis: verified
+mechanism: >-
+  Node 22.12 enables require(esm) without a flag, so older 22.x releases throw ERR_REQUIRE_ESM for
+  the same call.
+detect:
+  all:
+    - a: tool.node.version
+      ver: '>=22.12.0'
+    - b: tool.node.version
+      ver: '>=22.0.0,<22.12.0'
+severity: medium
+provenance:
+  - url: https://nodejs.org/en/blog/release/v22.12.0
+    kind: release-note
+    verified: '2026-10-06'
+    section: require(esm) is now enabled by default
+fixtures:
+  positive:
+    - name: node 24.21.0 to node 22.11.0
+      a:
+        attrs:
+          tool.node.version: '24.21.0'
+      b:
+        attrs:
+          tool.node.version: '22.11.0'
+  negative:
+    - name: node 22.12.0 to node 24.21.0
+      a:
+        attrs:
+          tool.node.version: '22.12.0'
+      b:
+        attrs:
+          tool.node.version: '24.21.0'
+    - name: node 18 failing side is outside the 22.x claim
+      a:
+        attrs:
+          tool.node.version: '24.21.0'
+      b:
+        attrs:
+          tool.node.version: '18.20.8'
+status: active

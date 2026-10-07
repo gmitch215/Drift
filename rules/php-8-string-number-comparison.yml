@@ -1,0 +1,44 @@
+schema: 1
+id: php-8-string-number-comparison
+title: PHP 8 compares a number with a non-numeric string as strings
+applies:
+  - runtime
+difference: >-
+  the PHP major version differs between the two sides, one on 8.0 or newer and one on 7.x
+symptoms:
+  - text: 'a loose comparison such as 0 == "foo" or 42 == "42foo" flips between true and false'
+    basis: verified
+mechanism: >-
+  PHP 8 casts the number to a string and compares strings when the other operand is non-numeric, so
+  loose comparisons that were true in PHP 7 are false.
+detect:
+  cross: tool.php.version
+  ver: '>=8.0.0'
+severity: medium
+provenance:
+  - url: https://github.com/php/doc-en/blob/master/appendices/migration80/incompatible.xml
+    kind: vendor-doc
+    verified: '2026-10-06'
+    section: 'PHP Core: String to Number Comparison'
+fixtures:
+  positive:
+    - name: php 7.4.33 to php 8.1.34
+      a:
+        attrs:
+          tool.php.version: '7.4.33'
+          tool.php.sapi: cli
+          tool.php.thread-safety: NTS
+      b:
+        attrs:
+          tool.php.version: '8.1.34'
+          tool.php.sapi: cli
+          tool.php.thread-safety: NTS
+  negative:
+    - name: php 8.1.34 to php 8.4.26
+      a:
+        attrs:
+          tool.php.version: '8.1.34'
+      b:
+        attrs:
+          tool.php.version: '8.4.26'
+status: active

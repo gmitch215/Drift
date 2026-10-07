@@ -1,0 +1,46 @@
+schema: 1
+id: double-tostring-min-value
+title: Double.toString of Double.MIN_VALUE prints a different decimal
+applies:
+  - runtime
+difference: >-
+  the number-to-string probe prints 4.940656458412465E-324 on one side and 4.9E-324 on the other
+symptoms:
+  - text: String.format and string concatenation of Double.MIN_VALUE differ in the digits
+    basis: verified
+mechanism: >-
+  A JVM emits the shortest decimal that round-trips, while the compared platform emits a longer one
+  at the smallest subnormal, although both parse back to the same double.
+probe: numeric.double-tostring
+detect:
+  cross: probe:numeric.double-tostring
+  has: '4.940656458412465E-324'
+severity: low
+provenance:
+  - url: https://github.com/gmitch215/bytebox/blob/master/TECHNICAL_REPORT.md
+    kind: measurement
+    verified: '2026-10-06'
+    section: >-
+      Double.toString: 544 of 546 agree, both differences are Double.MIN_VALUE (measured 2026-09-17)
+fixtures:
+  positive:
+    - name: 'jvm prints 4.9E-324, wasm prints the long form'
+      a:
+        attrs: {}
+        probes:
+          numeric.double-tostring: "4.9E-324 1\n"
+      b:
+        attrs: {}
+        probes:
+          numeric.double-tostring: "4.940656458412465E-324 1\n"
+  negative:
+    - name: both print the short form
+      a:
+        attrs: {}
+        probes:
+          numeric.double-tostring: "4.9E-324 1\n"
+      b:
+        attrs: {}
+        probes:
+          numeric.double-tostring: "4.9E-324 1\n"
+status: active

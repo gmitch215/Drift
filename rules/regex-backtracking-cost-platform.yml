@@ -1,0 +1,46 @@
+schema: 1
+id: regex-backtracking-cost-platform
+title: Regex backtracking costs seconds on the TeaVM wasm target and nothing on a JVM
+applies:
+  - runtime
+difference: >-
+  the passing side is a JVM and the failing side runs the same Java source compiled to wasm by TeaVM
+symptoms:
+  - text: >-
+      a pattern such as (a+)+b over 20 to 30 characters takes seconds and exceeds a 10 ms CPU budget
+    basis: verified
+mechanism: >-
+  The two regex engines backtrack differently, so a pattern the JDK resists outright costs
+  exponential time in the engine of the wasm target.
+detect:
+  all:
+    - a: runtime.platform
+      eq: jvm
+    - b: runtime.platform
+      eq: teavm-wasm
+severity: high
+provenance:
+  - url: https://github.com/gmitch215/bytebox/blob/master/TECHNICAL_REPORT.md
+    kind: measurement
+    verified: '2026-10-06'
+    section: >-
+      Backtracking Costs Far More Here: 14 ms on the JVM, 11,010 ms on the platform (measured
+      2026-09-17)
+fixtures:
+  positive:
+    - name: jvm to teavm wasm
+      a:
+        attrs:
+          runtime.platform: jvm
+      b:
+        attrs:
+          runtime.platform: teavm-wasm
+  negative:
+    - name: jvm on both sides
+      a:
+        attrs:
+          runtime.platform: jvm
+      b:
+        attrs:
+          runtime.platform: jvm
+status: active

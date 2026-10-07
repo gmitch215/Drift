@@ -1,0 +1,47 @@
+schema: 1
+id: format-line-separator-host-dependent
+title: '%n is the host line separator, not a newline'
+applies:
+  - os
+difference: one side is Windows and the other is not
+symptoms:
+  - text: >-
+      a test or comparison against a hardcoded newline passes on Linux and macOS and fails
+      deterministically on Windows
+    basis: verified
+mechanism: >-
+  The %n conversion of Formatter and String.format produces the platform-specific line separator,
+  which is a carriage return and line feed on Windows.
+detect:
+  cross: os.name
+  starts: windows
+severity: low
+provenance:
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Formatter.html
+    kind: spec
+    verified: '2026-10-06'
+    section: "Conversions: 'n' line separator, the result is the platform-specific line separator"
+  - url: https://github.com/gmitch215/bytebox/blob/master/core/build.gradle.kts
+    kind: measurement
+    verified: '2026-10-06'
+    section: >-
+      testCrlf task reruns the suite with -Dline.separator=CRLF; the Windows CI failure was
+      deterministic
+fixtures:
+  positive:
+    - name: linux to windows
+      a:
+        attrs:
+          os.name: linux
+      b:
+        attrs:
+          os.name: windows
+  negative:
+    - name: linux to macos
+      a:
+        attrs:
+          os.name: linux
+      b:
+        attrs:
+          os.name: mac
+status: active

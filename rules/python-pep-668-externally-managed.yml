@@ -1,0 +1,55 @@
+schema: 1
+id: python-pep-668-externally-managed
+title: pip refuses to install into an externally managed Python
+applies:
+  - runtime
+  - build
+difference: >-
+  the failing side's Python marks its environment as externally managed and the passing side's does
+  not
+symptoms:
+  - text: pip exits with an error saying installation outside a virtual environment is disabled
+    basis: verified
+mechanism: >-
+  An installer must refuse a non-virtualenv install when an EXTERNALLY-MANAGED marker file sits in
+  the interpreter's stdlib directory unless the user passes an override such as
+  --break-system-packages.
+detect:
+  all:
+    - a: tool.python.externally-managed
+      eq: 'false'
+    - b: tool.python.externally-managed
+      eq: 'true'
+severity: high
+provenance:
+  - url: https://peps.python.org/pep-0668/
+    kind: spec
+    verified: '2026-10-06'
+    section: 'Specification: the EXTERNALLY-MANAGED marker and installer behavior'
+fixtures:
+  positive:
+    - name: docker python image to a distro python
+      a:
+        attrs:
+          tool.python.version: '3.12.15'
+          tool.python.externally-managed: 'false'
+      b:
+        attrs:
+          tool.python.version: '3.12.3'
+          tool.python.externally-managed: 'true'
+  negative:
+    - name: both unmanaged
+      a:
+        attrs:
+          tool.python.externally-managed: 'false'
+      b:
+        attrs:
+          tool.python.externally-managed: 'false'
+    - name: marker not captured on the failing side
+      a:
+        attrs:
+          tool.python.externally-managed: 'false'
+      b:
+        attrs:
+          tool.python.version: '3.12.3'
+status: active

@@ -1,0 +1,53 @@
+schema: 1
+id: deployed-clock-frozen-in-sync-work
+title: Deployed Workers freeze the clock during synchronous execution
+applies:
+  - runtime
+difference: the failing side is a deployed Worker and the passing side is a native process
+symptoms:
+  - text: >-
+      a duration computed from two readings inside one synchronous run is 0 while the platform
+      charges real time
+    basis: verified
+mechanism: >-
+  Date.now does not advance during synchronous execution on Workers, so the glue that reads it as
+  the wasm clock yields correct timestamps but unusable durations.
+detect:
+  all:
+    - a: runtime.platform
+      ne: cloudflare-deployed
+    - b: runtime.platform
+      eq: cloudflare-deployed
+severity: medium
+provenance:
+  - url: https://github.com/drupflare/worker/blob/master/TECHNICAL_REPORT.md
+    kind: measurement
+    verified: '2026-10-06'
+    section: >-
+      The Clock: Date.now does not advance between I/O on Workers; 16 renders reported wallMs 0
+      against 27-120 ms charged
+fixtures:
+  positive:
+    - name: a local or VPS baseline to a deployed Durable Object
+      a:
+        attrs:
+          runtime.platform: linux-native
+      b:
+        attrs:
+          runtime.platform: cloudflare-deployed
+  negative:
+    - name: both deployed
+      a:
+        attrs:
+          runtime.platform: cloudflare-deployed
+      b:
+        attrs:
+          runtime.platform: cloudflare-deployed
+    - name: failing side is not deployed
+      a:
+        attrs:
+          runtime.platform: cloudflare-deployed
+      b:
+        attrs:
+          runtime.platform: linux-native
+status: active

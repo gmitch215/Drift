@@ -1,0 +1,57 @@
+schema: 1
+id: windows-11-arm-label-vs2026
+title: The windows-11-arm label moves to the Visual Studio 2026 image in September 2026
+applies:
+  - os
+  - build
+difference: >-
+  the passing run used the earlier windows-11-arm image and the failing run used the Visual Studio
+  2026 image under the same label
+symptoms:
+  - text: >-
+      a workflow with no change fails after the label repoint because the installed Visual Studio
+      and toolset differ
+    basis: inferred
+mechanism: >-
+  GitHub repoints the windows-11-arm label to the Windows 11 Arm64 with Visual Studio 2026 image,
+  replacing the preinstalled Visual Studio under an unchanged workflow file.
+detect:
+  all:
+    - a: ci.runner.label
+      eq: windows-11-arm
+    - b: ci.runner.label
+      eq: windows-11-arm
+    - a: tool.visualstudio.version
+      ver: '<18'
+    - b: tool.visualstudio.version
+      ver: '>=18'
+severity: medium
+provenance:
+  - url: https://github.com/actions/runner-images/releases/tag/win22/20260927.320
+    kind: release-note
+    verified: '2026-10-06'
+    section: >-
+      Announcements: the windows-11-arm label will use Windows 11 Arm64 with Visual Studio 2026 in
+      September 2026 (issue 14602)
+fixtures:
+  positive:
+    - name: windows-11-arm with VS 2022 then VS 2026
+      a:
+        attrs:
+          ci.runner.label: windows-11-arm
+          tool.visualstudio.version: '17.14.0'
+      b:
+        attrs:
+          ci.runner.label: windows-11-arm
+          tool.visualstudio.version: '18.0.0'
+  negative:
+    - name: same image on both runs
+      a:
+        attrs:
+          ci.runner.label: windows-11-arm
+          tool.visualstudio.version: '18.0.0'
+      b:
+        attrs:
+          ci.runner.label: windows-11-arm
+          tool.visualstudio.version: '18.0.1'
+status: active

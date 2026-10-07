@@ -1,0 +1,52 @@
+schema: 1
+id: gcc-14-cxx-missing-headers
+title: GCC 14 libstdc++ stops including algorithm and cstdint transitively
+applies:
+  - compiler
+difference: the C++ compiler is GCC 14 or newer on the failing side and older on the passing side
+symptoms:
+  - text: >-
+      C++ code using std::sort, std::copy_n, std::find_if or std::int8_t without its own include no
+      longer compiles
+    basis: verified
+mechanism: >-
+  GCC 14 libstdc++ headers no longer include algorithm and cstdint for other headers, so code that
+  relied on the indirect include fails.
+detect:
+  all:
+    - a: tool.cc.family
+      eq: gcc
+    - b: tool.cc.family
+      eq: gcc
+    - a: tool.cc.version
+      ver: '<14'
+    - b: tool.cc.version
+      ver: '>=14'
+severity: high
+provenance:
+  - url: https://gcc.gnu.org/gcc-14/porting_to.html
+    kind: vendor-doc
+    verified: '2026-10-06'
+    section: 'C++ language issues: Header dependency changes'
+fixtures:
+  positive:
+    - name: gcc 13.2.1 to 14.2.0
+      a:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '13.2.1'
+      b:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '14.2.0'
+  negative:
+    - name: gcc 12.2.1 to 13.2.1
+      a:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '12.2.1'
+      b:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '13.2.1'
+status: active

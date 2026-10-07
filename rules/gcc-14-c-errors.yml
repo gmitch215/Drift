@@ -1,0 +1,61 @@
+schema: 1
+id: gcc-14-c-errors
+title: GCC 14 turns old C warnings into errors
+applies:
+  - compiler
+difference: the C compiler is GCC 14 or newer on the failing side and older on the passing side
+symptoms:
+  - text: 'error: implicit declaration of function (-Wimplicit-function-declaration)'
+    basis: verified
+  - text: 'error from -Wimplicit-int, -Wint-conversion or -Wincompatible-pointer-types'
+    basis: verified
+mechanism: >-
+  GCC 14 reports implicit int, implicit function declarations, int-conversion and
+  incompatible-pointer-types as errors where GCC 13 and earlier only warned.
+detect:
+  all:
+    - a: tool.cc.family
+      eq: gcc
+    - b: tool.cc.family
+      eq: gcc
+    - a: tool.cc.version
+      ver: '<14'
+    - b: tool.cc.version
+      ver: '>=14'
+severity: high
+provenance:
+  - url: https://gcc.gnu.org/gcc-14/porting_to.html
+    kind: vendor-doc
+    verified: '2026-10-06'
+    section: 'C language issues: Certain warnings are now errors'
+fixtures:
+  positive:
+    - name: alpine 3.20 gcc 13.2.1 to alpine 3.22 gcc 14.2.0
+      a:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '13.2.1'
+      b:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '14.2.0'
+  negative:
+    - name: alpine 3.18 gcc 12.2.1 to alpine 3.20 gcc 13.2.1
+      a:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '12.2.1'
+      b:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '13.2.1'
+    - name: clang on both sides
+      a:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.version: '13.0.0'
+      b:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.version: '18.1.3'
+status: active

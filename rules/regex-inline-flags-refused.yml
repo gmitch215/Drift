@@ -1,0 +1,44 @@
+schema: 1
+id: regex-inline-flags-refused
+title: The TeaVM wasm target refuses inline regex flags and class intersection
+applies:
+  - runtime
+difference: >-
+  the passing side is a JVM and the failing side runs the same Java source compiled to wasm by TeaVM
+symptoms:
+  - text: 'PatternSyntaxException for (?i)HeLLo and [a-z&&[^aeiou]]+'
+    basis: verified
+mechanism: >-
+  Flags written inside a pattern and character-class intersection are on the target's documented
+  refusal list, so the pattern compiles on a JVM and is rejected on the wasm target.
+detect:
+  all:
+    - a: runtime.platform
+      eq: jvm
+    - b: runtime.platform
+      eq: teavm-wasm
+severity: medium
+provenance:
+  - url: https://github.com/gmitch215/bytebox/blob/master/TECHNICAL_REPORT.md
+    kind: measurement
+    verified: '2026-10-06'
+    section: >-
+      Regular Expression Agreement: six refusals, no silent divergence (measured 2026-09-17)
+fixtures:
+  positive:
+    - name: jvm to teavm wasm
+      a:
+        attrs:
+          runtime.platform: jvm
+      b:
+        attrs:
+          runtime.platform: teavm-wasm
+  negative:
+    - name: teavm wasm on both sides
+      a:
+        attrs:
+          runtime.platform: teavm-wasm
+      b:
+        attrs:
+          runtime.platform: teavm-wasm
+status: active
