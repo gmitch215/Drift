@@ -1,0 +1,11 @@
+{
+	"name": "drift-browsers",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"smoke": "node run.mjs"
+	},
+	"dependencies": {
+		"playwright": "1.63.0"
+	}
+}

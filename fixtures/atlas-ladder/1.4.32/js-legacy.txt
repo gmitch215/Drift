@@ -1,0 +1,513 @@
+# kotlin.version = 1.4.32
+# kotlin.target = js-legacy
+@@ kotlin.char.bmp-case-mapping [UNAVAILABLE]
+does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'
+@@ kotlin.char.bmp-categories [UNAVAILABLE]
+does not compile: unresolved reference: CharCategory
+@@ kotlin.char.case-special [UNAVAILABLE]
+does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'
+@@ kotlin.char.whitespace-set [UNAVAILABLE]
+does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'
+@@ kotlin.collections.equality-hashing
+array-eq = false
+array-content-eq = true
+list-vs-arraylist = true
+list-vs-set = false
+set-order = true
+map-order = true
+list-of-arrays = false
+int-vs-long = false
+pair = true
+range = true
+empty-ranges = true
+range-hash = 34
+list-null-hash = 962
+set-hash-order = true
+entry-hash = 29
+empty-hashes = 1 0 0
+string-builder = false
+char-array-hash = 4066
+double-list-hash = 569902017
+@@ kotlin.collections.hash-order
+ints = [3, 8, 17, 42, 100, 1000, -5]
+strings = [fig, kiwi, pear, apple, banana]
+chars = [B, a, m, z]
+longs = [-1, 3, 100, 5000000000]
+doubles = [100, 0.1, 1.5, -2]
+grown = [0, 7, 14, 21, 28, 35, 42, 49, 56, 63, 70, 77, 84, 91, 98, 105, 112, 119, 126, 133]
+map-keys = [a, b, m, z]
+map-string = {1=a, 2=b, 3=c}
+linked-set = [5, 1, 3]
+set-of = [5, 1, 3]
+map-of = [z, a]
+to-set = [3, 1, 2]
+group-by = {2=[bb, cc], 1=[a, d]}
+readd = [2, 3, 1]
+@@ kotlin.collections.iterator-modification
+list-add = ok:[1, 2, 3, 4]
+list-remove-first = ok:[2, 3]
+list-remove-second = ok:[1, 3]
+list-remove-last = ok:[1, 2]
+map-put = ok:{1=1, 2=2, 11=0, 12=0}
+hashmap-remove-other = err:null
+set-add = ok:[1, 2, 11, 12]
+sublist-after-add = ok:[1, 2]
+sublist-size-after-add = ok:2
+next-on-empty = err:NoSuchElementException
+remove-before-next = err:IllegalStateException
+set-before-next = err:IllegalStateException
+removeAt-range = err:IndexOutOfBoundsException
+subList-range = err:IndexOutOfBoundsException
+@@ kotlin.collections.sorting
+doubles = [-Infinity, 0, 0, 1, 3, NaN]
+max-nan = NaN
+max-zeros = 0
+min-zeros = 0
+stable-4 = [(a, 2), (d, 4), (bb, 1), (cc, 3)]
+stable-40 = true
+min-by-ties = bb
+max-by-ties = bb
+nulls-first = [null, 1, 3]
+strings = [A, B, a, b]
+descending = [3, 2, 1]
+always-positive = ok:[3, 1, 2, 5, 4, 0, 7, 6]
+always-negative = ok:[6, 7, 0, 4, 5, 2, 1, 3]
+parity = ok:[7, 5, 1, 3, 2, 4, 0, 6]
+broken-40 = ok:[0, 1, 2, 3, 4, 5]
+@@ kotlin.collections.tostring-forms [UNAVAILABLE]
+does not compile: unsupported [This reflection API is not supported yet in JavaScript]
+@@ kotlin.double.equality-order
+nan==nan = false
+any-nan==any-nan = true
+0.0==-0.0 = true
+any-0.0==any-neg-0.0 = false
+equals = false
+compareTo = 1
+nan-compareTo-inf = 1
+minOf = 0
+maxOf = 0
+min-nan = NaN
+distinct = [0, 0]
+set-nan = 1
+list-nan = true
+nan>1 = false
+float-any-eq = false
+@@ kotlin.double.extremes
+min-value = 5e-324
+max-value = 1.7976931348623157e+308
+0.1+0.2 = 0.30000000000000004
+neg-zero = 0
+nan = NaN
+inf = Infinity
+neg-inf = -Infinity
+overflow = Infinity
+underflow = 0
+min-normal = 2.2250738585072014e-308
+2^53+1 = 9007199254740992
+@@ kotlin.double.nan-bits
+nan-raw = 7ff8000000000000
+0/0-raw = 7ff8000000000000
+neg-nan-raw = fff8000000000000
+sqrt-neg-raw = 7ff8000000000000
+inf-minus-inf-raw = 7ff8000000000000
+payload-raw = 7ff0000000000001
+payload-bits = 7ff8000000000000
+payload-to-float = 7fc00000
+float-nan-raw = 7fc00000
+float-payload-raw = 7fc00001
+neg-zero-raw = 8000000000000000
+@@ kotlin.double.parse
+'1e3' = 1000
+'1.' = 1
+'.5' = 0.5
+'NaN' = NaN
+'Infinity' = Infinity
+'-Infinity' = -Infinity
+'+Infinity' = Infinity
+'0x1p3' = null
+'1d' = null
+'1f' = null
+' 2 ' = 2
+'1,5' = null
+'1_0' = null
+'1e400' = Infinity
+'-1e400' = -Infinity
+'1e-400' = 0
+'+.5e-2' = 0.005
+'nan' = NaN
+'inf' = null
+'1e' = null
+'e1' = null
+'' = null
+'-' = null
+'00012' = 12
+'1E+2' = 100
+'0x10' = 16
+'0.1e1' = 1
+'1.0e+' = null
+float-above-max = 3.4028236e+38
+float-1e39 = 1e+39
+@@ kotlin.double.shortest-digits
+2e23 = 2e+23
+1e23 = 1e+23
+8.41e21 = 8.41e+21
+5e-324 = 5e-324
+4.35 = 4.35
+0.3 = 0.3
+1/3 = 0.3333333333333333
+2/3 = 0.6666666666666666
+1e16/3 = 3333333333333333.5
+0.1f = 0.1
+sqrt2 = 1.4142135623730951
+1.1*1.1 = 1.2100000000000002
+123456.789e-6 = 0.123456789
+@@ kotlin.double.tostring-boundaries
+1e-4 = 0.0001
+1e-3 = 0.001
+9.999e-4 = 0.0009999
+9999999 = 9999999
+1e7 = 10000000
+12345678 = 12345678
+1e21 = 1e+21
+1e22 = 1e+22
+1e-7 = 1e-7
+100 = 100
+0.5 = 0.5
+@@ kotlin.exceptions.messages [UNAVAILABLE]
+does not compile: unresolved reference: floorDiv
+@@ kotlin.exceptions.tostring-cause
+toString = probe16$lambda$ProbeException: m
+simple-name = ProbeException
+message = m
+bare-toString = Exception: null
+bare-message = null
+cause-null = null
+cause-message = b
+cause-only-message = Exception: b
+illegal-state = IllegalStateException: x
+npe = NullPointerException: null
+assertion = AssertionError: x
+not-implemented = NotImplementedError: An operation is not implemented.
+stack-first-line = probe16$lambda$ProbeException: m
+stack-multiline = true
+caused-by-lines = 1
+suppressed = 1
+equality = false
+same-instance = true
+@@ kotlin.float.tostring
+0.1 = 0.1
+1e7 = 10000000
+1e10 = 10000000000
+16777217 = 16777216
+min = 1.4e-45
+max = 3.4028235e+38
+1/3 = 0.3333333333333333
+1e-3 = 0.001
+1e-4 = 0.0001
+9999999 = 9999999
+0.1+0.2 = 0.30000000000000004
+widen-0.1 = 0.1
+widen-sum = 0.30000000000000004
+@@ kotlin.int.division-modulo [UNAVAILABLE]
+does not compile: unresolved reference: mod
+@@ kotlin.int.overflow
+max+1 = -2147483648
+min-1 = 2147483647
+negate-min = -2147483648
+min/-1 = -2147483648
+min%-1 = 0
+long-min/-1 = -9223372036854775808
+long-min%-1 = 0
+max*max = 1
+long-max+1 = -9223372036854775808
+shl-32 = 1
+shl-33 = 2
+shl-neg1 = -2147483648
+long-shl-64 = 1
+long-shl-65 = 2
+ushr-28 = 15
+shr-neg = -4
+long-ushr = 9223372036854775804
+byte-200 = -56
+short-70000 = 4464
+long-max-to-int = -1
+long-min-to-int = 0
+@@ kotlin.int.radix
+255-bin = 11111111
+neg255-hex = -ff
+int-min-hex = -80000000
+long-min-bin = -1000000000000000000000000000000000000000000000000000000000000000
+long-min-36 = -1y2p0ij32e8e8
+ulong-max-36 = 3w5e11264sgsf
+uint-bin = 11111111
+radix-1 = err:IllegalArgumentException
+radix-37 = err:IllegalArgumentException
+'ff' = 255
+'-80000000' = -2147483648
+'80000000' = null
+'+1f' = 31
+'FF' = 255
+'0x10' = null
+'zz' = null
+'-0' = 0
+'' = null
+zz-36 = 1295
+arabic-digit = null
+fullwidth-digit = null
+underscore = null
+plus = 5
+space = null
+int-max+1 = null
+int-min = -2147483648
+long-min = -9223372036854775808
+@@ kotlin.long.bit-ops [UNAVAILABLE]
+does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'
+@@ kotlin.math.pow-special-cases
+nan^0 = 1
+1^nan = NaN
+1^inf = NaN
+-1^inf = NaN
+2^nan = NaN
+0^-1 = Infinity
+-0^-1 = -Infinity
+-0^-2 = Infinity
+-8^third = NaN
+2^1024 = Infinity
+2^-1075 = 0
+2^-1074 = 5e-324
+10^-5 = 3ee4f8b588e368f1
+2^half = 3ff6a09e667f3bcd
+2^int-10 = 1024
+1.1^int-100 = 40caea4e6126bb95
+int-pow-nan = 1
+inf^0 = 1
+inf^-1 = 0
+@@ kotlin.math.rounding
+0.5 = round=0 int=1 long=1
+1.5 = round=2 int=2 long=2
+2.5 = round=2 int=3 long=3
+-0.5 = round=0 int=0 long=0
+-1.5 = round=-2 int=-1 long=-1
+-2.5 = round=-2 int=-2 long=-2
+0.49999999999999994 = round=0 int=0 long=0
+2.4999999999999996 = round=2 int=2 long=2
+4503599627370497 = round=4503599627370497 int=2147483647 long=4503599627370497
+roundToInt-nan = err:IllegalArgumentException
+roundToInt-1e10 = 2147483647
+roundToInt-int-max-half = 2147483647
+float-0.5 = 1
+float-2.5 = 3
+float-neg-2.5 = -2
+float-8388609 = 8388609
+@@ kotlin.math.transcendental-bits [UNAVAILABLE]
+does not compile: unresolved reference: cbrt
+@@ kotlin.numbers.float-conversions
+nan-int = 0
+1e20-int = 2147483647
+-1e20-int = -2147483648
+1e20-long = 9223372036854775807
+trunc = 3 -3
+float-3e9-int = 2147483647
+1e40-float = 1e+40
+1e-50-float = 1e-50
+long-max-double = 9223372036854776000
+long-max-float = 9223372036854776000
+long-max-roundtrip = 9223372036854775807
+int-max-float = 2147483647
+ulong-max-double = 18446744073709552000
+neg-uint = 0
+1e20-ulong = 18446744073709551615
+nan-uint = 0
+@@ kotlin.numbers.type-checks
+1.0-is-Int = true
+1.0-is-Double = true
+1-is-Double = true
+1-is-Long = false
+1.5f-is-Double = true
+1.0-class = Int
+1-class = Int
+1L-class = Long
+1.5f-class = Double
+1==1L = false
+1==1.0 = true
+1==1 = true
+1.0-as?-Int = 1
+1.0-toString = 1
+1.0-hash = 1
+1-hash = 1
+1L-hash = 1
+@@ kotlin.random.seeded
+ints = [972016666, 1740578880, -408207414, -112774692]
+bounded = [11, 12, 11, 10]
+until = [6, 5, 4]
+long = -6040149782845276193
+long-range = 703381690794
+double = 3fee2b476cbe9f97
+double-range = 401644b6d56d6a80
+float = 3e442024
+booleans = [true, false, true, false, false, false, false, true]
+bytes = [-56, 13, 56, 93, -112, 65]
+bits = 14
+seed-long-min = -1399536436
+seed-zero = -1934310868
+seed-neg = -280203964
+shuffle = [1, 3, 6, 5, 7, 4, 2, 8]
+random-element = 1
+array-shuffle = [2, 4, 1, 5, 3]
+uint = 2944804283
+ulong = 12647838088272997204
+uint-until = 1
+@@ kotlin.regex.anchors-lines [UNAVAILABLE]
+does not compile: unresolved reference: matchAt
+@@ kotlin.regex.groups-replace [UNAVAILABLE]
+does not compile: type mismatch: inferred type is String but Int was expected
+@@ kotlin.regex.syntax-support
+lookbehind = ok:true
+neg-lookbehind = ok:false
+lookbehind-unbounded = ok:true
+lookahead = ok:true
+possessive-star = err:null
+possessive-plus = err:null
+atomic = err:null
+named-backref = ok:true
+numbered-backref = ok:true
+inline-ignore-case = err:null
+inline-dotall = err:null
+comment-group = err:null
+unicode-letter = ok:false
+unicode-upper = ok:false
+is-alphabetic = ok:false
+java-lowercase = ok:false
+block-greek = ok:false
+posix-alpha = ok:false
+posix-bracket = ok:false
+horizontal-space = ok:false
+linebreak = ok:false
+grapheme = ok:false
+quote = ok:false
+literal-close-brace = ok:true
+literal-open-brace = ok:true
+literal-close-bracket = ok:true
+class-intersection = ok:false
+unicode-escape = ok:true
+hex-braces = ok:false
+control-escape = ok:true
+end-z = ok:false
+end-Z = ok:false
+empty-class = ok:false
+lone-quantifier-range = ok:true
+unclosed-group = err:null
+dangling-quantifier = err:null
+@@ kotlin.regex.unicode-matching
+digit-arabic = ok:false
+digit-fullwidth = ok:false
+word-accent = ok:false
+word-greek = ok:false
+word-underscore = ok:true
+space-nbsp = ok:true
+space-em = ok:true
+space-nel = ok:false
+space-vt = ok:true
+boundary-accent = ok:true
+dot-lf = ok:false
+dot-cr = ok:false
+dot-nel = ok:true
+dot-line-separator = ok:false
+dot-emoji = ok:false
+two-dots-emoji = ok:true
+letter-deseret = ok:false
+upper-deseret = ok:false
+ic-ascii = ok:true
+ic-accent = ok:true
+ic-sharp-s = ok:false
+ic-kelvin = ok:false
+ic-dz = ok:true
+ic-final-sigma = ok:true
+ic-dotted-i = ok:false
+ic-dotless-i = ok:false
+ic-deseret = ok:false
+@@ kotlin.string.compare-order
+a-vs-B = 31
+a-vs-B-ignore-case = -1
+sorted = [ , 10, 9, B, Z, _, a, b, ä]
+sorted-ignore-case = [a, A, b, B]
+composed-vs-decomposed = false
+composed-vs-decomposed-order = 132
+sharp-s-vs-SS = false
+dotted-I-vs-i = false
+dotless-i-vs-I = false
+kelvin-vs-k = true
+dz-forms = true
+final-sigma = false
+char-ignore-case = true
+compare-ignore-case-sigma = 0
+compare-ignore-case-sharp-s = 1
+compare-ignore-case-upper-lower = -1
+maxOf-strings = a
+nbsp-vs-space = false
+regionMatches = true
+@@ kotlin.string.hashcode
+hello = 99162322
+empty = 0
+unicode = 27236
+long = -206135704
+list = 30817
+set = 6
+map = 192
+array = 30817
+int-array = 30817
+pair = 151
+triple = 1026
+data-class = 151
+double-1.5 = -1089994752
+double-neg-0 = 0
+double-nan = 2131230720
+float-1.5 = -1089994752
+long-max = -2147483648
+boolean = 1
+char = 97
+null-list = 31
+ulong = 0
+@@ kotlin.string.padding
+pad-zero = 005
+pad-shorter = abc
+pad-end = x..
+pad-negative = err:IllegalArgumentException:Desired length -1 is less than zero.
+pad-hex = 00ff
+pad-double =      1.5
+pad-wide = **中
+repeat-zero = 
+repeat-negative = err:IllegalArgumentException:Count 'n' must be non-negative, but was -1.
+repeat-char = -----
+chunked = [abc, def, g]
+windowed = [abc, bcd]
+center = ***ab**
+@@ kotlin.string.split-replace-lines
+split-trailing = [a, , b, ]
+split-limit = [a, b,c]
+split-empty-delim = [, a, b, c, ]
+split-empty-input = []
+split-regex-empty = [, a, b, c, ]
+split-regex-limit = [, a, b c ]
+split-ignore-case = [a, b, c]
+replace-empty = -a-b-c-
+replace-ignore-case = bb
+replace-first = baa
+lines = [a, b, c, d ef]
+lines-trailing = [a, ]
+trimIndent = a
+ b
+substringBefore-missing = none
+removeSurrounding = a
+take-neg = err:IllegalArgumentException
+drop-over = 
+indexOf-empty = 3
+lastIndexOf-empty = 2
+contains-empty = true
+startsWith-offset = true
+commonPrefix = ab
+compare-length = -1
+@@ kotlin.string.supplementary [UNAVAILABLE]
+does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'
+@@ kotlin.time.duration-format [UNAVAILABLE]
+does not compile: unresolved reference: days

@@ -1,0 +1,390 @@
+# kotlin.version = 1.3.72
+# kotlin.target = jvm
+@@ kotlin.char.bmp-case-mapping [UNAVAILABLE]
+does not compile: cannot access '<init>': it is private in 'Char'
+@@ kotlin.char.bmp-categories [UNAVAILABLE]
+does not compile: unresolved reference: entries
+@@ kotlin.char.case-special [UNAVAILABLE]
+does not compile: unresolved reference: uppercase
+@@ kotlin.char.whitespace-set [UNAVAILABLE]
+does not compile: cannot access '<init>': it is private in 'Char'
+@@ kotlin.collections.equality-hashing
+array-eq = false
+array-content-eq = true
+list-vs-arraylist = true
+list-vs-set = false
+set-order = true
+map-order = true
+list-of-arrays = false
+int-vs-long = false
+pair = true
+range = true
+empty-ranges = true
+range-hash = 34
+list-null-hash = 962
+set-hash-order = true
+entry-hash = 29
+empty-hashes = 1 0 0
+string-builder = false
+char-array-hash = 4066
+double-list-hash = 1057489857
+@@ kotlin.collections.hash-order
+ints = [17, 3, 100, -5, 8, 1000, 42]
+strings = [banana, apple, pear, kiwi, fig]
+chars = [a, z, B, m]
+longs = [-1, 3, 5000000000, 100]
+doubles = [1.5, -2.0, 100.0, 0.1]
+grown = [0, 98, 35, 133, 70, 7, 105, 42, 77, 14, 112, 49, 84, 21, 119, 56, 91, 28, 126, 63]
+map-keys = [a, z, b, m]
+map-string = {1=a, 2=b, 3=c}
+linked-set = [5, 1, 3]
+set-of = [5, 1, 3]
+map-of = [z, a]
+to-set = [3, 1, 2]
+group-by = {2=[bb, cc], 1=[a, d]}
+readd = [2, 3, 1]
+@@ kotlin.collections.iterator-modification
+list-add = err:ConcurrentModificationException
+list-remove-first = err:ConcurrentModificationException
+list-remove-second = ok:[1, 3]
+list-remove-last = err:ConcurrentModificationException
+map-put = err:ConcurrentModificationException
+hashmap-remove-other = err:ConcurrentModificationException
+set-add = err:ConcurrentModificationException
+sublist-after-add = err:ConcurrentModificationException
+sublist-size-after-add = err:ConcurrentModificationException
+next-on-empty = err:NoSuchElementException
+remove-before-next = err:IllegalStateException
+set-before-next = err:IllegalStateException
+removeAt-range = err:IndexOutOfBoundsException
+subList-range = err:IndexOutOfBoundsException
+@@ kotlin.collections.sorting [UNAVAILABLE]
+does not compile: type inference failed: fun <T> Iterable<T>.sortedWith(comparator: kotlin.Comparator<in T> /* = java.util.Comparator<in T> */): List<T>
+@@ kotlin.collections.tostring-forms
+list-doubles = [1.0, 2.5, 1.0E10]
+nested = {k=[1, 2], e=[]}
+pair-null = (1, null)
+triple = (a, b, 1)
+array-content = [1, null]
+array-deep = [[1], [2]]
+char-array = [a, b]
+range-step = 1..3 step 2
+empty-range = 1..0
+down-to = 3 downTo 1 step 2
+char-range = a..c
+long-range = 1..3
+unit = kotlin.Unit
+null = null
+result-success = Success(1)
+result-failure = Failure(java.lang.IllegalStateException: x)
+set-null = [null]
+map-null-value = {1=null}
+char-list = [a, b]
+string-list = [a b, ]
+regex = a+
+regex-option = a
+enum = DOCUMENTED
+uint = 5
+ulong-max = 18446744073709551615
+ubyte = 200
+char-plus = b
+char-minus = 2
+kclass-int = int (Kotlin reflection is not available)
+kclass-simple = String
+kclass-qualified = ok:kotlin.String
+kclass-list = SingletonList
+@@ kotlin.double.equality-order
+nan==nan = false
+any-nan==any-nan = true
+0.0==-0.0 = true
+any-0.0==any-neg-0.0 = false
+equals = false
+compareTo = 1
+nan-compareTo-inf = 1
+minOf = -0.0
+maxOf = 0.0
+min-nan = NaN
+distinct = [0.0, -0.0]
+set-nan = 1
+list-nan = true
+nan>1 = false
+float-any-eq = false
+@@ kotlin.double.extremes
+min-value = 4.9E-324
+max-value = 1.7976931348623157E308
+0.1+0.2 = 0.30000000000000004
+neg-zero = -0.0
+nan = NaN
+inf = Infinity
+neg-inf = -Infinity
+overflow = Infinity
+underflow = 0.0
+min-normal = 2.2250738585072014E-308
+2^53+1 = 9.007199254740992E15
+@@ kotlin.double.nan-bits
+nan-raw = 7ff8000000000000
+0/0-raw = 7ff8000000000000
+neg-nan-raw = fff8000000000000
+sqrt-neg-raw = 7ff8000000000000
+inf-minus-inf-raw = 7ff8000000000000
+payload-raw = 7ff0000000000001
+payload-bits = 7ff8000000000000
+payload-to-float = 7fc00000
+float-nan-raw = 7fc00000
+float-payload-raw = 7f800001
+neg-zero-raw = 8000000000000000
+@@ kotlin.double.parse [UNAVAILABLE]
+does not compile: the feature "trailing commas" is only available since language version 1.4
+@@ kotlin.double.shortest-digits [UNAVAILABLE]
+does not compile: the feature "trailing commas" is only available since language version 1.4
+@@ kotlin.double.tostring-boundaries [UNAVAILABLE]
+does not compile: the feature "trailing commas" is only available since language version 1.4
+@@ kotlin.exceptions.messages [UNAVAILABLE]
+does not compile: unresolved reference: floorDiv
+@@ kotlin.exceptions.tostring-cause [UNAVAILABLE]
+does not compile: unresolved reference: stackTraceToString
+@@ kotlin.float.tostring [UNAVAILABLE]
+does not compile: the feature "trailing commas" is only available since language version 1.4
+@@ kotlin.int.division-modulo [UNAVAILABLE]
+does not compile: using 'mod(Int): Int' is an error. Use rem(other) instead
+@@ kotlin.int.overflow
+max+1 = -2147483648
+min-1 = 2147483647
+negate-min = -2147483648
+min/-1 = -2147483648
+min%-1 = 0
+long-min/-1 = -9223372036854775808
+long-min%-1 = 0
+max*max = 1
+long-max+1 = -9223372036854775808
+shl-32 = 1
+shl-33 = 2
+shl-neg1 = -2147483648
+long-shl-64 = 1
+long-shl-65 = 2
+ushr-28 = 15
+shr-neg = -4
+long-ushr = 9223372036854775804
+byte-200 = -56
+short-70000 = 4464
+long-max-to-int = -1
+long-min-to-int = 0
+@@ kotlin.int.radix [UNAVAILABLE]
+does not compile: the feature "trailing commas" is only available since language version 1.4
+@@ kotlin.long.bit-ops [UNAVAILABLE]
+does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'
+@@ kotlin.math.pow-special-cases
+nan^0 = 1.0
+1^nan = NaN
+1^inf = NaN
+-1^inf = NaN
+2^nan = NaN
+0^-1 = Infinity
+-0^-1 = -Infinity
+-0^-2 = Infinity
+-8^third = NaN
+2^1024 = Infinity
+2^-1075 = 0.0
+2^-1074 = 4.9E-324
+10^-5 = 3ee4f8b588e368f0
+2^half = 3ff6a09e667f3bcd
+2^int-10 = 1024.0
+1.1^int-100 = 40caea4e6126bb95
+int-pow-nan = 1.0
+inf^0 = 1.0
+inf^-1 = 0.0
+@@ kotlin.math.rounding [UNAVAILABLE]
+does not compile: the feature "trailing commas" is only available since language version 1.4
+@@ kotlin.math.transcendental-bits [UNAVAILABLE]
+does not compile: unresolved reference: cbrt
+@@ kotlin.numbers.float-conversions
+nan-int = 0
+1e20-int = 2147483647
+-1e20-int = -2147483648
+1e20-long = 9223372036854775807
+trunc = 3 -3
+float-3e9-int = 2147483647
+1e40-float = Infinity
+1e-50-float = 0.0
+long-max-double = 9.223372036854776E18
+long-max-float = 9.223372E18
+long-max-roundtrip = 9223372036854775807
+int-max-float = 2.1474836E9
+ulong-max-double = 1.8446744073709552E19
+neg-uint = 0
+1e20-ulong = 18446744073709551615
+nan-uint = 0
+@@ kotlin.numbers.type-checks
+1.0-is-Int = false
+1.0-is-Double = true
+1-is-Double = false
+1-is-Long = false
+1.5f-is-Double = false
+1.0-class = Double
+1-class = Int
+1L-class = Long
+1.5f-class = Float
+1==1L = false
+1==1.0 = false
+1==1 = true
+1.0-as?-Int = null
+1.0-toString = 1.0
+1.0-hash = 1072693248
+1-hash = 1
+1L-hash = 1
+@@ kotlin.random.seeded [UNAVAILABLE]
+does not compile: unresolved reference. None of the following candidates is applicable because of receiver type mismatch:
+@@ kotlin.regex.anchors-lines [UNAVAILABLE]
+does not compile: unresolved reference: matchAt
+@@ kotlin.regex.groups-replace [UNAVAILABLE]
+does not compile: type mismatch: inferred type is String but Int was expected
+@@ kotlin.regex.syntax-support
+lookbehind = ok:true
+neg-lookbehind = ok:false
+lookbehind-unbounded = ok:true
+lookahead = ok:true
+possessive-star = ok:false
+possessive-plus = ok:true
+atomic = ok:false
+named-backref = ok:true
+numbered-backref = ok:true
+inline-ignore-case = ok:true
+inline-dotall = ok:true
+comment-group = err:PatternSyntaxException
+unicode-letter = ok:true
+unicode-upper = ok:true
+is-alphabetic = ok:true
+java-lowercase = ok:true
+block-greek = ok:true
+posix-alpha = ok:true
+posix-bracket = ok:true
+horizontal-space = ok:true
+linebreak = ok:true
+grapheme = ok:true
+quote = ok:true
+literal-close-brace = ok:true
+literal-open-brace = err:PatternSyntaxException
+literal-close-bracket = ok:true
+class-intersection = ok:false
+unicode-escape = ok:true
+hex-braces = ok:true
+control-escape = ok:true
+end-z = ok:false
+end-Z = ok:true
+empty-class = err:PatternSyntaxException
+lone-quantifier-range = err:PatternSyntaxException
+unclosed-group = err:PatternSyntaxException
+dangling-quantifier = err:PatternSyntaxException
+@@ kotlin.regex.unicode-matching
+digit-arabic = ok:false
+digit-fullwidth = ok:false
+word-accent = ok:false
+word-greek = ok:false
+word-underscore = ok:true
+space-nbsp = ok:false
+space-em = ok:false
+space-nel = ok:false
+space-vt = ok:true
+boundary-accent = ok:true
+dot-lf = ok:false
+dot-cr = ok:false
+dot-nel = ok:false
+dot-line-separator = ok:false
+dot-emoji = ok:true
+two-dots-emoji = ok:false
+letter-deseret = ok:true
+upper-deseret = ok:true
+ic-ascii = ok:true
+ic-accent = ok:true
+ic-sharp-s = ok:false
+ic-kelvin = ok:true
+ic-dz = ok:true
+ic-final-sigma = ok:true
+ic-dotted-i = ok:true
+ic-dotless-i = ok:true
+ic-deseret = ok:true
+@@ kotlin.string.compare-order
+a-vs-B = 31
+a-vs-B-ignore-case = -1
+sorted = [ , 10, 9, B, Z, _, a, b, ä]
+sorted-ignore-case = [a, A, b, B]
+composed-vs-decomposed = false
+composed-vs-decomposed-order = 132
+sharp-s-vs-SS = false
+dotted-I-vs-i = true
+dotless-i-vs-I = true
+kelvin-vs-k = true
+dz-forms = true
+final-sigma = true
+char-ignore-case = true
+compare-ignore-case-sigma = 0
+compare-ignore-case-sharp-s = 108
+compare-ignore-case-upper-lower = -6
+maxOf-strings = a
+nbsp-vs-space = false
+regionMatches = true
+@@ kotlin.string.hashcode
+hello = 99162322
+empty = 0
+unicode = 27236
+long = -206135704
+list = 30817
+set = 6
+map = 192
+array = 30817
+int-array = 30817
+pair = 151
+triple = 1026
+data-class = 151
+double-1.5 = 1073217536
+double-neg-0 = -2147483648
+double-nan = 2146959360
+float-1.5 = 1069547520
+long-max = -2147483648
+boolean = 1231
+char = 97
+null-list = 31
+ulong = 0
+@@ kotlin.string.padding
+pad-zero = 005
+pad-shorter = abc
+pad-end = x..
+pad-negative = err:IllegalArgumentException:Desired length -1 is less than zero.
+pad-hex = 00ff
+pad-double =      1.5
+pad-wide = **中
+repeat-zero = 
+repeat-negative = err:IllegalArgumentException:Count 'n' must be non-negative, but was -1.
+repeat-char = -----
+chunked = [abc, def, g]
+windowed = [abc, bcd]
+center = ***ab**
+@@ kotlin.string.split-replace-lines
+split-trailing = [a, , b, ]
+split-limit = [a, b,c]
+split-empty-delim = [, a, b, c, ]
+split-empty-input = []
+split-regex-empty = [, a, b, c, ]
+split-regex-limit = [, a, b c ]
+split-ignore-case = [a, b, c]
+replace-empty = -a-b-c-
+replace-ignore-case = bb
+replace-first = baa
+lines = [a, b, c, d ef]
+lines-trailing = [a, ]
+trimIndent = a
+ b
+substringBefore-missing = none
+removeSurrounding = a
+take-neg = err:IllegalArgumentException
+drop-over = 
+indexOf-empty = 3
+lastIndexOf-empty = 2
+contains-empty = true
+startsWith-offset = true
+commonPrefix = ab
+compare-length = -1
+@@ kotlin.string.supplementary [UNAVAILABLE]
+does not compile: unresolved reference: uppercase
+@@ kotlin.time.duration-format [UNAVAILABLE]
+does not compile: unresolved reference: days
