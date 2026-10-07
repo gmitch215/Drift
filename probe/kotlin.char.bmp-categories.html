@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kotlin.char.bmp-categories | Drift Atlas</title>
+<style>
+:root{color-scheme:light dark;--fg:#1a1a1a;--bg:#fff;--muted:#555;--line:#c8c8c8;
+--mark:#ffe58a;--code:#f3f3f3;--link:#0b57d0}
+@media (prefers-color-scheme:dark){:root{--fg:#ececec;--bg:#161616;--muted:#a8a8a8;
+--line:#444;--mark:#6b5300;--code:#222;--link:#8ab4f8}}
+body{margin:0;font:16px/1.5 system-ui,sans-serif;color:var(--fg);background:var(--bg)}
+header,main,footer{max-width:72rem;margin:0 auto;padding:.75rem 1rem}
+a{color:var(--link)}
+.skip{position:absolute;left:-999px}.skip:focus{left:1rem;top:.5rem}
+nav a{margin-right:1rem}
+pre,code{font:14px/1.4 ui-monospace,monospace;background:var(--code)}
+pre{padding:.5rem;overflow-x:auto;white-space:pre}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%}
+th,td{border:1px solid var(--line);padding:.25rem .5rem;text-align:left;vertical-align:top}
+tr.differs{background:var(--mark)}
+mark{background:var(--mark);color:inherit}
+blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
+.draft{border:2px solid var(--fg);padding:.5rem}
+.muted{color:var(--muted)}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+<nav aria-label="Atlas">
+<a href="../">Interactive Atlas</a>
+<a href="../probe/">All probes</a>
+<a href="../data/dataset.json">dataset.json</a>
+<a href="../data/classification.json">classification.json</a>
+</nav>
+</header>
+<main id="main">
+<h1>kotlin.char.bmp-categories</h1>
+<p>How many BMP characters does each Char predicate and category accept?</p>
+<p><strong>platform-defined</strong> (basis: inferred); differs between targets</p>
+<h2>Source</h2>
+<pre><code>val counts = IntArray(CharCategory.entries.size)
+var letters = 0
+var digits = 0
+var upper = 0
+var lower = 0
+var title = 0
+var white = 0
+var digitSum = 0
+for (code in 0..0xFFFF) {
+    val ch = Char(code)
+    counts[ch.category.ordinal]++
+    if (ch.isLetter()) letters++
+    if (ch.isDigit()) digits++
+    if (ch.isUpperCase()) upper++
+    if (ch.isLowerCase()) lower++
+    if (ch.isTitleCase()) title++
+    if (ch.isWhitespace()) white++
+    digitSum += ch.digitToIntOrNull() ?: 0
+}
+line(&quot;letters&quot;, letters)
+line(&quot;digits&quot;, digits)
+line(&quot;upper&quot;, upper)
+line(&quot;lower&quot;, lower)
+line(&quot;title&quot;, title)
+line(&quot;whitespace&quot;, white)
+line(&quot;digit-value-sum&quot;, digitSum)
+val all = CharCategory.entries
+line(&quot;categories&quot;, all.joinToString(&quot; &quot;) { it.name + &quot;=&quot; + counts[it.ordinal] })</code></pre>
+<h2>Results on Kotlin 2.4.20</h2>
+<p>4 different results; 4 of 8 lines differ.</p>
+<table>
+<caption>Result per column, Kotlin 2.4.20</caption>
+<tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
+<tr class="differs"><th scope="row">android</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
+<tr><th scope="row">ios</th><td>B</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
+<tr><th scope="row">jvm-17</th><td>B</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
+<tr><th scope="row">linux</th><td>B</td><td>ok</td><td><a href="../data/transcripts/linux.txt">file</a></td></tr>
+<tr><th scope="row">linux-arm64</th><td>B</td><td>ok</td><td><a href="../data/transcripts/linux-arm64.txt">file</a></td></tr>
+<tr><th scope="row">macos</th><td>B</td><td>ok</td><td><a href="../data/transcripts/macos.txt">file</a></td></tr>
+<tr><th scope="row">wasm</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm.txt">file</a></td></tr>
+<tr><th scope="row">wasm-chromium</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
+<tr><th scope="row">wasm-firefox</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
+<tr><th scope="row">wasm-webkit</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-21</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-21.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-25</th><td>D (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-25.txt">file</a></td></tr>
+</table>
+<h3>Group A: android</h3>
+<pre><mark>letters = 48981</mark>
+digits = 370
+<mark>upper = 1135</mark>
+<mark>lower = 1448</mark>
+title = 31
+whitespace = 28
+digit-value-sum = 1665
+<mark>categories = UNASSIGNED=1370 UPPERCASE_LETTER=1135 LOWERCASE_LETTER=1448 TITLECASE_LETTER=31 MODIFIER_LETTER=237 OTHER_LETTER=46130 NON_SPACING_MARK=1093 ENCLOSING_MARK=13 COMBINING_SPACING_MARK=260 DECIMAL_DIGIT_NUMBER=370 LETTER_NUMBER=65 OTHER_NUMBER=300 SPACE_SEPARATOR=17 LINE_SEPARATOR=1 PARAGRAPH_SEPARATOR=1 CONTROL=65 FORMAT=43 PRIVATE_USE=6400 SURROGATE=2048 DASH_PUNCTUATION=25 START_PUNCTUATION=79 END_PUNCTUATION=77 CONNECTOR_PUNCTUATION=10 OTHER_PUNCTUATION=415 MATH_SYMBOL=936 CURRENCY_SYMBOL=58 MODIFIER_SYMBOL=120 OTHER_SYMBOL=2767 INITIAL_QUOTE_PUNCTUATION=12 FINAL_QUOTE_PUNCTUATION=10</mark></pre>
+<h3>Group B: ios, jvm-17, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
+<pre><mark>letters = 48909</mark>
+digits = 370
+<mark>upper = 1164</mark>
+<mark>lower = 1627</mark>
+title = 31
+whitespace = 28
+digit-value-sum = 1665
+<mark>categories = UNASSIGNED=1585 UPPERCASE_LETTER=1122 LOWERCASE_LETTER=1438 TITLECASE_LETTER=31 MODIFIER_LETTER=232 OTHER_LETTER=46086 NON_SPACING_MARK=1031 ENCLOSING_MARK=13 COMBINING_SPACING_MARK=257 DECIMAL_DIGIT_NUMBER=370 LETTER_NUMBER=65 OTHER_NUMBER=300 SPACE_SEPARATOR=17 LINE_SEPARATOR=1 PARAGRAPH_SEPARATOR=1 CONTROL=65 FORMAT=41 PRIVATE_USE=6400 SURROGATE=2048 DASH_PUNCTUATION=24 START_PUNCTUATION=75 END_PUNCTUATION=73 CONNECTOR_PUNCTUATION=10 OTHER_PUNCTUATION=407 MATH_SYMBOL=936 CURRENCY_SYMBOL=56 MODIFIER_SYMBOL=118 OTHER_SYMBOL=2712 INITIAL_QUOTE_PUNCTUATION=12 FINAL_QUOTE_PUNCTUATION=10</mark></pre>
+<h3>Group C: jvm, jvm-21</h3>
+<pre><mark>letters = 48965</mark>
+digits = 370
+<mark>upper = 1169</mark>
+<mark>lower = 1639</mark>
+title = 31
+whitespace = 28
+digit-value-sum = 1665
+<mark>categories = UNASSIGNED=1454 UPPERCASE_LETTER=1127 LOWERCASE_LETTER=1445 TITLECASE_LETTER=31 MODIFIER_LETTER=236 OTHER_LETTER=46126 NON_SPACING_MARK=1065 ENCLOSING_MARK=13 COMBINING_SPACING_MARK=260 DECIMAL_DIGIT_NUMBER=370 LETTER_NUMBER=65 OTHER_NUMBER=300 SPACE_SEPARATOR=17 LINE_SEPARATOR=1 PARAGRAPH_SEPARATOR=1 CONTROL=65 FORMAT=43 PRIVATE_USE=6400 SURROGATE=2048 DASH_PUNCTUATION=25 START_PUNCTUATION=79 END_PUNCTUATION=77 CONNECTOR_PUNCTUATION=10 OTHER_PUNCTUATION=412 MATH_SYMBOL=936 CURRENCY_SYMBOL=57 MODIFIER_SYMBOL=120 OTHER_SYMBOL=2731 INITIAL_QUOTE_PUNCTUATION=12 FINAL_QUOTE_PUNCTUATION=10</mark></pre>
+<h3>Group D: jvm-25</h3>
+<pre><mark>letters = 48973</mark>
+digits = 370
+<mark>upper = 1174</mark>
+<mark>lower = 1642</mark>
+title = 31
+whitespace = 28
+digit-value-sum = 1665
+<mark>categories = UNASSIGNED=1432 UPPERCASE_LETTER=1132 LOWERCASE_LETTER=1448 TITLECASE_LETTER=31 MODIFIER_LETTER=236 OTHER_LETTER=46126 NON_SPACING_MARK=1066 ENCLOSING_MARK=13 COMBINING_SPACING_MARK=260 DECIMAL_DIGIT_NUMBER=370 LETTER_NUMBER=65 OTHER_NUMBER=300 SPACE_SEPARATOR=17 LINE_SEPARATOR=1 PARAGRAPH_SEPARATOR=1 CONTROL=65 FORMAT=43 PRIVATE_USE=6400 SURROGATE=2048 DASH_PUNCTUATION=25 START_PUNCTUATION=79 END_PUNCTUATION=77 CONNECTOR_PUNCTUATION=10 OTHER_PUNCTUATION=415 MATH_SYMBOL=936 CURRENCY_SYMBOL=57 MODIFIER_SYMBOL=120 OTHER_SYMBOL=2741 INITIAL_QUOTE_PUNCTUATION=12 FINAL_QUOTE_PUNCTUATION=10</mark></pre>
+<h2>Results on Kotlin 2.5.0-Beta1</h2>
+<p>3 different results; 4 of 8 lines differ.</p>
+<table>
+<caption>Result per column, Kotlin 2.5.0-Beta1</caption>
+<tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
+<tr class="differs"><th scope="row">android</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/android.txt">file</a></td></tr>
+<tr><th scope="row">ios</th><td>B</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/ios.txt">file</a></td></tr>
+<tr><th scope="row">macos</th><td>B</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/macos.txt">file</a></td></tr>
+<tr><th scope="row">wasm</th><td>B</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/wasm.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/jvm.txt">file</a></td></tr>
+</table>
+<h3>Group A: android</h3>
+<pre><mark>letters = 48981</mark>
+digits = 370
+<mark>upper = 1135</mark>
+<mark>lower = 1448</mark>
+title = 31
+whitespace = 28
+digit-value-sum = 1665
+<mark>categories = UNASSIGNED=1370 UPPERCASE_LETTER=1135 LOWERCASE_LETTER=1448 TITLECASE_LETTER=31 MODIFIER_LETTER=237 OTHER_LETTER=46130 NON_SPACING_MARK=1093 ENCLOSING_MARK=13 COMBINING_SPACING_MARK=260 DECIMAL_DIGIT_NUMBER=370 LETTER_NUMBER=65 OTHER_NUMBER=300 SPACE_SEPARATOR=17 LINE_SEPARATOR=1 PARAGRAPH_SEPARATOR=1 CONTROL=65 FORMAT=43 PRIVATE_USE=6400 SURROGATE=2048 DASH_PUNCTUATION=25 START_PUNCTUATION=79 END_PUNCTUATION=77 CONNECTOR_PUNCTUATION=10 OTHER_PUNCTUATION=415 MATH_SYMBOL=936 CURRENCY_SYMBOL=58 MODIFIER_SYMBOL=120 OTHER_SYMBOL=2767 INITIAL_QUOTE_PUNCTUATION=12 FINAL_QUOTE_PUNCTUATION=10</mark></pre>
+<h3>Group B: ios, macos, wasm</h3>
+<pre><mark>letters = 48909</mark>
+digits = 370
+<mark>upper = 1164</mark>
+<mark>lower = 1627</mark>
+title = 31
+whitespace = 28
+digit-value-sum = 1665
+<mark>categories = UNASSIGNED=1585 UPPERCASE_LETTER=1122 LOWERCASE_LETTER=1438 TITLECASE_LETTER=31 MODIFIER_LETTER=232 OTHER_LETTER=46086 NON_SPACING_MARK=1031 ENCLOSING_MARK=13 COMBINING_SPACING_MARK=257 DECIMAL_DIGIT_NUMBER=370 LETTER_NUMBER=65 OTHER_NUMBER=300 SPACE_SEPARATOR=17 LINE_SEPARATOR=1 PARAGRAPH_SEPARATOR=1 CONTROL=65 FORMAT=41 PRIVATE_USE=6400 SURROGATE=2048 DASH_PUNCTUATION=24 START_PUNCTUATION=75 END_PUNCTUATION=73 CONNECTOR_PUNCTUATION=10 OTHER_PUNCTUATION=407 MATH_SYMBOL=936 CURRENCY_SYMBOL=56 MODIFIER_SYMBOL=118 OTHER_SYMBOL=2712 INITIAL_QUOTE_PUNCTUATION=12 FINAL_QUOTE_PUNCTUATION=10</mark></pre>
+<h3>Group C: jvm</h3>
+<pre><mark>letters = 48965</mark>
+digits = 370
+<mark>upper = 1169</mark>
+<mark>lower = 1639</mark>
+title = 31
+whitespace = 28
+digit-value-sum = 1665
+<mark>categories = UNASSIGNED=1454 UPPERCASE_LETTER=1127 LOWERCASE_LETTER=1445 TITLECASE_LETTER=31 MODIFIER_LETTER=236 OTHER_LETTER=46126 NON_SPACING_MARK=1065 ENCLOSING_MARK=13 COMBINING_SPACING_MARK=260 DECIMAL_DIGIT_NUMBER=370 LETTER_NUMBER=65 OTHER_NUMBER=300 SPACE_SEPARATOR=17 LINE_SEPARATOR=1 PARAGRAPH_SEPARATOR=1 CONTROL=65 FORMAT=43 PRIVATE_USE=6400 SURROGATE=2048 DASH_PUNCTUATION=25 START_PUNCTUATION=79 END_PUNCTUATION=77 CONNECTOR_PUNCTUATION=10 OTHER_PUNCTUATION=412 MATH_SYMBOL=936 CURRENCY_SYMBOL=57 MODIFIER_SYMBOL=120 OTHER_SYMBOL=2731 INITIAL_QUOTE_PUNCTUATION=12 FINAL_QUOTE_PUNCTUATION=10</mark></pre>
+<h2>Classification</h2>
+<p>platform-defined, basis inferred; causes: JDK version.</p>
+<blockquote><p>Character information is based on the Unicode Standard, version 13.0.</p>
+<footer><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Character.html">https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Character.html</a></footer></blockquote>
+<blockquote><p>Character information is based on the Unicode Standard, version 15.0.</p>
+<footer><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Character.html">https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Character.html</a></footer></blockquote>
+<blockquote><p>Character information is based on the Unicode Standard, version 16.0.</p>
+<footer><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Character.html">https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Character.html</a></footer></blockquote>
+<blockquote><p>A character is considered to be a letter if its category is CharCategory.UPPERCASE_LETTER</p>
+<footer><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/is-letter.html">https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/is-letter.html</a></footer></blockquote>
+<h3>Notes</h3>
+<p>Same evidence and same limits as char.bmp-case-mapping (UNASSIGNED 1585, 1454, 1432 for JDK 17, 21, 25).</p>
+<p class="muted">Read on 2026-10-07.</p>
+<h2>Issues</h2>
+<table>
+<caption>Tracker state on 2026-10-07</caption>
+<tr><th scope="col">Issue</th><th scope="col">State when read</th><th scope="col">Resolved</th><th scope="col">Summary</th></tr>
+<tr><th scope="row"><a href="https://youtrack.jetbrains.com/issue/KT-58195">KT-58195</a></th><td>Open</td><td></td><td>Native: Use the same unicode version for regex canonicalization</td></tr>
+</table>
+<h2>Kotlin versions measured</h2>
+<p>2.4.20, 2.5.0-Beta1</p>
+<h2>How it was measured</h2>
+<ul>
+<li><strong>android</strong>: The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</li>
+<li><strong>ios</strong>: The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</li>
+<li><strong>jvm</strong>: The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
+<li><strong>jvm-17</strong>: The CLI JVM classes (jvmTarget 17) on Temurin 17.0.20.1, x86-64 Linux container, recorded with --target jvm-17.</li>
+<li><strong>jvm-21</strong>: The same classes on Temurin 21.0.12.1, x86-64 Linux container. Differs from the jvm column in hardware only.</li>
+<li><strong>jvm-25</strong>: The same classes on Temurin 25.0.4.1, x86-64 Linux container.</li>
+<li><strong>linux</strong>: The Kotlin/Native linuxX64 release executable, cross-linked on macOS, run in a debian:bookworm-slim container (glibc 2.36), x86-64. The same executable on ubuntu:24.04 (glibc 2.39) recorded identical results, kept in fixtures/atlas-extra. A release executable linked on macOS prints Apple libm values for three math constants (tan1, asin-half and acos-half); one linked on Ubuntu, or a debug build, prints glibc values. The Ubuntu-linked transcript is in fixtures/atlas-variants.</li>
+<li><strong>linux-arm64</strong>: The Kotlin/Native linuxArm64 release executable, cross-linked on macOS and run in an arm64 debian:bookworm-slim container. The Ubuntu-linked transcript, which differs on the same three math lines, is in fixtures/atlas-variants.</li>
+<li><strong>macos</strong>: The Kotlin/Native macosArm64 executable on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
+<li><strong>wasm</strong>: Kotlin/Wasm (wasmJs) on Node 26.8.2, macOS, Apple Silicon. Recorded through the wasm test harness because the wasm CLI has no file writer.</li>
+<li><strong>wasm-chromium</strong>: The Studio web build in Chromium 153.0.8010.12 (V8), driven by Playwright 1.63.0 on x86-64 Linux in a container.</li>
+<li><strong>wasm-firefox</strong>: The Studio web build in Firefox 155.0 (SpiderMonkey), driven by Playwright 1.63.0 on x86-64 Linux in a container.</li>
+<li><strong>wasm-webkit</strong>: The Studio web build in WebKit 26.6 (JavaScriptCore, the Playwright build for Linux), driven by Playwright 1.63.0 on x86-64 Linux in a container. Not Safari.</li>
+</ul>
+</main>
+<footer class="muted">
+<p>Results are recorded measurements for the listed Kotlin versions. A difference between
+targets is a result, not a diagnosis.</p>
+</footer>
+</body>
+</html>

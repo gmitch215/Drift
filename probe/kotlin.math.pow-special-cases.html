@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kotlin.math.pow-special-cases | Drift Atlas</title>
+<style>
+:root{color-scheme:light dark;--fg:#1a1a1a;--bg:#fff;--muted:#555;--line:#c8c8c8;
+--mark:#ffe58a;--code:#f3f3f3;--link:#0b57d0}
+@media (prefers-color-scheme:dark){:root{--fg:#ececec;--bg:#161616;--muted:#a8a8a8;
+--line:#444;--mark:#6b5300;--code:#222;--link:#8ab4f8}}
+body{margin:0;font:16px/1.5 system-ui,sans-serif;color:var(--fg);background:var(--bg)}
+header,main,footer{max-width:72rem;margin:0 auto;padding:.75rem 1rem}
+a{color:var(--link)}
+.skip{position:absolute;left:-999px}.skip:focus{left:1rem;top:.5rem}
+nav a{margin-right:1rem}
+pre,code{font:14px/1.4 ui-monospace,monospace;background:var(--code)}
+pre{padding:.5rem;overflow-x:auto;white-space:pre}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%}
+th,td{border:1px solid var(--line);padding:.25rem .5rem;text-align:left;vertical-align:top}
+tr.differs{background:var(--mark)}
+mark{background:var(--mark);color:inherit}
+blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
+.draft{border:2px solid var(--fg);padding:.5rem}
+.muted{color:var(--muted)}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+<nav aria-label="Atlas">
+<a href="../">Interactive Atlas</a>
+<a href="../probe/">All probes</a>
+<a href="../data/dataset.json">dataset.json</a>
+<a href="../data/classification.json">classification.json</a>
+</nav>
+</header>
+<main id="main">
+<h1>kotlin.math.pow-special-cases</h1>
+<p>What does pow return for NaN, infinities, zeros and huge exponents?</p>
+<p><strong>unclassified</strong> (basis: verified); differs between targets</p>
+<h2>Source</h2>
+<pre><code>val nan = Double.NaN
+val inf = Double.POSITIVE_INFINITY
+line(&quot;nan^0&quot;, nan.pow(0.0))
+line(&quot;1^nan&quot;, 1.0.pow(nan))
+line(&quot;1^inf&quot;, 1.0.pow(inf))
+line(&quot;-1^inf&quot;, (-1.0).pow(inf))
+line(&quot;2^nan&quot;, 2.0.pow(nan))
+line(&quot;0^-1&quot;, 0.0.pow(-1.0))
+line(&quot;-0^-1&quot;, (-0.0).pow(-1.0))
+line(&quot;-0^-2&quot;, (-0.0).pow(-2.0))
+line(&quot;-8^third&quot;, (-8.0).pow(1.0 / 3.0))
+line(&quot;2^1024&quot;, 2.0.pow(1024.0))
+line(&quot;2^-1075&quot;, 2.0.pow(-1075.0))
+line(&quot;2^-1074&quot;, 2.0.pow(-1074.0))
+line(&quot;10^-5&quot;, bits(10.0.pow(-5.0)))
+line(&quot;2^half&quot;, bits(2.0.pow(0.5)))
+line(&quot;2^int-10&quot;, 2.0.pow(10))
+line(&quot;1.1^int-100&quot;, bits(1.1.pow(100)))
+line(&quot;int-pow-nan&quot;, nan.pow(0))
+line(&quot;inf^0&quot;, inf.pow(0.0))
+line(&quot;inf^-1&quot;, inf.pow(-1.0))</code></pre>
+<h2>Results on Kotlin 2.4.20</h2>
+<p>5 different results; 5 of 19 lines differ.</p>
+<table>
+<caption>Result per column, Kotlin 2.4.20</caption>
+<tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
+<tr class="differs"><th scope="row">android</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
+<tr><th scope="row">ios</th><td>B</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
+<tr><th scope="row">linux</th><td>B</td><td>ok</td><td><a href="../data/transcripts/linux.txt">file</a></td></tr>
+<tr><th scope="row">linux-arm64</th><td>B</td><td>ok</td><td><a href="../data/transcripts/linux-arm64.txt">file</a></td></tr>
+<tr><th scope="row">macos</th><td>B</td><td>ok</td><td><a href="../data/transcripts/macos.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-17</th><td>D (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-21</th><td>D (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-21.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-25</th><td>D (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-25.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">wasm</th><td>E (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/wasm.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">wasm-chromium</th><td>E (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">wasm-firefox</th><td>E (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">wasm-webkit</th><td>E (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
+</table>
+<h3>Group A: android</h3>
+<pre>nan^0 = 1.0
+<mark>1^nan = 1.0</mark>
+<mark>1^inf = 1.0</mark>
+<mark>-1^inf = 1.0</mark>
+2^nan = NaN
+0^-1 = Infinity
+-0^-1 = -Infinity
+-0^-2 = Infinity
+-8^third = NaN
+2^1024 = Infinity
+2^-1075 = 0.0
+<mark>2^-1074 = 4.9E-324</mark>
+<mark>10^-5 = 3ee4f8b588e368f1</mark>
+2^half = 3ff6a09e667f3bcd
+2^int-10 = 1024.0
+1.1^int-100 = 40caea4e6126bb95
+int-pow-nan = 1.0
+inf^0 = 1.0
+inf^-1 = 0.0</pre>
+<h3>Group B: ios, linux, linux-arm64, macos</h3>
+<pre>nan^0 = 1.0
+<mark>1^nan = 1.0</mark>
+<mark>1^inf = NaN</mark>
+<mark>-1^inf = NaN</mark>
+2^nan = NaN
+0^-1 = Infinity
+-0^-1 = -Infinity
+-0^-2 = Infinity
+-8^third = NaN
+2^1024 = Infinity
+2^-1075 = 0.0
+<mark>2^-1074 = 4.9E-324</mark>
+<mark>10^-5 = 3ee4f8b588e368f1</mark>
+2^half = 3ff6a09e667f3bcd
+2^int-10 = 1024.0
+1.1^int-100 = 40caea4e6126bb95
+int-pow-nan = 1.0
+inf^0 = 1.0
+inf^-1 = 0.0</pre>
+<h3>Group C: jvm</h3>
+<pre>nan^0 = 1.0
+<mark>1^nan = NaN</mark>
+<mark>1^inf = NaN</mark>
+<mark>-1^inf = NaN</mark>
+2^nan = NaN
+0^-1 = Infinity
+-0^-1 = -Infinity
+-0^-2 = Infinity
+-8^third = NaN
+2^1024 = Infinity
+2^-1075 = 0.0
+<mark>2^-1074 = 4.9E-324</mark>
+<mark>10^-5 = 3ee4f8b588e368f0</mark>
+2^half = 3ff6a09e667f3bcd
+2^int-10 = 1024.0
+1.1^int-100 = 40caea4e6126bb95
+int-pow-nan = 1.0
+inf^0 = 1.0
+inf^-1 = 0.0</pre>
+<h3>Group D: jvm-17, jvm-21, jvm-25</h3>
+<pre>nan^0 = 1.0
+<mark>1^nan = NaN</mark>
+<mark>1^inf = NaN</mark>
+<mark>-1^inf = NaN</mark>
+2^nan = NaN
+0^-1 = Infinity
+-0^-1 = -Infinity
+-0^-2 = Infinity
+-8^third = NaN
+2^1024 = Infinity
+2^-1075 = 0.0
+<mark>2^-1074 = 4.9E-324</mark>
+<mark>10^-5 = 3ee4f8b588e368f1</mark>
+2^half = 3ff6a09e667f3bcd
+2^int-10 = 1024.0
+1.1^int-100 = 40caea4e6126bb95
+int-pow-nan = 1.0
+inf^0 = 1.0
+inf^-1 = 0.0</pre>
+<h3>Group E: wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
+<pre>nan^0 = 1.0
+<mark>1^nan = NaN</mark>
+<mark>1^inf = NaN</mark>
+<mark>-1^inf = NaN</mark>
+2^nan = NaN
+0^-1 = Infinity
+-0^-1 = -Infinity
+-0^-2 = Infinity
+-8^third = NaN
+2^1024 = Infinity
+2^-1075 = 0.0
+<mark>2^-1074 = 5e-324</mark>
+<mark>10^-5 = 3ee4f8b588e368f0</mark>
+2^half = 3ff6a09e667f3bcd
+2^int-10 = 1024.0
+1.1^int-100 = 40caea4e6126bb95
+int-pow-nan = 1.0
+inf^0 = 1.0
+inf^-1 = 0.0</pre>
+<h2>Results on Kotlin 2.5.0-Beta1</h2>
+<p>3 different results; 4 of 19 lines differ.</p>
+<table>
+<caption>Result per column, Kotlin 2.5.0-Beta1</caption>
+<tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
+<tr class="differs"><th scope="row">android</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/android.txt">file</a></td></tr>
+<tr><th scope="row">ios</th><td>B</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/ios.txt">file</a></td></tr>
+<tr><th scope="row">macos</th><td>B</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/macos.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/jvm.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">wasm</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/wasm.txt">file</a></td></tr>
+</table>
+<h3>Group A: android</h3>
+<pre>nan^0 = 1.0
+<mark>1^nan = 1.0</mark>
+<mark>1^inf = 1.0</mark>
+<mark>-1^inf = 1.0</mark>
+2^nan = NaN
+0^-1 = Infinity
+-0^-1 = -Infinity
+-0^-2 = Infinity
+-8^third = NaN
+2^1024 = Infinity
+2^-1075 = 0.0
+2^-1074 = 4.9E-324
+<mark>10^-5 = 3ee4f8b588e368f1</mark>
+2^half = 3ff6a09e667f3bcd
+2^int-10 = 1024.0
+1.1^int-100 = 40caea4e6126bb95
+int-pow-nan = 1.0
+inf^0 = 1.0
+inf^-1 = 0.0</pre>
+<h3>Group B: ios, macos</h3>
+<pre>nan^0 = 1.0
+<mark>1^nan = 1.0</mark>
+<mark>1^inf = NaN</mark>
+<mark>-1^inf = NaN</mark>
+2^nan = NaN
+0^-1 = Infinity
+-0^-1 = -Infinity
+-0^-2 = Infinity
+-8^third = NaN
+2^1024 = Infinity
+2^-1075 = 0.0
+2^-1074 = 4.9E-324
+<mark>10^-5 = 3ee4f8b588e368f1</mark>
+2^half = 3ff6a09e667f3bcd
+2^int-10 = 1024.0
+1.1^int-100 = 40caea4e6126bb95
+int-pow-nan = 1.0
+inf^0 = 1.0
+inf^-1 = 0.0</pre>
+<h3>Group C: jvm, wasm</h3>
+<pre>nan^0 = 1.0
+<mark>1^nan = NaN</mark>
+<mark>1^inf = NaN</mark>
+<mark>-1^inf = NaN</mark>
+2^nan = NaN
+0^-1 = Infinity
+-0^-1 = -Infinity
+-0^-2 = Infinity
+-8^third = NaN
+2^1024 = Infinity
+2^-1075 = 0.0
+2^-1074 = 4.9E-324
+<mark>10^-5 = 3ee4f8b588e368f0</mark>
+2^half = 3ff6a09e667f3bcd
+2^int-10 = 1024.0
+1.1^int-100 = 40caea4e6126bb95
+int-pow-nan = 1.0
+inf^0 = 1.0
+inf^-1 = 0.0</pre>
+<h2>Classification</h2>
+<p>unclassified, basis verified; causes: documented difference, Kotlin issue, hardware.</p>
+<p>Downgraded from documented; the reason is in the notes.</p>
+<p>No explanation was found in the sources searched.</p>
+<blockquote><p>b.pow(NaN) is NaN</p>
+<footer><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.math/pow.html">https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.math/pow.html</a></footer></blockquote>
+<blockquote><p>If the second argument is NaN, then the result is NaN except where the first argument is 1.0.</p>
+<footer><a href="https://developer.android.com/reference/java/lang/Math">https://developer.android.com/reference/java/lang/Math</a></footer></blockquote>
+<blockquote><p>If the absolute value of the first argument equals 1 and the second argument is infinite, then the result is 1.0.</p>
+<footer><a href="https://developer.android.com/reference/java/lang/Math">https://developer.android.com/reference/java/lang/Math</a></footer></blockquote>
+<blockquote><p>all implementations of the equivalent functions of class Math are not defined to return the bit-for-bit same results</p>
+<footer><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Math.html">https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Math.html</a></footer></blockquote>
+<h3>Notes</h3>
+<p>Downgraded from documented: the Kotlin KDoc states b.pow(NaN) is NaN, so Native violates a documented contract (open defect, not a documented difference). The Android column is also off the Kotlin contract, but its own Math.pow page documents the 1.0 results (verified).</p>
+<p class="muted">Read on 2026-10-07.</p>
+<h2>Issues</h2>
+<table>
+<caption>Tracker state on 2026-10-07</caption>
+<tr><th scope="col">Issue</th><th scope="col">State when read</th><th scope="col">Resolved</th><th scope="col">Summary</th></tr>
+<tr><th scope="row"><a href="https://youtrack.jetbrains.com/issue/KT-89072">KT-89072</a></th><td>Open</td><td></td><td>Kotlin/Native: 1.0.pow(NaN) returns 1.0 instead of NaN from the contract</td></tr>
+<tr><th scope="row"><a href="https://youtrack.jetbrains.com/issue/KT-88414">KT-88414</a></th><td>Fixed</td><td>2026-08-30</td><td>[Wasm] Make FP parse and toString alighed with JVM and Native targets</td></tr>
+</table>
+<h2>What was searched</h2>
+<p>YouTrack: &quot;pow NaN&quot;, &quot;Math.pow Android&quot;. KT-89072 read in full (Open). Kotlin pow KDoc and Android Math.pow page read in full. Native 1.0 for 1^NaN violates the KDoc; Android 1.0 is documented by its own Math.pow page.</p>
+<h2>Repro draft</h2>
+<div class="draft">
+<p><strong>Draft for human review; not filed.</strong></p>
+<pre>Draft for human review. Not filed.
+
+# kotlin.math.pow-special-cases
+
+This text was written by an agent from measured transcripts and pages it read. A person must rerun the probe, read the pages named below and rewrite it in their own words before anything is posted; the Kotlin maintainers do not want generated reports. The columns mingw-wine, linux-ubuntu and jvm-21-arm64 named below are measured transcripts kept in fixtures/atlas-extra.
+
+Question: What does pow return for NaN, infinities, zeros and huge exponents?
+
+Classification now: unclassified (was documented); cause letters: a c d; basis: verified.
+
+Measured: Kotlin 2.4.20 on 16 columns (android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, jvm 21 arm64 in a container, linux x64, linux arm64 and linux-ubuntu Native, mingw Native under wine); Kotlin 2.5.0-Beta1 on jvm, macos, wasm, android and ios. Single run per cell; no spread measured.
+
+Helpers (not shown below): `line(label, v)` prints `label = v`; `outcome(label) { }` prints `ok:&lt;value&gt;` or `err:&lt;ExceptionClass&gt;`; `failure(label) { }` prints `err:&lt;Class&gt;:&lt;message&gt;`; `bits(d)` prints `d.toRawBits()` as unsigned hex.
+
+Code for the differing lines (from the displayed probe source):
+
+```kotlin
+val nan = Double.NaN
+val inf = Double.POSITIVE_INFINITY
+line(&quot;1^nan&quot;, 1.0.pow(nan))
+line(&quot;1^inf&quot;, 1.0.pow(inf))
+line(&quot;-1^inf&quot;, (-1.0).pow(inf))
+line(&quot;2^-1074&quot;, 2.0.pow(-1074.0))
+line(&quot;10^-5&quot;, bits(10.0.pow(-5.0)))
+```
+
+Results at 2.4.20, one row per distinct output (columns that agree share a row):
+
+- `1^nan`
+  - `1.0`: android, ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
+  - `NaN`: jvm+jvm-21-arm64, wasm+3browsers, jvm-17+jvm-21+jvm-25
+- `1^inf`
+  - `1.0`: android
+  - `NaN`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine, jvm+jvm-21-arm64, wasm+3browsers, jvm-17+jvm-21+jvm-25
+- `-1^inf`
+  - `1.0`: android
+  - `NaN`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine, jvm+jvm-21-arm64, wasm+3browsers, jvm-17+jvm-21+jvm-25
+- `2^-1074`
+  - `4.9E-324`: android, ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine, jvm+jvm-21-arm64, jvm-17+jvm-21+jvm-25
+  - `5e-324`: wasm+3browsers
+- `10^-5`
+  - `3ee4f8b588e368f1`: android, ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine, jvm-17+jvm-21+jvm-25
+  - `3ee4f8b588e368f0`: jvm+jvm-21-arm64, wasm+3browsers
+
+On 2.5.0-Beta1 the cells group as: jvm+wasm; macos+ios; android.
+
+Docs read (FULL text):
+- https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.math/pow.html : &quot;b.pow(NaN) is NaN&quot;
+- https://developer.android.com/reference/java/lang/Math : &quot;If the second argument is NaN, then the result is NaN except where the first argument is 1.0.&quot;
+- https://developer.android.com/reference/java/lang/Math : &quot;If the absolute value of the first argument equals 1 and the second argument is infinite, then the result is 1.0.&quot;
+- https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Math.html : &quot;all implementations of the equivalent functions of class Math are not defined to return the bit-for-bit same results&quot;
+
+Existing tracker issues (read through the YouTrack REST API on 2026-10-07; nothing was posted): KT-89072 Open; KT-88414 Fixed.
+
+What is known: Downgraded from documented: the Kotlin KDoc states b.pow(NaN) is NaN, so Native violates a documented contract (open defect, not a documented difference). The Android column is also off the Kotlin contract, but its own Math.pow page documents the 1.0 results (verified).
+
+What is NOT known: the intended behavior where no page read states one; whether the divergent column is a defect or by design; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device of the same target differs (one device per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies; the ladder agent re-compiled the displayed text and matched 37 of 38 probes on JVM and macOS Native).
+</pre>
+</div>
+<h2>Kotlin versions measured</h2>
+<p>2.4.20, 2.5.0-Beta1</p>
+<h2>How it was measured</h2>
+<ul>
+<li><strong>android</strong>: The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</li>
+<li><strong>ios</strong>: The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</li>
+<li><strong>jvm</strong>: The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
+<li><strong>jvm-17</strong>: The CLI JVM classes (jvmTarget 17) on Temurin 17.0.20.1, x86-64 Linux container, recorded with --target jvm-17.</li>
+<li><strong>jvm-21</strong>: The same classes on Temurin 21.0.12.1, x86-64 Linux container. Differs from the jvm column in hardware only.</li>
+<li><strong>jvm-25</strong>: The same classes on Temurin 25.0.4.1, x86-64 Linux container.</li>
+<li><strong>linux</strong>: The Kotlin/Native linuxX64 release executable, cross-linked on macOS, run in a debian:bookworm-slim container (glibc 2.36), x86-64. The same executable on ubuntu:24.04 (glibc 2.39) recorded identical results, kept in fixtures/atlas-extra. A release executable linked on macOS prints Apple libm values for three math constants (tan1, asin-half and acos-half); one linked on Ubuntu, or a debug build, prints glibc values. The Ubuntu-linked transcript is in fixtures/atlas-variants.</li>
+<li><strong>linux-arm64</strong>: The Kotlin/Native linuxArm64 release executable, cross-linked on macOS and run in an arm64 debian:bookworm-slim container. The Ubuntu-linked transcript, which differs on the same three math lines, is in fixtures/atlas-variants.</li>
+<li><strong>macos</strong>: The Kotlin/Native macosArm64 executable on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
+<li><strong>wasm</strong>: Kotlin/Wasm (wasmJs) on Node 26.8.2, macOS, Apple Silicon. Recorded through the wasm test harness because the wasm CLI has no file writer.</li>
+<li><strong>wasm-chromium</strong>: The Studio web build in Chromium 153.0.8010.12 (V8), driven by Playwright 1.63.0 on x86-64 Linux in a container.</li>
+<li><strong>wasm-firefox</strong>: The Studio web build in Firefox 155.0 (SpiderMonkey), driven by Playwright 1.63.0 on x86-64 Linux in a container.</li>
+<li><strong>wasm-webkit</strong>: The Studio web build in WebKit 26.6 (JavaScriptCore, the Playwright build for Linux), driven by Playwright 1.63.0 on x86-64 Linux in a container. Not Safari.</li>
+</ul>
+</main>
+<footer class="muted">
+<p>Results are recorded measurements for the listed Kotlin versions. A difference between
+targets is a result, not a diagnosis.</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kotlin.math.rounding | Drift Atlas</title>
+<style>
+:root{color-scheme:light dark;--fg:#1a1a1a;--bg:#fff;--muted:#555;--line:#c8c8c8;
+--mark:#ffe58a;--code:#f3f3f3;--link:#0b57d0}
+@media (prefers-color-scheme:dark){:root{--fg:#ececec;--bg:#161616;--muted:#a8a8a8;
+--line:#444;--mark:#6b5300;--code:#222;--link:#8ab4f8}}
+body{margin:0;font:16px/1.5 system-ui,sans-serif;color:var(--fg);background:var(--bg)}
+header,main,footer{max-width:72rem;margin:0 auto;padding:.75rem 1rem}
+a{color:var(--link)}
+.skip{position:absolute;left:-999px}.skip:focus{left:1rem;top:.5rem}
+nav a{margin-right:1rem}
+pre,code{font:14px/1.4 ui-monospace,monospace;background:var(--code)}
+pre{padding:.5rem;overflow-x:auto;white-space:pre}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%}
+th,td{border:1px solid var(--line);padding:.25rem .5rem;text-align:left;vertical-align:top}
+tr.differs{background:var(--mark)}
+mark{background:var(--mark);color:inherit}
+blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
+.draft{border:2px solid var(--fg);padding:.5rem}
+.muted{color:var(--muted)}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+<nav aria-label="Atlas">
+<a href="../">Interactive Atlas</a>
+<a href="../probe/">All probes</a>
+<a href="../data/dataset.json">dataset.json</a>
+<a href="../data/classification.json">classification.json</a>
+</nav>
+</header>
+<main id="main">
+<h1>kotlin.math.rounding</h1>
+<p>How do round and roundToInt treat ties and values just below a tie?</p>
+<p><strong>unclassified</strong> (basis: verified); differs between targets</p>
+<h2>Source</h2>
+<pre><code>for ((name, d) in listOf(
+    &quot;0.5&quot; to 0.5, &quot;1.5&quot; to 1.5, &quot;2.5&quot; to 2.5, &quot;-0.5&quot; to -0.5, &quot;-1.5&quot; to -1.5,
+    &quot;-2.5&quot; to -2.5, &quot;0.49999999999999994&quot; to 0.49999999999999994,
+    &quot;2.4999999999999996&quot; to 2.4999999999999996,
+    &quot;4503599627370497&quot; to 4503599627370497.0,
+)) {
+    val r = round(d)
+    line(name, &quot;round=&quot; + r + &quot; int=&quot; + d.roundToInt() + &quot; long=&quot; + d.roundToLong())
+}
+outcome(&quot;roundToInt-nan&quot;) { Double.NaN.roundToInt() }
+line(&quot;roundToInt-1e10&quot;, 1e10.roundToInt())
+line(&quot;roundToInt-int-max-half&quot;, 2147483647.5.roundToInt())
+line(&quot;float-0.5&quot;, 0.5f.roundToInt())
+line(&quot;float-2.5&quot;, 2.5f.roundToInt())
+line(&quot;float-neg-2.5&quot;, (-2.5f).roundToInt())
+line(&quot;float-8388609&quot;, 8388609f.roundToInt())</code></pre>
+<h2>Results on Kotlin 2.4.20</h2>
+<p>3 different results; 3 of 16 lines differ.</p>
+<table>
+<caption>Result per column, Kotlin 2.4.20</caption>
+<tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
+<tr><th scope="row">android</th><td>A</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
+<tr><th scope="row">jvm</th><td>A</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
+<tr><th scope="row">jvm-17</th><td>A</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
+<tr><th scope="row">jvm-21</th><td>A</td><td>ok</td><td><a href="../data/transcripts/jvm-21.txt">file</a></td></tr>
+<tr><th scope="row">jvm-25</th><td>A</td><td>ok</td><td><a href="../data/transcripts/jvm-25.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">ios</th><td>B (differs from group A)</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">linux</th><td>B (differs from group A)</td><td>ok</td><td><a href="../data/transcripts/linux.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">linux-arm64</th><td>B (differs from group A)</td><td>ok</td><td><a href="../data/transcripts/linux-arm64.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">macos</th><td>B (differs from group A)</td><td>ok</td><td><a href="../data/transcripts/macos.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">wasm</th><td>C (differs from group A)</td><td>ok</td><td><a href="../data/transcripts/wasm.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">wasm-chromium</th><td>C (differs from group A)</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">wasm-firefox</th><td>C (differs from group A)</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">wasm-webkit</th><td>C (differs from group A)</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
+</table>
+<h3>Group A: android, jvm, jvm-17, jvm-21, jvm-25</h3>
+<pre>0.5 = round=0.0 int=1 long=1
+1.5 = round=2.0 int=2 long=2
+2.5 = round=2.0 int=3 long=3
+-0.5 = round=-0.0 int=0 long=0
+-1.5 = round=-2.0 int=-1 long=-1
+-2.5 = round=-2.0 int=-2 long=-2
+<mark>0.49999999999999994 = round=0.0 int=0 long=0</mark>
+2.4999999999999996 = round=2.0 int=2 long=2
+<mark>4503599627370497 = round=4.503599627370497E15 int=2147483647 long=4503599627370497</mark>
+roundToInt-nan = err:IllegalArgumentException
+roundToInt-1e10 = 2147483647
+roundToInt-int-max-half = 2147483647
+float-0.5 = 1
+float-2.5 = 3
+float-neg-2.5 = -2
+<mark>float-8388609 = 8388609</mark></pre>
+<h3>Group B: ios, linux, linux-arm64, macos</h3>
+<pre>0.5 = round=0.0 int=1 long=1
+1.5 = round=2.0 int=2 long=2
+2.5 = round=2.0 int=3 long=3
+-0.5 = round=-0.0 int=0 long=0
+-1.5 = round=-2.0 int=-1 long=-1
+-2.5 = round=-2.0 int=-2 long=-2
+<mark>0.49999999999999994 = round=0.0 int=1 long=1</mark>
+2.4999999999999996 = round=2.0 int=2 long=2
+<mark>4503599627370497 = round=4.503599627370497E15 int=2147483647 long=4503599627370498</mark>
+roundToInt-nan = err:IllegalArgumentException
+roundToInt-1e10 = 2147483647
+roundToInt-int-max-half = 2147483647
+float-0.5 = 1
+float-2.5 = 3
+float-neg-2.5 = -2
+<mark>float-8388609 = 8388610</mark></pre>
+<h3>Group C: wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
+<pre>0.5 = round=0.0 int=1 long=1
+1.5 = round=2.0 int=2 long=2
+2.5 = round=2.0 int=3 long=3
+-0.5 = round=-0.0 int=0 long=0
+-1.5 = round=-2.0 int=-1 long=-1
+-2.5 = round=-2.0 int=-2 long=-2
+<mark>0.49999999999999994 = round=0.0 int=1 long=1</mark>
+2.4999999999999996 = round=2.0 int=2 long=2
+<mark>4503599627370497 = round=4503599627370497.0 int=2147483647 long=4503599627370498</mark>
+roundToInt-nan = err:IllegalArgumentException
+roundToInt-1e10 = 2147483647
+roundToInt-int-max-half = 2147483647
+float-0.5 = 1
+float-2.5 = 3
+float-neg-2.5 = -2
+<mark>float-8388609 = 8388610</mark></pre>
+<h2>Results on Kotlin 2.5.0-Beta1</h2>
+<p>2 different results; 3 of 16 lines differ.</p>
+<table>
+<caption>Result per column, Kotlin 2.5.0-Beta1</caption>
+<tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
+<tr class="differs"><th scope="row">android</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/android.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/jvm.txt">file</a></td></tr>
+<tr><th scope="row">ios</th><td>B</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/ios.txt">file</a></td></tr>
+<tr><th scope="row">macos</th><td>B</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/macos.txt">file</a></td></tr>
+<tr><th scope="row">wasm</th><td>B</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/wasm.txt">file</a></td></tr>
+</table>
+<h3>Group A: android, jvm</h3>
+<pre>0.5 = round=0.0 int=1 long=1
+1.5 = round=2.0 int=2 long=2
+2.5 = round=2.0 int=3 long=3
+-0.5 = round=-0.0 int=0 long=0
+-1.5 = round=-2.0 int=-1 long=-1
+-2.5 = round=-2.0 int=-2 long=-2
+<mark>0.49999999999999994 = round=0.0 int=0 long=0</mark>
+2.4999999999999996 = round=2.0 int=2 long=2
+<mark>4503599627370497 = round=4.503599627370497E15 int=2147483647 long=4503599627370497</mark>
+roundToInt-nan = err:IllegalArgumentException
+roundToInt-1e10 = 2147483647
+roundToInt-int-max-half = 2147483647
+float-0.5 = 1
+float-2.5 = 3
+float-neg-2.5 = -2
+<mark>float-8388609 = 8388609</mark></pre>
+<h3>Group B: ios, macos, wasm</h3>
+<pre>0.5 = round=0.0 int=1 long=1
+1.5 = round=2.0 int=2 long=2
+2.5 = round=2.0 int=3 long=3
+-0.5 = round=-0.0 int=0 long=0
+-1.5 = round=-2.0 int=-1 long=-1
+-2.5 = round=-2.0 int=-2 long=-2
+<mark>0.49999999999999994 = round=0.0 int=1 long=1</mark>
+2.4999999999999996 = round=2.0 int=2 long=2
+<mark>4503599627370497 = round=4.503599627370497E15 int=2147483647 long=4503599627370498</mark>
+roundToInt-nan = err:IllegalArgumentException
+roundToInt-1e10 = 2147483647
+roundToInt-int-max-half = 2147483647
+float-0.5 = 1
+float-2.5 = 3
+float-neg-2.5 = -2
+<mark>float-8388609 = 8388610</mark></pre>
+<h2>Classification</h2>
+<p>unclassified, basis verified; causes: Kotlin issue.</p>
+<p>Downgraded from documented; the reason is in the notes.</p>
+<p>No explanation was found in the sources searched.</p>
+<blockquote><p>Rounds this Double value to the nearest integer and converts the result to Int</p>
+<footer><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.math/round-to-int.html">https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.math/round-to-int.html</a></footer></blockquote>
+<h3>Notes</h3>
+<p>Downgraded from documented: the KDoc says &quot;nearest integer&quot; and the inputs are not ties, so Native and Wasm results (1, 4503599627370498, 8388610) violate it. KT-89074 Open. Unchanged on 2.5.0-Beta1.</p>
+<p class="muted">Read on 2026-10-07.</p>
+<h2>Issues</h2>
+<table>
+<caption>Tracker state on 2026-10-07</caption>
+<tr><th scope="col">Issue</th><th scope="col">State when read</th><th scope="col">Resolved</th><th scope="col">Summary</th></tr>
+<tr><th scope="row"><a href="https://youtrack.jetbrains.com/issue/KT-89074">KT-89074</a></th><td>Open</td><td></td><td>Kotlin/Native and Kotlin/Wasm: roundToInt, roundToLong do not follow contract</td></tr>
+</table>
+<h2>What was searched</h2>
+<p>YouTrack: &quot;roundToInt Native&quot;. KT-89074 read in full (Open). Kotlin roundToInt KDoc read in full: the inputs are not ties and the results violate &quot;nearest integer&quot;.</p>
+<h2>Repro draft</h2>
+<div class="draft">
+<p><strong>Draft for human review; not filed.</strong></p>
+<pre>Draft for human review. Not filed.
+
+# kotlin.math.rounding
+
+This text was written by an agent from measured transcripts and pages it read. A person must rerun the probe, read the pages named below and rewrite it in their own words before anything is posted; the Kotlin maintainers do not want generated reports. The columns mingw-wine, linux-ubuntu and jvm-21-arm64 named below are measured transcripts kept in fixtures/atlas-extra.
+
+Question: How do round and roundToInt treat ties and values just below a tie?
+
+Classification now: unclassified (was documented); cause letters: c; basis: verified.
+
+Measured: Kotlin 2.4.20 on 16 columns (android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, jvm 21 arm64 in a container, linux x64, linux arm64 and linux-ubuntu Native, mingw Native under wine); Kotlin 2.5.0-Beta1 on jvm, macos, wasm, android and ios. Single run per cell; no spread measured.
+
+Helpers (not shown below): `line(label, v)` prints `label = v`; `outcome(label) { }` prints `ok:&lt;value&gt;` or `err:&lt;ExceptionClass&gt;`; `failure(label) { }` prints `err:&lt;Class&gt;:&lt;message&gt;`; `bits(d)` prints `d.toRawBits()` as unsigned hex.
+
+Code for the differing lines (from the displayed probe source):
+
+```kotlin
+for ((name, d) in listOf(
+	&quot;0.5&quot; to 0.5, &quot;1.5&quot; to 1.5, &quot;2.5&quot; to 2.5, &quot;-0.5&quot; to -0.5, &quot;-1.5&quot; to -1.5,
+	&quot;-2.5&quot; to -2.5, &quot;0.49999999999999994&quot; to 0.49999999999999994,
+	&quot;2.4999999999999996&quot; to 2.4999999999999996,
+	&quot;4503599627370497&quot; to 4503599627370497.0,
+)) {
+	val r = round(d)
+	line(name, &quot;round=&quot; + r + &quot; int=&quot; + d.roundToInt() + &quot; long=&quot; + d.roundToLong())
+}
+line(&quot;float-8388609&quot;, 8388609f.roundToInt())
+```
+
+Results at 2.4.20, one row per distinct output (columns that agree share a row):
+
+- `0.49999999999999994`
+  - `round=0.0 int=0 long=0`: android+jvm+jvm-17+jvm-21+jvm-21-arm64+jvm-25
+  - `round=0.0 int=1 long=1`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine, wasm+3browsers
+- `4503599627370497`
+  - `round=4.503599627370497E15 int=2147483647 long=4503599627370497`: android+jvm+jvm-17+jvm-21+jvm-21-arm64+jvm-25
+  - `round=4.503599627370497E15 int=2147483647 long=4503599627370498`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
+  - `round=4503599627370497.0 int=2147483647 long=4503599627370498`: wasm+3browsers
+- `float-8388609`
+  - `8388609`: android+jvm+jvm-17+jvm-21+jvm-21-arm64+jvm-25
+  - `8388610`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine, wasm+3browsers
+
+On 2.5.0-Beta1 the cells group as: jvm+android; macos+wasm+ios.
+
+Docs read (FULL text):
+- https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.math/round-to-int.html : &quot;Rounds this Double value to the nearest integer and converts the result to Int&quot;
+
+Existing tracker issues (read through the YouTrack REST API on 2026-10-07; nothing was posted): KT-89074 Open.
+
+What is known: Downgraded from documented: the KDoc says &quot;nearest integer&quot; and the inputs are not ties, so Native and Wasm results (1, 4503599627370498, 8388610) violate it. KT-89074 Open. Unchanged on 2.5.0-Beta1.
+
+What is NOT known: the intended behavior where no page read states one; whether the divergent column is a defect or by design; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device of the same target differs (one device per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies; the ladder agent re-compiled the displayed text and matched 37 of 38 probes on JVM and macOS Native).
+</pre>
+</div>
+<h2>Kotlin versions measured</h2>
+<p>2.4.20, 2.5.0-Beta1</p>
+<h2>How it was measured</h2>
+<ul>
+<li><strong>android</strong>: The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</li>
+<li><strong>ios</strong>: The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</li>
+<li><strong>jvm</strong>: The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
+<li><strong>jvm-17</strong>: The CLI JVM classes (jvmTarget 17) on Temurin 17.0.20.1, x86-64 Linux container, recorded with --target jvm-17.</li>
+<li><strong>jvm-21</strong>: The same classes on Temurin 21.0.12.1, x86-64 Linux container. Differs from the jvm column in hardware only.</li>
+<li><strong>jvm-25</strong>: The same classes on Temurin 25.0.4.1, x86-64 Linux container.</li>
+<li><strong>linux</strong>: The Kotlin/Native linuxX64 release executable, cross-linked on macOS, run in a debian:bookworm-slim container (glibc 2.36), x86-64. The same executable on ubuntu:24.04 (glibc 2.39) recorded identical results, kept in fixtures/atlas-extra. A release executable linked on macOS prints Apple libm values for three math constants (tan1, asin-half and acos-half); one linked on Ubuntu, or a debug build, prints glibc values. The Ubuntu-linked transcript is in fixtures/atlas-variants.</li>
+<li><strong>linux-arm64</strong>: The Kotlin/Native linuxArm64 release executable, cross-linked on macOS and run in an arm64 debian:bookworm-slim container. The Ubuntu-linked transcript, which differs on the same three math lines, is in fixtures/atlas-variants.</li>
+<li><strong>macos</strong>: The Kotlin/Native macosArm64 executable on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
+<li><strong>wasm</strong>: Kotlin/Wasm (wasmJs) on Node 26.8.2, macOS, Apple Silicon. Recorded through the wasm test harness because the wasm CLI has no file writer.</li>
+<li><strong>wasm-chromium</strong>: The Studio web build in Chromium 153.0.8010.12 (V8), driven by Playwright 1.63.0 on x86-64 Linux in a container.</li>
+<li><strong>wasm-firefox</strong>: The Studio web build in Firefox 155.0 (SpiderMonkey), driven by Playwright 1.63.0 on x86-64 Linux in a container.</li>
+<li><strong>wasm-webkit</strong>: The Studio web build in WebKit 26.6 (JavaScriptCore, the Playwright build for Linux), driven by Playwright 1.63.0 on x86-64 Linux in a container. Not Safari.</li>
+</ul>
+</main>
+<footer class="muted">
+<p>Results are recorded measurements for the listed Kotlin versions. A difference between
+targets is a result, not a diagnosis.</p>
+</footer>
+</body>
+</html>

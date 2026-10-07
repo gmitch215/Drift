@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kotlin.time.duration-format | Drift Atlas</title>
+<style>
+:root{color-scheme:light dark;--fg:#1a1a1a;--bg:#fff;--muted:#555;--line:#c8c8c8;
+--mark:#ffe58a;--code:#f3f3f3;--link:#0b57d0}
+@media (prefers-color-scheme:dark){:root{--fg:#ececec;--bg:#161616;--muted:#a8a8a8;
+--line:#444;--mark:#6b5300;--code:#222;--link:#8ab4f8}}
+body{margin:0;font:16px/1.5 system-ui,sans-serif;color:var(--fg);background:var(--bg)}
+header,main,footer{max-width:72rem;margin:0 auto;padding:.75rem 1rem}
+a{color:var(--link)}
+.skip{position:absolute;left:-999px}.skip:focus{left:1rem;top:.5rem}
+nav a{margin-right:1rem}
+pre,code{font:14px/1.4 ui-monospace,monospace;background:var(--code)}
+pre{padding:.5rem;overflow-x:auto;white-space:pre}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%}
+th,td{border:1px solid var(--line);padding:.25rem .5rem;text-align:left;vertical-align:top}
+tr.differs{background:var(--mark)}
+mark{background:var(--mark);color:inherit}
+blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
+.draft{border:2px solid var(--fg);padding:.5rem}
+.muted{color:var(--muted)}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+<nav aria-label="Atlas">
+<a href="../">Interactive Atlas</a>
+<a href="../probe/">All probes</a>
+<a href="../data/dataset.json">dataset.json</a>
+<a href="../data/classification.json">classification.json</a>
+</nav>
+</header>
+<main id="main">
+<h1>kotlin.time.duration-format</h1>
+<p>How does Duration print, round and parse?</p>
+<p><strong>documented</strong> (basis: verified); identical on every column</p>
+<h2>Source</h2>
+<pre><code>line(&quot;90m&quot;, 90.minutes)
+line(&quot;1.5s&quot;, 1.5.seconds)
+line(&quot;1234567ms&quot;, 1234567.milliseconds)
+line(&quot;infinite&quot;, Duration.INFINITE)
+line(&quot;neg-infinite&quot;, -Duration.INFINITE)
+line(&quot;zero&quot;, Duration.ZERO)
+line(&quot;neg-5s&quot;, (-5).seconds)
+line(&quot;100ns&quot;, 100.nanoseconds)
+line(&quot;3d4h&quot;, 3.days + 4.hours)
+line(&quot;0.5ms&quot;, 0.5.milliseconds)
+line(&quot;1.5us&quot;, 1.5.microseconds)
+line(&quot;1.2345678s&quot;, 1.2345678.seconds)
+line(&quot;2.5ms&quot;, 2.5.milliseconds)
+line(&quot;1.0005s&quot;, 1.0005.seconds)
+line(&quot;0.0005s&quot;, 0.0005.seconds)
+line(&quot;123456789.123s&quot;, 123456789.123.seconds)
+line(&quot;1e6-days&quot;, 1e6.days)
+line(&quot;decimals-3&quot;, 1.23456.seconds.toString(DurationUnit.SECONDS, 3))
+line(&quot;decimals-0&quot;, 1.5.seconds.toString(DurationUnit.SECONDS, 0))
+line(&quot;decimals-10&quot;, 1.5.seconds.toString(DurationUnit.SECONDS, 10))
+line(&quot;decimals-minutes&quot;, 90.seconds.toString(DurationUnit.MINUTES, 2))
+line(&quot;iso&quot;, 90.minutes.toIsoString())
+line(&quot;iso-fraction&quot;, 1.5.seconds.toIsoString())
+line(&quot;iso-negative&quot;, (-1.5).seconds.toIsoString())
+line(&quot;parse-iso&quot;, Duration.parseIsoString(&quot;PT1H30M&quot;))
+line(&quot;parse&quot;, Duration.parse(&quot;1h 30m 15.5s&quot;))
+outcome(&quot;parse-bad&quot;) { Duration.parse(&quot;abc&quot;) }
+line(&quot;whole-seconds-negative&quot;, (-1500).milliseconds.inWholeSeconds)
+line(&quot;to-long-ms&quot;, 1.5.seconds.toLong(DurationUnit.MILLISECONDS))
+line(&quot;to-double-min&quot;, 90.seconds.toDouble(DurationUnit.MINUTES))
+line(&quot;components&quot;, 3725.seconds.toComponents { h, m, s, ns -&gt;
+    &quot;$h:$m:$s.$ns&quot;
+})
+line(&quot;div&quot;, 10.seconds / 4)
+line(&quot;times&quot;, 1.5.seconds * 3)
+line(&quot;long-max-ms&quot;, Long.MAX_VALUE.milliseconds)
+line(&quot;long-max-ns&quot;, Long.MAX_VALUE.nanoseconds)</code></pre>
+<h2>Results on Kotlin 2.4.20</h2>
+<p>Identical on every column.</p>
+<table>
+<caption>Result per column, Kotlin 2.4.20</caption>
+<tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
+<tr><th scope="row">android</th><td>A</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
+<tr><th scope="row">ios</th><td>A</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
+<tr><th scope="row">jvm</th><td>A</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
+<tr><th scope="row">jvm-17</th><td>A</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
+<tr><th scope="row">jvm-21</th><td>A</td><td>ok</td><td><a href="../data/transcripts/jvm-21.txt">file</a></td></tr>
+<tr><th scope="row">jvm-25</th><td>A</td><td>ok</td><td><a href="../data/transcripts/jvm-25.txt">file</a></td></tr>
+<tr><th scope="row">linux</th><td>A</td><td>ok</td><td><a href="../data/transcripts/linux.txt">file</a></td></tr>
+<tr><th scope="row">linux-arm64</th><td>A</td><td>ok</td><td><a href="../data/transcripts/linux-arm64.txt">file</a></td></tr>
+<tr><th scope="row">macos</th><td>A</td><td>ok</td><td><a href="../data/transcripts/macos.txt">file</a></td></tr>
+<tr><th scope="row">wasm</th><td>A</td><td>ok</td><td><a href="../data/transcripts/wasm.txt">file</a></td></tr>
+<tr><th scope="row">wasm-chromium</th><td>A</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
+<tr><th scope="row">wasm-firefox</th><td>A</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
+<tr><th scope="row">wasm-webkit</th><td>A</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
+</table>
+<h3>Group A: android, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
+<pre>90m = 1h 30m
+1.5s = 1.5s
+1234567ms = 20m 34.567s
+infinite = Infinity
+neg-infinite = -Infinity
+zero = 0s
+neg-5s = -5s
+100ns = 100ns
+3d4h = 3d 4h
+0.5ms = 500us
+1.5us = 1.5us
+1.2345678s = 1.234567800s
+2.5ms = 2.5ms
+1.0005s = 1.000500s
+0.0005s = 500us
+123456789.123s = 1428d 21h 33m 9.123s
+1e6-days = 1000000d
+decimals-3 = 1.235s
+decimals-0 = 2s
+decimals-10 = 1.5000000000s
+decimals-minutes = 1.50m
+iso = PT1H30M
+iso-fraction = PT1.500S
+iso-negative = -PT1.500S
+parse-iso = 1h 30m
+parse = 1h 30m 15.5s
+parse-bad = err:IllegalArgumentException
+whole-seconds-negative = -1
+to-long-ms = 1500
+to-double-min = 1.5
+components = 1:2:5.0
+div = 2.5s
+times = 4.5s
+long-max-ms = Infinity
+long-max-ns = 106751d 23h 47m 16.854s</pre>
+<h2>Results on Kotlin 2.5.0-Beta1</h2>
+<p>Identical on every column.</p>
+<table>
+<caption>Result per column, Kotlin 2.5.0-Beta1</caption>
+<tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
+<tr><th scope="row">android</th><td>A</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/android.txt">file</a></td></tr>
+<tr><th scope="row">ios</th><td>A</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/ios.txt">file</a></td></tr>
+<tr><th scope="row">jvm</th><td>A</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/jvm.txt">file</a></td></tr>
+<tr><th scope="row">macos</th><td>A</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/macos.txt">file</a></td></tr>
+<tr><th scope="row">wasm</th><td>A</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/wasm.txt">file</a></td></tr>
+</table>
+<h3>Group A: android, ios, jvm, macos, wasm</h3>
+<pre>90m = 1h 30m
+1.5s = 1.5s
+1234567ms = 20m 34.567s
+infinite = Infinity
+neg-infinite = -Infinity
+zero = 0s
+neg-5s = -5s
+100ns = 100ns
+3d4h = 3d 4h
+0.5ms = 500us
+1.5us = 1.5us
+1.2345678s = 1.234567800s
+2.5ms = 2.5ms
+1.0005s = 1.000500s
+0.0005s = 500us
+123456789.123s = 1428d 21h 33m 9.123s
+1e6-days = 1000000d
+decimals-3 = 1.235s
+decimals-0 = 2s
+decimals-10 = 1.5000000000s
+decimals-minutes = 1.50m
+iso = PT1H30M
+iso-fraction = PT1.500S
+iso-negative = -PT1.500S
+parse-iso = 1h 30m
+parse = 1h 30m 15.5s
+parse-bad = err:IllegalArgumentException
+whole-seconds-negative = -1
+to-long-ms = 1500
+to-double-min = 1.5
+components = 1:2:5.0
+div = 2.5s
+times = 4.5s
+long-max-ms = Infinity
+long-max-ns = 106751d 23h 47m 16.854s</pre>
+<h2>Classification</h2>
+<p>documented, basis verified; causes: documented difference.</p>
+<blockquote><p>Returns a string representation of this duration value expressed as a combination of numeric components, each in its own unit.</p>
+<footer><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/-duration/">https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.time/-duration/</a></footer></blockquote>
+<h3>Notes</h3>
+<p>Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Probe notes: Identical on every column measured, including decimals and rounding in toString(unit, decimals). The Duration KDoc (read) describes the component form and the unit and decimals form.</p>
+<p class="muted">Read on 2026-10-07.</p>
+<h2>Kotlin versions measured</h2>
+<p>2.4.20, 2.5.0-Beta1</p>
+<h2>How it was measured</h2>
+<ul>
+<li><strong>android</strong>: The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</li>
+<li><strong>ios</strong>: The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</li>
+<li><strong>jvm</strong>: The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
+<li><strong>jvm-17</strong>: The CLI JVM classes (jvmTarget 17) on Temurin 17.0.20.1, x86-64 Linux container, recorded with --target jvm-17.</li>
+<li><strong>jvm-21</strong>: The same classes on Temurin 21.0.12.1, x86-64 Linux container. Differs from the jvm column in hardware only.</li>
+<li><strong>jvm-25</strong>: The same classes on Temurin 25.0.4.1, x86-64 Linux container.</li>
+<li><strong>linux</strong>: The Kotlin/Native linuxX64 release executable, cross-linked on macOS, run in a debian:bookworm-slim container (glibc 2.36), x86-64. The same executable on ubuntu:24.04 (glibc 2.39) recorded identical results, kept in fixtures/atlas-extra. A release executable linked on macOS prints Apple libm values for three math constants (tan1, asin-half and acos-half); one linked on Ubuntu, or a debug build, prints glibc values. The Ubuntu-linked transcript is in fixtures/atlas-variants.</li>
+<li><strong>linux-arm64</strong>: The Kotlin/Native linuxArm64 release executable, cross-linked on macOS and run in an arm64 debian:bookworm-slim container. The Ubuntu-linked transcript, which differs on the same three math lines, is in fixtures/atlas-variants.</li>
+<li><strong>macos</strong>: The Kotlin/Native macosArm64 executable on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
+<li><strong>wasm</strong>: Kotlin/Wasm (wasmJs) on Node 26.8.2, macOS, Apple Silicon. Recorded through the wasm test harness because the wasm CLI has no file writer.</li>
+<li><strong>wasm-chromium</strong>: The Studio web build in Chromium 153.0.8010.12 (V8), driven by Playwright 1.63.0 on x86-64 Linux in a container.</li>
+<li><strong>wasm-firefox</strong>: The Studio web build in Firefox 155.0 (SpiderMonkey), driven by Playwright 1.63.0 on x86-64 Linux in a container.</li>
+<li><strong>wasm-webkit</strong>: The Studio web build in WebKit 26.6 (JavaScriptCore, the Playwright build for Linux), driven by Playwright 1.63.0 on x86-64 Linux in a container. Not Safari.</li>
+</ul>
+</main>
+<footer class="muted">
+<p>Results are recorded measurements for the listed Kotlin versions. A difference between
+targets is a result, not a diagnosis.</p>
+</footer>
+</body>
+</html>

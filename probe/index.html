@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Probes | Drift Atlas</title>
+<style>
+:root{color-scheme:light dark;--fg:#1a1a1a;--bg:#fff;--muted:#555;--line:#c8c8c8;
+--mark:#ffe58a;--code:#f3f3f3;--link:#0b57d0}
+@media (prefers-color-scheme:dark){:root{--fg:#ececec;--bg:#161616;--muted:#a8a8a8;
+--line:#444;--mark:#6b5300;--code:#222;--link:#8ab4f8}}
+body{margin:0;font:16px/1.5 system-ui,sans-serif;color:var(--fg);background:var(--bg)}
+header,main,footer{max-width:72rem;margin:0 auto;padding:.75rem 1rem}
+a{color:var(--link)}
+.skip{position:absolute;left:-999px}.skip:focus{left:1rem;top:.5rem}
+nav a{margin-right:1rem}
+pre,code{font:14px/1.4 ui-monospace,monospace;background:var(--code)}
+pre{padding:.5rem;overflow-x:auto;white-space:pre}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%}
+th,td{border:1px solid var(--line);padding:.25rem .5rem;text-align:left;vertical-align:top}
+tr.differs{background:var(--mark)}
+mark{background:var(--mark);color:inherit}
+blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
+.draft{border:2px solid var(--fg);padding:.5rem}
+.muted{color:var(--muted)}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+<nav aria-label="Atlas">
+<a href="../">Interactive Atlas</a>
+<a href="../probe/">All probes</a>
+<a href="../data/dataset.json">dataset.json</a>
+<a href="../data/classification.json">classification.json</a>
+</nav>
+</header>
+<main id="main">
+<h1>Drift Atlas probes</h1>
+<p>38 Kotlin probes, 18 measured columns, 23 probes that differ between targets on at least one Kotlin version (2.4.20, 2.5.0-Beta1). Classifications and issue states were read on 2026-10-07.</p>
+<table>
+<caption>Classification counts</caption>
+<tr><th scope="col">Classification</th><th scope="col">Probes</th><th scope="col">Differing</th></tr>
+<tr><th scope="row">documented</th><td>18</td><td>6</td></tr>
+<tr><th scope="row">platform-defined</th><td>4</td><td>4</td></tr>
+<tr><th scope="row">unclassified</th><td>16</td><td>13</td></tr>
+</table>
+<h2>Probes</h2>
+<table>
+<caption>Every probe</caption>
+<tr><th scope="col">Probe</th><th scope="col">Classification</th><th scope="col">Differs on Kotlin</th><th scope="col">Issues</th></tr>
+<tr><th scope="row"><a href="kotlin.char.bmp-case-mapping.html">kotlin.char.bmp-case-mapping</a></th><td>platform-defined</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-58195</td></tr>
+<tr><th scope="row"><a href="kotlin.char.bmp-categories.html">kotlin.char.bmp-categories</a></th><td>platform-defined</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-58195</td></tr>
+<tr><th scope="row"><a href="kotlin.char.case-special.html">kotlin.char.case-special</a></th><td>documented</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.char.whitespace-set.html">kotlin.char.whitespace-set</a></th><td>documented</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.collections.equality-hashing.html">kotlin.collections.equality-hashing</a></th><td>documented</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.collections.hash-order.html">kotlin.collections.hash-order</a></th><td>documented</td><td>2.4.20, 2.5.0-Beta1</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.collections.iterator-modification.html">kotlin.collections.iterator-modification</a></th><td>platform-defined</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-88775, KT-89031</td></tr>
+<tr><th scope="row"><a href="kotlin.collections.sorting.html">kotlin.collections.sorting</a></th><td>documented</td><td>2.4.20, 2.5.0-Beta1</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.collections.tostring-forms.html">kotlin.collections.tostring-forms</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-88414, KT-69456, KT-78708</td></tr>
+<tr><th scope="row"><a href="kotlin.double.equality-order.html">kotlin.double.equality-order</a></th><td>documented</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.double.extremes.html">kotlin.double.extremes</a></th><td>unclassified</td><td>2.4.20</td><td>KT-88414, KT-88035, KT-88036</td></tr>
+<tr><th scope="row"><a href="kotlin.double.nan-bits.html">kotlin.double.nan-bits</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-53258</td></tr>
+<tr><th scope="row"><a href="kotlin.double.parse.html">kotlin.double.parse</a></th><td>unclassified</td><td>2.4.20</td><td>KT-88414</td></tr>
+<tr><th scope="row"><a href="kotlin.double.shortest-digits.html">kotlin.double.shortest-digits</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-88414</td></tr>
+<tr><th scope="row"><a href="kotlin.double.tostring-boundaries.html">kotlin.double.tostring-boundaries</a></th><td>unclassified</td><td>2.4.20</td><td>KT-88414</td></tr>
+<tr><th scope="row"><a href="kotlin.exceptions.messages.html">kotlin.exceptions.messages</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-88829</td></tr>
+<tr><th scope="row"><a href="kotlin.exceptions.tostring-cause.html">kotlin.exceptions.tostring-cause</a></th><td>documented</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-78708</td></tr>
+<tr><th scope="row"><a href="kotlin.float.tostring.html">kotlin.float.tostring</a></th><td>unclassified</td><td>2.4.20</td><td>KT-88414</td></tr>
+<tr><th scope="row"><a href="kotlin.int.division-modulo.html">kotlin.int.division-modulo</a></th><td>documented</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.int.overflow.html">kotlin.int.overflow</a></th><td>documented</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.int.radix.html">kotlin.int.radix</a></th><td>documented</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.long.bit-ops.html">kotlin.long.bit-ops</a></th><td>documented</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.math.pow-special-cases.html">kotlin.math.pow-special-cases</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-89072, KT-88414</td></tr>
+<tr><th scope="row"><a href="kotlin.math.rounding.html">kotlin.math.rounding</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-89074</td></tr>
+<tr><th scope="row"><a href="kotlin.math.transcendental-bits.html">kotlin.math.transcendental-bits</a></th><td>platform-defined</td><td>2.4.20, 2.5.0-Beta1</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.numbers.float-conversions.html">kotlin.numbers.float-conversions</a></th><td>unclassified</td><td>2.4.20</td><td>KT-88414</td></tr>
+<tr><th scope="row"><a href="kotlin.numbers.type-checks.html">kotlin.numbers.type-checks</a></th><td>unclassified</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.random.seeded.html">kotlin.random.seeded</a></th><td>documented</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.regex.anchors-lines.html">kotlin.regex.anchors-lines</a></th><td>unclassified</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.regex.groups-replace.html">kotlin.regex.groups-replace</a></th><td>documented</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.regex.syntax-support.html">kotlin.regex.syntax-support</a></th><td>documented</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-49557, KT-71003</td></tr>
+<tr><th scope="row"><a href="kotlin.regex.unicode-matching.html">kotlin.regex.unicode-matching</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-51859, KT-58195, KT-53212, KT-58678</td></tr>
+<tr><th scope="row"><a href="kotlin.string.compare-order.html">kotlin.string.compare-order</a></th><td>documented</td><td>2.4.20, 2.5.0-Beta1</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.string.hashcode.html">kotlin.string.hashcode</a></th><td>unclassified</td><td>identical</td><td>KT-44746, KT-61028</td></tr>
+<tr><th scope="row"><a href="kotlin.string.padding.html">kotlin.string.padding</a></th><td>documented</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.string.split-replace-lines.html">kotlin.string.split-replace-lines</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-63088, KT-50777</td></tr>
+<tr><th scope="row"><a href="kotlin.string.supplementary.html">kotlin.string.supplementary</a></th><td>documented</td><td>2.4.20, 2.5.0-Beta1</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.time.duration-format.html">kotlin.time.duration-format</a></th><td>documented</td><td>identical</td><td></td></tr>
+</table>
+<h2>Columns</h2>
+<table>
+<caption>How each column was measured</caption>
+<tr><th scope="col">Column</th><th scope="col">Kotlin</th><th scope="col">Transcript</th><th scope="col">How</th></tr>
+<tr><th scope="row">android</th><td>2.4.20</td><td><a href="../data/transcripts/android.txt">transcript</a></td><td>The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</td></tr>
+<tr><th scope="row">android</th><td>2.5.0-Beta1</td><td><a href="../data/transcripts/2.5.0-beta1/android.txt">transcript</a></td><td>The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</td></tr>
+<tr><th scope="row">ios</th><td>2.4.20</td><td><a href="../data/transcripts/ios.txt">transcript</a></td><td>The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</td></tr>
+<tr><th scope="row">ios</th><td>2.5.0-Beta1</td><td><a href="../data/transcripts/2.5.0-beta1/ios.txt">transcript</a></td><td>The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</td></tr>
+<tr><th scope="row">jvm</th><td>2.4.20</td><td><a href="../data/transcripts/jvm.txt">transcript</a></td><td>The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</td></tr>
+<tr><th scope="row">jvm</th><td>2.5.0-Beta1</td><td><a href="../data/transcripts/2.5.0-beta1/jvm.txt">transcript</a></td><td>The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</td></tr>
+<tr><th scope="row">jvm-17</th><td>2.4.20</td><td><a href="../data/transcripts/jvm-17.txt">transcript</a></td><td>The CLI JVM classes (jvmTarget 17) on Temurin 17.0.20.1, x86-64 Linux container, recorded with --target jvm-17.</td></tr>
+<tr><th scope="row">jvm-21</th><td>2.4.20</td><td><a href="../data/transcripts/jvm-21.txt">transcript</a></td><td>The same classes on Temurin 21.0.12.1, x86-64 Linux container. Differs from the jvm column in hardware only.</td></tr>
+<tr><th scope="row">jvm-25</th><td>2.4.20</td><td><a href="../data/transcripts/jvm-25.txt">transcript</a></td><td>The same classes on Temurin 25.0.4.1, x86-64 Linux container.</td></tr>
+<tr><th scope="row">linux</th><td>2.4.20</td><td><a href="../data/transcripts/linux.txt">transcript</a></td><td>The Kotlin/Native linuxX64 release executable, cross-linked on macOS, run in a debian:bookworm-slim container (glibc 2.36), x86-64. The same executable on ubuntu:24.04 (glibc 2.39) recorded identical results, kept in fixtures/atlas-extra. A release executable linked on macOS prints Apple libm values for three math constants (tan1, asin-half and acos-half); one linked on Ubuntu, or a debug build, prints glibc values. The Ubuntu-linked transcript is in fixtures/atlas-variants.</td></tr>
+<tr><th scope="row">linux-arm64</th><td>2.4.20</td><td><a href="../data/transcripts/linux-arm64.txt">transcript</a></td><td>The Kotlin/Native linuxArm64 release executable, cross-linked on macOS and run in an arm64 debian:bookworm-slim container. The Ubuntu-linked transcript, which differs on the same three math lines, is in fixtures/atlas-variants.</td></tr>
+<tr><th scope="row">macos</th><td>2.4.20</td><td><a href="../data/transcripts/macos.txt">transcript</a></td><td>The Kotlin/Native macosArm64 executable on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</td></tr>
+<tr><th scope="row">macos</th><td>2.5.0-Beta1</td><td><a href="../data/transcripts/2.5.0-beta1/macos.txt">transcript</a></td><td>The Kotlin/Native macosArm64 executable on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</td></tr>
+<tr><th scope="row">wasm</th><td>2.4.20</td><td><a href="../data/transcripts/wasm.txt">transcript</a></td><td>Kotlin/Wasm (wasmJs) on Node 26.8.2, macOS, Apple Silicon. Recorded through the wasm test harness because the wasm CLI has no file writer.</td></tr>
+<tr><th scope="row">wasm</th><td>2.5.0-Beta1</td><td><a href="../data/transcripts/2.5.0-beta1/wasm.txt">transcript</a></td><td>Kotlin/Wasm (wasmJs) on Node 26.8.2, macOS, Apple Silicon. Recorded through the wasm test harness because the wasm CLI has no file writer.</td></tr>
+<tr><th scope="row">wasm-chromium</th><td>2.4.20</td><td><a href="../data/transcripts/wasm-chromium.txt">transcript</a></td><td>The Studio web build in Chromium 153.0.8010.12 (V8), driven by Playwright 1.63.0 on x86-64 Linux in a container.</td></tr>
+<tr><th scope="row">wasm-firefox</th><td>2.4.20</td><td><a href="../data/transcripts/wasm-firefox.txt">transcript</a></td><td>The Studio web build in Firefox 155.0 (SpiderMonkey), driven by Playwright 1.63.0 on x86-64 Linux in a container.</td></tr>
+<tr><th scope="row">wasm-webkit</th><td>2.4.20</td><td><a href="../data/transcripts/wasm-webkit.txt">transcript</a></td><td>The Studio web build in WebKit 26.6 (JavaScriptCore, the Playwright build for Linux), driven by Playwright 1.63.0 on x86-64 Linux in a container. Not Safari.</td></tr>
+</table>
+</main>
+<footer class="muted">
+<p>Results are recorded measurements for the listed Kotlin versions. A difference between
+targets is a result, not a diagnosis.</p>
+</footer>
+</body>
+</html>

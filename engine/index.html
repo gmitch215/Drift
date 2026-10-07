@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>All modules</title>
+    <link href="images/logo-icon.svg" rel="icon" type="image/svg">
+        <script>var pathToRoot = "";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="scripts/sourceset_dependencies.js" async="async"></script>
+<link href="styles/style.css" rel="Stylesheet">
+<link href="styles/main.css" rel="Stylesheet">
+<link href="styles/prism.css" rel="Stylesheet">
+<link href="styles/logo-styles.css" rel="Stylesheet">
+<link href="ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="ui-kit/ui-kit.min.js" defer="defer"></script>
+</head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+            <a class="library-name--link" href="index.html" tabindex="1">
+                    Drift Engine Documentation
+            </a>
+        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle"
+                type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+1.0.0        </div>
+        <div class="navigation-controls">
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button"
+                    type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config='{"defaultSize": 280, "minSize": 200, "maxSize": 400}'>
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
+                    data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Drift Engine Documentation
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" id="content" pageIds="Drift Engine Documentation::.ext/allModules///PointingToDeclaration//0">
+  <div class="breadcrumbs"></div>
+  <div class="cover ">
+    <div class="cover ">
+      <h1 class="">Module Drift Engine Documentation</h1>
+      <p class="paragraph">Reference documentation for the engine and tools inside the Drift application. It describes how the code is organized so the source is easier to read. Drift ships as an application, and these modules are not published artifacts.</p>
+      <p class="paragraph">The modules are <code class="lang-kotlin">core</code>, <code class="lang-kotlin">host</code>, <code class="lang-kotlin">scan</code>, <code class="lang-kotlin">tools</code>, <code class="lang-kotlin">bench</code>, <code class="lang-kotlin">cli</code> and <code class="lang-kotlin">studio</code>. The <code class="lang-kotlin">build-core</code> Gradle build logic, the Android application module and the Xcode project are not documented here.</p>
+    </div>
+    <h2 class="">All modules:</h2>
+    <div class="table"><a data-name="1194476637%2FMain%2F0" anchor-label="bench" id="1194476637%2FMain%2F0" data-filterable-set=""></a>
+      <div class="table-row table-row_multimodule">
+        <div class="main-subrow ">
+          <div class="w-100"><span class="inline-flex">
+              <div><a href="bench/index.html">bench</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1194476637%2FMain%2F0"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div><span class="brief-comment">
+              <p class="paragraph">Benchmark harness. It generates synthetic cases, runs the engine on them and scores the result against known answers.</p>
+            </span></div>
+        </div>
+      </div>
+<a data-name="1273621101%2FMain%2F0" anchor-label="cli" id="1273621101%2FMain%2F0" data-filterable-set=""></a>
+      <div class="table-row table-row_multimodule">
+        <div class="main-subrow ">
+          <div class="w-100"><span class="inline-flex">
+              <div><a href="cli/index.html">cli</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1273621101%2FMain%2F0"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div><span class="brief-comment">
+              <p class="paragraph">The <code class="lang-kotlin">drift</code> command. Each subcommand lives in <code class="lang-kotlin">dev.gmitch215.drift.cli.command</code> and calls into <code class="lang-kotlin">core</code>, <code class="lang-kotlin">host</code> and <code class="lang-kotlin">scan</code>. The installer behind <code class="lang-kotlin">install</code> and <code class="lang-kotlin">uninstall</code> is in <code class="lang-kotlin">cli.install</code> and the web server behind <code class="lang-kotlin">serve</code> is in <code class="lang-kotlin">cli.serve</code>.</p>
+            </span></div>
+        </div>
+      </div>
+<a data-name="-387464810%2FMain%2F0" anchor-label="core" id="-387464810%2FMain%2F0" data-filterable-set=""></a>
+      <div class="table-row table-row_multimodule">
+        <div class="main-subrow ">
+          <div class="w-100"><span class="inline-flex">
+              <div><a href="core/index.html">core</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-387464810%2FMain%2F0"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div><span class="brief-comment">
+              <p class="paragraph">Capsule model, canonical JSON, SHA-256, fixed-point math, and the diagnosis engine built on them. All code is common Kotlin, so every target produces the same bytes.</p>
+            </span></div>
+        </div>
+      </div>
+<a data-name="209987501%2FMain%2F0" anchor-label="host" id="209987501%2FMain%2F0" data-filterable-set=""></a>
+      <div class="table-row table-row_multimodule">
+        <div class="main-subrow ">
+          <div class="w-100"><span class="inline-flex">
+              <div><a href="host/index.html">host</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="209987501%2FMain%2F0"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div><span class="brief-comment">
+              <p class="paragraph">Operating system access. <code class="lang-kotlin">Host</code> is the interface the rest of Drift reads facts through, with one implementation per target (JVM, macOS, Linux, Windows, Wasm, and Android and iOS when the mobile targets are enabled) and a fake for tests.</p>
+            </span></div>
+        </div>
+      </div>
+<a data-name="1985708152%2FMain%2F0" anchor-label="scan" id="1985708152%2FMain%2F0" data-filterable-set=""></a>
+      <div class="table-row table-row_multimodule">
+        <div class="main-subrow ">
+          <div class="w-100"><span class="inline-flex">
+              <div><a href="scan/index.html">scan</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1985708152%2FMain%2F0"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div><span class="brief-comment">
+              <p class="paragraph">Probes, toolchain scanners and the atlas. <code class="lang-kotlin">Capture</code> runs them against a <code class="lang-kotlin">Host</code> and builds a capsule. The atlas records probe transcripts, builds the dataset, compares a device against it and carries the classification of each probe.</p>
+            </span></div>
+        </div>
+      </div>
+<a data-name="1270868543%2FMain%2F0" anchor-label="studio" id="1270868543%2FMain%2F0" data-filterable-set=""></a>
+      <div class="table-row table-row_multimodule">
+        <div class="main-subrow ">
+          <div class="w-100"><span class="inline-flex">
+              <div><a href="studio/index.html">studio</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1270868543%2FMain%2F0"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div><span class="brief-comment">
+              <p class="paragraph">Compose Multiplatform interface for working with cases and for browsing the Atlas, for desktop (JVM) and the browser (wasmJs), with Android and iOS builds when the mobile targets are enabled.</p>
+            </span></div>
+        </div>
+      </div>
+<a data-name="-109677806%2FMain%2F0" anchor-label="tools" id="-109677806%2FMain%2F0" data-filterable-set=""></a>
+      <div class="table-row table-row_multimodule">
+        <div class="main-subrow ">
+          <div class="w-100"><span class="inline-flex">
+              <div><a href="tools/index.html">tools</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-109677806%2FMain%2F0"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div><span class="brief-comment">
+              <p class="paragraph">JVM-only maintenance programs: transcript fixture generation, log sanitizing, the probe ladder and rule verification. They support development and are not part of the <code class="lang-kotlin">drift</code> executable. The Playwright scripts for the browser Atlas columns live beside them in <code class="lang-kotlin">tools/browsers</code>.</p>
+            </span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>Copyright (c) Gregory Mitchell</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

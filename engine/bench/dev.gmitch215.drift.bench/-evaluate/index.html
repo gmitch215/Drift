@@ -1,0 +1,355 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Evaluate</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
+                    Drift Engine Documentation
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">1.0.0
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":bench/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":bench/commonMain" data-filter=":bench/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Drift Engine Documentation
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="bench::dev.gmitch215.drift.bench/Evaluate///PointingToDeclaration//150601193">
+  <div class="breadcrumbs"><a href="../../index.html">bench</a><span class="delimiter">/</span><a href="../index.html">dev.gmitch215.drift.bench</a><span class="delimiter">/</span><span class="current">Evaluate</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Evaluate</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bench/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="index.html">Evaluate</a><span class="source-link-wrapper"><span class="source-link" data-element-type="source-link">(<a href="https://github.com/gmitch215/Drift/blob/master/bench/src/common/main/dev/gmitch215/drift/bench/Evaluate.kt#L302">source</a>)</span></span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="1388524422%2FProperties%2F150601193" anchor-label="BINS" id="1388524422%2FProperties%2F150601193" data-filterable-set=":bench/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":bench/commonMain" data-filterable-set=":bench/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-i-n-s.html"><span><span>BINS</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1388524422%2FProperties%2F150601193"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bench/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-b-i-n-s.html">BINS</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">5</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="862186459%2FProperties%2F150601193" anchor-label="PROBE_RATIOS" id="862186459%2FProperties%2F150601193" data-filterable-set=":bench/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":bench/commonMain" data-filterable-set=":bench/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-p-r-o-b-e_-r-a-t-i-o-s.html"><span>PROBE_</span><wbr><span>RATIOS</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="862186459%2FProperties%2F150601193"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bench/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-p-r-o-b-e_-r-a-t-i-o-s.html">PROBE_RATIOS</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-1460625723%2FFunctions%2F150601193" anchor-label="brier" id="-1460625723%2FFunctions%2F150601193" data-filterable-set=":bench/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":bench/commonMain" data-filterable-set=":bench/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="brier.html"><span><span>brier</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1460625723%2FFunctions%2F150601193"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bench/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="brier.html"><span class="token function">brier</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">preds<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-pred/index.html">Pred</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1837591387%2FFunctions%2F150601193" anchor-label="brierCovered" id="-1837591387%2FFunctions%2F150601193" data-filterable-set=":bench/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":bench/commonMain" data-filterable-set=":bench/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="brier-covered.html"><span>brier</span><wbr><span><span>Covered</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1837591387%2FFunctions%2F150601193"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bench/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="brier-covered.html"><span class="token function">brierCovered</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">preds<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-pred/index.html">Pred</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">Brier over the rankings the product prints a probability for.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1352376785%2FFunctions%2F150601193" anchor-label="crossValidated" id="-1352376785%2FFunctions%2F150601193" data-filterable-set=":bench/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":bench/commonMain" data-filterable-set=":bench/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cross-validated.html"><span>cross</span><wbr><span><span>Validated</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1352376785%2FFunctions%2F150601193"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bench/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="cross-validated.html"><span class="token function">crossValidated</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">obs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-observed/index.html">Observed</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">model<span class="token operator">: </span><a href="../-model/index.html">Model</a><span class="token punctuation">, </span></span><span class="parameter ">k<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span>Folds.K</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-pred/index.html">Pred</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1951189962%2FFunctions%2F150601193" anchor-label="entries" id="-1951189962%2FFunctions%2F150601193" data-filterable-set=":bench/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":bench/commonMain" data-filterable-set=":bench/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="entries.html"><span><span>entries</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1951189962%2FFunctions%2F150601193"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bench/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="entries.html"><span class="token function">entries</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">obs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-observed/index.html">Observed</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-entry/index.html">Entry</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Candidates as entries without a probability, for checks that need no model.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="137401012%2FFunctions%2F150601193" anchor-label="gates" id="137401012%2FFunctions%2F150601193" data-filterable-set=":bench/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":bench/commonMain" data-filterable-set=":bench/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="gates.html"><span><span>gates</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="137401012%2FFunctions%2F150601193"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bench/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="gates.html"><span class="token function">gates</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entries<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-entry/index.html">Entry</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../core/dev.gmitch215.drift.json/-json-object/index.html">JsonObject</a></div><div class="brief "><p class="paragraph"><a href="honesty.html">honesty</a> plus how often the tiers named the injected cause.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1941318338%2FFunctions%2F150601193" anchor-label="honesty" id="1941318338%2FFunctions%2F150601193" data-filterable-set=":bench/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":bench/commonMain" data-filterable-set=":bench/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="honesty.html"><span><span>honesty</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1941318338%2FFunctions%2F150601193"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bench/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="honesty.html"><span class="token function">honesty</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entries<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-entry/index.html">Entry</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../core/dev.gmitch215.drift.json/-json-object/index.html">JsonObject</a></div><div class="brief "><p class="paragraph">What <code class="lang-kotlin">known</code> and <code class="lang-kotlin">plausible</code> rest on; needs no label, so it holds for any pair.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="214753711%2FFunctions%2F150601193" anchor-label="inSample" id="214753711%2FFunctions%2F150601193" data-filterable-set=":bench/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":bench/commonMain" data-filterable-set=":bench/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="in-sample.html"><span>in</span><wbr><span><span>Sample</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="214753711%2FFunctions%2F150601193"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bench/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="in-sample.html"><span class="token function">inSample</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">obs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-observed/index.html">Observed</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">model<span class="token operator">: </span><a href="../-model/index.html">Model</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-pred/index.html">Pred</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2105773182%2FFunctions%2F150601193" anchor-label="metrics" id="-2105773182%2FFunctions%2F150601193" data-filterable-set=":bench/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":bench/commonMain" data-filterable-set=":bench/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="metrics.html"><span><span>metrics</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2105773182%2FFunctions%2F150601193"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bench/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="metrics.html"><span class="token function">metrics</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">preds<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-pred/index.html">Pred</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">tiered<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../core/dev.gmitch215.drift.json/-json-object/index.html">JsonObject</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-685251853%2FFunctions%2F150601193" anchor-label="model" id="-685251853%2FFunctions%2F150601193" data-filterable-set=":bench/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":bench/commonMain" data-filterable-set=":bench/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="model.html"><span><span>model</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-685251853%2FFunctions%2F150601193"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bench/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="model.html"><span class="token function">model</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">obs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-observed/index.html">Observed</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">m<span class="token operator">: </span><a href="../-model/index.html">Model</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../core/dev.gmitch215.drift.json/-json-object/index.html">JsonObject</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-845391636%2FFunctions%2F150601193" anchor-label="mrr" id="-845391636%2FFunctions%2F150601193" data-filterable-set=":bench/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":bench/commonMain" data-filterable-set=":bench/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="mrr.html"><span><span>mrr</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-845391636%2FFunctions%2F150601193"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bench/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="mrr.html"><span class="token function">mrr</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">preds<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-pred/index.html">Pred</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="602725112%2FFunctions%2F150601193" anchor-label="probeSweep" id="602725112%2FFunctions%2F150601193" data-filterable-set=":bench/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":bench/commonMain" data-filterable-set=":bench/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="probe-sweep.html"><span>probe</span><wbr><span><span>Sweep</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="602725112%2FFunctions%2F150601193"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bench/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="probe-sweep.html"><span class="token function">probeSweep</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">obs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-observed/index.html">Observed</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../core/dev.gmitch215.drift.json/-json-object/index.html">JsonObject</a></div><div class="brief "><p class="paragraph">Out-of-fold Brier of the shipped readout as the probe ratio varies, over the rankings that carry a probe and over all of them, next to the uniform 1/n readout on the same rankings.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1334716538%2FFunctions%2F150601193" anchor-label="tail" id="-1334716538%2FFunctions%2F150601193" data-filterable-set=":bench/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":bench/commonMain" data-filterable-set=":bench/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="tail.html"><span><span>tail</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1334716538%2FFunctions%2F150601193"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bench/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="tail.html"><span class="token function">tail</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">p<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">k<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">The chance, in micro-units, of at least <a href="tail.html">k</a> hits when scenario i hits with probability <code class="lang-kotlin">p[i]</code> (micro-units); the exact Poisson-binomial tail.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1741072589%2FFunctions%2F150601193" anchor-label="versusRandom" id="1741072589%2FFunctions%2F150601193" data-filterable-set=":bench/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":bench/commonMain" data-filterable-set=":bench/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="versus-random.html"><span>versus</span><wbr><span><span>Random</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1741072589%2FFunctions%2F150601193"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":bench/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="versus-random.html"><span class="token function">versusRandom</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">obs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-observed/index.html">Observed</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../core/dev.gmitch215.drift.json/-json-object/index.html">JsonObject</a></div><div class="brief "><p class="paragraph">The shipped order against a random order of the same candidates: hits, the hits a random order is expected to make, and the chance that a random order makes at least as many.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>Copyright (c) Gregory Mitchell</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
