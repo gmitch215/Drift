@@ -68,14 +68,17 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
-      - name: Cache Kotlin/Native
+      - name: Set up Konan
         uses: actions/cache@v5
         with:
           path: |
             ~/.konan/caches
             ~/.konan/dependencies
             ~/.konan/kotlin-native-prebuilt-*
-          key: konan-${{ matrix.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
       - name: Extract Version
         run: echo "VERSION=$(grep '^version=' gradle.properties | cut -d= -f2)" >> "$GITHUB_ENV"
       - name: Build Executable
@@ -156,6 +159,17 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
+      - name: Set up Konan
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.konan/caches
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-prebuilt-*
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
       - name: Extract Version
         run: echo "VERSION=$(grep '^version=' gradle.properties | cut -d= -f2)" >> "$GITHUB_ENV"
       - name: Package macOS
@@ -246,6 +260,17 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
+      - name: Set up Konan
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.konan/caches
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-prebuilt-*
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
       - name: Extract Version
         run: echo "VERSION=$(grep '^version=' gradle.properties | cut -d= -f2)" >> "$GITHUB_ENV"
       - name: Install Android Platform
@@ -355,6 +380,17 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
+      - name: Set up Konan
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.konan/caches
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-prebuilt-*
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
       - name: Extract Version
         run: echo "VERSION=$(grep '^version=' gradle.properties | cut -d= -f2)" >> "$GITHUB_ENV"
       - name: Check Wait Script
@@ -441,6 +477,17 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
+      - name: Set up Konan
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.konan/caches
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-prebuilt-*
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
       - name: Extract Version
         run: echo "VERSION=$(grep '^version=' gradle.properties | cut -d= -f2)" >> "$GITHUB_ENV"
       - name: Wait for Release Assets

@@ -28,6 +28,17 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
+      - name: Set up Konan
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.konan/caches
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-prebuilt-*
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
       - uses: gradle/actions/wrapper-validation@v5
       - name: Check Style and Coverage Rules
         run: ./gradlew spotlessCheck checkLineLength sharedRatio :build-core:check
@@ -80,14 +91,17 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
-      - name: Cache Kotlin/Native
+      - name: Set up Konan
         uses: actions/cache@v5
         with:
           path: |
             ~/.konan/caches
             ~/.konan/dependencies
             ~/.konan/kotlin-native-prebuilt-*
-          key: konan-${{ matrix.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
       - name: Run Tests
         run: ./gradlew ${{ matrix.tasks }} ${{ matrix.link }} --continue
       - name: Check Executable
@@ -152,14 +166,17 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
-      - name: Cache Kotlin/Native
+      - name: Set up Konan
         uses: actions/cache@v5
         with:
           path: |
             ~/.konan/caches
             ~/.konan/dependencies
             ~/.konan/kotlin-native-prebuilt-*
-          key: konan-ubuntu-24.04-${{ hashFiles('gradle/libs.versions.toml') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
       - name: Link Binaries
         run: ./gradlew linkDebugTestLinuxArm64 linkReleaseExecutableLinuxArm64
       - name: Archive Binaries
@@ -190,6 +207,17 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
+      - name: Set up Konan
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.konan/caches
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-prebuilt-*
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
       - name: Download Binaries
         uses: actions/download-artifact@v8
         with:
@@ -229,6 +257,17 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
+      - name: Set up Konan
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.konan/caches
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-prebuilt-*
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
       - name: Set up Node
         uses: actions/setup-node@v7
         with:

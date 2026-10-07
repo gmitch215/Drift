@@ -50,14 +50,17 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
-      - name: Cache Kotlin/Native
+      - name: Set up Konan
         uses: actions/cache@v5
         with:
           path: |
             ~/.konan/caches
             ~/.konan/dependencies
             ~/.konan/kotlin-native-prebuilt-*
-          key: konan-${{ matrix.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
       - name: Build Executable
         run: ./gradlew :cli:${{ matrix.link }}
       - name: Record Transcripts
@@ -87,14 +90,17 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
-      - name: Cache Kotlin/Native
+      - name: Set up Konan
         uses: actions/cache@v5
         with:
           path: |
             ~/.konan/caches
             ~/.konan/dependencies
             ~/.konan/kotlin-native-prebuilt-*
-          key: konan-ubuntu-24.04-${{ hashFiles('gradle/libs.versions.toml') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
       - name: Build Executable
         run: ./gradlew :cli:linkReleaseExecutableLinuxArm64
       - name: Archive Executable
@@ -148,6 +154,17 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
+      - name: Set up Konan
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.konan/caches
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-prebuilt-*
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
       - name: Build Classes for JDK 17
         run: ./gradlew atlasRuntime -Pdrift.jvmTarget=17
       - name: Archive Classes
@@ -198,6 +215,17 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
+      - name: Set up Konan
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.konan/caches
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-prebuilt-*
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
       - name: Download Classes
         uses: actions/download-artifact@v8
         with:
@@ -230,6 +258,17 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
+      - name: Set up Konan
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.konan/caches
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-prebuilt-*
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
       - name: Set up Node
         uses: actions/setup-node@v7
         with:
@@ -276,6 +315,17 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
+      - name: Set up Konan
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.konan/caches
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-prebuilt-*
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
       - name: Download Transcripts
         uses: actions/download-artifact@v8
         with:
