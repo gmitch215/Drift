@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kotlin.regex.unicode-matching | Drift Atlas</title>
+<style>
+:root{color-scheme:light dark;--fg:#1a1a1a;--bg:#fff;--muted:#555;--line:#c8c8c8;
+--mark:#ffe58a;--code:#f3f3f3;--link:#0b57d0}
+@media (prefers-color-scheme:dark){:root{--fg:#ececec;--bg:#161616;--muted:#a8a8a8;
+--line:#444;--mark:#6b5300;--code:#222;--link:#8ab4f8}}
+body{margin:0;font:16px/1.5 system-ui,sans-serif;color:var(--fg);background:var(--bg)}
+header,main,footer{max-width:72rem;margin:0 auto;padding:.75rem 1rem}
+a{color:var(--link)}
+.skip{position:absolute;left:-999px}.skip:focus{left:1rem;top:.5rem}
+nav a{margin-right:1rem}
+pre,code{font:14px/1.4 ui-monospace,monospace;background:var(--code)}
+pre{padding:.5rem;overflow-x:auto;white-space:pre}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%}
+th,td{border:1px solid var(--line);padding:.25rem .5rem;text-align:left;vertical-align:top}
+tr.differs{background:var(--mark)}
+mark{background:var(--mark);color:inherit}
+blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
+.draft{border:2px solid var(--fg);padding:.5rem}
+.muted{color:var(--muted)}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+<nav aria-label="Atlas">
+<a href="../../">Drift</a>
+<a href="../">Interactive Atlas</a>
+<a href="../probe/">All probes</a>
+<a href="../data/dataset.json">dataset.json</a>
+<a href="../data/classification.json">classification.json</a>
+</nav>
+</header>
+<main id="main">
+<h1>kotlin.regex.unicode-matching</h1>
+<p>What do \d, \w, \s, dot and ignore-case match outside ASCII?</p>
+<p><strong>unclassified</strong> (basis: inferred); differs between targets</p>
+<h2>Source</h2>
+<pre><code>fun find(label: String, pattern: String, input: String) =
+    outcome(label) { Regex(pattern).containsMatchIn(input) }
+fun option(label: String, pattern: String, option: RegexOption, input: String) =
+    outcome(label) { Regex(pattern, option).containsMatchIn(input) }
+find(&quot;digit-arabic&quot;, &quot;^\\d$&quot;, &quot;٣&quot;)
+find(&quot;digit-fullwidth&quot;, &quot;^\\d$&quot;, &quot;３&quot;)
+find(&quot;word-accent&quot;, &quot;^\\w$&quot;, &quot;é&quot;)
+find(&quot;word-greek&quot;, &quot;^\\w$&quot;, &quot;α&quot;)
+find(&quot;word-underscore&quot;, &quot;^\\w$&quot;, &quot;_&quot;)
+find(&quot;space-nbsp&quot;, &quot;^\\s$&quot;, &quot;\u00a0&quot;)
+find(&quot;space-em&quot;, &quot;^\\s$&quot;, &quot;\u2003&quot;)
+find(&quot;space-nel&quot;, &quot;^\\s$&quot;, &quot;\u0085&quot;)
+find(&quot;space-vt&quot;, &quot;^\\s$&quot;, &quot;\u000B&quot;)
+find(&quot;boundary-accent&quot;, &quot;a\\b&quot;, &quot;aé&quot;)
+find(&quot;dot-lf&quot;, &quot;^.$&quot;, &quot;\n&quot;)
+find(&quot;dot-cr&quot;, &quot;^.$&quot;, &quot;\r&quot;)
+find(&quot;dot-nel&quot;, &quot;^.$&quot;, &quot;\u0085&quot;)
+find(&quot;dot-line-separator&quot;, &quot;^.$&quot;, &quot;\u2028&quot;)
+find(&quot;dot-emoji&quot;, &quot;^.$&quot;, &quot;😀&quot;)
+find(&quot;two-dots-emoji&quot;, &quot;^..$&quot;, &quot;😀&quot;)
+find(&quot;letter-deseret&quot;, &quot;^\\p{L}$&quot;, &quot;𐐀&quot;)
+find(&quot;upper-deseret&quot;, &quot;^\\p{Lu}$&quot;, &quot;𐐀&quot;)
+option(&quot;ic-ascii&quot;, &quot;^a$&quot;, RegexOption.IGNORE_CASE, &quot;A&quot;)
+option(&quot;ic-accent&quot;, &quot;^é$&quot;, RegexOption.IGNORE_CASE, &quot;É&quot;)
+option(&quot;ic-sharp-s&quot;, &quot;^straße$&quot;, RegexOption.IGNORE_CASE, &quot;STRASSE&quot;)
+option(&quot;ic-kelvin&quot;, &quot;^k$&quot;, RegexOption.IGNORE_CASE, &quot;K&quot;)
+option(&quot;ic-dz&quot;, &quot;^ǆ$&quot;, RegexOption.IGNORE_CASE, &quot;ǅ&quot;)
+option(&quot;ic-final-sigma&quot;, &quot;^σ$&quot;, RegexOption.IGNORE_CASE, &quot;ς&quot;)
+option(&quot;ic-dotted-i&quot;, &quot;^i$&quot;, RegexOption.IGNORE_CASE, &quot;İ&quot;)
+option(&quot;ic-dotless-i&quot;, &quot;^ı$&quot;, RegexOption.IGNORE_CASE, &quot;I&quot;)
+option(&quot;ic-deseret&quot;, &quot;^𐐨$&quot;, RegexOption.IGNORE_CASE, &quot;𐐀&quot;)</code></pre>
+<h2>Results on Kotlin 2.4.20</h2>
+<p>4 different results; 13 of 27 lines differ.</p>
+<table>
+<caption>Result per column, Kotlin 2.4.20</caption>
+<tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
+<tr class="differs"><th scope="row">android</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
+<tr><th scope="row">ios</th><td>B</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
+<tr><th scope="row">linux</th><td>B</td><td>ok</td><td><a href="../data/transcripts/linux.txt">file</a></td></tr>
+<tr><th scope="row">linux-arm64</th><td>B</td><td>ok</td><td><a href="../data/transcripts/linux-arm64.txt">file</a></td></tr>
+<tr><th scope="row">macos</th><td>B</td><td>ok</td><td><a href="../data/transcripts/macos.txt">file</a></td></tr>
+<tr><th scope="row">wasm</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm.txt">file</a></td></tr>
+<tr><th scope="row">wasm-chromium</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
+<tr><th scope="row">wasm-firefox</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
+<tr><th scope="row">wasm-webkit</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-21</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-21.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-25</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-25.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-17</th><td>D (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
+</table>
+<h3>Group A: android</h3>
+<pre><mark>digit-arabic = ok:true</mark>
+<mark>digit-fullwidth = ok:true</mark>
+<mark>word-accent = ok:true</mark>
+<mark>word-greek = ok:true</mark>
+word-underscore = ok:true
+<mark>space-nbsp = ok:true</mark>
+<mark>space-em = ok:true</mark>
+<mark>space-nel = ok:true</mark>
+space-vt = ok:true
+<mark>boundary-accent = ok:false</mark>
+dot-lf = ok:false
+dot-cr = ok:false
+dot-nel = ok:false
+dot-line-separator = ok:false
+dot-emoji = ok:true
+two-dots-emoji = ok:false
+letter-deseret = ok:true
+upper-deseret = ok:true
+ic-ascii = ok:true
+ic-accent = ok:true
+<mark>ic-sharp-s = ok:true</mark>
+ic-kelvin = ok:true
+ic-dz = ok:true
+<mark>ic-final-sigma = ok:true</mark>
+<mark>ic-dotted-i = ok:false</mark>
+<mark>ic-dotless-i = ok:false</mark>
+<mark>ic-deseret = ok:true</mark></pre>
+<h3>Group B: ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
+<pre><mark>digit-arabic = ok:false</mark>
+<mark>digit-fullwidth = ok:false</mark>
+<mark>word-accent = ok:false</mark>
+<mark>word-greek = ok:false</mark>
+word-underscore = ok:true
+<mark>space-nbsp = ok:false</mark>
+<mark>space-em = ok:false</mark>
+<mark>space-nel = ok:false</mark>
+space-vt = ok:true
+<mark>boundary-accent = ok:false</mark>
+dot-lf = ok:false
+dot-cr = ok:false
+dot-nel = ok:false
+dot-line-separator = ok:false
+dot-emoji = ok:true
+two-dots-emoji = ok:false
+letter-deseret = ok:true
+upper-deseret = ok:true
+ic-ascii = ok:true
+ic-accent = ok:true
+<mark>ic-sharp-s = ok:false</mark>
+ic-kelvin = ok:true
+ic-dz = ok:true
+<mark>ic-final-sigma = ok:false</mark>
+<mark>ic-dotted-i = ok:true</mark>
+<mark>ic-dotless-i = ok:false</mark>
+<mark>ic-deseret = ok:false</mark></pre>
+<h3>Group C: jvm, jvm-21, jvm-25</h3>
+<pre><mark>digit-arabic = ok:false</mark>
+<mark>digit-fullwidth = ok:false</mark>
+<mark>word-accent = ok:false</mark>
+<mark>word-greek = ok:false</mark>
+word-underscore = ok:true
+<mark>space-nbsp = ok:false</mark>
+<mark>space-em = ok:false</mark>
+<mark>space-nel = ok:false</mark>
+space-vt = ok:true
+<mark>boundary-accent = ok:true</mark>
+dot-lf = ok:false
+dot-cr = ok:false
+dot-nel = ok:false
+dot-line-separator = ok:false
+dot-emoji = ok:true
+two-dots-emoji = ok:false
+letter-deseret = ok:true
+upper-deseret = ok:true
+ic-ascii = ok:true
+ic-accent = ok:true
+<mark>ic-sharp-s = ok:false</mark>
+ic-kelvin = ok:true
+ic-dz = ok:true
+<mark>ic-final-sigma = ok:true</mark>
+<mark>ic-dotted-i = ok:true</mark>
+<mark>ic-dotless-i = ok:true</mark>
+<mark>ic-deseret = ok:true</mark></pre>
+<h3>Group D: jvm-17</h3>
+<pre><mark>digit-arabic = ok:false</mark>
+<mark>digit-fullwidth = ok:false</mark>
+<mark>word-accent = ok:false</mark>
+<mark>word-greek = ok:false</mark>
+word-underscore = ok:true
+<mark>space-nbsp = ok:false</mark>
+<mark>space-em = ok:false</mark>
+<mark>space-nel = ok:false</mark>
+space-vt = ok:true
+<mark>boundary-accent = ok:false</mark>
+dot-lf = ok:false
+dot-cr = ok:false
+dot-nel = ok:false
+dot-line-separator = ok:false
+dot-emoji = ok:true
+two-dots-emoji = ok:false
+letter-deseret = ok:true
+upper-deseret = ok:true
+ic-ascii = ok:true
+ic-accent = ok:true
+<mark>ic-sharp-s = ok:false</mark>
+ic-kelvin = ok:true
+ic-dz = ok:true
+<mark>ic-final-sigma = ok:true</mark>
+<mark>ic-dotted-i = ok:true</mark>
+<mark>ic-dotless-i = ok:true</mark>
+<mark>ic-deseret = ok:true</mark></pre>
+<h2>Results on Kotlin 2.5.0-Beta1</h2>
+<p>3 different results; 13 of 27 lines differ.</p>
+<table>
+<caption>Result per column, Kotlin 2.5.0-Beta1</caption>
+<tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
+<tr class="differs"><th scope="row">android</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/android.txt">file</a></td></tr>
+<tr><th scope="row">ios</th><td>B</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/ios.txt">file</a></td></tr>
+<tr><th scope="row">macos</th><td>B</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/macos.txt">file</a></td></tr>
+<tr><th scope="row">wasm</th><td>B</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/wasm.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/2.5.0-beta1/jvm.txt">file</a></td></tr>
+</table>
+<h3>Group A: android</h3>
+<pre><mark>digit-arabic = ok:true</mark>
+<mark>digit-fullwidth = ok:true</mark>
+<mark>word-accent = ok:true</mark>
+<mark>word-greek = ok:true</mark>
+word-underscore = ok:true
+<mark>space-nbsp = ok:true</mark>
+<mark>space-em = ok:true</mark>
+<mark>space-nel = ok:true</mark>
+space-vt = ok:true
+<mark>boundary-accent = ok:false</mark>
+dot-lf = ok:false
+dot-cr = ok:false
+dot-nel = ok:false
+dot-line-separator = ok:false
+dot-emoji = ok:true
+two-dots-emoji = ok:false
+letter-deseret = ok:true
+upper-deseret = ok:true
+ic-ascii = ok:true
+ic-accent = ok:true
+<mark>ic-sharp-s = ok:true</mark>
+ic-kelvin = ok:true
+ic-dz = ok:true
+<mark>ic-final-sigma = ok:true</mark>
+<mark>ic-dotted-i = ok:false</mark>
+<mark>ic-dotless-i = ok:false</mark>
+<mark>ic-deseret = ok:true</mark></pre>
+<h3>Group B: ios, macos, wasm</h3>
+<pre><mark>digit-arabic = ok:false</mark>
+<mark>digit-fullwidth = ok:false</mark>
+<mark>word-accent = ok:false</mark>
+<mark>word-greek = ok:false</mark>
+word-underscore = ok:true
+<mark>space-nbsp = ok:false</mark>
+<mark>space-em = ok:false</mark>
+<mark>space-nel = ok:false</mark>
+space-vt = ok:true
+<mark>boundary-accent = ok:false</mark>
+dot-lf = ok:false
+dot-cr = ok:false
+dot-nel = ok:false
+dot-line-separator = ok:false
+dot-emoji = ok:true
+two-dots-emoji = ok:false
+letter-deseret = ok:true
+upper-deseret = ok:true
+ic-ascii = ok:true
+ic-accent = ok:true
+<mark>ic-sharp-s = ok:false</mark>
+ic-kelvin = ok:true
+ic-dz = ok:true
+<mark>ic-final-sigma = ok:false</mark>
+<mark>ic-dotted-i = ok:true</mark>
+<mark>ic-dotless-i = ok:false</mark>
+<mark>ic-deseret = ok:false</mark></pre>
+<h3>Group C: jvm</h3>
+<pre><mark>digit-arabic = ok:false</mark>
+<mark>digit-fullwidth = ok:false</mark>
+<mark>word-accent = ok:false</mark>
+<mark>word-greek = ok:false</mark>
+word-underscore = ok:true
+<mark>space-nbsp = ok:false</mark>
+<mark>space-em = ok:false</mark>
+<mark>space-nel = ok:false</mark>
+space-vt = ok:true
+<mark>boundary-accent = ok:true</mark>
+dot-lf = ok:false
+dot-cr = ok:false
+dot-nel = ok:false
+dot-line-separator = ok:false
+dot-emoji = ok:true
+two-dots-emoji = ok:false
+letter-deseret = ok:true
+upper-deseret = ok:true
+ic-ascii = ok:true
+ic-accent = ok:true
+<mark>ic-sharp-s = ok:false</mark>
+ic-kelvin = ok:true
+ic-dz = ok:true
+<mark>ic-final-sigma = ok:true</mark>
+<mark>ic-dotted-i = ok:true</mark>
+<mark>ic-dotless-i = ok:true</mark>
+<mark>ic-deseret = ok:true</mark></pre>
+<h2>Classification</h2>
+<p>unclassified, basis inferred; causes: documented difference, JDK version, unexplained.</p>
+<p>No explanation was found in the sources searched.</p>
+<blockquote><p>This flag is not supported on Android, and Unicode character classes are always used.</p>
+<footer><a href="https://developer.android.com/reference/java/util/regex/Pattern">https://developer.android.com/reference/java/util/regex/Pattern</a></footer></blockquote>
+<blockquote><p>The \b metacharacter now matches ASCII word characters by default in the same way that the \w metacharacter does.</p>
+<footer><a href="https://www.oracle.com/java/technologies/javase/19-relnote-issues.html">https://www.oracle.com/java/technologies/javase/19-relnote-issues.html</a></footer></blockquote>
+<blockquote><p>Note that the pattern syntax and the option set has differences on each platform.</p>
+<footer><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/">https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/</a></footer></blockquote>
+<h3>Notes</h3>
+<p>Three groups of lines. Android: Unicode classes always on (documented). jvm-17 versus jvm-21 and jvm-25 on boundary-accent: JDK 19 note on \b (consistent with the note; Native, Wasm and Android match JDK 17). Native and Wasm versus JVM on ic-final-sigma, ic-dotless-i, ic-deseret: unexplained. KT-51859 says UNICODE_CASE is always on in Native, which does not predict these three lines.</p>
+<p class="muted">Read on 2026-10-07.</p>
+<h2>Issues</h2>
+<table>
+<caption>Tracker state on 2026-10-07</caption>
+<tr><th scope="col">Issue</th><th scope="col">State when read</th><th scope="col">Resolved</th><th scope="col">Summary</th></tr>
+<tr><th scope="row"><a href="https://youtrack.jetbrains.com/issue/KT-51859">KT-51859</a></th><td>Open</td><td></td><td>Kotlin/Native: Regex does not support turning off UNICODE_CASE</td></tr>
+<tr><th scope="row"><a href="https://youtrack.jetbrains.com/issue/KT-58195">KT-58195</a></th><td>Open</td><td></td><td>Native: Use the same unicode version for regex canonicalization</td></tr>
+<tr><th scope="row"><a href="https://youtrack.jetbrains.com/issue/KT-53212">KT-53212</a></th><td>As Designed</td><td>2022-08-02</td><td>Kotlin Regex IGNORE_CASE giving incorrect results for lowercase Turkish &quot;i&quot; and dotless i</td></tr>
+<tr><th scope="row"><a href="https://youtrack.jetbrains.com/issue/KT-58678">KT-58678</a></th><td>Open</td><td></td><td>Native Regex inconsistency with JVM / Native Regex</td></tr>
+</table>
+<h2>What was searched</h2>
+<p>YouTrack: &quot;Regex Native Unicode&quot;, &quot;Regex IGNORE_CASE Native Unicode case folding&quot;, &quot;Regex case insensitive sigma&quot;, &quot;Regex IGNORE_CASE&quot;, &quot;Regex case-insensitive Unicode&quot;, &quot;Regex Android&quot;. Pages read in full: Kotlin Regex and RegexOption, Android Pattern, JDK 19 release note. Native and Wasm results for ic-final-sigma, ic-dotless-i and ic-deseret are not explained by any of them.</p>
+<h2>Repro draft</h2>
+<div class="draft">
+<p><strong>Draft for human review; not filed.</strong></p>
+<pre>Draft for human review. Not filed.
+
+# kotlin.regex.unicode-matching
+
+This text was written by an agent from measured transcripts and pages it read. A person must rerun the probe, read the pages named below and rewrite it in their own words before anything is posted; the Kotlin maintainers do not want generated reports. The columns mingw-wine, linux-ubuntu and jvm-21-arm64 named below are measured transcripts kept in fixtures/atlas-extra.
+
+Question: What do \d, \w, \s, dot and ignore-case match outside ASCII?
+
+Classification now: unclassified (was unclassified); cause letters: a e g; basis: inferred.
+
+Measured: Kotlin 2.4.20 on 16 columns (android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, jvm 21 arm64 in a container, linux x64, linux arm64 and linux-ubuntu Native, mingw Native under wine); Kotlin 2.5.0-Beta1 on jvm, macos, wasm, android and ios. Single run per cell; no spread measured.
+
+Helpers (not shown below): `line(label, v)` prints `label = v`; `outcome(label) { }` prints `ok:&lt;value&gt;` or `err:&lt;ExceptionClass&gt;`; `failure(label) { }` prints `err:&lt;Class&gt;:&lt;message&gt;`; `bits(d)` prints `d.toRawBits()` as unsigned hex.
+
+Code for the differing lines (from the displayed probe source):
+
+```kotlin
+fun find(label: String, pattern: String, input: String) =
+fun option(label: String, pattern: String, option: RegexOption, input: String) =
+find(&quot;digit-arabic&quot;, &quot;^\\d${'$'}&quot;, &quot;٣&quot;)
+find(&quot;digit-fullwidth&quot;, &quot;^\\d${'$'}&quot;, &quot;３&quot;)
+find(&quot;word-accent&quot;, &quot;^\\w${'$'}&quot;, &quot;é&quot;)
+find(&quot;word-greek&quot;, &quot;^\\w${'$'}&quot;, &quot;α&quot;)
+find(&quot;space-nbsp&quot;, &quot;^\\s${'$'}&quot;, &quot;\u00a0&quot;)
+find(&quot;space-em&quot;, &quot;^\\s${'$'}&quot;, &quot;\u2003&quot;)
+find(&quot;space-nel&quot;, &quot;^\\s${'$'}&quot;, &quot;\u0085&quot;)
+find(&quot;boundary-accent&quot;, &quot;a\\b&quot;, &quot;aé&quot;)
+option(&quot;ic-sharp-s&quot;, &quot;^straße${'$'}&quot;, RegexOption.IGNORE_CASE, &quot;STRASSE&quot;)
+option(&quot;ic-final-sigma&quot;, &quot;^σ${'$'}&quot;, RegexOption.IGNORE_CASE, &quot;ς&quot;)
+option(&quot;ic-dotted-i&quot;, &quot;^i${'$'}&quot;, RegexOption.IGNORE_CASE, &quot;İ&quot;)
+option(&quot;ic-dotless-i&quot;, &quot;^ı${'$'}&quot;, RegexOption.IGNORE_CASE, &quot;I&quot;)
+```
+
+Results at 2.4.20, one row per distinct output (columns that agree share a row):
+
+- `digit-arabic`
+  - `ok:true`: android
+  - `ok:false`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine+wasm+3browsers, jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
+- `digit-fullwidth`
+  - `ok:true`: android
+  - `ok:false`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine+wasm+3browsers, jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
+- `word-accent`
+  - `ok:true`: android
+  - `ok:false`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine+wasm+3browsers, jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
+- `word-greek`
+  - `ok:true`: android
+  - `ok:false`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine+wasm+3browsers, jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
+- `space-nbsp`
+  - `ok:true`: android
+  - `ok:false`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine+wasm+3browsers, jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
+- `space-em`
+  - `ok:true`: android
+  - `ok:false`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine+wasm+3browsers, jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
+- `space-nel`
+  - `ok:true`: android
+  - `ok:false`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine+wasm+3browsers, jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
+- `boundary-accent`
+  - `ok:false`: android, ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine+wasm+3browsers, jvm-17
+  - `ok:true`: jvm+jvm-21+jvm-21-arm64+jvm-25
+- `ic-sharp-s`
+  - `ok:true`: android
+  - `ok:false`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine+wasm+3browsers, jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
+- `ic-final-sigma`
+  - `ok:true`: android, jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
+  - `ok:false`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine+wasm+3browsers
+- `ic-dotted-i`
+  - `ok:false`: android
+  - `ok:true`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine+wasm+3browsers, jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
+- `ic-dotless-i`
+  - `ok:false`: android, ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine+wasm+3browsers
+  - `ok:true`: jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
+- also differing, not expanded: `ic-deseret`
+
+On 2.5.0-Beta1 the cells group as: jvm; macos+wasm+ios; android.
+
+Docs read (FULL text):
+- https://developer.android.com/reference/java/util/regex/Pattern : &quot;This flag is not supported on Android, and Unicode character classes are always used.&quot;
+- https://www.oracle.com/java/technologies/javase/19-relnote-issues.html : &quot;The \b metacharacter now matches ASCII word characters by default in the same way that the \w metacharacter does.&quot;
+- https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/ : &quot;Note that the pattern syntax and the option set has differences on each platform.&quot;
+
+Existing tracker issues (read through the YouTrack REST API on 2026-10-07; nothing was posted): KT-51859 Open; KT-58195 Open; KT-53212 As Designed; KT-58678 Open.
+
+What is known: Three groups of lines. Android: Unicode classes always on (documented). jvm-17 versus jvm-21 and jvm-25 on boundary-accent: JDK 19 note on \b (consistent with the note; Native, Wasm and Android match JDK 17). Native and Wasm versus JVM on ic-final-sigma, ic-dotless-i, ic-deseret: unexplained. KT-51859 says UNICODE_CASE is always on in Native, which does not predict these three lines.
+
+What is NOT known: the intended behavior where no page read states one; whether the divergent column is a defect or by design; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device of the same target differs (one device per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies; the ladder agent re-compiled the displayed text and matched 37 of 38 probes on JVM and macOS Native).
+</pre>
+</div>
+<h2>Kotlin versions measured</h2>
+<p>2.4.20, 2.5.0-Beta1</p>
+<h2>How it was measured</h2>
+<ul>
+<li><strong>android</strong>: The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</li>
+<li><strong>ios</strong>: The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</li>
+<li><strong>jvm</strong>: The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
+<li><strong>jvm-17</strong>: The CLI JVM classes (jvmTarget 17) on Temurin 17.0.20.1, x86-64 Linux container, recorded with --target jvm-17.</li>
+<li><strong>jvm-21</strong>: The same classes on Temurin 21.0.12.1, x86-64 Linux container. Differs from the jvm column in hardware only.</li>
+<li><strong>jvm-25</strong>: The same classes on Temurin 25.0.4.1, x86-64 Linux container.</li>
+<li><strong>linux</strong>: The Kotlin/Native linuxX64 release executable, cross-linked on macOS, run in a debian:bookworm-slim container (glibc 2.36), x86-64. The same executable on ubuntu:24.04 (glibc 2.39) recorded identical results, kept in fixtures/atlas-extra. A release executable linked on macOS prints Apple libm values for three math constants (tan1, asin-half and acos-half); one linked on Ubuntu, or a debug build, prints glibc values. The Ubuntu-linked transcript is in fixtures/atlas-variants.</li>
+<li><strong>linux-arm64</strong>: The Kotlin/Native linuxArm64 release executable, cross-linked on macOS and run in an arm64 debian:bookworm-slim container. The Ubuntu-linked transcript, which differs on the same three math lines, is in fixtures/atlas-variants.</li>
+<li><strong>macos</strong>: The Kotlin/Native macosArm64 executable on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
+<li><strong>wasm</strong>: Kotlin/Wasm (wasmJs) on Node 26.8.2, macOS, Apple Silicon. Recorded through the wasm test harness because the wasm CLI has no file writer.</li>
+<li><strong>wasm-chromium</strong>: The Studio web build in Chromium 153.0.8010.12 (V8), driven by Playwright 1.63.0 on x86-64 Linux in a container.</li>
+<li><strong>wasm-firefox</strong>: The Studio web build in Firefox 155.0 (SpiderMonkey), driven by Playwright 1.63.0 on x86-64 Linux in a container.</li>
+<li><strong>wasm-webkit</strong>: The Studio web build in WebKit 26.6 (JavaScriptCore, the Playwright build for Linux), driven by Playwright 1.63.0 on x86-64 Linux in a container. Not Safari.</li>
+</ul>
+</main>
+<footer class="muted">
+<p>Results are recorded measurements for the listed Kotlin versions. A difference between
+targets is a result, not a diagnosis.</p>
+</footer>
+</body>
+</html>

@@ -1,15 +1,789 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Drift Studio</title>
-<link rel="icon" href="favicon.ico" sizes="any">
-<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="manifest" href="site.webmanifest">
-<style>html,body{margin:0;width:100%;height:100%}</style>
-<script src="studio.js"></script>
-</head>
-<body><noscript><p>Drift Atlas needs JavaScript for the interactive matrix. The results are also static pages: <a href="probe/">all probes</a>.</p></noscript></body>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Drift</title>
+		<meta name="description" content="Why it passes here and fails there" />
+		<link rel="icon" href="drift.ico" sizes="any" />
+		<link rel="icon" href="drift_128.png" type="image/png" sizes="128x128" />
+		<link rel="apple-touch-icon" href="drift.png" />
+		<meta property="og:title" content="Drift" />
+		<meta property="og:description" content="Why it passes here and fails there" />
+		<meta property="og:image" content="https://drift.gmitch215.dev/drift.png" />
+		<style>
+			:root {
+				color-scheme: light dark;
+				--fg: #1d1a26;
+				--muted: #5b556b;
+				--bg: #fcfbfe;
+				--card: #ffffff;
+				--line: #e4def0;
+				--accent: #6b3fd4;
+				--accent-strong: #8a63f0;
+				--pink: #b0399a;
+				--pink-soft: #c768bd;
+				--coral: #e4707a;
+				--code-bg: #f4f0fb;
+				--code-fg: #96307f;
+				--tint: #efe8fb;
+				--gradient: linear-gradient(90deg, #7a4fe0 0%, #a548c6 60%, #bd3a93 100%);
+				--glow: color-mix(in oklab, #8a63f0 16%, transparent);
+				--glow-pink: color-mix(in oklab, #c768bd 11%, transparent);
+				--glow-coral: color-mix(in oklab, #e4707a 7%, transparent);
+			}
+			@media (prefers-color-scheme: dark) {
+				:root {
+					--fg: #ece9f3;
+					--muted: #a69fb8;
+					--bg: #110e17;
+					--card: #191521;
+					--line: #2b2438;
+					--accent: #b99cff;
+					--accent-strong: #9d7bf5;
+					--pink: #e58fd8;
+					--pink-soft: #c872bd;
+					--coral: #f08a92;
+					--code-bg: #1f1a2a;
+					--code-fg: #f0a6e4;
+					--tint: #2a2140;
+					--gradient: linear-gradient(90deg, #b99cff 0%, #d595ee 60%, #f09ad0 100%);
+					--glow: color-mix(in oklab, #9d7bf5 22%, transparent);
+					--glow-pink: color-mix(in oklab, #c872bd 14%, transparent);
+					--glow-coral: color-mix(in oklab, #f08a92 7%, transparent);
+				}
+			}
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				margin: 0;
+				padding: 0 1rem 5rem;
+				background:
+					radial-gradient(60rem 30rem at 30% -10rem, var(--glow), transparent 70%),
+					radial-gradient(40rem 24rem at 95% 0, var(--glow-pink), transparent 70%),
+					radial-gradient(30rem 16rem at 100% 8rem, var(--glow-coral), transparent 70%),
+					var(--bg);
+				color: var(--fg);
+				font:
+					16px/1.7 ui-sans-serif,
+					system-ui,
+					-apple-system,
+					'Segoe UI',
+					Roboto,
+					sans-serif;
+				overflow-wrap: break-word;
+			}
+			main,
+			nav .bar,
+			footer {
+				max-width: 52rem;
+				margin: 0 auto;
+			}
+			nav {
+				margin: 0 -1rem 2.5rem;
+				padding: 0.75rem 1rem;
+				border-bottom: 1px solid var(--line);
+			}
+			nav .bar {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 0.25rem 1rem;
+			}
+			nav a {
+				color: var(--muted);
+				font-size: 0.925rem;
+				text-decoration: none;
+			}
+			nav a:hover,
+			nav a[aria-current] {
+				color: var(--accent);
+			}
+			nav a[aria-current] {
+				text-decoration: underline;
+				text-decoration-color: var(--pink-soft);
+				text-decoration-thickness: 2px;
+				text-underline-offset: 0.5em;
+			}
+			nav a.brand {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				margin-right: auto;
+				color: var(--fg);
+				font-size: 1.05rem;
+				font-weight: 700;
+				letter-spacing: -0.01em;
+			}
+			nav a.brand[aria-current] {
+				color: var(--fg);
+				text-decoration: none;
+			}
+			nav a.brand img {
+				width: 1.75rem;
+				height: 1.75rem;
+			}
+			h1 {
+				margin: 0 0 1rem;
+				font-size: 2.25rem;
+				line-height: 1.2;
+				letter-spacing: -0.03em;
+			}
+			.hero {
+				margin: 0 0 2rem;
+			}
+			.hero img {
+				display: block;
+				margin: 0 0 1rem;
+			}
+			.hero h1 {
+				width: fit-content;
+				margin: 0 0 0.25rem;
+				color: var(--accent);
+				font-size: 3rem;
+			}
+			@supports (background-clip: text) or (-webkit-background-clip: text) {
+				.hero h1 {
+					background: var(--gradient);
+					-webkit-background-clip: text;
+					background-clip: text;
+					-webkit-text-fill-color: transparent;
+					color: transparent;
+				}
+			}
+			.hero .lead {
+				margin: 0;
+				color: var(--muted);
+				font-size: 1.2rem;
+			}
+			.links {
+				display: grid;
+				gap: 0.85rem;
+				grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+				margin: 0 0 3rem;
+			}
+			a.card {
+				display: block;
+				padding: 1rem 1.25rem;
+				border: 1px solid var(--line);
+				border-radius: 0.8rem;
+				background: var(--card);
+				color: inherit;
+				text-decoration: none;
+				transition:
+					border-color 0.15s,
+					box-shadow 0.15s;
+			}
+			a.card:hover {
+				border-color: var(--accent-strong);
+				box-shadow: 0 0 36px -10px var(--accent-strong);
+			}
+			a.card strong {
+				color: var(--accent);
+			}
+			a.card strong {
+				display: block;
+				font-size: 1.02rem;
+			}
+			a.card span {
+				color: var(--muted);
+				font-size: 0.875rem;
+				line-height: 1.5;
+			}
+
+			.readme h2 {
+				margin: 3rem 0 1rem;
+				padding-bottom: 0.4rem;
+				border-bottom: 2px solid transparent;
+				border-image: linear-gradient(90deg, var(--accent-strong), var(--pink-soft) 40%, var(--line)) 1;
+				font-size: 1.55rem;
+				letter-spacing: -0.01em;
+			}
+			.readme h3 {
+				margin: 2rem 0 0.75rem;
+				padding-left: 0.6rem;
+				border-left: 3px solid var(--pink-soft);
+				font-size: 1.2rem;
+			}
+			.readme h4 {
+				margin: 1.5rem 0 0.5rem;
+			}
+			.readme a {
+				color: var(--accent);
+				text-underline-offset: 0.2em;
+			}
+			.readme hr {
+				margin: 3rem 0;
+				border: 0;
+				border-top: 1px solid var(--line);
+			}
+			.readme blockquote {
+				margin: 1.5rem 0;
+				padding: 0.25rem 0 0.25rem 1.25rem;
+				border-left: 3px solid var(--pink-soft);
+				color: var(--muted);
+			}
+			.readme ul,
+			.readme ol {
+				padding-left: 1.4rem;
+			}
+			.readme li {
+				margin: 0.35rem 0;
+			}
+			.readme li::marker {
+				color: var(--pink-soft);
+			}
+			.readme code {
+				font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+			}
+			.readme :not(pre) > code {
+				padding: 0.15em 0.4em;
+				border-radius: 0.35rem;
+				background: var(--code-bg);
+				color: var(--code-fg);
+				font-size: 0.85em;
+				overflow-wrap: anywhere;
+			}
+			.readme pre {
+				margin: 1.25rem 0;
+				padding: 1rem 1.25rem;
+				border: 1px solid var(--line);
+				border-radius: 0.8rem;
+				overflow-x: auto;
+				background: var(--code-bg);
+				font-size: 0.85rem;
+				line-height: 1.6;
+			}
+			.readme pre code {
+				display: block;
+			}
+			.readme .table {
+				overflow-x: auto;
+				margin: 1.25rem 0;
+				border: 1px solid var(--line);
+				border-radius: 0.8rem;
+			}
+			.readme table {
+				width: 100%;
+				border-collapse: collapse;
+				font-size: 0.925rem;
+			}
+			.readme th,
+			.readme td {
+				padding: 0.55rem 0.9rem;
+				border-bottom: 1px solid var(--line);
+				text-align: left;
+				vertical-align: top;
+			}
+			.readme th {
+				background: var(--tint);
+				border-bottom-color: var(--accent-strong);
+				font-weight: 600;
+			}
+			.readme tbody tr:last-child td {
+				border-bottom: 0;
+			}
+			.readme img {
+				max-width: 100%;
+			}
+
+			footer {
+				margin-top: 4rem;
+				padding-top: 1.5rem;
+				border-top: 1px solid var(--line);
+				color: var(--muted);
+				font-size: 0.9rem;
+			}
+			footer a {
+				color: inherit;
+			}
+		</style>
+	</head>
+	<body>
+		<nav>
+			<div class="bar"><a class="brand" href="index.html" aria-current="page"><img src="drift_128.png" alt="" width="28" height="28">Drift</a>
+<a href="advanced-usage.html">Usage</a>
+<a href="technical-report.html">Report</a>
+<a href="atlas/">Atlas</a>
+<a href="engine/">Engine</a>
+<a href="https://github.com/gmitch215/Drift">GitHub</a></div>
+		</nav>
+		<main>
+			<div class="hero">
+<img src="drift.png" alt="" width="96" height="96">
+<h1>Drift</h1>
+<p class="lead">Why it passes here and fails there</p>
+</div>
+<div class="links">
+<a class="card" href="advanced-usage.html"><strong>Usage</strong><span>Every command and flag, with real output.</span></a>
+<a class="card" href="technical-report.html"><strong>Report</strong><span>The design, the evidence and the numbers.</span></a>
+<a class="card" href="atlas/"><strong>Atlas</strong><span>Kotlin behavior recorded per target, with Studio.</span></a>
+<a class="card" href="engine/"><strong>Engine</strong><span>KDoc for the engine modules, from Dokka.</span></a>
+<a class="card" href="https://github.com/gmitch215/Drift"><strong>GitHub</strong><span>Source, releases and issues.</span></a>
+</div>
+			<div class="readme"><p>Drift diagnoses a program that passes in one environment and fails in another. It records each
+environment as a capsule, ranks what differs between a passing run and a failing one, proposes the
+experiment that would remove the most uncertainty, runs it, and writes a certificate that a second
+command can verify. It is written in Kotlin Multiplatform and runs as a command line tool, a desktop
+app, a web app, an Android app and an iOS app from the same shared code.</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#what-it-does">What It Does</a></li>
+<li><a href="#the-kotlin-portability-atlas">The Kotlin Portability Atlas</a></li>
+<li><a href="#install-and-run">Install and Run</a></li>
+<li><a href="#try-it">Try It</a></li>
+<li><a href="#architecture">Architecture</a></li>
+<li><a href="#shared-code">Shared Code</a></li>
+<li><a href="#status-and-limits">Status and Limits</a></li>
+<li><a href="#documentation">Documentation</a></li>
+<li><a href="#license">License</a></li>
+</ul>
+<hr />
+<h2 id="what-it-does">What It Does</h2>
+<ol>
+<li><strong>Capture.</strong> <code>drift capture</code> fingerprints a machine as a capsule: operating system, toolchains,
+environment variables (secret values redacted), limits, and the results of small probes. The
+capsule is canonical JSON with a SHA-256 hash, so the same capsule gives the same bytes on every
+target.</li>
+<li><strong>Diff and rank.</strong> <code>drift diagnose</code> compares the capsules of a passing and a failing run and ranks
+the attributes that differ into explicit tiers. A set of changes the data cannot separate is
+reported as a bundle, and the tool says when no single cause is named.</li>
+<li><strong>Plan.</strong> The planner prices each possible experiment in expected bits and proposes the one that
+removes the most uncertainty. Experiments no hosted runner can run are marked as such.</li>
+<li><strong>Run.</strong> <code>drift solve</code> runs the experiment in containers under a decision rule fixed before the
+first trial. It needs Docker.</li>
+<li><strong>Certify.</strong> <code>drift pack</code> archives the case as a <code>.driftcase</code> file and <code>drift verify</code> re-derives
+every count, p-value and verdict from the archive alone. It does not re-run an experiment.</li>
+</ol>
+<p><code>drift reproduce</code> writes a <code>Dockerfile</code> and a run script that mirror a capsule as far as a container
+can. The full command reference is in <a href="advanced-usage.html">ADVANCED_USAGE.md</a>.</p>
+<hr />
+<h2 id="the-kotlin-portability-atlas">The Kotlin Portability Atlas</h2>
+<p>Kotlin code that compiles everywhere does not always print the same thing everywhere. The Atlas holds
+38 probes of Kotlin behavior. Each probe is a small program with a recorded output per target.
+Thirteen columns are recorded on Kotlin 2.4.20: the JVM on JDK 17, 21 and 25, Linux x64 and arm64
+and macOS native, Wasm on Node, Chromium, Firefox and WebKit, Android and the iOS simulator. Five more
+(JVM, macOS native, Wasm, Android and iOS) are recorded on Kotlin 2.5.0-Beta1.</p>
+<p>23 probes differ between targets on 2.4.20, and 18 on 2.5.0-Beta1. Every probe carries a
+classification from primary sources: 18 are <code>documented</code> (a Kotlin page states the behavior), 4 are
+<code>platform-defined</code> (a JDK or ECMAScript page does) and 16 are <code>unclassified</code>, with the search that
+found no explanation. A divergence is data, not a verdict that something is a bug.</p>
+<p>Studio opens on the Atlas. The matrix groups columns by target family and adds a column for the
+device it runs on, measured live. A predict-and-reveal mode asks for the output you expect on a
+target, then shows the recorded one.</p>
+<p><code>drift atlas record</code>, <code>build</code>, <code>compare</code> and <code>show</code> do the same work from the command line.
+<code>./gradlew atlasSite</code> builds the static Atlas site: Studio, a page per probe and the dataset as
+JSON. <code>./gradlew docsSite</code> assembles the documentation site around it: this README as the front
+page, the two documents listed under Documentation as pages of their own, the Atlas site under
+<code>atlas/</code> and the engine documentation under <code>engine/</code>. The <code>docs.yml</code> workflow builds that site on
+every push and publishes it to GitHub Pages from <code>master</code>, with the custom domain
+<code>drift.gmitch215.dev</code>.</p>
+<hr />
+<h2 id="install-and-run">Install and Run</h2>
+<p>The first release has not been published. The download links and the <code>brew</code> and <code>choco</code> commands
+below work once it is. Until then, build from source.</p>
+<h3 id="downloads">Downloads</h3>
+<p>Assets are on the <a href="https://github.com/gmitch215/Drift/releases">releases page</a>. Every asset has a
+<code>.sha256</code> file, and <code>SHA256SUMS</code> lists them all.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Studio</th>
+<th>Command line</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>macOS, Apple silicon</td>
+<td><code>drift-1.0.0-macos-arm64.dmg</code>, <code>drift-1.0.0-macos-arm64.pkg</code></td>
+<td><code>drift-1.0.0-macos-arm64.tar.gz</code></td>
+</tr>
+<tr>
+<td>Windows x64</td>
+<td><code>drift-1.0.0-windows-x64.msi</code>, <code>drift-1.0.0-windows-x64.exe</code></td>
+<td><code>drift-1.0.0-windows-x64.zip</code></td>
+</tr>
+<tr>
+<td>Linux x64</td>
+<td><code>drift-1.0.0-linux-x64.AppImage</code>, <code>.deb</code>, <code>.rpm</code></td>
+<td><code>drift-1.0.0-linux-x64.tar.gz</code></td>
+</tr>
+<tr>
+<td>Linux arm64</td>
+<td></td>
+<td><code>drift-1.0.0-linux-arm64.tar.gz</code></td>
+</tr>
+<tr>
+<td>Android</td>
+<td><code>drift-1.0.0-android.apk</code></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>There is no Intel macOS asset. The Linux executables are built for glibc and do not run on musl
+systems such as Alpine. An archive holds <code>drift</code> (<code>drift.exe</code> on Windows), <code>LICENSE</code> and a short
+<code>README.txt</code>.</p>
+<pre><code class="language-sh">shasum -a 256 -c --ignore-missing SHA256SUMS
+</code></pre>
+<p>The <code>.deb</code> and <code>.rpm</code> packages are desktop packages. Their install script needs the standard
+desktop directories, so they do not install on a headless server. Make the AppImage executable with
+<code>chmod +x</code> and run it, or pass <code>--appimage-extract-and-run</code> where FUSE is missing.</p>
+<h3 id="unsigned-apps">Unsigned Apps</h3>
+<p>The macOS and Windows installers are not signed with a developer certificate, so the first launch is
+blocked.</p>
+<ul>
+<li><strong>macOS:</strong> Gatekeeper rejects the app. Open System Settings, Privacy and Security, and choose Open
+Anyway, or run <code>xattr -dr com.apple.quarantine /Applications/Drift.app</code>.</li>
+<li><strong>Windows:</strong> SmartScreen shows &quot;Windows protected your PC&quot;. Choose More info, then Run anyway.</li>
+<li><strong>Android:</strong> the APK is signed with a debug key. Allow installs from your browser or file manager.
+An update over an older sideloaded build needs <code>adb uninstall dev.gmitch215.drift</code> first, because
+each build machine signs with its own key.</li>
+</ul>
+<h3 id="homebrew">Homebrew</h3>
+<pre><code class="language-sh">brew install gmitch215/tap/drift
+brew install --cask gmitch215/tap/drift-studio
+</code></pre>
+<p>Use the full tap path, because other taps carry a formula named <code>drift</code>. The cask is Apple silicon
+only and clears the quarantine attribute after install.</p>
+<h3 id="chocolatey">Chocolatey</h3>
+<pre><code class="language-sh">choco install drift
+choco install drift-studio
+</code></pre>
+<h3 id="install-script">Install Script</h3>
+<pre><code class="language-sh">curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh | sh
+</code></pre>
+<p>On Windows, in PowerShell:</p>
+<pre><code class="language-powershell">irm https://raw.githubusercontent.com/gmitch215/Drift/master/install.ps1 | iex
+</code></pre>
+<p>Each script finds your OS and architecture, downloads the archive and its <code>.sha256</code> file from the
+latest release, checks the digest, runs the executable's <code>--version</code> and hands over to <code>drift install</code>.
+Flags go after <code>sh -s --</code> (<code>install.sh --dry-run</code> from a saved copy): <code>--user</code>, <code>--global</code>, <code>--dir</code>,
+<code>--no-modify-path</code> and <code>--dry-run</code>. <code>DRIFT_VERSION=1.0.0</code> pins a release. <code>install.ps1</code> takes the same
+options as <code>-User</code>, <code>-Global</code>, <code>-Dir</code>, <code>-NoModifyPath</code> and <code>-DryRun</code> when saved with
+<code>irm ... -OutFile install.ps1</code>.</p>
+<h3 id="drift-install">Drift Install</h3>
+<p><code>drift install</code> copies the executable you are running to a directory on your path and records what it
+changed in a receipt. <code>drift uninstall</code> reverses exactly that.</p>
+<pre><code class="language-sh">drift install --dry-run
+</code></pre>
+<p>By default it installs for the current user, into <code>~/.local/bin</code> (<code>%LOCALAPPDATA%\Programs\Drift</code> on
+Windows), and appends a marked block to the shell profiles that exist when the directory is not on
+<code>PATH</code>. Windows edits the user <code>Path</code> value in the registry. <code>--global</code> installs into <code>/usr/local/bin</code>
+(<code>%ProgramFiles%\Drift</code>), never calls <code>sudo</code>, and prints the command to run when the directory is not
+writable. <code>--no-modify-path</code> or <code>DRIFT_NO_MODIFY_PATH=1</code> skips the path edit. The JVM build cannot
+install itself. See <a href="advanced-usage.html#install-and-uninstall">ADVANCED_USAGE.md</a> for the full
+behavior.</p>
+<h3 id="build-from-source">Build from Source</h3>
+<p>Clone the repository. Every target builds from the Gradle wrapper, and the build downloads the JDK 21
+toolchain if one is missing. A cold build downloads toolchains and dependencies and takes minutes.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Target</th>
+<th>Needs</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CLI on the JVM</td>
+<td>JDK 21</td>
+<td><code>./gradlew :cli:jvmRun --args=--version</code></td>
+</tr>
+<tr>
+<td>CLI, macOS arm64</td>
+<td>macOS, Xcode command line tools</td>
+<td><code>./gradlew :cli:linkReleaseExecutableMacosArm64</code></td>
+</tr>
+<tr>
+<td>CLI, Linux x64 and arm64</td>
+<td>any host Kotlin/Native supports</td>
+<td><code>./gradlew :cli:linkReleaseExecutableLinuxX64</code> and <code>...LinuxArm64</code></td>
+</tr>
+<tr>
+<td>CLI, Windows x64</td>
+<td>any host Kotlin/Native supports</td>
+<td><code>./gradlew :cli:linkReleaseExecutableMingwX64</code></td>
+</tr>
+<tr>
+<td>Studio on the desktop</td>
+<td>JDK 21</td>
+<td><code>./gradlew :studio:run</code></td>
+</tr>
+<tr>
+<td>Studio on the web</td>
+<td>JDK 21, a browser</td>
+<td><code>./gradlew :cli:stageStudio</code>, then <code>drift serve</code></td>
+</tr>
+<tr>
+<td>Studio on Android</td>
+<td>Android SDK with platform 37</td>
+<td>see <a href="#android">Android</a></td>
+</tr>
+<tr>
+<td>Studio on iOS</td>
+<td>macOS, Xcode with a simulator runtime</td>
+<td>see <a href="#ios-simulator">iOS Simulator</a></td>
+</tr>
+</tbody>
+</table></div>
+<p>The installers are built by <code>release.yml</code> with <code>./gradlew :studio:packageDmg :studio:packagePkg</code> on
+macOS, <code>:studio:packageDeb :studio:packageRpm :studio:packageAppImage</code> on Linux and
+<code>:studio:packageMsi :studio:packageExe</code> on Windows (WiX Toolset). <code>drift solve</code> also needs Docker.
+Everything else runs without it.</p>
+<h3 id="command-line">Command Line</h3>
+<p>Executables land in <code>cli/build/bin/&lt;target&gt;/releaseExecutable/</code>. The macOS executable is <code>drift.kexe</code>
+and the Windows one is <code>drift.exe</code>.</p>
+<pre><code class="language-sh">alias drift=cli/build/bin/macosArm64/releaseExecutable/drift.kexe
+drift --version
+</code></pre>
+<pre><code>drift version 1.0.0 (macos)
+</code></pre>
+<p>On the JVM, <code>./gradlew :cli:jvmRun --args=--version</code> prints <code>drift version 1.0.0 (jvm)</code>, and any other
+command goes in <code>--args</code>. The macOS executable and the JVM build were run. The Linux arm64 and x64
+executables ran inside Debian containers. The Windows executable ran under Wine, not on Windows.</p>
+<h3 id="studio-on-the-desktop">Studio on the Desktop</h3>
+<pre><code class="language-sh">./gradlew :studio:run
+</code></pre>
+<p>A window opens on the Atlas, with the Investigation view on the second tab.</p>
+<h3 id="studio-on-the-web">Studio on the Web</h3>
+<p><code>drift serve</code> serves the web build from a directory, read-only, on the loopback interface.
+<code>:cli:stageStudio</code> builds the Wasm distribution and copies it to <code>cli/build/serve/studio</code>.</p>
+<pre><code class="language-sh">./gradlew :cli:stageStudio
+drift serve --dir cli/build/serve/studio
+</code></pre>
+<p>Open <code>http://localhost:8080/</code>. The page title is &quot;Drift Studio&quot;. <code>--port 0</code> takes a free port,
+<code>--cert</code> and <code>--key</code> (or <code>--mkcert</code> with an existing mkcert CA) serve HTTPS on the JVM, macOS and
+Linux builds, and <code>--domain</code> adds names such as <code>drift.local</code>. Any static server works too: serve
+<code>studio/build/dist/wasmJs/productionExecutable</code> after <code>./gradlew :studio:wasmJsBrowserDistribution</code>.
+Nothing hosts the site until <code>docs.yml</code> has run.</p>
+<h3 id="android">Android</h3>
+<p>Android and iOS builds are off by default so that a fresh clone needs only a JDK. Pass
+<code>-Pdrift.mobile=true</code> to turn them on. The Android build is a debug APK for an emulator or a device
+with USB debugging.</p>
+<pre><code class="language-sh">./gradlew -Pdrift.mobile=true :androidApp:assembleDebug
+adb install -r androidApp/build/outputs/apk/debug/androidApp-debug.apk
+adb shell am start -n dev.gmitch215.drift/dev.gmitch215.drift.android.MainActivity
+</code></pre>
+<p>On an arm64 emulator (Pixel 7, API 37) the cold build took 3m26s and the APK is about 10 MB.
+<code>./gradlew -Pdrift.mobile=true :androidApp:packageApk</code> writes the release APK that the release
+workflow attaches, <code>androidApp/build/distributions/drift-1.0.0-android.apk</code>. It is signed with the
+debug key. Nothing is published to a store.</p>
+<h3 id="ios-simulator">iOS Simulator</h3>
+<pre><code class="language-sh">xcodebuild -project iosApp/iosApp.xcodeproj -target iosApp -configuration Debug \
+  -sdk iphonesimulator ARCHS=arm64 ONLY_ACTIVE_ARCH=YES SYMROOT=build/xcode build
+xcrun simctl list devices available
+xcrun simctl boot &lt;device-udid&gt;
+xcrun simctl install &lt;device-udid&gt; build/xcode/Debug-iphonesimulator/iosApp.app
+xcrun simctl launch &lt;device-udid&gt; dev.gmitch215.drift
+</code></pre>
+<p>The Xcode project calls <code>./gradlew -Pdrift.mobile=true :studio:embedAndSignAppleFrameworkForXcode</code>
+in a build phase. Its <code>PATH</code> adds <code>/opt/homebrew/opt/openjdk/bin</code>, <code>/opt/homebrew/bin</code> and
+<code>/usr/local/bin</code>; a JDK installed elsewhere needs the script phase edited. No signing or provisioning
+is involved, and the build targets the simulator only.</p>
+<p>On Android and iOS, Studio replays the embedded Atlas transcripts and measures the live this-device
+probes. It does not sample the machine. The iOS host cannot start processes, so process probes are
+unavailable there.</p>
+<hr />
+<h2 id="try-it">Try It</h2>
+<p>The examples run from the repository root against the files in <code>fixtures/</code>. They assume the <code>drift</code>
+alias from the command line section.</p>
+<p><strong>Capture this machine.</strong></p>
+<pre><code class="language-sh">drift capture --label ci &gt; ci.json
+shasum -a 256 ci.json
+</code></pre>
+<p><strong>Diagnose a real failure.</strong> <code>fixtures/drangler</code> holds capsules from a CI run that went from passing
+to failing. <code>--detail</code> prints text instead of JSON, at three levels (<code>summary</code>, <code>detail</code>, <code>full</code>).</p>
+<pre><code class="language-sh">G=fixtures/drangler/capsules/36702683742.json
+R=fixtures/drangler/capsules/36995781138.json
+drift diagnose --detail summary $G $R
+</code></pre>
+<pre><code>8 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
+so the data does not name one cause.
+</code></pre>
+<p>Use <code>--detail detail</code> for the ranked candidates, the bundle and the proposed next experiment.</p>
+<p><strong>Reproduce an environment.</strong> This writes a <code>Dockerfile</code>, <code>run.sh</code> and <code>manifest.json</code> into <code>repro/</code>.
+The manifest lists what a container cannot mirror.</p>
+<pre><code class="language-sh">drift reproduce fixtures/lab/node-alpine.json --run &quot;npm test&quot; --out repro
+</code></pre>
+<p><strong>Verify a packed case.</strong> <code>fixtures/lab/cases</code> holds four solved cases. <code>verify</code> runs 14 checks on the
+archive itself.</p>
+<pre><code class="language-sh">drift verify fixtures/lab/cases/locale-tz-date-2.driftcase | tail -3
+</code></pre>
+<pre><code>verdict: CONFIRMED: this dimension causes the failure: env.TZ. Setting it to the failing values moved the failure count from 0 of 5 to 5 of 5 (exact one-sided p 0.003968) and back from 5 of 5 to 0 of 5 when the failing side was set to the passing values (p 0.003968)
+experiments are not re-run; the recorded results are taken as given
+verify: ok
+</code></pre>
+<p><strong>Install into a scratch directory.</strong> <code>--dry-run</code> prints every change and makes none. Without it, the
+same command installs, and <code>drift uninstall</code> removes what the receipt lists.</p>
+<pre><code class="language-sh">drift install --dir &quot;$PWD/scratch-bin&quot; --no-modify-path --dry-run
+</code></pre>
+<pre><code>dry run: nothing is changed
+scope: user
+create directory /path/to/scratch-bin
+write /path/to/scratch-bin/drift (mode 0755, 6742776 bytes)
+create directory ~/.config
+create directory ~/.config/drift
+PATH is not modified
+write receipt ~/.config/drift/install-receipt.json
+</code></pre>
+<p><strong>Serve Studio.</strong> Stage the web build once, then serve it on a free port and fetch the page headers:</p>
+<pre><code class="language-sh">./gradlew :cli:stageStudio
+drift serve --dir cli/build/serve/studio --port 0
+</code></pre>
+<pre><code>drift serve 1.0.0: serving /path/to/studio
+http://localhost:56990/
+http://127.0.0.1:56990/
+http://[::1]:56990/
+press Ctrl+C to stop
+</code></pre>
+<pre><code class="language-sh">curl -sI http://localhost:56990/
+</code></pre>
+<pre><code>HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Cache-Control: no-cache
+Content-Length: 508
+Connection: close
+X-Content-Type-Options: nosniff
+Cross-Origin-Resource-Policy: same-origin
+</code></pre>
+<p><strong>Record the Atlas for this machine.</strong> The transcript is byte-identical to the one in the repository
+for the same target and Kotlin version.</p>
+<pre><code class="language-sh">drift atlas record --out tr
+</code></pre>
+<pre><code>wrote 38 probes for macos on kotlin 2.4.20 to tr/macos.txt
+</code></pre>
+<hr />
+<h2 id="architecture">Architecture</h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Owns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>core</code></td>
+<td>Capsule model, canonical JSON, SHA-256, fixed-point math, diff, ranking, rules, planner, Lab. Common code only.</td>
+</tr>
+<tr>
+<td><code>host</code></td>
+<td>Operating system access, one implementation per target (JVM, Linux, macOS, Windows, Wasm, Android, iOS).</td>
+</tr>
+<tr>
+<td><code>scan</code></td>
+<td>Probes, toolchain scanners, the Atlas dataset builder and the probe classification.</td>
+</tr>
+<tr>
+<td><code>cli</code></td>
+<td>The <code>drift</code> command, including <code>install</code>, <code>uninstall</code> and <code>serve</code>.</td>
+</tr>
+<tr>
+<td><code>studio</code></td>
+<td>The Compose Multiplatform app: Atlas and Investigation views for desktop, web, Android and iOS, and the installer packaging.</td>
+</tr>
+<tr>
+<td><code>bench</code></td>
+<td>DriftBench, a seeded benchmark of container pairs with an injected cause.</td>
+</tr>
+<tr>
+<td><code>tools</code></td>
+<td>Fixture freezing, Atlas ladder tooling and the installer test scripts.</td>
+</tr>
+<tr>
+<td><code>androidApp</code>, <code>iosApp</code></td>
+<td>The Android and iOS app shells. They exist only under <code>-Pdrift.mobile=true</code>.</td>
+</tr>
+<tr>
+<td><code>packaging</code></td>
+<td>Homebrew formula and cask and Chocolatey package templates, rendered by <code>./gradlew renderPackaging</code> after a release.</td>
+</tr>
+<tr>
+<td><code>atlas</code></td>
+<td>Hand-written probe classification, column descriptions and repro drafts in YAML. The build embeds the classification and builds the static site from it.</td>
+</tr>
+<tr>
+<td><code>build-core</code></td>
+<td>Gradle convention plugins and build tasks: rules, Atlas site, packaging templates, Dokka.</td>
+</tr>
+<tr>
+<td><code>rules</code></td>
+<td>Hand-written rule files in YAML. The build generates the JSON that <code>core</code> reads.</td>
+</tr>
+<tr>
+<td><code>fixtures</code></td>
+<td>Recorded capsules, Atlas transcripts and solved cases.</td>
+</tr>
+<tr>
+<td><code>install.sh</code>, <code>install.ps1</code></td>
+<td>Download, verify and install a release.</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="shared-code">Shared Code</h2>
+<p>Kotlin common code holds most of the program. <code>core</code> and <code>scan</code> have no platform source sets, and
+<code>host</code> holds every <code>expect</code> and <code>actual</code> pair. <code>./gradlew sharedRatio</code> prints common and platform
+lines per module and fails the build if a floor or budget is broken:</p>
+<pre><code>module     common  platform  shared
+host          176       388   31.2%
+core         9712         0  100.0%
+scan         3542         0  100.0%
+cli          2576      1549   62.4%
+studio        822        67   92.5%
+bench        1996       466   81.1%
+total       18824      2470   88.4%
+</code></pre>
+<p>The platform lines of <code>cli</code> are the file, process and socket code behind <code>install</code> and <code>serve</code>. The
+ratio counts the default targets: JVM, Linux, macOS, Windows and Wasm. <code>core</code> and the common code of
+<code>bench</code> use no <code>Double</code> or <code>Float</code>, so their results are the same on every target.</p>
+<hr />
+<h2 id="status-and-limits">Status and Limits</h2>
+<p>The command line tool, Studio on desktop and web, the Atlas, the Lab, <code>verify</code>, <code>install</code> and <code>serve</code>
+are implemented and tested. The Android and iOS apps build and launch on an emulator and a simulator.
+No real Android or iOS device has been tried, and the iOS build is a simulator build.</p>
+<p>What a result does and does not show:</p>
+<ul>
+<li>The ranking weights are hand-set. On the development benchmark the ranker beats a random order at the
+top only narrowly, and a <code>plausible</code> tier candidate is more often wrong than right.</li>
+<li>The Lab confirms a cause only under a rule fixed before the first trial, and <code>verify</code> checks the
+arithmetic of a case, not that the experiment would repeat.</li>
+<li>Some Atlas probes depend on hardware and on the build host. NaN bit patterns and the last digits of
+some math functions differ between CPUs, and a Linux executable linked on Ubuntu prints different
+digits for three math probes than one linked on macOS. Each column is one run.</li>
+<li>Coverage covers JVM code only. Kotlin/Native and Wasm have no coverage tool.</li>
+</ul>
+<p>What has not been run:</p>
+<ul>
+<li>Windows. The Windows executable ran under Wine only, the <code>.msi</code> and <code>.exe</code> installers have not been
+built, and <code>install.ps1</code> ran under PowerShell 7 on Linux, not on Windows.</li>
+<li>Safari. Studio loads in Chromium, Firefox and WebKit through Playwright, and not in Safari.</li>
+<li>The workflows <code>build.yml</code>, <code>atlas.yml</code>, <code>docs.yml</code> and <code>release.yml</code>, so the badges above show no
+status and the Homebrew and Chocolatey packages have never been installed from a published release.</li>
+</ul>
+<p>The measurements and their instruments are in the
+<a href="technical-report.html#evaluation-and-limits">Evaluation and Limits</a> section of the report.</p>
+<hr />
+<h2 id="documentation">Documentation</h2>
+<ul>
+<li><a href="technical-report.html">TECHNICAL_REPORT.md</a> describes the design, the evidence and the numbers.</li>
+<li><a href="advanced-usage.html">ADVANCED_USAGE.md</a> covers every command and flag, with output from real runs.</li>
+<li>Engine documentation for the modules is generated with Dokka by <code>./gradlew :dokkaGenerate</code> into
+<code>build/dokka/html</code>, and <code>docsSite</code> copies it to <code>engine/</code>. It describes how the code is
+organized. Drift ships as an application, and the modules are not a public API or a published
+library.</li>
+</ul>
+<hr />
+<h2 id="license">License</h2>
+<p>MIT. See <a href="https://github.com/gmitch215/Drift/blob/master/LICENSE">LICENSE</a>.</p></div>
+		</main>
+		<footer>
+			<a href="https://github.com/gmitch215/Drift">github.com/gmitch215/Drift</a> &middot;
+			<a href="https://github.com/gmitch215/Drift/blob/master/LICENSE">MIT License</a>
+		</footer>
+	</body>
 </html>

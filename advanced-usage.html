@@ -1,0 +1,2337 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Advanced Usage - Drift</title>
+		<meta name="description" content="Every drift command and flag, with output from real runs." />
+		<link rel="icon" href="drift.ico" sizes="any" />
+		<link rel="icon" href="drift_128.png" type="image/png" sizes="128x128" />
+		<link rel="apple-touch-icon" href="drift.png" />
+		<meta property="og:title" content="Advanced Usage - Drift" />
+		<meta property="og:description" content="Every drift command and flag, with output from real runs." />
+		<meta property="og:image" content="https://drift.gmitch215.dev/drift.png" />
+		<style>
+			:root {
+				color-scheme: light dark;
+				--fg: #1d1a26;
+				--muted: #5b556b;
+				--bg: #fcfbfe;
+				--card: #ffffff;
+				--line: #e4def0;
+				--accent: #6b3fd4;
+				--accent-strong: #8a63f0;
+				--pink: #b0399a;
+				--pink-soft: #c768bd;
+				--coral: #e4707a;
+				--code-bg: #f4f0fb;
+				--code-fg: #96307f;
+				--tint: #efe8fb;
+				--gradient: linear-gradient(90deg, #7a4fe0 0%, #a548c6 60%, #bd3a93 100%);
+				--glow: color-mix(in oklab, #8a63f0 16%, transparent);
+				--glow-pink: color-mix(in oklab, #c768bd 11%, transparent);
+				--glow-coral: color-mix(in oklab, #e4707a 7%, transparent);
+			}
+			@media (prefers-color-scheme: dark) {
+				:root {
+					--fg: #ece9f3;
+					--muted: #a69fb8;
+					--bg: #110e17;
+					--card: #191521;
+					--line: #2b2438;
+					--accent: #b99cff;
+					--accent-strong: #9d7bf5;
+					--pink: #e58fd8;
+					--pink-soft: #c872bd;
+					--coral: #f08a92;
+					--code-bg: #1f1a2a;
+					--code-fg: #f0a6e4;
+					--tint: #2a2140;
+					--gradient: linear-gradient(90deg, #b99cff 0%, #d595ee 60%, #f09ad0 100%);
+					--glow: color-mix(in oklab, #9d7bf5 22%, transparent);
+					--glow-pink: color-mix(in oklab, #c872bd 14%, transparent);
+					--glow-coral: color-mix(in oklab, #f08a92 7%, transparent);
+				}
+			}
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				margin: 0;
+				padding: 0 1rem 5rem;
+				background:
+					radial-gradient(60rem 30rem at 30% -10rem, var(--glow), transparent 70%),
+					radial-gradient(40rem 24rem at 95% 0, var(--glow-pink), transparent 70%),
+					radial-gradient(30rem 16rem at 100% 8rem, var(--glow-coral), transparent 70%),
+					var(--bg);
+				color: var(--fg);
+				font:
+					16px/1.7 ui-sans-serif,
+					system-ui,
+					-apple-system,
+					'Segoe UI',
+					Roboto,
+					sans-serif;
+				overflow-wrap: break-word;
+			}
+			main,
+			nav .bar,
+			footer {
+				max-width: 52rem;
+				margin: 0 auto;
+			}
+			nav {
+				margin: 0 -1rem 2.5rem;
+				padding: 0.75rem 1rem;
+				border-bottom: 1px solid var(--line);
+			}
+			nav .bar {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 0.25rem 1rem;
+			}
+			nav a {
+				color: var(--muted);
+				font-size: 0.925rem;
+				text-decoration: none;
+			}
+			nav a:hover,
+			nav a[aria-current] {
+				color: var(--accent);
+			}
+			nav a[aria-current] {
+				text-decoration: underline;
+				text-decoration-color: var(--pink-soft);
+				text-decoration-thickness: 2px;
+				text-underline-offset: 0.5em;
+			}
+			nav a.brand {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				margin-right: auto;
+				color: var(--fg);
+				font-size: 1.05rem;
+				font-weight: 700;
+				letter-spacing: -0.01em;
+			}
+			nav a.brand[aria-current] {
+				color: var(--fg);
+				text-decoration: none;
+			}
+			nav a.brand img {
+				width: 1.75rem;
+				height: 1.75rem;
+			}
+			h1 {
+				margin: 0 0 1rem;
+				font-size: 2.25rem;
+				line-height: 1.2;
+				letter-spacing: -0.03em;
+			}
+			.hero {
+				margin: 0 0 2rem;
+			}
+			.hero img {
+				display: block;
+				margin: 0 0 1rem;
+			}
+			.hero h1 {
+				width: fit-content;
+				margin: 0 0 0.25rem;
+				color: var(--accent);
+				font-size: 3rem;
+			}
+			@supports (background-clip: text) or (-webkit-background-clip: text) {
+				.hero h1 {
+					background: var(--gradient);
+					-webkit-background-clip: text;
+					background-clip: text;
+					-webkit-text-fill-color: transparent;
+					color: transparent;
+				}
+			}
+			.hero .lead {
+				margin: 0;
+				color: var(--muted);
+				font-size: 1.2rem;
+			}
+			.links {
+				display: grid;
+				gap: 0.85rem;
+				grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+				margin: 0 0 3rem;
+			}
+			a.card {
+				display: block;
+				padding: 1rem 1.25rem;
+				border: 1px solid var(--line);
+				border-radius: 0.8rem;
+				background: var(--card);
+				color: inherit;
+				text-decoration: none;
+				transition:
+					border-color 0.15s,
+					box-shadow 0.15s;
+			}
+			a.card:hover {
+				border-color: var(--accent-strong);
+				box-shadow: 0 0 36px -10px var(--accent-strong);
+			}
+			a.card strong {
+				color: var(--accent);
+			}
+			a.card strong {
+				display: block;
+				font-size: 1.02rem;
+			}
+			a.card span {
+				color: var(--muted);
+				font-size: 0.875rem;
+				line-height: 1.5;
+			}
+
+			.readme h2 {
+				margin: 3rem 0 1rem;
+				padding-bottom: 0.4rem;
+				border-bottom: 2px solid transparent;
+				border-image: linear-gradient(90deg, var(--accent-strong), var(--pink-soft) 40%, var(--line)) 1;
+				font-size: 1.55rem;
+				letter-spacing: -0.01em;
+			}
+			.readme h3 {
+				margin: 2rem 0 0.75rem;
+				padding-left: 0.6rem;
+				border-left: 3px solid var(--pink-soft);
+				font-size: 1.2rem;
+			}
+			.readme h4 {
+				margin: 1.5rem 0 0.5rem;
+			}
+			.readme a {
+				color: var(--accent);
+				text-underline-offset: 0.2em;
+			}
+			.readme hr {
+				margin: 3rem 0;
+				border: 0;
+				border-top: 1px solid var(--line);
+			}
+			.readme blockquote {
+				margin: 1.5rem 0;
+				padding: 0.25rem 0 0.25rem 1.25rem;
+				border-left: 3px solid var(--pink-soft);
+				color: var(--muted);
+			}
+			.readme ul,
+			.readme ol {
+				padding-left: 1.4rem;
+			}
+			.readme li {
+				margin: 0.35rem 0;
+			}
+			.readme li::marker {
+				color: var(--pink-soft);
+			}
+			.readme code {
+				font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+			}
+			.readme :not(pre) > code {
+				padding: 0.15em 0.4em;
+				border-radius: 0.35rem;
+				background: var(--code-bg);
+				color: var(--code-fg);
+				font-size: 0.85em;
+				overflow-wrap: anywhere;
+			}
+			.readme pre {
+				margin: 1.25rem 0;
+				padding: 1rem 1.25rem;
+				border: 1px solid var(--line);
+				border-radius: 0.8rem;
+				overflow-x: auto;
+				background: var(--code-bg);
+				font-size: 0.85rem;
+				line-height: 1.6;
+			}
+			.readme pre code {
+				display: block;
+			}
+			.readme .table {
+				overflow-x: auto;
+				margin: 1.25rem 0;
+				border: 1px solid var(--line);
+				border-radius: 0.8rem;
+			}
+			.readme table {
+				width: 100%;
+				border-collapse: collapse;
+				font-size: 0.925rem;
+			}
+			.readme th,
+			.readme td {
+				padding: 0.55rem 0.9rem;
+				border-bottom: 1px solid var(--line);
+				text-align: left;
+				vertical-align: top;
+			}
+			.readme th {
+				background: var(--tint);
+				border-bottom-color: var(--accent-strong);
+				font-weight: 600;
+			}
+			.readme tbody tr:last-child td {
+				border-bottom: 0;
+			}
+			.readme img {
+				max-width: 100%;
+			}
+
+			footer {
+				margin-top: 4rem;
+				padding-top: 1.5rem;
+				border-top: 1px solid var(--line);
+				color: var(--muted);
+				font-size: 0.9rem;
+			}
+			footer a {
+				color: inherit;
+			}
+		</style>
+	</head>
+	<body>
+		<nav>
+			<div class="bar"><a class="brand" href="index.html"><img src="drift_128.png" alt="" width="28" height="28">Drift</a>
+<a href="advanced-usage.html" aria-current="page">Usage</a>
+<a href="technical-report.html">Report</a>
+<a href="atlas/">Atlas</a>
+<a href="engine/">Engine</a>
+<a href="https://github.com/gmitch215/Drift">GitHub</a></div>
+		</nav>
+		<main>
+			
+			<div class="readme"><h1 id="advanced-usage-the-full-cli">Advanced Usage: The Full CLI</h1>
+<p>This guide covers every <code>drift</code> command and flag for people who have already run <code>drift capture</code>. It shows scripting patterns, the JSON and text output levels, cases, reproduction, the Lab (<code>solve</code>, <code>ingest</code>, <code>pack</code>, <code>report</code>, <code>verify</code>), the Atlas, and the commands that install and serve Drift (<code>install</code>, <code>uninstall</code>, <code>serve</code>, <code>install.sh</code>, <code>install.ps1</code>). For the design and the measurements behind the commands, see <a href="technical-report.html">TECHNICAL_REPORT.md</a>.</p>
+<p>Every example below was run with the macOS release executable (<code>drift version 1.0.0 (macos)</code>) from a directory that holds <code>fixtures/</code> and <code>bench/</code>, against the files in <a href="https://github.com/gmitch215/Drift/tree/master/fixtures"><code>fixtures/</code></a> and <a href="https://github.com/gmitch215/Drift/tree/master/bench/data"><code>bench/data/</code></a>. Output is copied from those runs; a line that holds only <code>...</code> marks output cut for length. Where a command prints to standard error, the example says so. The <code>install</code>, <code>uninstall</code> and <code>serve</code> examples ran with a scratch home directory and a scratch prefix, never the real profile, registry or trust store. Their output shows the scratch home as <code>/home/you</code>, the scratch work directory as <code>/work</code> and the scratch release directory as <code>/release</code>. The Windows and Linux builds and the <code>.ps1</code> script were not run for this guide, and the sections say where a statement comes from a recorded run of someone else's.</p>
+<p>The executable is <code>cli/build/bin/macosArm64/releaseExecutable/drift.kexe</code>; the README explains how to build it and how to download one. The examples call it <code>drift</code>; put it on <code>PATH</code> (see <a href="#install-and-uninstall">Install and Uninstall</a>) or alias it.</p>
+<h2 id="command-index">Command Index</h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Reads</th>
+<th>Writes</th>
+<th>Needs Docker</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#capture"><code>capture</code></a></td>
+<td>this machine</td>
+<td>a capsule on standard output</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#diagnose"><code>diagnose</code></a></td>
+<td>two capsules</td>
+<td>JSON or text, optionally a case directory</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#next-and-case-show"><code>next</code></a></td>
+<td>a case directory</td>
+<td>text</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#next-and-case-show"><code>case show</code></a></td>
+<td>a case directory</td>
+<td>text</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#reproduce"><code>reproduce</code></a></td>
+<td>a capsule</td>
+<td><code>Dockerfile</code>, <code>run.sh</code>, <code>manifest.json</code></td>
+<td>no (it only writes files)</td>
+</tr>
+<tr>
+<td><a href="#solve"><code>solve</code></a></td>
+<td>two capsules</td>
+<td>a case directory with a certificate</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="#ingest"><code>ingest</code></a></td>
+<td>a case directory, result files</td>
+<td>the case directory</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#pack-report-and-verify"><code>pack</code></a></td>
+<td>a solved case directory</td>
+<td>a <code>.driftcase</code> archive</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#pack-report-and-verify"><code>report</code></a></td>
+<td>a <code>.driftcase</code></td>
+<td><code>report.html</code></td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#pack-report-and-verify"><code>verify</code></a></td>
+<td>a <code>.driftcase</code></td>
+<td>text or JSON</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#atlas"><code>atlas record</code></a></td>
+<td>this machine</td>
+<td>a transcript</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#atlas"><code>atlas build</code></a></td>
+<td>transcripts</td>
+<td>a dataset</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#atlas"><code>atlas compare</code></a></td>
+<td>a dataset, a transcript</td>
+<td>text</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#atlas"><code>atlas show</code></a></td>
+<td>a dataset</td>
+<td>text</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#install-and-uninstall"><code>install</code></a></td>
+<td>this executable</td>
+<td>a copy of it, shell profiles or the registry, a receipt</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#install-and-uninstall"><code>uninstall</code></a></td>
+<td>the receipt</td>
+<td>removes what <code>install</code> wrote</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#serve"><code>serve</code></a></td>
+<td>a Studio web build directory</td>
+<td>nothing (a local web server)</td>
+<td>no</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="environment-and-configuration">Environment and Configuration</h2>
+<p>The CLI has no configuration file and no config flag. It reads the following.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Used by</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>process environment (<code>env.*</code>)</td>
+<td><code>capture</code></td>
+<td>every variable becomes an <code>env.NAME</code> attribute; secret-looking values are stored as <code>&lt;redacted&gt;</code></td>
+</tr>
+<tr>
+<td><code>DRIFT_RUNNER_LABEL</code></td>
+<td><code>capture</code></td>
+<td>sets the <code>ci.runner.label</code> attribute</td>
+</tr>
+<tr>
+<td><code>DRIFT_RUNTIME_PLATFORM</code></td>
+<td><code>capture</code></td>
+<td>overrides <code>runtime.platform</code>, which otherwise holds the build platform</td>
+</tr>
+<tr>
+<td><code>PATH</code></td>
+<td><code>capture --tools</code></td>
+<td>the scanners run the tools they find there</td>
+</tr>
+<tr>
+<td><code>docker</code> on <code>PATH</code>, <code>sh</code></td>
+<td><code>solve</code></td>
+<td>one <code>docker build</code> per arm, one <code>docker run --rm</code> per trial</td>
+</tr>
+<tr>
+<td><code>DRIFT_TRIAL=&lt;n&gt;</code></td>
+<td>set by <code>solve</code></td>
+<td>passed into each trial container; the command can read it</td>
+</tr>
+<tr>
+<td><code>DRIFT_NO_MODIFY_PATH=1</code></td>
+<td><code>install</code></td>
+<td>same as <code>--no-modify-path</code></td>
+</tr>
+<tr>
+<td><code>XDG_BIN_HOME</code>, <code>XDG_CONFIG_HOME</code></td>
+<td><code>install</code>, <code>uninstall</code></td>
+<td>an absolute value replaces <code>~/.local/bin</code> and <code>~/.config</code> (the receipt lives in <code>$XDG_CONFIG_HOME/drift</code>)</td>
+</tr>
+<tr>
+<td><code>SHELL</code>, <code>ZDOTDIR</code></td>
+<td><code>install</code></td>
+<td>choose which profile files get the <code>PATH</code> block</td>
+</tr>
+<tr>
+<td><code>PATH</code></td>
+<td><code>serve --mkcert</code>, <code>serve --mdns</code></td>
+<td>finds <code>mkcert</code>, <code>dns-sd</code> or <code>avahi-publish</code></td>
+</tr>
+<tr>
+<td><code>CAROOT</code></td>
+<td><code>serve --mkcert</code></td>
+<td>read by <code>mkcert</code>; <code>drift serve</code> asks <code>mkcert -CAROOT</code> for the CA directory</td>
+</tr>
+<tr>
+<td><code>DRIFT_INSTALL_BASE_URL</code>, <code>DRIFT_VERSION</code></td>
+<td><code>install.sh</code>, <code>install.ps1</code></td>
+<td>release location and version (see <a href="#install-scripts">Install Scripts</a>)</td>
+</tr>
+</tbody>
+</table></div>
+<pre><code class="language-sh">DRIFT_RUNNER_LABEL=ci-runner-7 DRIFT_RUNTIME_PLATFORM=container drift capture --label t \
+  | jq -c '.attributes[] | select(.path | test(&quot;^(ci|runtime|drift)\\.&quot;))'
+</code></pre>
+<pre><code>{&quot;path&quot;:&quot;ci.runner.label&quot;,&quot;source&quot;:&quot;env&quot;,&quot;stability&quot;:&quot;static&quot;,&quot;value&quot;:&quot;ci-runner-7&quot;}
+{&quot;path&quot;:&quot;drift.platform&quot;,&quot;source&quot;:&quot;drift&quot;,&quot;stability&quot;:&quot;static&quot;,&quot;value&quot;:&quot;macos&quot;}
+{&quot;path&quot;:&quot;runtime.platform&quot;,&quot;source&quot;:&quot;env&quot;,&quot;stability&quot;:&quot;static&quot;,&quot;value&quot;:&quot;container&quot;}
+</code></pre>
+<p>Defaults that matter:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>capture --label</code></td>
+<td><code>capture</code></td>
+</tr>
+<tr>
+<td><code>diagnose --detail</code></td>
+<td>none (canonical JSON)</td>
+</tr>
+<tr>
+<td><code>diagnose --frame</code></td>
+<td><code>sha</code></td>
+</tr>
+<tr>
+<td><code>diagnose --trial-minutes</code>, <code>--failures</code>, <code>--runs</code></td>
+<td>5, 1, 1</td>
+</tr>
+<tr>
+<td><code>next --detail</code>, <code>case show --detail</code></td>
+<td><code>detail</code> for <code>next</code>, <code>summary</code> for <code>case show</code></td>
+</tr>
+<tr>
+<td><code>reproduce</code> default env copy</td>
+<td><code>LANG</code>, <code>LC_*</code>, <code>TZ</code></td>
+</tr>
+<tr>
+<td><code>solve --budget</code></td>
+<td><code>trials=300,minutes=45</code></td>
+</tr>
+<tr>
+<td><code>solve --pilot</code></td>
+<td>8 trials per arm</td>
+</tr>
+<tr>
+<td><code>solve --trial-minutes</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>solve --timeout</code></td>
+<td>120 seconds per trial</td>
+</tr>
+<tr>
+<td><code>solve --case</code></td>
+<td><code>drift-case</code></td>
+</tr>
+<tr>
+<td><code>solve --workspace</code></td>
+<td><code>.</code></td>
+</tr>
+<tr>
+<td><code>solve --detail</code></td>
+<td><code>summary</code></td>
+</tr>
+<tr>
+<td><code>compare --detail</code> (<code>atlas compare</code>)</td>
+<td><code>summary</code></td>
+</tr>
+<tr>
+<td><code>install</code> scope</td>
+<td><code>--user</code>, unless the process is root or elevated, then <code>--global</code></td>
+</tr>
+<tr>
+<td><code>install</code> directory</td>
+<td><code>~/.local/bin</code> (user), <code>/usr/local/bin</code> (global); Windows <code>%LOCALAPPDATA%\Programs\Drift</code> and <code>%ProgramFiles%\Drift</code></td>
+</tr>
+<tr>
+<td><code>serve --port</code></td>
+<td>8080 (8443 with TLS)</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>diagnose --case</code>, <code>solve --case</code> and <code>ingest</code> refuse to write into a directory that already holds a <code>case.json</code> (<code>ingest</code> rewrites the case it is given).</p>
+<h2 id="capture">Capture</h2>
+<p><code>drift capture</code> prints this machine's capsule as canonical JSON: sorted keys, no whitespace, one line. The output is the exact bytes that the capsule hash covers, so <code>jq</code>, <code>python3 -m json.tool</code> and <code>shasum</code> all work on it as written.</p>
+<pre><code class="language-sh">drift capture --label demo &gt; cap.json
+python3 -m json.tool cap.json &gt; /dev/null &amp;&amp; echo valid
+shasum -a 256 cap.json
+drift capture --label demo | shasum -a 256
+</code></pre>
+<pre><code>valid
+d97d073465e339c52eb89708936692297998cac742a0845ae5c86b215def0bd7  cap.json
+d97d073465e339c52eb89708936692297998cac742a0845ae5c86b215def0bd7  -
+</code></pre>
+<p>Two captures taken one after another in the same shell hash the same (the digest above is from one shell and differs on every machine and in every environment). A capsule changes when the machine does (a new tool, a changed environment variable), so compare hashes only between captures you expect to match.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--label TEXT</code></td>
+<td>name stored in the capsule (default <code>capture</code>)</td>
+</tr>
+<tr>
+<td><code>--tools</code></td>
+<td>also run the toolchain scanners (<code>tool.*</code> attributes such as <code>tool.git.version</code> and <code>tool.java.version</code>)</td>
+</tr>
+<tr>
+<td><code>--probes</code></td>
+<td>also run every probe and store its transcript under <code>probes</code></td>
+</tr>
+<tr>
+<td><code>--keep-identifiers</code></td>
+<td>keep the account name, host name and home path</td>
+</tr>
+</tbody>
+</table></div>
+<pre><code class="language-sh">drift capture --label demo --tools --probes &gt; cap-full.json
+jq '.attributes | length' cap.json cap-full.json
+jq '.probes | length' cap.json cap-full.json
+</code></pre>
+<pre><code>86
+99
+0
+71
+</code></pre>
+<p>The counts are from one Mac and vary with the tools installed. <code>--probes</code> adds 71 probe records; each holds <code>id</code>, <code>status</code>, a <code>hash</code> and the <code>transcript</code>.</p>
+<p><strong>Anonymization.</strong> By default the capsule rewrites the home path to <code>~</code>, masks the account and host names, and marks the affected attributes <code>source: &quot;env (anonymized)&quot;</code>. Values whose names look like secrets (for example <code>CLOUDFLARE_API_TOKEN</code>) are stored as <code>&lt;redacted&gt;</code>.</p>
+<pre><code class="language-sh">drift capture --label demo | jq '[.attributes[] | select(.source | test(&quot;anonymized&quot;))] | length'
+drift capture --label demo | jq '[.attributes[] | select(.value == &quot;&lt;redacted&gt;&quot;)] | length'
+</code></pre>
+<pre><code>18
+13
+</code></pre>
+<p><code>--keep-identifiers</code> turns the first rule off and prints a warning on standard error:</p>
+<pre><code>warning: the capsule keeps your account, host name and home path
+</code></pre>
+<p>Use it only for a capsule that stays on your machine, for example to see which attribute holds a home path. Do not use it for a capsule that you commit, attach to an issue, put in a case, or hand to <code>reproduce --env-all</code>. The redactor knows paths and secret-looking names. It has no rule for email addresses or account ids, so those pass through in any mode.</p>
+<p>Exit codes: 0 on success; 1 for a usage error such as an unknown flag (<code>Error: no such option --bogus</code>).</p>
+<h2 id="diagnose">Diagnose</h2>
+<p><code>drift diagnose GREEN RED</code> compares the capsule of a passing run with the capsule of a failing run, ranks the attributes that differ and proposes experiments. The default output is canonical JSON.</p>
+<pre><code class="language-sh">G=fixtures/drangler/capsules/36702683742.json
+R=fixtures/drangler/capsules/36995781138.json
+drift diagnose $G $R &gt; diag.json
+jq -r '.relevant[0].path, .weights.calibrated, (.bundles[0].members | length)' diag.json
+shasum -a 256 diag.json
+</code></pre>
+<pre><code>tool.node.version
+false
+8
+717191f28a8d593ecf8a5fcedee04b4471187cddfe29718dbd2e38e6676de52e  diag.json
+</code></pre>
+<p>The top-level keys are <code>bundles</code>, <code>changed</code>, <code>competing</code>, <code>facts</code>, <code>relevant</code>, <code>unattached</code> and <code>weights</code>. <code>weights.calibrated: false</code> means the ranking uses hand-set weights, so the order of candidates is not a probability of being the cause.</p>
+<p><code>--detail</code> prints text instead, at three levels. It cannot be combined with <code>--json</code>.</p>
+<pre><code class="language-sh">drift diagnose --detail summary $G $R
+</code></pre>
+<pre><code>8 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
+so the data does not name one cause.
+</code></pre>
+<p><code>--detail detail</code> adds the ranked candidates, the bundle and the next experiment (64 lines for this pair). <code>--detail full</code> adds every changed attribute (285 lines). The text is plain ASCII, wrapped at 100 columns.</p>
+<pre><code class="language-sh">drift diagnose --detail detail $G $R | sed -n 4,10p
+</code></pre>
+<pre><code>Candidates, best first. Scores come from hand-set weights (hand-set-1, uncalibrated); they order
+  candidates and are not probabilities.
+  1. tool.node.version tier difference inferred bundle bundle-1
+      evidence: attribute tool.node.version; no run history behind it
+  2. ci.provisioner.build-date tier difference inferred bundle bundle-1
+      evidence: attribute ci.provisioner.build-date; no run history behind it
+  3. ci.provisioner.version tier difference inferred bundle bundle-1
+</code></pre>
+<p>A bundle lists candidates the data cannot separate: &quot;none is the cause on its own&quot;.</p>
+<p><strong>Cases.</strong> <code>--case DIR</code> writes a case directory (11 files: <code>case.json</code>, <code>manifest.json</code>, the two capsules, the observation chain, the ranking, the prior and the plan) and prints the usual output. The <code>wrote 11 files to DIR</code> line goes to standard error.</p>
+<pre><code class="language-sh">drift diagnose --case case --failures 3 --runs 5 --trial-minutes 4 --name drangler-nightly \
+  --detail summary $G $R
+ls case
+jq -r .name case/case.json
+</code></pre>
+<pre><code>wrote 11 files to case
+8 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
+so the data does not name one cause.
+case.json
+eliminations
+environments
+experiments
+hypotheses
+manifest.json
+observations
+results
+drangler-nightly
+</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--case DIR</code></td>
+<td>write a case directory</td>
+</tr>
+<tr>
+<td><code>--name TEXT</code></td>
+<td>case name (default <code>GREEN-LABEL to RED-LABEL</code>)</td>
+</tr>
+<tr>
+<td><code>--frame sha|environment</code></td>
+<td><code>sha</code> for two commits of one pipeline, <code>environment</code> for a local capture against a CI capture; recorded in <code>case.json</code> as <code>frame</code></td>
+</tr>
+<tr>
+<td><code>--trial-minutes N</code></td>
+<td>minutes one trial takes; feeds the planner's cost (at least 1)</td>
+</tr>
+<tr>
+<td><code>--failures N</code>, <code>--runs N</code></td>
+<td>failing runs out of runs seen on the red side; <code>--failures</code> must be within <code>0..--runs</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The planner's trial counts and costs depend on these three numbers. With <code>--failures 3 --runs 5 --trial-minutes 4</code> the first proposal is 18 trials at 9 minutes; with the defaults it is 14 trials at 10 minutes.</p>
+<p>Exit codes: 0 whenever the command ran, including when it finds no cause. 1 for a missing or malformed capsule (<code>invalid capsule file broken.json: expected key at 2</code>), an unsupported schema (<code>unsupported capsule schema 2</code>), <code>--json</code> with <code>--detail</code>, a bad <code>--failures</code> or <code>--trial-minutes</code>, and a <code>--case</code> directory that already holds a case.</p>
+<h2 id="next-and-case-show">Next and Case Show</h2>
+<p><code>drift next CASE</code> prints the proposed experiments of a case. <code>drift case show CASE</code> prints what the case holds and whether it still checks out.</p>
+<pre><code class="language-sh">drift case show case
+</code></pre>
+<pre><code>case: drangler-nightly
+frame: sha, passing drangler-36702683742, failing drangler-36995781138
+observations: 2, chain head 51c3d18ef57180a4ee97f29a1afd87d1584bc5f95e8239e0664786ab85621c3b
+integrity: ok, 10 files match the manifest and the chain holds
+rule sha256: 85d28ec6c5ccb9292603be15d730a5685942efb2690a8b0ead6143480948d588 (ingest names it as ruleSha256)
+
+8 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
+so the data does not name one cause.
+</code></pre>
+<p><code>--detail summary|detail|full</code> applies to both. <code>next</code> at <code>detail</code> prints the best automatic experiment with the instructions for a workflow variant, then the manual ones (experiments Drift cannot run, such as a runner image the CI provider owns).</p>
+<pre><code class="language-sh">drift next --detail summary case
+</code></pre>
+<pre><code>Next experiment (a proposal, nothing has been run):
+  e9: drangler-36702683742 with deps.@napi-rs/keyring.version, deps.prettier-plugin-sh.version,
+    deps.wrangler.version, tool.node.version, tool.npm.version set to drangler-36995781138 values
+    automatic-ci; 9 min, 72 runner min, 18 trials
+    why: highest information gain per cost among the experiments that can run
+
+Manual experiments, which Drift cannot run (proposals, not results):
+  m1: drangler-36702683742 with ci.provisioner.version set to drangler-36995781138 values
+    manual; 192 min, 0 runner min, 18 trials
+...
+</code></pre>
+<p>The expected gain printed by <code>detail</code> is &quot;a prediction, not a measurement&quot;.</p>
+<p><code>case show</code> and <code>next</code> verify the case first. Change one character in an observation and both refuse:</p>
+<pre><code class="language-sh">cp -R case bad
+sed -i '' 's/drangler-36995781138/drangler-edited/' bad/observations/0002.json
+drift case show bad; echo &quot;exit $?&quot;
+drift next bad; echo &quot;exit $?&quot;
+</code></pre>
+<pre><code>case: drangler-nightly
+frame: sha, passing drangler-36702683742, failing drangler-36995781138
+observations: 2, chain head 51c3d18ef57180a4ee97f29a1afd87d1584bc5f95e8239e0664786ab85621c3b
+integrity: 2 problem(s)
+  observations/0002.json was changed: sha256 is 729d96b4..., the manifest has 06ad04b2...
+  observation chain broken at entry 1 (observations/0002.json): content does not match its hash
+
+exit 1
+case bad failed its checks: observations/0002.json was changed: sha256 is 729d96b4..., the manifest has 06ad04b2...; observation chain broken at entry 1 (observations/0002.json): content does not match its hash
+exit 1
+</code></pre>
+<p>The hashes in the example are shortened with <code>...</code>. A directory that is not a case gives <code>cannot read case nonexistent: missing case file: manifest.json</code>, exit 1.</p>
+<h2 id="reproduce">Reproduce</h2>
+<p><code>drift reproduce CAPSULE --run COMMAND --out DIR</code> writes <code>Dockerfile</code>, <code>run.sh</code> and <code>manifest.json</code> that mirror a capsule as far as a container can. It never runs Docker and never reads the network. Both <code>--run</code> and <code>--out</code> are required.</p>
+<pre><code class="language-sh">drift reproduce fixtures/lab/node-alpine.json --run &quot;npm test&quot; --out repro
+cat repro/Dockerfile
+</code></pre>
+<pre><code>wrote 3 files to repro
+23 attributes: 10 mirrored, 4 partially mirrored, 9 not mirrored; base image node:22.12.0-alpine3.20
+This is not the original environment. Attributes that are not mirrored are listed with their reasons
+  at --detail detail.
+# drift reproduce: capsule 540e5c225a8ee48280f38e3c96a68e4d43ee1b2879e9d2d7d21f1c8fcb006531; manifest.json says what is not mirrored
+FROM node:22.12.0-alpine3.20
+RUN apk add --no-cache tzdata
+RUN npm install -g npm@10.9.2
+WORKDIR /work
+</code></pre>
+<p><code>wrote 3 files</code> goes to standard error and the summary to standard output. Running the command twice produces identical files:</p>
+<pre><code class="language-sh">shasum -a 256 repro/*
+</code></pre>
+<pre><code>67b596a58c76f708d69be46e3a99d00a84e4007142697cae8cc0fb76dfbf1d9c  repro/Dockerfile
+33592f2de94cedfb387f9311810f65a72939566ee7183a8dee0da32f3cf7b878  repro/manifest.json
+14e096545016d3c998c10ff787a0ec456f1dab2fbeba38516b090f22d9abd280  repro/run.sh
+</code></pre>
+<p><code>run.sh</code> builds the image (tagged <code>drift-reproduce:&lt;12 hex of the Dockerfile hash&gt;</code>) and runs it with the flags the capsule implies:</p>
+<pre><code class="language-sh">sed -n 6,20p repro/run.sh
+</code></pre>
+<pre><code>docker build --platform linux/arm64 --tag &quot;$image&quot; &quot;$here&quot; &gt;&amp;2
+exec docker run --rm \
+	--platform linux/arm64 \
+	--user &quot;$(id -u):$(id -g)&quot; \
+	--volume &quot;$PWD:/work&quot; \
+	--env 'HOME=/tmp' \
+	--memory 512m \
+	--cpus 1.2 \
+	--ulimit nofile=2048:2048 \
+	--env 'LANG=en_GB.UTF-8' \
+	--env 'TZ=Asia/Tokyo' \
+	&quot;$@&quot; \
+	&quot;$image&quot; sh -c 'npm test'
+</code></pre>
+<p>Arguments after <code>run.sh</code> land before the image name, so they override the flags above them.</p>
+<p><strong>Naming the toolchain.</strong> The base image comes from the toolchain the capsule records. <code>--run</code> decides which one when the capsule records several: the first word of the command that names a toolchain wins (a path prefix is ignored, so <code>./gradlew</code> counts as <code>gradlew</code>; <code>node</code>, <code>npm</code> and <code>python3</code> are other examples). With no match, the first toolchain in table order is used.</p>
+<pre><code class="language-sh">for r in &quot;npm test&quot; &quot;sh test.sh&quot; &quot;python3 -m pytest&quot;; do
+  drift reproduce fixtures/lab/node.json --run &quot;$r&quot; --out t1 2&gt;/dev/null | sed -n 2p
+  jq -r '.image.basis' t1/manifest.json
+  rm -r t1
+done
+</code></pre>
+<pre><code>  node:22.12.0-bookworm-slim
+tool.node.version 22.12.0; the command names a node tool
+  node:22.12.0-bookworm-slim
+tool.node.version 22.12.0; the first of 2 toolchains in table order
+  python:3.11.2-slim-bookworm
+tool.python.version 3.11.2; the command names a python tool
+</code></pre>
+<p><code>fixtures/lab/node.json</code> records both a Node and a Python toolchain. Per command:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th><code>--run</code></th>
+<th>Base image</th>
+<th><code>image.basis</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>npm test</code></td>
+<td><code>node:22.12.0-bookworm-slim</code></td>
+<td>the command names a node tool</td>
+</tr>
+<tr>
+<td><code>sh test.sh</code></td>
+<td><code>node:22.12.0-bookworm-slim</code></td>
+<td>the first of 2 toolchains in table order</td>
+</tr>
+<tr>
+<td><code>python3 -m pytest</code></td>
+<td><code>python:3.11.2-slim-bookworm</code></td>
+<td>the command names a python tool</td>
+</tr>
+</tbody>
+</table></div>
+<p>If <code>sh test.sh</code> really runs Python, name it: <code>--run &quot;python3 test.py&quot;</code>.</p>
+<p><strong>What is mirrored.</strong> <code>--detail detail</code> lists every attribute that is not mirrored, by reason.</p>
+<pre><code class="language-sh">drift reproduce fixtures/lab/node-alpine.json --run &quot;npm test&quot; --out repro-detail --detail detail 2&gt;/dev/null | sed -n 9,25p
+</code></pre>
+<pre><code>Not mirrored (9), by reason:
+  a container runs on the Docker host's CPU (model, cache, count, steal time)
+    cpu.count
+  installed by the test command from the lockfile in the mounted workspace
+    deps.vitest.version
+  redacted: the capsule holds no usable value
+    env.API_TOKEN, env.DB_PASSWORD
+  host identity: the container has its own
+    env.HOME
+  not allowlisted
+    env.NODE_ENV
+  a container runs on the Docker host's kernel (version, clocksource, scheduler)
+    kernel.release
+  the base image ships its own git, or none; the version is not pinned
+    tool.git.version
+  comes with the base image; its version is not known offline
+    tool.libc.version
+</code></pre>
+<p><code>manifest.json</code> holds the same data as JSON: <code>attributes</code> (path, <code>status</code> of <code>mirrored</code>, <code>partial</code> or <code>not-mirrored</code>, a <code>detail</code>, a <code>bundle</code> flag), <code>env</code>, <code>image</code>, <code>run</code>, <code>summary</code>, <code>conventions</code> and <code>unusedDigests</code>. Never mirrored in any capsule: <code>kernel.*</code>, <code>cpu.*</code>, <code>hw.*</code>, <code>ci.*</code>, <code>deps.*</code> and anything that describes the capturing binary (<code>drift.*</code>, <code>kotlin.*</code>, <code>runtime.*</code>). A fix that depends on one of those cannot show up in a container built from these files.</p>
+<p><strong>Environment allowlist.</strong> Only <code>LANG</code>, <code>LC_*</code> and <code>TZ</code> are copied from the capsule's <code>env.*</code> attributes. <code>--env NAME</code> (repeatable) adds one variable. <code>--env-all</code> copies every <code>env.*</code> value.</p>
+<pre><code class="language-sh">drift reproduce fixtures/lab/node-alpine.json --run &quot;npm test&quot; --out r3 --env NODE_ENV 2&gt;/dev/null | sed -n 1p
+grep -n NODE_ENV r3/run.sh
+</code></pre>
+<pre><code>23 attributes: 11 mirrored, 4 partially mirrored, 8 not mirrored; base image node:22.12.0-alpine3.20
+16:	--env 'NODE_ENV=production' \
+</code></pre>
+<p>A name the capsule does not hold is refused: <code>--env NOPE does not name an env.* attribute of the capsule</code>, exit 1. A name whose value is <code>&lt;redacted&gt;</code> is accepted and writes nothing (<code>grep -c API_TOKEN run.sh</code> gives 0), and the attribute stays &quot;not mirrored&quot;.</p>
+<p><code>--env-all</code> is unsafe because the capsule's environment can hold identifiers and secrets that the redactor does not recognize, and <code>run.sh</code> and <code>manifest.json</code> are files you are likely to commit or share. It prints a warning on standard error:</p>
+<pre><code>warning: --env-all mirrors every env.* value; values may contain identifiers and secrets, and only secret-looking values and home paths are redacted
+</code></pre>
+<p>Home paths and the capsule's own account and host names are replaced in anything written; email addresses and account ids are not touched.</p>
+<p><strong>Digests.</strong> A tag can move. <code>--digests FILE</code> takes a JSON object that maps an image tag to a digest and pins the matching tag:</p>
+<pre><code class="language-sh">printf '{&quot;node:22.12.0-alpine3.20&quot;:&quot;sha256:%064d&quot;}\n' 0 &gt; digests.json
+drift reproduce fixtures/lab/node-alpine.json --run &quot;npm test&quot; --out r7 --digests digests.json 2&gt;/dev/null | sed -n 1,2p
+sed -n 2p r7/Dockerfile
+</code></pre>
+<pre><code>23 attributes: 10 mirrored, 4 partially mirrored, 9 not mirrored; base image
+  node:22.12.0-alpine3.20@sha256:0000000000000000000000000000000000000000000000000000000000000000
+FROM node:22.12.0-alpine3.20@sha256:0000000000000000000000000000000000000000000000000000000000000000
+</code></pre>
+<p>The digest in this example is zeros and does not exist; use a digest from your registry. Without <code>--digests</code>, <code>--detail detail</code> says <code>Pinned by tag only; a tag can move.</code> A digest file that does not exist gives <code>cannot read digests file: nofile.json</code>, exit 1.</p>
+<p><code>--out</code> must be a directory that holds no reproduction yet. If <code>Dockerfile</code>, <code>run.sh</code> or <code>manifest.json</code> is there, the command stops with <code>output directory already holds a reproduction: repro (Dockerfile, run.sh, manifest.json); pass --force to replace those files, nothing else in the directory is touched</code>, exit 1. <code>--force</code> replaces those three files and nothing else, prints <code>replacing Dockerfile, run.sh, manifest.json in repro</code> first, and refuses (<code>--force replaces only files drift reproduce wrote, and Dockerfile in repro is not one; nothing was replaced</code>) when one of them was not written by <code>drift reproduce</code>.</p>
+<p><code>--help</code> marks <code>--run</code> and <code>--out</code> <code>(required)</code> and shows the defaults of the other options. Exit codes: 0; 1 for a missing <code>--run</code> or <code>--out</code> (<code>Error: missing option --run</code>), an unreadable or malformed capsule, an unknown <code>--env</code> name, or a missing digests file.</p>
+<h2 id="solve">Solve</h2>
+<p><code>drift solve GREEN RED --run COMMAND --fail-when TEST</code> runs counterfactual arms in containers on the local machine and writes a case directory with a certificate. It is the only command that needs a working Docker (<code>docker info</code> must succeed). Every container is built from <code>reproduce</code> files, so the arms are evidence about containers built from the capsules, not about the original host.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--run TEXT</code></td>
+<td>the failing command, run in each container (required)</td>
+</tr>
+<tr>
+<td><code>--fail-when TEXT</code></td>
+<td><code>exit</code> (a nonzero exit fails) or a pattern that the output of a failing trial matches (required)</td>
+</tr>
+<tr>
+<td><code>--budget trials=N,minutes=M</code></td>
+<td>most trials over all arms and most minutes of container time (default <code>trials=300,minutes=45</code>)</td>
+</tr>
+<tr>
+<td><code>--case DIR</code></td>
+<td>case directory to write (default <code>drift-case</code>)</td>
+</tr>
+<tr>
+<td><code>--workspace DIR</code></td>
+<td>directory mounted at <code>/work</code> in each container (default <code>.</code>)</td>
+</tr>
+<tr>
+<td><code>--drift-binary PATH</code></td>
+<td>absolute path of a Linux <code>drift</code> binary; each arm is then captured inside its container</td>
+</tr>
+<tr>
+<td><code>--pilot N</code></td>
+<td>trials per baseline arm that check the failure shows (default 8)</td>
+</tr>
+<tr>
+<td><code>--trial-minutes N</code></td>
+<td>planner's minutes per trial (default 1)</td>
+</tr>
+<tr>
+<td><code>--timeout N</code></td>
+<td>seconds before one trial is cut off (default 120)</td>
+</tr>
+<tr>
+<td><code>--max-memory</code>, <code>--max-cpus</code></td>
+<td><code>docker --memory</code> and <code>--cpus</code> for arms whose capsule sets no limit</td>
+</tr>
+<tr>
+<td><code>--name TEXT</code></td>
+<td>case name</td>
+</tr>
+<tr>
+<td><code>--exit-status</code></td>
+<td>exit 0 <code>CONFIRMED</code>, 10 <code>CONFIRMED EFFECT (bundle)</code>, 11 <code>NARROWED</code>, 12 <code>STUCK</code> (default: 0 for every verdict)</td>
+</tr>
+<tr>
+<td><code>--detail summary|detail|full</code></td>
+<td>how much to print</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Naming the toolchain in <code>--run</code>.</strong> <code>--run</code> also picks the base image of every arm (see <a href="#reproduce">Reproduce</a>), so start the command with the tool that runs the test: <code>node test.js</code>, <code>python3 -m pytest</code>, <code>./gradlew test</code>. The command runs with the workspace at <code>/work</code> as the working directory.</p>
+<p><strong>An example that ran.</strong> The scenario is <code>locale-tz-date-2</code> from DriftBench: a program that compares the local calendar day with the UTC day. The green capsule has <code>TZ=UTC</code> and the red one <code>TZ=Pacific/Auckland</code>.</p>
+<pre><code class="language-sh">mkdir ws
+cat &gt; ws/prog.sh &lt;&lt;'EOF'
+day=$(date -d @1700000000 +%F)
+if [ &quot;$day&quot; != 2023-11-14 ]; then
+  echo &quot;report: date $day does not match the UTC batch day&quot;
+  exit 1
+fi
+echo ok
+EOF
+drift solve --run 'sh prog.sh' --fail-when 'does not match the UTC batch day' \
+  --budget trials=80,minutes=15 --workspace ws --drift-binary /abs/path/to/drift-linux-x64 \
+  --case solved --name tz-demo \
+  bench/data/capsules/locale-tz-date-2.green.json bench/data/capsules/locale-tz-date-2.red.json
+</code></pre>
+<pre><code>wrote 41 files to solved
+CONFIRMED: this dimension causes the failure: env.TZ. Setting it to the failing values moved the
+  failure count from 0 of 5 to 5 of 5 (exact one-sided p 0.003968) and back from 5 of 5 to 0 of 5
+  when the failing side was set to the passing values (p 0.003968)
+1 candidate changes, 2 experiments run in containers (36 trials, 36 seconds), not on the original
+  host.
+</code></pre>
+<p>The capsule says <code>os.arch=x86_64</code>, so the arms ran as <code>linux/amd64</code> containers on an arm64 Mac (emulated), and <code>--drift-binary</code> had to be an x86_64 Linux binary (<code>cli/build/bin/linuxX64/releaseExecutable/drift.kexe</code>). The binary must run inside the arm's image. Without <code>--drift-binary</code> the same command also ended <code>CONFIRMED</code> and wrote 35 files; the 6 missing files are the capsules of the arms.</p>
+<p><code>wrote 41 files to solved</code> goes to standard error. The case has the files of a <code>diagnose</code> case plus <code>experiments/</code>, <code>arms/&lt;id&gt;-control</code> and <code>-treatment</code> (each with <code>Dockerfile</code>, <code>run.sh</code>, <code>manifest.json</code>, <code>capsule.json</code>), <code>results/NNNN.json</code> and <code>certificate.json</code>. The exit code is 0 for every verdict unless you pass <code>--exit-status</code>, which maps the verdict to an exit code (see <a href="#exit-codes">Exit Codes</a>).</p>
+<p><strong>Budgets.</strong> <code>--budget</code> caps trials over all arms and container minutes together. If no trials-per-arm count up to 30 reaches power 0.8 inside the remaining budget, the run ends <code>STUCK</code> with reason <code>budget</code> and names the shortfall. A bad item fails before any container starts: <code>bad --budget item: bogus</code>, or <code>--budget takes trials=N and minutes=M, not hours=2</code>.</p>
+<p><strong>The four verdicts.</strong></p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Verdict</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CONFIRMED</code></td>
+<td>a minimal set of attributes, all set directly, reproduces the failure forward and removes it in reverse</td>
+</tr>
+<tr>
+<td><code>CONFIRMED EFFECT (bundle)</code></td>
+<td>the same, but the arms also differ in attributes nobody set; each member is named</td>
+</tr>
+<tr>
+<td><code>NARROWED</code></td>
+<td>an experiment was supported or stayed inconclusive, but the conditions above are not met</td>
+</tr>
+<tr>
+<td><code>STUCK</code></td>
+<td>no experiment was supported; the reason is <code>not-reproduced</code>, <code>uncontrollable</code>, <code>no-candidates</code>, <code>budget</code> or <code>executor</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>A <code>STUCK</code> run, with a failure pattern that the program never prints:</p>
+<pre><code class="language-sh">drift solve --run 'sh prog.sh' --fail-when 'no such text' --pilot 3 --budget trials=20,minutes=5 \
+  --workspace ws --case stuck bench/data/capsules/locale-tz-date-2.green.json \
+  bench/data/capsules/locale-tz-date-2.red.json
+</code></pre>
+<pre><code>wrote 19 files to stuck
+STUCK: the failure does not reproduce in the container built from the failing capsule: 0 of 3 trials
+  failed
+1 candidate changes, 0 experiments run in containers (6 trials, 6 seconds), not on the original
+  host.
+</code></pre>
+<p>The loop assumes one cause: the first supported experiment ends it. The fixtures in <code>fixtures/lab/cases</code> hold one real certificate per verdict class (see <a href="#pack-report-and-verify">Verify</a>).</p>
+<p>Errors before any container starts: <code>case directory already holds a case: solved</code>, <code>--fail-when needs exit or a pattern</code> (an empty value), <code>cannot read capsule file: nofile.json</code>. All exit 1.</p>
+<h2 id="ingest">Ingest</h2>
+<p><code>drift ingest CASE RESULTS</code> adds result files that someone else produced, for example a CI workflow variant that <code>drift next</code> described, to a case under the preregistered rule. <code>RESULTS</code> is a directory of <code>*.json</code> files. Each file names an experiment from the case's plan.</p>
+<pre><code class="language-json">{
+  &quot;schema&quot;: 1,
+  &quot;experiment&quot;: &quot;e9&quot;,
+  &quot;ruleSha256&quot;: &quot;&lt;sha256 of the preregistered rule&gt;&quot;,
+  &quot;arms&quot;: [
+    { &quot;id&quot;: &quot;control&quot;, &quot;failures&quot;: 0, &quot;trials&quot;: 9 },
+    { &quot;id&quot;: &quot;treatment&quot;, &quot;failures&quot;: 8, &quot;trials&quot;: 9 }
+  ]
+}
+</code></pre>
+<p>The trial count must equal the preregistered count (<code>trials.perArm</code> in <code>experiments/plan.json</code>; 9 for this case), and <code>ruleSha256</code> must equal the hash of the preregistered rule. Drift derives the rule from the plan and never from the result file. <code>case show</code> prints the hash on a <code>rule sha256:</code> line, and <code>next</code> prints it at <code>--detail detail</code> and <code>full</code>. <code>ingest --template</code> writes the files for you: one per experiment of the plan that has no result yet and is not rejected (the manual ones too), with the experiment id, both arm ids, the trial count and the rule hash filled in.</p>
+<pre><code class="language-sh">drift case show case | sed -n 5p
+drift ingest case res --template
+cat res/e9.json
+</code></pre>
+<pre><code>rule sha256: 85d28ec6c5ccb9292603be15d730a5685942efb2690a8b0ead6143480948d588 (ingest names it as ruleSha256)
+wrote 11 result files to res; set failures for each arm
+e9.json
+e8.json
+e7.json
+e6.json
+e4.json
+e1.json
+e2.json
+e3.json
+e5.json
+m1.json
+m2.json
+{&quot;arms&quot;:[{&quot;failures&quot;:null,&quot;id&quot;:&quot;control&quot;,&quot;trials&quot;:9},{&quot;failures&quot;:null,&quot;id&quot;:&quot;treatment&quot;,&quot;trials&quot;:9}],&quot;experiment&quot;:&quot;e9&quot;,&quot;ruleSha256&quot;:&quot;85d28ec6c5ccb9292603be15d730a5685942efb2690a8b0ead6143480948d588&quot;,&quot;schema&quot;:1}
+</code></pre>
+<p>The first line of the template output goes to standard error. <code>failures</code> starts as <code>null</code>, so a file you did not fill in is refused (<code>e9.json: control failures are not filled in</code>) instead of counting as zero failures. Delete the files of experiments you did not run, set <code>failures</code> for both arms of the others, and run <code>ingest</code> on the directory. <code>--template</code> refuses to write over an existing file (<code>results directory already holds e9.json</code>).</p>
+<p>The counts below are made up to show the mechanics; they are not a measurement of the drangler pipeline.</p>
+<pre><code class="language-sh">mkdir res
+printf '{&quot;schema&quot;:1,&quot;experiment&quot;:&quot;e9&quot;,&quot;ruleSha256&quot;:&quot;%s&quot;,&quot;arms&quot;:[{&quot;id&quot;:&quot;control&quot;,&quot;failures&quot;:0,&quot;trials&quot;:9},{&quot;id&quot;:&quot;treatment&quot;,&quot;failures&quot;:8,&quot;trials&quot;:9}]}\n' \
+  85d28ec6c5ccb9292603be15d730a5685942efb2690a8b0ead6143480948d588 &gt; res/e9.json
+cp -R case icase
+drift ingest icase res
+</code></pre>
+<pre><code>wrote 13 files to icase
+e9: supported; control 0 of 9, treatment 8 of 9, p 0.000205
+NARROWED: the failure reproduces when deps.@napi-rs/keyring.version, deps.prettier-plugin-sh.version, deps.wrangler.version, tool.node.version, tool.npm.version are set to the failing values (ingested result e9), but it is not confirmed: the minimal-set search and the reverse arm are not in this case
+</code></pre>
+<p>The first line goes to standard error. <code>ingest</code> can narrow a case or rule a hypothesis out. It never confirms, because confirmation needs the minimal-set and reverse experiments, which are separate preregistered runs. A batch with one bad file applies nothing; <code>case show</code> then still reports <code>integrity: ok</code>. Refusals, all exit 1:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Cause</th>
+<th>Message</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>experiment already in the case</td>
+<td><code>e9.json: a result for e9 is already in the case</code></td>
+</tr>
+<tr>
+<td>wrong trial count</td>
+<td><code>e9.json: control has 8 trials, the preregistered count is 9</code></td>
+</tr>
+<tr>
+<td>wrong rule hash</td>
+<td><code>e9.json: result for e9 names rule 00, but the preregistered rule is 85d28ec6...</code></td>
+</tr>
+<tr>
+<td>experiment not in the plan</td>
+<td><code>e9.json: experiment e99 is not in the case's plan</code></td>
+</tr>
+<tr>
+<td>malformed JSON</td>
+<td><code>e9.json: not a result file: unexpected end</code></td>
+</tr>
+<tr>
+<td>no result files</td>
+<td><code>no *.json result files in empty</code></td>
+</tr>
+<tr>
+<td>directory missing</td>
+<td><code>cannot list results directory: nodir</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Each refusal is prefixed with <code>nothing was ingested:</code> except the last two.</p>
+<p>After an ingest, <code>drift next</code> leaves out every experiment that has a recorded result and says so (<code>Already has a recorded result, so not proposed: e9.</code>). It does not re-plan: the order of the remaining experiments is the order of the plan made before the results, and <code>next</code> says that too.</p>
+<p><code>ingest --exit-status</code> maps the verdict it prints to an exit code (see <a href="#exit-codes">Exit Codes</a>); without it the exit code is 0 whenever the batch was accepted.</p>
+<h2 id="pack-report-and-verify">Pack, Report, and Verify</h2>
+<p><code>drift pack CASE --out FILE</code> packs a solved case directory into a deterministic <code>.driftcase</code>, a USTAR tar with sorted names, mode 0644, uid and gid 0, modification time 0 and no compression. The same case directory always produces the same bytes. <code>pack</code> refuses a directory without a <code>certificate.json</code> (<code>cannot pack case: not a solved case: no certificate.json</code>) and one that fails its own integrity check. <code>arms/</code> is stored as <code>reproduce/</code>.</p>
+<p>The fixtures in <code>fixtures/lab/cases</code> are real archives. Extract one and pack it again:</p>
+<pre><code class="language-sh">mkdir ex
+tar -xf fixtures/lab/cases/locale-tz-date-2.driftcase -C ex
+drift pack ex --out packed.driftcase
+cmp packed.driftcase fixtures/lab/cases/locale-tz-date-2.driftcase &amp;&amp; echo identical
+tar -tvf fixtures/lab/cases/locale-tz-date-2.driftcase | head -4
+</code></pre>
+<pre><code>wrote packed.driftcase: 19 files, 50176 bytes, sha256 8d4aaf9f238896a823a4aa065b3022df1581b42e4c3e0f8c93986bfb1c889cba
+identical
+-rw-r--r--  0 0      0         212 Dec 31  1969 case.json
+-rw-r--r--  0 0      0        5895 Dec 31  1969 certificate.json
+-rw-r--r--  0 0      0         436 Dec 31  1969 confirmed/minimal-set.json
+-rw-r--r--  0 0      0          27 Dec 31  1969 eliminations/excluded.json
+</code></pre>
+<p>The <code>wrote</code> line of <code>pack</code> goes to standard output. System <code>tar</code> reads the archive. A solved case from a real run packs the same way:</p>
+<pre><code class="language-sh">drift pack solved --out solved.driftcase
+drift verify solved.driftcase | tail -2
+</code></pre>
+<pre><code>wrote solved.driftcase: 43 files, 326656 bytes, sha256 57f75f3f149d6e24989c19b05866da046c75f9b7ed9b7211038ec6bfd807fdd6
+experiments are not re-run; the recorded results are taken as given
+verify: ok
+</code></pre>
+<p><strong>Report.</strong> <code>drift report FILE --out HTML</code> renders the static <code>report.html</code> that <code>pack</code> stored: no script, link, image or external resource, ASCII only, no timestamp.</p>
+<pre><code class="language-sh">drift report fixtures/lab/cases/locale-tz-date-2.driftcase --out report.html
+shasum -a 256 report.html | cut -c1-16
+</code></pre>
+<pre><code>wrote report.html: 7052 characters
+29dfc13b8f4884e3
+</code></pre>
+<p>Running it twice writes the same file. A missing archive gives <code>cannot read archive: nofile</code>, exit 1.</p>
+<p><strong>Verify.</strong> <code>drift verify FILE</code> re-derives everything the archive records from its own data: it runs 14 checks in a fixed order and a failing check does not stop the later ones. Experiments are not re-run.</p>
+<pre><code class="language-sh">drift verify fixtures/lab/cases/locale-tz-date-2.driftcase
+</code></pre>
+<pre><code>PASS tar: 19 entries, canonical
+PASS manifest: 18 files match the manifest
+PASS observation-chain: 2 observations chain to the head in case.json
+PASS results-chain: 3 results continue the observation chain to the recorded head
+PASS capsules: both capsules match their observations and the certificate chains from the same head
+PASS counts: 3 experiments: every count is the tally of its recorded trials
+PASS fisher: 3 exact one-sided p-values re-derived from the recorded counts
+PASS rules: 2 preregistered rules match their spec hashes, the plan's alpha and the planned trials
+PASS decision: 2 outcomes follow from the counts under the preregistered rules
+PASS posteriors: 2 beliefs re-derived by Bayes over the recorded outcomes
+PASS ranking: tiers and candidates re-derived from the two capsules
+PASS plan: hypotheses, prior and plan re-derived from the ranking and the recorded options
+PASS verdict: CONFIRMED follows from the recorded experiments
+PASS report: report.html and the confirmed record are what the certificate generates
+verdict: CONFIRMED: this dimension causes the failure: env.TZ. Setting it to the failing values moved the failure count from 0 of 5 to 5 of 5 (exact one-sided p 0.003968) and back from 5 of 5 to 0 of 5 when the failing side was set to the passing values (p 0.003968)
+experiments are not re-run; the recorded results are taken as given
+verify: ok
+</code></pre>
+<p>A check can also print <code>SKIP</code>: <code>report</code> on a plain directory, <code>ranking</code> and <code>plan</code> on history cases, <code>posteriors</code> when an ingested result is present.</p>
+<p><code>--json</code> prints the same report as canonical JSON with the keys <code>checks</code>, <code>firstFailure</code>, <code>format</code>, <code>note</code>, <code>ok</code>, <code>schema</code> and <code>verdict</code>. Each check holds <code>id</code>, <code>status</code>, <code>detail</code>, <code>expected</code> and <code>recorded</code>.</p>
+<pre><code class="language-sh">drift verify --json fixtures/lab/cases/limits-nofile-1.driftcase | jq -r '.firstFailure // &quot;none&quot;'
+</code></pre>
+<pre><code>none
+</code></pre>
+<p>The four archives in <code>fixtures/lab/cases</code> cover one verdict each:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Archive</th>
+<th><code>verify</code> verdict line (cut)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>locale-tz-date-2</code></td>
+<td><code>CONFIRMED: this dimension causes the failure: env.TZ</code></td>
+</tr>
+<tr>
+<td><code>runtime-node-api-1</code></td>
+<td><code>CONFIRMED EFFECT (bundle): the arms differ in 2 attributes, so the effect is the bundle's and not one member's: env.NODE_VERSION, tool.node.version</code></td>
+</tr>
+<tr>
+<td><code>env-retries-flaky-plain-1</code></td>
+<td><code>NARROWED: no experiment reached significance; 1 stayed inconclusive at 21 trials per arm: env.MAX_RETRIES</code></td>
+</tr>
+<tr>
+<td><code>limits-nofile-1</code></td>
+<td><code>STUCK: the failure does not reproduce in the container built from the failing capsule: 0 of 8 trials failed</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Tamper evidence.</strong> Flip one recorded trial from <code>fail</code> to <code>pass</code>. The replacement has the same length, so the tar stays canonical and the check that sees it first is <code>manifest</code>:</p>
+<pre><code class="language-sh">python3 -c &quot;
+d = open('fixtures/lab/cases/locale-tz-date-2.driftcase', 'rb').read()
+open('bt.driftcase', 'wb').write(d.replace(b'\&quot;status\&quot;:\&quot;fail\&quot;', b'\&quot;status\&quot;:\&quot;pass\&quot;', 1))&quot;
+drift verify bt.driftcase 2&gt;/dev/null | grep '^FAIL\|^verify' | cut -c1-110
+echo &quot;exit ${pipestatus[1]}&quot;
+drift verify --json bt.driftcase 2&gt;/dev/null | jq -r '.checks[] | select(.status != &quot;pass&quot;) | .id' | tr '\n' ' '
+</code></pre>
+<pre><code>FAIL manifest: results/0001.json was changed; expected 5f6997c647d89b96cd77b038f0ce6679a32ae6f68a4cdeceaae5320
+FAIL results-chain: results chain broken at entry 0 (results/0001.json): content does not match its hash; expe
+FAIL counts: experiment p0 treatment failures; expected 7, recorded 8
+FAIL fisher: experiment p0 exact one-sided p; expected 8/11440 (699), recorded 1/12870 (77)
+verify: failed at manifest: results/0001.json was changed; expected 5f6997c647d89b96cd77b038f0ce6679a32ae6f68a
+exit 1
+manifest results-chain counts fisher
+</code></pre>
+<p>(<code>${pipestatus[1]}</code> is zsh; in bash use <code>${PIPESTATUS[0]}</code>.) On failure the report goes to standard output and one extra line, <code>verification failed: FAIL manifest: ...</code>, goes to standard error.</p>
+<p><code>verify</code> shows that an archive agrees with itself. It does not show that the experiments happened. Someone who rewrites every file, both chains, the hashes, the certificate and the manifest consistently makes an archive that verifies; preregistration is bound by hash, not by time. The technical report describes a second edit that also reseals the chains and the manifest and is still caught by <code>counts</code> and <code>fisher</code>.</p>
+<h2 id="atlas">Atlas</h2>
+<p>The Atlas asks, per probe, whether a Kotlin program prints the same thing on every target. It holds 38 probes. <code>atlas record</code> runs them on this target, <code>atlas build</code> aggregates transcripts into a dataset, <code>atlas compare</code> places this device against it and <code>atlas show</code> prints the matrix or a draft for one probe.</p>
+<p><strong>Columns.</strong> <code>fixtures/atlas/</code> holds 13 recorded columns on Kotlin 2.4.20, and <code>fixtures/atlas/2.5.0-beta1/</code> holds 5 on 2.5.0-Beta1 (<code>jvm</code>, <code>macos</code>, <code>wasm</code>, <code>android</code>, <code>ios</code>). <a href="https://github.com/gmitch215/Drift/blob/master/atlas/columns.yml"><code>atlas/columns.yml</code></a> says how each was measured.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Where it was recorded</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>jvm</code></td>
+<td>the CLI JVM build on Temurin 21, macOS arm64</td>
+</tr>
+<tr>
+<td><code>jvm-17</code>, <code>jvm-21</code>, <code>jvm-25</code></td>
+<td>the same classes (JVM target 17) on Temurin 17, 21 and 25, x86-64 Linux containers</td>
+</tr>
+<tr>
+<td><code>linux</code>, <code>linux-arm64</code></td>
+<td>Kotlin/Native release executables linked on macOS, run in Debian containers</td>
+</tr>
+<tr>
+<td><code>macos</code></td>
+<td>Kotlin/Native on macOS arm64</td>
+</tr>
+<tr>
+<td><code>wasm</code></td>
+<td>Kotlin/Wasm on Node, macOS arm64</td>
+</tr>
+<tr>
+<td><code>wasm-chromium</code>, <code>wasm-firefox</code>, <code>wasm-webkit</code></td>
+<td>the Studio web build in each browser, driven by Playwright in a Linux container (WebKit here is not Safari)</td>
+</tr>
+<tr>
+<td><code>android</code></td>
+<td>the debug build on an arm64 emulator (Pixel 7 profile, API 37)</td>
+</tr>
+<tr>
+<td><code>ios</code></td>
+<td>the simulator build on an iPhone 17 Pro simulator</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>mingw</code> and <code>jvm-windows</code> are recorded by the <code>atlas.yml</code> workflow and are not in the fixtures yet. <code>fixtures/atlas-extra/</code> holds three more transcripts that stay out of the dataset; its README says why. <code>fixtures/atlas-variants/</code> holds the Ubuntu-linked <code>linux</code> and <code>linux-arm64</code> transcripts, which differ from the committed columns on three math lines.</p>
+<p><strong>Record.</strong> <code>--out DIR</code> writes <code>DIR/&lt;target&gt;.txt</code>. Without <code>--out</code> the transcript goes to standard output and the summary line to standard error. <code>--target LABEL</code> sets the label in the header; the default is the platform (<code>macos</code>). A label may use letters, digits, <code>.</code>, <code>_</code> and <code>-</code>.</p>
+<pre><code class="language-sh">drift atlas record --out tr
+cmp tr/macos.txt fixtures/atlas/macos.txt &amp;&amp; echo identical-to-fixture
+head -3 tr/macos.txt
+drift atlas record --target &quot;bad label&quot;
+</code></pre>
+<pre><code>wrote 38 probes for macos on kotlin 2.4.20 to tr/macos.txt
+identical-to-fixture
+# kotlin.version = 2.4.20
+# kotlin.target = macos
+@@ kotlin.char.bmp-case-mapping
+--target may only use letters, digits, '.', '_' and '-': bad label
+</code></pre>
+<p>A transcript starts with <code># kotlin.version = ...</code> and <code># kotlin.target = ...</code>, then one <code>@@ &lt;probe id&gt;</code> section per probe. The target label and the Kotlin version name a column, <code>macos@2.4.20</code>, and divergence is judged inside one version only. The version is the Kotlin version the executable was built with, and a pre-release qualifier is not kept (a build on 2.5.0-Beta1 writes <code>2.5.0</code>), so the Beta fixtures carry the header <code>2.5.0-Beta1</code> by hand.</p>
+<p><strong>Build.</strong> <code>atlas build TRANSCRIPT... --out FILE</code> writes the dataset as canonical JSON. Pass files, not directories. The first command builds three columns, and the second takes every committed column through a shell glob.</p>
+<pre><code class="language-sh">drift atlas build fixtures/atlas/jvm.txt fixtures/atlas/macos.txt fixtures/atlas/wasm.txt --out atlas.json
+drift atlas build fixtures/atlas/*.txt fixtures/atlas/2.5.0-beta1/*.txt --out atlas-all.json
+</code></pre>
+<pre><code>dataset: 38 probes, 3 columns, 23 divergent, sha256 3cf771d67a004c85570eeb323050261a6a2a1d8f74fac71f04551760fb8f0470
+dataset: 38 probes, 18 columns, 23 divergent, sha256 de6b25cac2fed7bc5f357d3130be44d1629961efa94d5fdac4ab8a572a2ccebb
+</code></pre>
+<p>The summary goes to standard error. The sha256 is the hash of the dataset body; the file on disk has one more trailing newline. Building twice gives identical files, and the order of the arguments does not change the bytes. <code>--out</code> is required. <code>build</code> refuses a transcript that lacks a probe of the catalog, names an unknown probe, lacks a header (<code>bad transcript header in badt.txt: missing kotlin.target</code>) or duplicates a column (<code>fixtures/atlas/jvm.txt and fixtures/atlas/jvm.txt both record jvm@2.4.20</code>).</p>
+<p><strong>Show.</strong> Without <code>--probe</code>, <code>atlas show</code> prints the matrix: one row per probe, one letter per distinct output, and a repeated letter on a row marks a byte-identical transcript.</p>
+<pre><code class="language-sh">drift atlas show atlas.json | sed -n 1,6p
+drift atlas show atlas.json | tail -5
+</code></pre>
+<pre><code>atlas: 38 probes, 3 columns (jvm@2.4.20, macos@2.4.20, wasm@2.4.20)
+
+probe                                     classification    jvm@2.4.20  macos@2.4.20  wasm@2.4.20
+kotlin.char.bmp-case-mapping              platform-defined  A           B             B
+kotlin.char.bmp-categories                platform-defined  A           B             B
+kotlin.char.case-special                  documented        A           A             A
+a letter repeated on a row marks a byte-identical transcript
+divergent probes: 23 of 38
+  documented: 6 of 18
+  platform-defined: 4 of 4
+  unclassified: 13 of 16
+</code></pre>
+<p>With more than one Kotlin version in the dataset the summary adds a line per version:</p>
+<pre><code class="language-sh">drift atlas show atlas-all.json | tail -3
+</code></pre>
+<pre><code>divergent probes per kotlin version:
+  2.4.20: 23
+  2.5.0-Beta1: 18
+</code></pre>
+<p><strong>Classification.</strong> Every probe carries one of three labels, written by hand from primary sources in <a href="https://github.com/gmitch215/Drift/blob/master/atlas/classification.yml"><code>atlas/classification.yml</code></a> and embedded in the dataset:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Label</th>
+<th>Meaning</th>
+<th>Probes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>documented</code></td>
+<td>a Kotlin documentation page states the behavior</td>
+<td>18</td>
+</tr>
+<tr>
+<td><code>platform-defined</code></td>
+<td>a JDK or ECMAScript page does</td>
+<td>4</td>
+</tr>
+<tr>
+<td><code>unclassified</code></td>
+<td>no explanation was found; the entry records what was searched</td>
+<td>16</td>
+</tr>
+</tbody>
+</table></div>
+<p>Each entry also has a <code>basis</code> (<code>verified</code> when the cited page states the contract, <code>inferred</code> when the page implies it), the references with a short quote, and the linked issue ids with the state read on the research date. <code>unclassified</code> is not a finding. The 13 divergent unclassified probes each have a repro draft under <a href="https://github.com/gmitch215/Drift/tree/master/atlas/repros"><code>atlas/repros/</code></a>.</p>
+<p><strong>Compare.</strong> <code>atlas compare DATASET TRANSCRIPT</code> places this device against each recorded column. <code>--detail summary</code> prints counts; <code>detail</code> adds the probes that differ.</p>
+<pre><code class="language-sh">drift atlas compare atlas.json tr/macos.txt
+drift atlas compare atlas-all.json tr/macos.txt | tail -19
+</code></pre>
+<pre><code>this device: macos, kotlin 2.4.20, 38 probes measured
+dataset: 38 probes, 3 columns: jvm@2.4.20, macos@2.4.20, wasm@2.4.20
+matches every column: 15
+matches some columns: 23
+matches no column: 0
+not measured here: 0
+per column:
+  jvm@2.4.20: 21 of 38 probes match
+  macos@2.4.20: 38 of 38 probes match
+  wasm@2.4.20: 25 of 38 probes match
+per column:
+  android@2.4.20: 20 of 38 probes match
+  android@2.5.0-Beta1: 20 of 38 probes match
+  ios@2.4.20: 38 of 38 probes match
+  ios@2.5.0-Beta1: 37 of 38 probes match
+  jvm@2.4.20: 21 of 38 probes match
+  jvm@2.5.0-Beta1: 21 of 38 probes match
+  jvm-17@2.4.20: 22 of 38 probes match
+  jvm-21@2.4.20: 21 of 38 probes match
+  jvm-25@2.4.20: 21 of 38 probes match
+  linux@2.4.20: 36 of 38 probes match
+  linux-arm64@2.4.20: 37 of 38 probes match
+  macos@2.4.20: 38 of 38 probes match
+  macos@2.5.0-Beta1: 37 of 38 probes match
+  wasm@2.4.20: 25 of 38 probes match
+  wasm@2.5.0-Beta1: 32 of 38 probes match
+  wasm-chromium@2.4.20: 25 of 38 probes match
+  wasm-firefox@2.4.20: 25 of 38 probes match
+  wasm-webkit@2.4.20: 25 of 38 probes match
+</code></pre>
+<p>The Mac that recorded the transcript matches its own column on 38 of 38 probes, which makes a useful check that a fresh recording is unchanged. A column from another machine can differ for hardware reasons (for example the sign bit of a NaN), and a Linux executable linked on Ubuntu instead of macOS prints different last digits for three lines of <code>kotlin.math.transcendental-bits</code>. A mismatch against a column recorded elsewhere is not a Kotlin finding by itself.</p>
+<p><strong>Repro drafts.</strong> <code>atlas show DATASET --probe ID</code> prints a draft for one probe. It begins <code>GENERATED DRAFT, NOT REVIEWED</code>.</p>
+<pre><code class="language-sh">drift atlas show atlas.json --probe kotlin.collections.iterator-modification | sed -n 1,13p
+drift atlas show atlas.json --probe kotlin.collections.iterator-modification \
+  | sed -n '/^kotlin 2.4.20: 2 different/,/^controls/p'
+</code></pre>
+<pre><code>GENERATED DRAFT, NOT REVIEWED
+drift atlas show wrote this from recorded transcripts. A person must read it, rerun the source by
+hand and rewrite it in their own words before anything is filed. Drift does not file, post or
+contact anyone.
+
+probe: kotlin.collections.iterator-modification
+question: Which structural changes during iteration throw, and which pass silently?
+classification: platform-defined
+basis: verified
+reference: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayList.html &quot;the fail-fast behavior of an iterator cannot be guaranteed&quot;
+reference: https://developer.android.com/reference/java/util/ArrayList &quot;the fail-fast behavior of an iterator cannot be guaranteed&quot;
+linked issues: KT-88775 (Open when read), KT-89031 (To be discussed when read)
+measured: kotlin 2.4.20 on jvm, macos, wasm
+...
+kotlin 2.4.20: 2 different results
+differing lines: 1 of 14
+  line 4
+    jvm: list-remove-last = err:ConcurrentModificationException
+    macos, wasm: list-remove-last = ok:[1, 2]
+controls: 13 lines are the same on every target
+</code></pre>
+<p>For an <code>unclassified</code> probe the draft adds a <code>searched:</code> entry that lists the tracker queries and the pages read.</p>
+<pre><code class="language-sh">drift atlas show atlas-all.json --probe kotlin.double.nan-bits | sed -n 8,17p | cut -c1-110
+</code></pre>
+<pre><code>classification: unclassified
+basis: inferred
+reference: https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.2.3 &quot;IEEE 754 allows multiple d
+reference: https://webassembly.github.io/spec/core/exec/numerics.html &quot;Some operators are non-deterministic, b
+reference: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/to-raw-bits.html &quot;preserving NaN values exact 
+linked issues: KT-53258 (In Progress when read)
+  searched: YouTrack: &quot;NaN toRawBits&quot;, &quot;Double toBits NaN canonical&quot;, &quot;NaN unaryMinus sign Native&quot;,
+  &quot;Double.NaN raw bits negative&quot;, &quot;unaryMinus NaN&quot;, &quot;NaN sign bit&quot;, &quot;toRawBits&quot;. Pages read in full:
+  JLS 4.2.3, WebAssembly numerics appendix, Kotlin toRawBits and unaryMinus pages. 0/0 and sqrt
+  follow the CPU; no page, issue or commit explains the Native result for neg-nan-raw.
+</code></pre>
+<p><code>cut</code> shortens the reference lines here. The rest of a draft holds the probe source, the research notes, which are also unreviewed, and a <code>before filing</code> checklist: search the tracker, check the reference page, rerun the source on the newest release and on each target by hand, and write the report yourself. The issue ids come from the probe notes, and the tracker is not queried. Review the draft before it goes anywhere: it states what the transcripts show, not that the behavior is a bug. An unknown id gives <code>no probe nope in the dataset</code>, exit 1.</p>
+<p><strong>Dataset and site from Gradle.</strong> Two tasks build the same data without calling the executable yourself.</p>
+<pre><code class="language-sh">./gradlew atlasDataset
+./gradlew atlasSite
+</code></pre>
+<p><code>atlasDataset</code> runs the JVM CLI's <code>atlas build</code> over every <code>fixtures/atlas/**/*.txt</code> file and writes <code>build/atlas-work/dataset.json</code>. The file is byte-identical to the <code>atlas-all.json</code> built above (<code>cmp</code> found no difference). <code>atlasSite</code> builds the Studio web distribution and writes a static site to <code>build/atlas-site</code>: Studio at <code>index.html</code>, one page per probe in <code>probe/</code> (38 pages and an index), <code>data/dataset.json</code>, <code>data/classification.json</code> and the transcripts in <code>data/transcripts/</code>. Serve it like any build:</p>
+<pre><code class="language-sh">drift serve --dir build/atlas-site --port 0 --quiet
+curl -s -o /dev/null -w '%{http_code} %{content_type}\n' http://localhost:PORT/probe/kotlin.char.case-special.html
+</code></pre>
+<pre><code>200 text/html; charset=utf-8
+</code></pre>
+<p><code>./gradlew docsSite</code> runs <code>dokkaGenerate</code> and <code>atlasSite</code> first, then assembles <code>build/site</code> (3,089 files): <code>README.md</code> as <code>index.html</code>, <code>ADVANCED_USAGE.md</code> as <code>advanced-usage.html</code> and <code>TECHNICAL_REPORT.md</code> as <code>technical-report.html</code>, each rendered into <code>assets/site-template.html</code>, the Atlas site under <code>atlas/</code>, the Dokka site under <code>engine/</code>, the icons from <code>assets/</code>, <code>CNAME</code> and <code>.nojekyll</code>. A relative link in the three Markdown files to a repository path that does not exist fails the render, and a link to one that does exist becomes a GitHub URL on <code>master</code>. <code>checkSiteLinks</code> runs after it and fails on a relative <code>href</code> or <code>src</code> that does not resolve inside <code>build/site</code>. It scanned 73,286 links and found none unresolved outside <code>engine/</code>, where Dokka leaves 14 unresolved; those are counted and printed and do not fail it.</p>
+<p>The <code>docs.yml</code> workflow runs <code>./gradlew dokkaGenerate atlasSite docsSite</code> and pushes <code>build/site</code> to the <code>gh-pages</code> branch. It builds on pushes to <code>master</code>, <code>ver/*</code>, <code>feat/*</code> and <code>renovate/*</code> and deploys only from <code>master</code>, with a <code>CNAME</code> file for <code>drift.gmitch215.dev</code>. It has not run yet.</p>
+<h2 id="install-and-uninstall">Install and Uninstall</h2>
+<p><code>drift install</code> copies the executable you are running into a directory and records every change in a receipt. <code>drift uninstall</code> reads the receipt and reverses it. Only a native build can do this. From the JVM build, <code>drift install</code> prints <code>error: the JVM distribution cannot install itself; install the native executable</code> and exits 2.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--user</code></td>
+<td>install for the current user (the default)</td>
+</tr>
+<tr>
+<td><code>--global</code></td>
+<td>install for every user; never uses <code>sudo</code></td>
+</tr>
+<tr>
+<td><code>--dir PATH</code></td>
+<td>install into this absolute directory</td>
+</tr>
+<tr>
+<td><code>--no-modify-path</code></td>
+<td>leave shell profiles and the registry alone (same as <code>DRIFT_NO_MODIFY_PATH=1</code>)</td>
+</tr>
+<tr>
+<td><code>--dry-run</code></td>
+<td>print every change without making any</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>uninstall</code> takes <code>--dry-run</code> only.</p>
+<p><strong>Dry run.</strong> <code>--dry-run</code> prints <code>dry run: nothing is changed</code>, then each action the real run would take, and changes nothing. This example ran with a scratch home that holds an empty <code>.profile</code> and a <code>.zshenv</code> with one line, and with <code>SHELL=/bin/zsh</code>:</p>
+<pre><code class="language-sh">drift install --dry-run
+</code></pre>
+<pre><code>dry run: nothing is changed
+scope: user
+create directory /home/you/.local
+create directory /home/you/.local/bin
+write /home/you/.local/bin/drift (mode 0755, 6742776 bytes)
+create directory /home/you/.config
+create directory /home/you/.config/drift
+append to /home/you/.profile:
+  # &gt;&gt;&gt; drift &gt;&gt;&gt;
+  case &quot;:${PATH}:&quot; in
+  	*&quot;:$HOME/.local/bin:&quot;*) ;;
+  	*) export PATH=&quot;$HOME/.local/bin:$PATH&quot; ;;
+  esac
+  # &lt;&lt;&lt; drift &lt;&lt;&lt;
+append to /home/you/.zshenv:
+  # &gt;&gt;&gt; drift &gt;&gt;&gt;
+  case &quot;:${PATH}:&quot; in
+  	*&quot;:$HOME/.local/bin:&quot;*) ;;
+  	*) export PATH=&quot;$HOME/.local/bin:$PATH&quot; ;;
+  esac
+  # &lt;&lt;&lt; drift &lt;&lt;&lt;
+write receipt /home/you/.config/drift/install-receipt.json
+restart your shell or run: . &quot;/home/you/.profile&quot;
+</code></pre>
+<p>The block is a POSIX <code>case</code> guard, so sourcing the file twice leaves one entry on <code>PATH</code>. The real run prints the same lines, with <code>installing drift 1.0.0</code> first and <code>installed drift 1.0.0 to &lt;path&gt;</code> last. Two dry runs print the same bytes.</p>
+<p><strong>Scope and directory.</strong> The default scope is <code>--user</code>, unless the process is root or elevated, and then it is <code>--global</code>. The user directory is <code>$XDG_BIN_HOME</code> when that is an absolute path, else <code>~/.local/bin</code>; on Windows it is <code>%LOCALAPPDATA%\Programs\Drift</code>. The global directory is <code>/usr/local/bin</code>, or <code>%ProgramFiles%\Drift</code> on Windows. <code>--global</code> never runs <code>sudo</code>. When the directory is not writable it exits 1 and prints the command to run yourself, such as <code>sudo &quot;&lt;path&gt;/drift&quot; install --global</code>; that message is quoted from the installer's test run in a Debian container, because <code>/usr/local/bin</code> is writable on the Mac used for this guide. A relative <code>--dir</code> is refused.</p>
+<p><strong>Path edits.</strong> Nothing is edited when the target directory is on <code>PATH</code> already. Otherwise, for a user install on Unix:</p>
+<ul>
+<li>every existing file among <code>~/.profile</code>, <code>~/.bash_profile</code> and <code>~/.bashrc</code> gets the marked block;</li>
+<li>zsh gets <code>$ZDOTDIR/.zshenv</code> if it exists, else <code>.zprofile</code> if it exists, else a new <code>.zshenv</code> when <code>SHELL</code> is zsh;</li>
+<li>fish gets <code>~/.config/fish/conf.d/drift.fish</code> when <code>~/.config/fish</code> exists or <code>SHELL</code> is fish;</li>
+<li><code>~/.profile</code> is created when none of those apply.</li>
+</ul>
+<p>A global install edits no profile and says that the directory is not on <code>PATH</code>. On Windows the directory is appended to the <code>Path</code> value in <code>HKCU\Environment</code> (user) or the machine environment key (global), the value type is kept, and the change is broadcast. The Windows behavior comes from a recorded run under Wine, not from Windows. <code>--no-modify-path</code> skips every edit.</p>
+<pre><code class="language-sh">drift install | tail -3
+sh -c '. ~/.profile; . ~/.profile; echo &quot;$PATH&quot; | tr : &quot;\n&quot;; drift --version'
+</code></pre>
+<pre><code>write receipt /home/you/.config/drift/install-receipt.json
+installed drift 1.0.0 to /home/you/.local/bin/drift
+restart your shell or run: . &quot;/home/you/.profile&quot;
+/home/you/.local/bin
+/usr/bin
+/bin
+drift version 1.0.0 (macos)
+</code></pre>
+<p>Run the same command again and it changes nothing:</p>
+<pre><code class="language-sh">~/.local/bin/drift install
+</code></pre>
+<pre><code>installing drift 1.0.0
+scope: user
+/home/you/.local/bin/drift is up to date
+/home/you/.profile already has the drift block
+/home/you/.zshenv already has the drift block
+/home/you/.config/drift/install-receipt.json is up to date
+installed drift 1.0.0 to /home/you/.local/bin/drift
+restart your shell for the PATH change to apply
+</code></pre>
+<p><strong>Receipt.</strong> <code>install-receipt.json</code> is canonical JSON in <code>$XDG_CONFIG_HOME/drift</code> (an absolute path) or <code>~/.config/drift</code>, and in <code>%LOCALAPPDATA%\Drift</code> on Windows. It holds the schema, the version, the scope, the install directory, the binary path, the directories the install created, leftovers, and every path edit with the exact block or registry entry. A reinstall into the same directory carries the old edits forward. A reinstall into a different directory, or with a different scope, is refused until you run <code>drift uninstall</code>.</p>
+<p><strong>Uninstall.</strong> <code>drift uninstall</code> reverses the edits in reverse order. A profile block is removed and the file is restored byte for byte, including the newline the install added. A profile that <code>install</code> created is deleted if it is empty afterwards. Then it removes the binary, the receipt and the directories the install created, if they are empty. It removes nothing else: a block you edited by hand is kept and reported.</p>
+<pre><code class="language-sh">drift uninstall --dry-run
+drift uninstall
+</code></pre>
+<pre><code>dry run: nothing is changed
+remove the drift block from /home/you/.zshenv
+remove the drift block from /home/you/.profile
+remove /home/you/.local/bin/drift
+remove /home/you/.config/drift/install-receipt.json
+remove directory /home/you/.config/drift if it is empty
+remove directory /home/you/.config if it is empty
+remove directory /home/you/.local/bin if it is empty
+remove directory /home/you/.local if it is empty
+uninstalling drift 1.0.0
+remove the drift block from /home/you/.zshenv
+remove the drift block from /home/you/.profile
+remove /home/you/.local/bin/drift
+remove /home/you/.config/drift/install-receipt.json
+remove directory /home/you/.config/drift
+remove directory /home/you/.config
+remove directory /home/you/.local/bin
+remove directory /home/you/.local
+uninstalled drift
+</code></pre>
+<p>Afterwards the home directory holds only what it held before. <code>.profile</code> is the empty file it was, and <code>.zshenv</code> holds its one line:</p>
+<pre><code class="language-sh">ls -A ~
+wc -c &lt; ~/.profile
+cat ~/.zshenv
+</code></pre>
+<pre><code>.profile
+.zshenv
+0
+export FOO=1
+</code></pre>
+<p>A second <code>drift uninstall</code> finds no receipt, says so and exits 0:</p>
+<pre><code>no install receipt at /home/you/.config/drift/install-receipt.json; nothing removed
+</code></pre>
+<p><strong>Other directories and no path edit.</strong> <code>--dir</code> installs somewhere else. With <code>--no-modify-path</code> or <code>DRIFT_NO_MODIFY_PATH=1</code>, no profile or registry value changes, and the receipt records no path edit.</p>
+<pre><code class="language-sh">drift install --dir /opt/tools --no-modify-path
+drift uninstall
+</code></pre>
+<pre><code>installing drift 1.0.0
+scope: user
+create directory /opt
+create directory /opt/tools
+write /opt/tools/drift (mode 0755, 6742776 bytes)
+create directory /home/you/.config
+create directory /home/you/.config/drift
+PATH is not modified
+write receipt /home/you/.config/drift/install-receipt.json
+installed drift 1.0.0 to /opt/tools/drift
+uninstalling drift 1.0.0
+remove /opt/tools/drift
+remove /home/you/.config/drift/install-receipt.json
+remove directory /home/you/.config/drift
+remove directory /home/you/.config
+remove directory /opt/tools
+remove directory /opt
+uninstalled drift
+</code></pre>
+<pre><code class="language-sh">DRIFT_NO_MODIFY_PATH=1 drift install
+</code></pre>
+<pre><code>installing drift 1.0.0
+scope: user
+create directory /home/you/.local
+create directory /home/you/.local/bin
+write /home/you/.local/bin/drift (mode 0755, 6742776 bytes)
+create directory /home/you/.config
+create directory /home/you/.config/drift
+PATH is not modified
+write receipt /home/you/.config/drift/install-receipt.json
+installed drift 1.0.0 to /home/you/.local/bin/drift
+</code></pre>
+<p><strong>Refusals.</strong></p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Output</th>
+<th>Exit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>drift install --user --global</code></td>
+<td><code>error: --user and --global cannot be combined</code></td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>drift install --dir relative/bin</code></td>
+<td><code>error: --dir must be an absolute path: relative/bin</code></td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>drift install --dir /ro/bin</code> on a read-only parent</td>
+<td><code>error: cannot write to /ro</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>drift install --dir /b</code> after an install into <code>/a</code></td>
+<td><code>error: drift is already installed in /a (user); run drift uninstall first</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>drift install</code> or <code>drift uninstall</code> with a corrupt receipt</td>
+<td><code>error: cannot read the install receipt at &lt;path&gt; (expected key at 1); nothing changed</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>drift install --bogus</code></td>
+<td><code>Error: no such option --bogus</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>drift uninstall</code> with no receipt</td>
+<td><code>no install receipt at &lt;path&gt;; nothing removed</code></td>
+<td>0</td>
+</tr>
+</tbody>
+</table></div>
+<p>A step that fails after the binary landed still writes the receipt, so <code>uninstall</code> can undo the part that happened. On Windows a running <code>drift.exe</code> cannot be overwritten or deleted, so the old file is renamed to <code>drift.old</code> and removed at the next install or, for an uninstall, by a detached helper after the process exits. That path comes from the recorded Wine run.</p>
+<h2 id="serve">Serve</h2>
+<p><code>drift serve</code> starts a small web server for the Studio web build, so you can open Studio in a browser without a hosting step. It binds to the loopback interface only, answers <code>GET</code> and <code>HEAD</code>, and serves files from one directory. It does not need a network connection.</p>
+<pre><code class="language-sh">drift serve --dir studio --port 0
+</code></pre>
+<pre><code>drift serve 1.0.0: serving /path/to/studio
+http://localhost:56990/
+http://127.0.0.1:56990/
+http://[::1]:56990/
+press Ctrl+C to stop
+</code></pre>
+<p>The port in the example is the one the operating system picked for <code>--port 0</code>. Without <code>--quiet</code> the server prints one line per request, <code>METHOD PATH STATUS BYTES</code>, and <code>stopped</code> after Ctrl+C.</p>
+<p>Build the directory with <code>./gradlew :cli:stageStudio</code>. It runs <code>:studio:wasmJsBrowserDistribution</code> and copies the result, without source maps, to <code>cli/build/serve/studio</code> (about 12 MB). The <code>build/atlas-site</code> directory from <a href="#atlas"><code>atlasSite</code></a> serves the same way.</p>
+<h3 id="where-the-studio-build-comes-from">Where the Studio Build Comes From</h3>
+<p><code>--dir</code> names the directory, which must hold an <code>index.html</code>. Without it, <code>drift serve</code> looks for <code>studio</code> next to the executable and then for <code>../share/drift/studio</code>. If neither exists it exits with status 1 and lists both places:</p>
+<pre><code>error: no Studio web build found; pass --dir &lt;dist&gt; (build one with ./gradlew :studio:wasmJsBrowserDistribution)
+searched: /path/bin/studio
+searched: /path/share/drift/studio
+</code></pre>
+<p>A <code>--dir</code> that exists without an <code>index.html</code> gives <code>error: no Studio web build in nodir: index.html not found</code>, exit 1. The executable does not embed the build. Storing a gzip of the 12.4 MB build as base64 text grew a macOS test executable by 12.1 MB, and <code>drift</code> is 6.7 MB without it; that measurement is about embedding as a Kotlin string, not about every way to embed.</p>
+<h3 id="requests">Requests</h3>
+<p>The checks below ran against the macOS release executable.</p>
+<pre><code class="language-sh">curl -s -D - -o /dev/null http://localhost:56990/
+</code></pre>
+<pre><code>HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Cache-Control: no-cache
+Content-Length: 508
+Connection: close
+X-Content-Type-Options: nosniff
+Cross-Origin-Resource-Policy: same-origin
+</code></pre>
+<p>Files with a content hash in the name are cached as immutable, and everything else is <code>no-cache</code>. The <code>.wasm</code> file answers with <code>Content-Type: application/wasm</code> and <code>Cache-Control: public, max-age=31536000, immutable</code>. The server sends no <code>Access-Control-*</code> header, even when the request carries an <code>Origin</code>, and no COOP or COEP header (Studio loads without cross-origin isolation).</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Request</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /</code> and <code>GET /index.html</code></td>
+<td>200</td>
+</tr>
+<tr>
+<td><code>GET /some/route</code> with <code>Accept: text/html</code></td>
+<td>200 (the <code>index.html</code> fallback, for navigation only)</td>
+</tr>
+<tr>
+<td><code>GET /missing.js</code></td>
+<td>404</td>
+</tr>
+<tr>
+<td><code>GET /etc/passwd</code></td>
+<td>404 (the path is looked up inside the directory)</td>
+</tr>
+<tr>
+<td><code>GET /../../etc/passwd</code> and <code>GET /%2e%2e/etc/passwd</code> (<code>curl --path-as-is</code>)</td>
+<td>400</td>
+</tr>
+<tr>
+<td><code>Host: evil.example</code></td>
+<td>403</td>
+</tr>
+<tr>
+<td><code>POST</code> with a body</td>
+<td>400</td>
+</tr>
+<tr>
+<td><code>PUT</code>, and <code>OPTIONS</code></td>
+<td>405 with <code>Allow: GET, HEAD</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The rest of the path rules are in <a href="#security">Security</a>.</p>
+<h3 id="http-and-https">HTTP and HTTPS</h3>
+<p>Browsers treat <code>http://localhost</code> and <code>http://127.0.0.1</code> as secure contexts, and Studio loads over both in Chromium, Firefox and WebKit (a headless Firefox without a GL context fails, which is Firefox, not <code>serve</code>). Plain HTTP is the default and needs no setup. The default port is 8080 for HTTP and 8443 for HTTPS. <code>--port 0</code> takes a free port and prints it, and a port outside 0 to 65535 gives <code>error: --port must be between 0 and 65535</code>.</p>
+<p>HTTPS needs a certificate that your browser trusts. Give <code>drift serve</code> a PEM pair:</p>
+<pre><code class="language-sh">drift serve --dir studio --cert leaf.pem --key leaf-key.pem --port 0
+</code></pre>
+<pre><code>drift serve 1.0.0: serving /path/to/studio
+https://localhost:57034/
+https://127.0.0.1:57034/
+https://[::1]:57034/
+</code></pre>
+<p><code>--tls</code> selects HTTPS and needs <code>--cert</code> and <code>--key</code> or <code>--mkcert</code>; <code>--cert</code> and <code>--key</code> imply it. The pair in these examples came from a scratch mkcert CA that was never installed in any trust store, so <code>curl</code> trusts it through <code>--cacert</code>:</p>
+<pre><code class="language-sh">curl -s --cacert ca.pem -o /dev/null -w '%{http_code} verify=%{ssl_verify_result}\n' https://localhost:57034/
+curl -s -o /dev/null -w '%{http_code}\n' https://localhost:57034/
+curl -s --cacert ca.pem --tls-max 1.1 -o /dev/null -w '%{http_code}\n' https://localhost:57034/
+curl -s -o /dev/null -w '%{http_code}\n' http://localhost:57034/
+curl -s --cacert ca.pem -H 'Host: evil.com' -o /dev/null -w '%{http_code}\n' https://localhost:57034/
+</code></pre>
+<pre><code>200 verify=0
+000
+000
+000
+403
+</code></pre>
+<p>The second line is <code>curl</code> without the CA (the certificate is untrusted), the third is a client limited to TLS 1.1 (TLS 1.2 is the minimum), and the fourth is plain HTTP to the TLS port. A <code>--key</code> file that other users can read prints <code>warning: leaf-key.pem is readable by other users; run: chmod 600 leaf-key.pem</code>. A missing file gives <code>error: cannot read nokey.pem</code>, exit 1.</p>
+<p>The JVM build parses a PKCS#8 key (<code>BEGIN PRIVATE KEY</code>). The macOS and Linux executables open the system OpenSSL at run time (nothing is linked or bundled): on macOS Homebrew's <code>openssl@3</code> at <code>/opt/homebrew/opt/openssl@3</code> or <code>/usr/local/opt/openssl@3</code> (the system LibreSSL is not used), and on Linux <code>libssl.so.3</code>, then <code>libssl.so.1.1</code>. Without a library, <code>--tls</code>, <code>--cert</code> and <code>--mkcert</code> fail before listening and exit 1; they never fall back to HTTP. The missing-library error was covered by a test with a stand-in, and was not run without OpenSSL.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Build</th>
+<th>HTTPS</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>JVM</td>
+<td>yes</td>
+<td>JDK <code>SSLServerSocket</code></td>
+</tr>
+<tr>
+<td>macOS and Linux executables</td>
+<td>yes, when OpenSSL 3 or 1.1 is installed</td>
+<td><code>libssl</code> opened at run time</td>
+</tr>
+<tr>
+<td>Windows executable</td>
+<td>no</td>
+<td>serve HTTP, or put a TLS proxy that you install in front</td>
+</tr>
+</tbody>
+</table></div>
+<p>On Windows, <code>--tls</code> and <code>--cert</code> print <code>this build cannot serve https: the Windows build has no TLS library</code> and exit 1. That message and the Windows HTTP serving come from a run under Wine, not from Windows.</p>
+<h3 id="mkcert">mkcert</h3>
+<p><code>--mkcert</code> gets the certificate from <a href="https://github.com/FiloSottile/mkcert">mkcert</a> instead of a pair you made. <code>drift serve</code> runs <code>mkcert -CAROOT</code> and continues only if that directory already holds a CA that the system trust store has accepted. It then writes a certificate for <code>localhost</code>, <code>127.0.0.1</code>, <code>::1</code> and every <code>--domain</code> into the drift configuration directory, with mode 0600 for the key and 0700 for the directories. It never runs <code>mkcert -install</code>, because that edits your system trust store. If mkcert is missing, has no CA, or reports its CA as not installed, <code>drift serve</code> says so, prints the commands to run and serves plain HTTP.</p>
+<pre><code class="language-sh">drift serve --dir studio --port 0 --quiet --mkcert
+</code></pre>
+<pre><code>warning: the mkcert local CA is not installed in the system trust store; serving plain http instead
+for https, run once (this edits your system trust store, so drift never runs it):
+  mkcert -install
+then start drift serve --mkcert again (mkcert: https://github.com/FiloSottile/mkcert)
+drift serve 1.0.0: serving /path/to/studio
+http://localhost:57067/
+http://127.0.0.1:57067/
+http://[::1]:57067/
+press Ctrl+C to stop
+</code></pre>
+<p>That ran with <code>CAROOT</code> pointing at a scratch CA, so mkcert reported that the CA was not installed. With no <code>mkcert</code> on <code>PATH</code> the first line is <code>warning: mkcert was not found on PATH; serving plain http instead</code>. The path where the CA is installed was not run on this machine, because it needs <code>mkcert -install</code>; a test with a stand-in mkcert covers it. mkcert 1.4.4 exits without writing a certificate when <code>JAVA_HOME</code> points at a JDK that has no <code>lib/security/cacerts</code> (Homebrew's OpenJDK), so on Unix <code>drift serve</code> starts mkcert through <code>env -u JAVA_HOME</code>.</p>
+<h3 id="local-names">Local Names</h3>
+<p><code>--domain</code> adds names that <code>drift serve</code> answers to, for example <code>--domain drift.studio --domain drift.local --domain '*.drift.local'</code>. It cannot make a name resolve, because that changes your system. It checks each name with <code>getaddrinfo</code>, says where it points, and prints the exact command for you to run:</p>
+<pre><code class="language-sh">drift serve --dir studio --port 0 --quiet --domain drift.studio --domain '*.drift.local'
+</code></pre>
+<pre><code>drift serve 1.0.0: serving /path/to/studio
+http://localhost:57064/
+http://127.0.0.1:57064/
+http://[::1]:57064/
+http://drift.studio:57064/ (resolves to 13.248.169.48, 76.223.54.146, which is not loopback)
+http://*.drift.local:57064/ (wildcard; a hosts file cannot hold wildcards)
+to make a name point here, run this yourself (drift never edits /etc/hosts):
+  echo '127.0.0.1 drift.studio' | sudo tee -a /etc/hosts
+for https on these names, run: mkcert -install, then
+  mkcert -cert-file drift.pem -key-file drift-key.pem localhost 127.0.0.1 ::1 drift.studio &quot;*.drift.local&quot;
+and start drift serve --cert drift.pem --key drift-key.pem
+press Ctrl+C to stop
+</code></pre>
+<p>The addresses are what <code>drift.studio</code> resolved to on the day of the run. <code>.studio</code> is a real top-level domain, so <code>drift.studio</code> points at public addresses until you add the hosts line, and the line hides the public site on that machine. On Windows the line goes into <code>C:\Windows\System32\drivers\etc\hosts</code> from an elevated PowerShell. With a certificate that covers the names, the same flags work over HTTPS (a <code>curl --resolve drift.studio:57034:127.0.0.1 --cacert ca.pem</code> request returned 200 with <code>verify=0</code>).</p>
+<p><code>--mdns</code> advertises the first <code>.local</code> name while the server runs, with <code>dns-sd -P</code> on macOS or <code>avahi-publish</code> on Linux, so <code>drift.local</code> resolves to 127.0.0.1 with no hosts edit. Other machines on the network see a record that points at 127.0.0.1, which is their own loopback, for as long as the server runs. <code>drift serve</code> stops the helper on exit. Windows is refused with exit 2. Without a <code>.local</code> name the command prints <code>error: --mdns needs a --domain that ends in .local</code> and exits 2. The advertisement itself was not rerun for this guide, because it publishes a record to the local network. A recorded run on macOS is the source: <code>dns-sd -G v4 drift.local</code> returned <code>127.0.0.1</code>, <code>curl http://drift.local:18769/</code> returned 200, and after Ctrl+C the helper was gone and the name stopped resolving.</p>
+<h3 id="security">Security</h3>
+<ul>
+<li>
+<p>It listens on <code>127.0.0.1</code> and <code>::1</code> and nothing else (<code>lsof</code> showed <code>127.0.0.1:56990</code> and <code>[::1]:56990</code>). <code>--unsafe-bind-all</code> listens on every interface, and any IP address in the Host header is accepted too:</p>
+<pre><code class="language-sh">drift serve --dir studio --port 0 --quiet --unsafe-bind-all
+</code></pre>
+<pre><code>drift serve 1.0.0: serving /path/to/studio
+http://localhost:57160/
+http://0.0.0.0:57160/
+http://[::]:57160/
+warning: listening on every network interface; anyone who can reach this machine can read this build. Only loopback names, IP addresses and --domain names get an answer.
+press Ctrl+C to stop
+</code></pre>
+</li>
+<li>
+<p>The Host header must be <code>localhost</code>, <code>127.0.0.1</code>, <code>[::1]</code> or a <code>--domain</code> name (ports are ignored). Anything else gets 403, which stops DNS rebinding.</p>
+</li>
+<li>
+<p>Only <code>GET</code> and <code>HEAD</code>. Other methods get 405 with <code>Allow: GET, HEAD</code>, and a request with a body gets 400.</p>
+</li>
+<li>
+<p>A path with <code>..</code>, a backslash, a colon, a control character, bad percent encoding or a trailing dot or space gets 400. Names that start with a dot get 404. Every path is resolved with symlinks followed and must stay inside the directory, so a symlink that leaves it gets 404. There is no directory listing.</p>
+</li>
+<li>
+<p>A page route that is not a file falls back to <code>index.html</code> only for a navigation: <code>Accept</code> includes <code>text/html</code>, <code>Sec-Fetch-Mode</code> is absent or <code>navigate</code>, and the last segment has no file extension.</p>
+</li>
+<li>
+<p>Responses carry no CORS headers, so another origin cannot read them, and carry <code>Cross-Origin-Resource-Policy: same-origin</code> and <code>X-Content-Type-Options: nosniff</code>.</p>
+</li>
+<li>
+<p>One request per connection. The request head is limited to 16 KiB (431), the request line to 8 KiB (414), headers to 64, the head to 10 seconds (408), an idle read to 5 seconds, and open connections to 128 (503). A 9000 character path returned 414 and a 20000 character header returned 431 here; the 408 and 503 paths come from the server's tests.</p>
+</li>
+<li>
+<p>Ctrl+C or SIGTERM stops accepting and waits up to 5 seconds for open requests. The native executables print <code>stopped</code> and exit 0 (run here with both signals). The JVM build also prints <code>stopped</code> and exits 130, the JVM's status for SIGINT; that is from a recorded <code>:cli:jvmRun</code> session.</p>
+</li>
+</ul>
+<p>Not covered: slow-loris variants beyond the head timeout, a symlink swapped after the path is resolved, and Windows alternate data streams beyond the refused colon.</p>
+<h3 id="options">Options</h3>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--dir PATH</code></td>
+<td>directory with the Studio web build</td>
+</tr>
+<tr>
+<td><code>--port N</code></td>
+<td>port; 0 picks a free one (default 8080, or 8443 with TLS)</td>
+</tr>
+<tr>
+<td><code>--tls</code></td>
+<td>serve HTTPS; needs <code>--cert</code> and <code>--key</code>, or <code>--mkcert</code></td>
+</tr>
+<tr>
+<td><code>--cert PEM</code>, <code>--key PEM</code></td>
+<td>certificate chain and private key</td>
+</tr>
+<tr>
+<td><code>--mkcert</code></td>
+<td>certificate from an existing mkcert CA; never installs it</td>
+</tr>
+<tr>
+<td><code>--domain NAME</code></td>
+<td>also answer to this name; repeatable; <code>*.name</code> allowed</td>
+</tr>
+<tr>
+<td><code>--mdns</code></td>
+<td>advertise the first <code>.local</code> name</td>
+</tr>
+<tr>
+<td><code>--open</code></td>
+<td>open the default browser</td>
+</tr>
+<tr>
+<td><code>--unsafe-bind-all</code></td>
+<td>listen on every interface</td>
+</tr>
+<tr>
+<td><code>--quiet</code></td>
+<td>no line per request</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>--open</code> was not run against a real browser for this guide; a test with a stand-in launcher covers it.</p>
+<p>Exit status is 0 after a normal stop. It is 1 when no build is found, a file cannot be read, a port is busy (<code>error: cannot listen on port 57111: Address already in use; pass --port 0 to take a free port</code>), or the build cannot serve TLS, and 2 for a bad combination of options (<code>error: --tls needs --cert and --key, or --mkcert</code>, <code>error: --cert and --key go together</code>, <code>--mdns</code> without a <code>.local</code> name).</p>
+<h3 id="serve-limits">Serve Limits</h3>
+<p>The server reads each file whole into memory for each request, so a few large concurrent downloads of the 8.6 MB WebAssembly file cost that much memory each. It does not support range requests or compression. The Windows executable has run under Wine and serves HTTP there; it has not been run on Windows. Safari was not tested; Chromium, Firefox and WebKit ran Studio through Playwright in a Linux container.</p>
+<h2 id="install-scripts">Install Scripts</h2>
+<p><code>install.sh</code> (POSIX <code>sh</code>) and <code>install.ps1</code> (PowerShell 5.1 and 7) download a release archive, verify its checksum, check that the executable runs and hand over to <code>drift install</code>. They live in the repository root. Both fail with <code>cannot download</code> until a release exists.</p>
+<pre><code class="language-sh">curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh | sh -s -- --dry-run
+</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--user</code>, <code>--global</code>, <code>--dir PATH</code>, <code>--no-modify-path</code>, <code>--dry-run</code></td>
+<td>passed to <code>drift install</code> unchanged</td>
+</tr>
+<tr>
+<td><code>-h</code>, <code>--help</code></td>
+<td>print the usage and exit 0</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DRIFT_VERSION</code></td>
+<td>version to install, for example <code>1.0.0</code>; a leading <code>v</code> is stripped. The default is the latest release, read from the redirect of <code>/releases/latest</code>. Required when <code>DRIFT_INSTALL_BASE_URL</code> is set</td>
+</tr>
+<tr>
+<td><code>DRIFT_INSTALL_BASE_URL</code></td>
+<td>where assets live, laid out as <code>BASE/v&lt;version&gt;/&lt;asset&gt;</code>; the default is <code>https://github.com/gmitch215/Drift/releases/download</code>. A <code>file://</code> URL works</td>
+</tr>
+<tr>
+<td><code>DRIFT_NO_MODIFY_PATH=1</code></td>
+<td>same as <code>--no-modify-path</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>What it does.</strong> <code>install.sh</code> maps <code>uname</code> to an asset name (<code>macos-arm64</code>, <code>linux-x64</code> or <code>linux-arm64</code>; Rosetta counts as arm64), downloads <code>drift-&lt;version&gt;-&lt;os&gt;-&lt;arch&gt;.tar.gz</code> and its <code>.sha256</code> file with <code>curl</code> or <code>wget</code>, and compares the 64-hex digest with <code>sha256sum</code> or <code>shasum -a 256</code>. It extracts into a temporary directory, runs <code>drift --version</code>, runs <code>drift install</code> with your flags, and removes the directory on exit and on signals. It refuses a musl Linux (<code>ldd --version</code> or <code>/lib/ld-musl-*</code>), because the Linux executable is built for glibc. macOS on Intel has no asset. <code>install.ps1</code> takes <code>-User</code>, <code>-Global</code>, <code>-Dir</code>, <code>-NoModifyPath</code>, <code>-DryRun</code> and <code>-Help</code>, downloads <code>drift-&lt;version&gt;-windows-x64.zip</code>, checks it with <code>Get-FileHash</code>, and extracts it with <code>Expand-Archive</code>.</p>
+<p><strong>An example that ran.</strong> No release exists, so the example builds a release directory from the local executable with the layout the script expects and points the script at it:</p>
+<pre><code class="language-sh">mkdir -p release/v1.0.0 stage
+cp &quot;$(command -v drift)&quot; stage/drift
+cp LICENSE stage/
+tar -czf release/v1.0.0/drift-1.0.0-macos-arm64.tar.gz -C stage drift LICENSE
+(cd release/v1.0.0 &amp;&amp; shasum -a 256 drift-1.0.0-macos-arm64.tar.gz &gt; drift-1.0.0-macos-arm64.tar.gz.sha256)
+DRIFT_INSTALL_BASE_URL=file://$PWD/release DRIFT_VERSION=1.0.0 sh install.sh --dry-run --no-modify-path
+</code></pre>
+<pre><code>drift-install: downloading drift-1.0.0-macos-arm64.tar.gz
+drift-install: sha256 verified
+dry run: nothing is changed
+scope: user
+create directory /home/you/.local
+create directory /home/you/.local/bin
+write /home/you/.local/bin/drift (mode 0755, 6742776 bytes)
+create directory /home/you/.config
+create directory /home/you/.config/drift
+PATH is not modified
+write receipt /home/you/.config/drift/install-receipt.json
+</code></pre>
+<p>The first two lines go to standard error. Corrupt the archive and the script stops before it installs anything:</p>
+<pre><code class="language-sh">cp -R release release-bad
+echo x &gt;&gt; release-bad/v1.0.0/drift-1.0.0-macos-arm64.tar.gz
+DRIFT_INSTALL_BASE_URL=file://$PWD/release-bad DRIFT_VERSION=1.0.0 sh install.sh
+</code></pre>
+<pre><code>drift-install: downloading drift-1.0.0-macos-arm64.tar.gz
+drift-install: error: checksum mismatch for drift-1.0.0-macos-arm64.tar.gz (expected 97c66ddafc23715fce5e0d79f9f875f9a0976d2d955f87ec0dddcbdbeb4c1c57, got 6f4b578c65ee4a77a8f24db1d5a31a212a2c807f15a0e144a2daf2328c9675f1); nothing was installed
+</code></pre>
+<p>Exit codes: 0 on success; 1 for an unsupported OS or architecture, musl, a missing downloader or hash tool, a download failure, a checksum mismatch, a bad sidecar, an executable that does not run, or a failure of <code>drift install</code> (its exit code passes through); 2 for an unknown option, <code>--user</code> with <code>--global</code>, or <code>--dir</code> without a value.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Message</th>
+<th>Exit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>archive does not match its digest</td>
+<td><code>drift-install: error: checksum mismatch for &lt;asset&gt; (expected ..., got ...); nothing was installed</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td>asset missing</td>
+<td><code>drift-install: error: cannot download file:///.../drift-1.0.0-macos-arm64.tar.gz</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td>base URL without a version</td>
+<td><code>drift-install: error: set DRIFT_VERSION when DRIFT_INSTALL_BASE_URL is set</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>--bogus</code></td>
+<td><code>drift-install: error: unknown option: --bogus</code></td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>--dir</code> without a value</td>
+<td><code>drift-install: error: --dir needs a value</code></td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>--user --global</code></td>
+<td><code>drift-install: error: --user and --global cannot be combined</code></td>
+<td>2</td>
+</tr>
+</tbody>
+</table></div>
+<p>What ran and what did not: the macOS runs above were run for this guide. The Debian 12 (non-root and root), Alpine (musl refused, exit 1: <code>the Linux executable is built for glibc and this system uses musl; no asset is available</code>) and <code>wget</code>-only runs come from the installer's recorded test log, and so does <code>install.ps1</code>: it parsed and passed PSScriptAnalyzer under PowerShell 7.4 on Linux, and a mocked run passed 16 of 16 checks. <code>install.ps1</code> has not run on Windows or under Windows PowerShell 5.1, the real <code>github.com</code> download and the <code>/releases/latest</code> lookup have not run, and the Linux arm64 and Rosetta branches have not run.</p>
+<h2 id="release-assets">Release Assets</h2>
+<p>The release workflow publishes these names. Nothing has been published yet, so they come from the workflow and from the packaging run that built them locally.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Asset</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>drift-1.0.0-macos-arm64.tar.gz</code>, <code>drift-1.0.0-linux-x64.tar.gz</code>, <code>drift-1.0.0-linux-arm64.tar.gz</code>, <code>drift-1.0.0-windows-x64.zip</code></td>
+<td>the CLI: <code>drift</code> (<code>drift.exe</code>), <code>LICENSE</code>, <code>README.txt</code></td>
+</tr>
+<tr>
+<td><code>drift-1.0.0-macos-arm64.dmg</code>, <code>drift-1.0.0-macos-arm64.pkg</code></td>
+<td>Studio for macOS (unsigned)</td>
+</tr>
+<tr>
+<td><code>drift-1.0.0-windows-x64.msi</code>, <code>drift-1.0.0-windows-x64.exe</code></td>
+<td>Studio for Windows (configured, never built)</td>
+</tr>
+<tr>
+<td><code>drift-1.0.0-linux-x64.deb</code>, <code>drift-1.0.0-linux-x64.rpm</code>, <code>drift-1.0.0-linux-x64.AppImage</code></td>
+<td>Studio for Linux</td>
+</tr>
+<tr>
+<td><code>drift-1.0.0-android.apk</code></td>
+<td>Studio for Android, debug-signed</td>
+</tr>
+<tr>
+<td><code>&lt;asset&gt;.sha256</code></td>
+<td>the digest of one asset, in <code>sha256sum</code> format</td>
+</tr>
+<tr>
+<td><code>SHA256SUMS</code></td>
+<td>every asset, sorted by name</td>
+</tr>
+</tbody>
+</table></div>
+<p>Verify a download with the sidecar for one file or <code>SHA256SUMS</code> for all of them. <code>--ignore-missing</code> skips the assets you did not download; without it a listed file that is absent counts as a failure:</p>
+<pre><code class="language-sh">shasum -a 256 -c drift-1.0.0-macos-arm64.tar.gz.sha256
+shasum -a 256 -c SHA256SUMS
+shasum -a 256 -c --ignore-missing SHA256SUMS
+</code></pre>
+<pre><code>drift-1.0.0-macos-arm64.tar.gz: OK
+drift-1.0.0-macos-arm64.tar.gz: OK
+shasum: drift-1.0.0-linux-x64.tar.gz: No such file or directory
+drift-1.0.0-linux-x64.tar.gz: FAILED open or read
+shasum: WARNING: 1 listed file could not be read
+drift-1.0.0-macos-arm64.tar.gz: OK
+</code></pre>
+<p>The commands exit 0, 1 and 0. The second ran with a <code>SHA256SUMS</code> that lists one more asset than the directory holds. On Linux use <code>sha256sum -c</code>, and in PowerShell compare <code>(Get-FileHash &lt;file&gt;).Hash</code> with the sidecar (not run here). The Studio installers and the CLI archives are unsigned. Studio's <code>.deb</code> and <code>.rpm</code> are desktop packages: jpackage's install script needs the desktop directories (<code>/usr/share/applications</code>, <code>/usr/share/mime/packages</code>, <code>/etc/xdg/menus</code>), and <code>dpkg -i</code> or <code>dnf install</code> fails in a bare container without them.</p>
+<h2 id="scripting-patterns">Scripting Patterns</h2>
+<p><strong>Gate a step on <code>verify</code>.</strong> <code>verify</code> exits 1 when any check fails and prints the report either way, so a script can stop on the exit code and read the JSON for the reason. <code>solve</code> and <code>ingest</code> encode their verdict in the exit code only with <code>--exit-status</code>, and <code>diagnose</code> never does (it prints a ranking, not a verdict); otherwise read their output.</p>
+<pre><code class="language-sh">set -eu
+drift verify fixtures/lab/cases/limits-nofile-1.driftcase --json &gt; verify.json
+jq -r '.ok, .verdict' verify.json | cut -c1-80
+drift verify bt.driftcase --json &gt; bad.json 2&gt;/dev/null || echo &quot;verify failed: $(jq -r .firstFailure bad.json)&quot;
+</code></pre>
+<pre><code>true
+STUCK: the failure does not reproduce in the container built from the failing ca
+verify failed: manifest
+</code></pre>
+<p><code>bt.driftcase</code> is the edited archive from <a href="#pack-report-and-verify">Verify</a>.</p>
+<p><strong>Pipe the JSON, parse with <code>jq</code>.</strong> <code>capture</code> and <code>diagnose</code> print one line of canonical JSON.</p>
+<pre><code class="language-sh">drift diagnose $G $R | jq -r '.relevant[] | .path' | head -3
+</code></pre>
+<pre><code>tool.node.version
+ci.provisioner.build-date
+ci.provisioner.version
+</code></pre>
+<p><strong>Determinism and hashing.</strong> These outputs are functions of their inputs, so a hash identifies them. Over the same two capsules <code>diagnose</code> printed the same bytes on every run here (<code>717191f2...de52</code>), <code>reproduce</code> wrote identical files, <code>pack</code> identical archives and <code>atlas build</code> an identical dataset.</p>
+<pre><code class="language-sh">drift diagnose $G $R | shasum -a 256
+drift diagnose $G $R | shasum -a 256
+</code></pre>
+<pre><code>717191f28a8d593ecf8a5fcedee04b4471187cddfe29718dbd2e38e6676de52e  -
+717191f28a8d593ecf8a5fcedee04b4471187cddfe29718dbd2e38e6676de52e  -
+</code></pre>
+<p>The test suite pins these outputs for fixtures on the JVM, macOS Native and Wasm targets (see <a href="technical-report.html">TECHNICAL_REPORT.md</a>, &quot;Reproducing the Numbers&quot;). A capsule from <code>capture</code> is the exception: it describes the machine, so two machines give two hashes.</p>
+<p><strong>CI.</strong> Capture in a failing job and in a passing job, keep both files as artifacts, then diagnose anywhere:</p>
+<pre><code class="language-sh">drift capture --label ci-job-1 --tools &gt; capsule-1.json
+</code></pre>
+<p>Set <code>DRIFT_RUNNER_LABEL</code> in the job to record the runner. Do not use <code>--keep-identifiers</code> in CI: logs and artifacts are readable by more people than a local shell. To put the executable on a runner, run <code>install.sh</code> with <code>--dir</code> and <code>--no-modify-path</code> and add that directory to the job's path (see <a href="#install-scripts">Install Scripts</a>; not run in a CI job, since no release exists).</p>
+<h2 id="exit-codes">Exit Codes</h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>the command ran, including <code>diagnose</code> with no cause found, <code>solve</code> or <code>ingest</code> with any verdict (<code>STUCK</code> included) unless <code>--exit-status</code> is given, <code>drift</code> or <code>drift case</code> alone (they print help), <code>install</code> and <code>uninstall</code> (also with <code>--dry-run</code>), <code>uninstall</code> with no receipt, and <code>serve</code> after Ctrl+C or SIGTERM on a native build</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>solve --exit-status</code> or <code>ingest --exit-status</code> ended <code>CONFIRMED EFFECT (bundle)</code></td>
+</tr>
+<tr>
+<td>11</td>
+<td>the same, ended <code>NARROWED</code></td>
+</tr>
+<tr>
+<td>12</td>
+<td>the same, ended <code>STUCK</code></td>
+</tr>
+<tr>
+<td>1</td>
+<td>usage error from the parser: unknown command or flag, missing argument or option, bad <code>--detail</code> value, <code>--json</code> with <code>--detail</code></td>
+</tr>
+<tr>
+<td>1</td>
+<td>unreadable or malformed input: missing file, malformed capsule JSON, unsupported capsule schema, missing case, missing archive, a corrupt install receipt</td>
+</tr>
+<tr>
+<td>1</td>
+<td><code>case show</code> or <code>next</code> on a case that fails its integrity check</td>
+</tr>
+<tr>
+<td>1</td>
+<td><code>verify</code> when any check fails (the report is still printed on standard output)</td>
+</tr>
+<tr>
+<td>1</td>
+<td>a refusal: <code>ingest</code> with any bad result, <code>pack</code> on an unsolved case, <code>diagnose --case</code> or <code>solve --case</code> into an existing case, a bad <code>--budget</code> or <code>--fail-when</code>, <code>install</code> into a directory that is not writable or while another install exists</td>
+</tr>
+<tr>
+<td>1</td>
+<td><code>serve</code> with no build to serve, an unreadable file, a busy port or a build without TLS; <code>install.sh</code> for any failed step</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>install</code> with <code>--user</code> and <code>--global</code>, a relative <code>--dir</code>, or from the JVM build; <code>serve</code> with a bad combination of options (<code>--tls</code> without a certificate, <code>--cert</code> without <code>--key</code>, <code>--mdns</code> without a <code>.local</code> name); <code>install.sh</code> for an unknown option, <code>--user</code> with <code>--global</code>, or <code>--dir</code> without a value</td>
+</tr>
+<tr>
+<td>130</td>
+<td><code>serve</code> on the JVM build after Ctrl+C (the JVM's status for SIGINT)</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>--exit-status</code> gives <code>CONFIRMED</code> 0. Codes 10 to 12 are used only for verdicts. The parser's own errors exit 1 in this CLI, as they do for every command; the usage errors that the install and serve commands detect themselves exit 2. Every row except 130 and the Windows, musl and missing-OpenSSL cases was run on the macOS executable. The 130 row is from a recorded JVM run.</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Message</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>invalid capsule file broken.json: expected key at 2</code></td>
+<td>the capsule file is not valid JSON (here a lone <code>{</code>)</td>
+</tr>
+<tr>
+<td><code>unsupported capsule schema 2</code></td>
+<td>the capsule's <code>schema</code> is not 1</td>
+</tr>
+<tr>
+<td><code>cannot read capsule file: missing.json</code></td>
+<td>no such file</td>
+</tr>
+<tr>
+<td><code>Error: missing argument &lt;red&gt;</code></td>
+<td><code>diagnose</code> and <code>solve</code> take two capsules, green first</td>
+</tr>
+<tr>
+<td><code>Error: missing option --out</code></td>
+<td><code>reproduce</code> requires both <code>--run</code> and <code>--out</code>; <code>--help</code> marks them <code>(required)</code></td>
+</tr>
+<tr>
+<td><code>case directory already holds a case: case</code></td>
+<td><code>diagnose --case</code> and <code>solve --case</code> never overwrite; pick a new directory</td>
+</tr>
+<tr>
+<td><code>case bad failed its checks: ...</code></td>
+<td>a file differs from the manifest or the chain is broken; the message names the file</td>
+</tr>
+<tr>
+<td><code>cannot read case nonexistent: missing case file: manifest.json</code></td>
+<td>the path is not a case directory</td>
+</tr>
+<tr>
+<td><code>--env NOPE does not name an env.* attribute of the capsule</code></td>
+<td><code>--env</code> takes a name that the capsule holds</td>
+</tr>
+<tr>
+<td><code>nothing was ingested:</code> plus a reason</td>
+<td>see the table under <a href="#ingest">Ingest</a>; the case was not changed</td>
+</tr>
+<tr>
+<td><code>cannot pack case: not a solved case: no certificate.json</code></td>
+<td><code>pack</code> takes a case written by <code>solve</code></td>
+</tr>
+<tr>
+<td><code>verify: failed at tar: archive is truncated: no end-of-archive marker</code></td>
+<td>the file is not a <code>.driftcase</code></td>
+</tr>
+<tr>
+<td><code>case is a case directory; expected a .driftcase archive; pack the case first (drift pack case --out file.driftcase)</code></td>
+<td><code>verify</code> and <code>report</code> read an archive; pack the case directory first</td>
+</tr>
+<tr>
+<td><code>verify: failed at manifest: results/0001.json was changed</code></td>
+<td>the archive was edited after <code>pack</code>; later checks list what else disagrees</td>
+</tr>
+<tr>
+<td><code>no probe nope in the dataset</code></td>
+<td>the id is not one of the 38 probes; <code>atlas show DATASET</code> lists them</td>
+</tr>
+<tr>
+<td><code>--target may only use letters, digits, '.', '_' and '-'</code></td>
+<td>the label becomes a file name</td>
+</tr>
+<tr>
+<td><code>error: --user and --global cannot be combined</code></td>
+<td><code>install</code> takes one scope</td>
+</tr>
+<tr>
+<td><code>error: --dir must be an absolute path: relative/bin</code></td>
+<td><code>install --dir</code> needs an absolute path</td>
+</tr>
+<tr>
+<td><code>error: drift is already installed in /a (user); run drift uninstall first</code></td>
+<td>one receipt, one install; uninstall before moving it</td>
+</tr>
+<tr>
+<td><code>error: cannot read the install receipt at &lt;path&gt; (expected key at 1); nothing changed</code></td>
+<td>the receipt is not valid JSON; fix or delete it by hand</td>
+</tr>
+<tr>
+<td><code>error: cannot write to /ro</code></td>
+<td>the directory or its nearest parent is not writable; pick another <code>--dir</code>, or run it as an elevated user for <code>--global</code></td>
+</tr>
+<tr>
+<td><code>error: the JVM distribution cannot install itself; install the native executable</code></td>
+<td><code>install</code> needs a native build</td>
+</tr>
+<tr>
+<td><code>no install receipt at &lt;path&gt;; nothing removed</code></td>
+<td><code>uninstall</code> found nothing to undo (exit 0)</td>
+</tr>
+<tr>
+<td><code>error: no Studio web build found; pass --dir &lt;dist&gt; (build one with ./gradlew :studio:wasmJsBrowserDistribution)</code></td>
+<td><code>serve</code> found no <code>index.html</code>; the next lines list where it looked</td>
+</tr>
+<tr>
+<td><code>error: cannot listen on port 57111: Address already in use; pass --port 0 to take a free port</code></td>
+<td>the port is taken</td>
+</tr>
+<tr>
+<td><code>error: --tls needs --cert and --key, or --mkcert</code></td>
+<td><code>--tls</code> has no certificate source</td>
+</tr>
+<tr>
+<td><code>error: --cert and --key go together</code></td>
+<td>give both files</td>
+</tr>
+<tr>
+<td><code>warning: mkcert was not found on PATH; serving plain http instead</code></td>
+<td><code>--mkcert</code> without mkcert; the commands to run follow</td>
+</tr>
+<tr>
+<td><code>warning: the mkcert local CA is not installed in the system trust store; serving plain http instead</code></td>
+<td>run <code>mkcert -install</code> yourself, then <code>--mkcert</code> again</td>
+</tr>
+<tr>
+<td><code>warning: leaf-key.pem is readable by other users; run: chmod 600 leaf-key.pem</code></td>
+<td>the key file has loose permissions</td>
+</tr>
+<tr>
+<td><code>403</code> from <code>serve</code></td>
+<td>the Host header is not <code>localhost</code>, <code>127.0.0.1</code>, <code>[::1]</code> or a <code>--domain</code> name</td>
+</tr>
+<tr>
+<td><code>drift-install: error: checksum mismatch for &lt;asset&gt; ...; nothing was installed</code></td>
+<td>the download is corrupt or changed; fetch it again</td>
+</tr>
+<tr>
+<td><code>drift-install: error: cannot download &lt;url&gt;</code></td>
+<td>no such asset; no release has been published yet, or the base URL or version is wrong</td>
+</tr>
+<tr>
+<td><code>drift-install: error: set DRIFT_VERSION when DRIFT_INSTALL_BASE_URL is set</code></td>
+<td>a custom base needs an explicit version</td>
+</tr>
+<tr>
+<td><code>the Linux executable is built for glibc and this system uses musl; no asset is available</code></td>
+<td><code>install.sh</code> on Alpine and other musl systems (from the installer's Alpine run)</td>
+</tr>
+</tbody>
+</table></div>
+<p>When a <code>solve</code> trial cannot start, the certificate records an infrastructure problem (a failed <code>docker build</code>, a <code>docker run</code> error, a timeout) and the loop retries once before it ends <code>STUCK</code> with reason <code>executor</code>. Check <code>docker info</code> first, and run <code>./repro/run.sh</code> from a <code>reproduce</code> of the same capsule to see the failure by hand.</p>
+<h2 id="limits">Limits</h2>
+<ul>
+<li>A container mirrors a part of a machine. Never mirrored: the kernel (<code>kernel.*</code>), the CPU (<code>cpu.*</code>, <code>hw.*</code>), the CI provider's image and provisioner (<code>ci.*</code>), dependencies installed by the test command (<code>deps.*</code>) and the properties of the capturing binary. <code>reproduce</code> lists every unmirrored attribute and its reason, and the certificate carries the list. A <code>solve</code> verdict is about containers built from the capsules, not about the original host.</li>
+<li>The ranking uses hand-set weights (<code>hand-set-1</code>, <code>weights.calibrated: false</code> in <code>diagnose</code> output). A score orders candidates; it is not a probability. On the dev benchmark the <code>plausible</code> tier (a probe differs in the candidate's dimension) was unreliable: 10 of its 19 candidates were wrong, and probes helped no scenario. The numbers and their intervals are in <a href="technical-report.html">TECHNICAL_REPORT.md</a> under &quot;Evaluation and Limits&quot;.</li>
+<li><code>ingest</code> can narrow a case or rule a hypothesis out. It never confirms a cause.</li>
+<li><code>solve</code> runs on local Docker only. It does not use a remote host, a CI service or a cluster, and a failure that needs a different kernel, CPU model or CI-owned image cannot be varied by it (the run ends <code>STUCK</code> with reason <code>uncontrollable</code>).</li>
+<li><code>solve</code> assumes a single cause: the first supported experiment ends the loop.</li>
+<li><code>verify</code> checks that an archive agrees with itself. It does not re-run experiments, so it cannot tell a faithful archive from a forged one that was rewritten consistently.</li>
+<li><code>next</code> after <code>ingest</code> skips the experiments that have results but does not re-plan; the order of the rest comes from the plan made before the results (see <a href="#ingest">Ingest</a>).</li>
+<li>The Atlas columns are single runs on the hardware named in <a href="https://github.com/gmitch215/Drift/blob/master/atlas/columns.yml"><code>atlas/columns.yml</code></a>. A column recorded on other hardware can differ, and <code>atlas compare</code> against a column from another machine reports a difference without saying whether hardware caused it. A Linux executable linked on Ubuntu prints different last digits for three lines of <code>kotlin.math.transcendental-bits</code> than one linked on macOS, so the <code>linux</code> columns come from the macOS-linked build and a CI recording can differ. The <code>wasm</code> column on Node comes from a test harness, because the Wasm CLI has no file writer, and the <code>mingw</code> and <code>jvm-windows</code> columns are not recorded yet. The classification rests on the pages its authors read, and 16 of the 38 probes are <code>unclassified</code>. Generated repro text needs a person's review before it goes into an issue.</li>
+<li><code>install</code> and <code>uninstall</code> were run on macOS only. The Linux behavior comes from the installer's Debian run, and the Windows registry and <code>drift.old</code> behavior from a run under Wine. A real Windows machine has not run <code>drift install</code>, and package-manager awareness is absent: it does not refuse to run inside a Homebrew or Chocolatey tree.</li>
+<li><code>serve</code> is a development server for a local Studio build. It binds to loopback, has no range requests, compression or directory listing, reads each file whole, and has no TLS on Windows. The embedded-asset option (a CLI that carries Studio inside it) is not built.</li>
+<li>No release has been published. The asset names, the <code>brew</code> and <code>choco</code> commands and the install scripts' default download URL are what the workflows and templates say, and they have not been exercised against GitHub.</li>
+</ul></div>
+		</main>
+		<footer>
+			<a href="https://github.com/gmitch215/Drift">github.com/gmitch215/Drift</a> &middot;
+			<a href="https://github.com/gmitch215/Drift/blob/master/LICENSE">MIT License</a>
+		</footer>
+	</body>
+</html>
