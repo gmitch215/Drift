@@ -1,0 +1,1800 @@
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0329087Z Current runner version: '2.337.0'
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0353436Z ##[group]Runner Image Provisioner
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0354379Z Hosted Compute Agent
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0354986Z Version: 20260901.588
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0356075Z Commit: <hex>
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0356880Z Build Date: 2026-09-01T19:56:44Z
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0357586Z Worker ID: {<uuid>}
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0358427Z Azure Region: eastus2
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0359011Z ##[endgroup]
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0360566Z ##[group]Operating System
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0361279Z Ubuntu
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0361810Z 24.04.5
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0362379Z LTS
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0362891Z ##[endgroup]
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0363424Z ##[group]Runner Image
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0364118Z Image: ubuntu-24.04
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0364689Z Version: 20260927.320.1
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0366245Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0367822Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0368921Z ##[endgroup]
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0370141Z ##[group]GITHUB_TOKEN Permissions
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0372339Z Contents: read
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0372942Z Metadata: read
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0373607Z PullRequests: read
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0374186Z ##[endgroup]
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0376549Z Secret source: Actions
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0377621Z Cache mode: write
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0379927Z Prepare workflow directory
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0717979Z Prepare all required actions
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.0765674Z Getting action download info
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.3256438Z Download action repository 'actions/checkout@v7' (SHA:<hex>)
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.4317084Z Download action repository 'dorny/paths-filter@v4' (SHA:<hex>)
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.7011012Z Complete job name: What the Diff Touches
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.7750359Z ##[group]Run actions/checkout@v7
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.7751256Z with:
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.7751672Z   fetch-depth: 0
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.7752138Z   repository: <org>/drangler
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.7756401Z   token: ***
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.7756836Z   ssh-strict: true
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.7757263Z   ssh-user: git
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.7757697Z   persist-credentials: true
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.7758179Z   clean: true
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.7758621Z   sparse-checkout-cone-mode: true
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.7759136Z   fetch-tags: false
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.7759579Z   show-progress: true
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.7760018Z   lfs: false
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.7760424Z   submodules: false
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.7760873Z   set-safe-directory: true
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.7761372Z   allow-unsafe-pr-checkout: false
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.7762190Z ##[endgroup]
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.8772849Z Syncing repository: <org>/drangler
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.8775559Z ##[group]Getting Git version info
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.8776798Z Working directory is '/home/runner/work/drangler/drangler'
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.8778489Z [command]/usr/bin/git version
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.8843874Z git version 2.55.0
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.8900071Z ##[endgroup]
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.8910500Z Temporarily overriding HOME='/home/runner/work/_temp/<uuid>' before making global git config changes
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.8913048Z Adding repository directory to the temporary git global config as a safe directory
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.8917672Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/drangler/drangler
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.8970107Z Deleting the contents of '/home/runner/work/drangler/drangler'
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.8973584Z ##[group]Determining repository object format
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.8974994Z ##[endgroup]
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.8976372Z ##[group]Initializing the repository
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.8979867Z [command]/usr/bin/git init /home/runner/work/drangler/drangler
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9092996Z hint: Using 'master' as the name for the initial branch. This default branch name
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9094570Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9096798Z hint: to use in all of your new repositories, which will suppress this warning,
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9098081Z hint: call:
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9098818Z hint:
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9099761Z hint: 	git config --global init.defaultBranch <name>
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9100801Z hint:
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9101585Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9103104Z hint: 'development'. The just-created branch can be renamed via this command:
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9103966Z hint:
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9104400Z hint: 	git branch -m <name>
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9104898Z hint:
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9105972Z hint: Disable this message with "git config set advice.defaultBranchName false"
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9107700Z Initialized empty Git repository in /home/runner/work/drangler/drangler/.git/
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9111105Z [command]/usr/bin/git remote add origin https://github.com/<org>/drangler
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9176015Z ##[endgroup]
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9177293Z ##[group]Disabling automatic garbage collection
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9180508Z [command]/usr/bin/git config --local gc.auto 0
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9214456Z ##[endgroup]
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9215870Z ##[group]Setting up auth
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9216755Z Removing SSH command configuration
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9221219Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9257106Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9676742Z Removing HTTP extra header
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9683259Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9719801Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9936106Z Removing includeIf entries pointing to credentials config files
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9940622Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:28:59.9977298Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.0234975Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-<uuid>.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.0276456Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/drangler/drangler/.git.path /home/runner/work/_temp/git-credentials-<uuid>.config
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.0312128Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-<uuid>.config
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.0356640Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-<uuid>.config
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.0397750Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-<uuid>.config
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.0432691Z ##[endgroup]
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.0433431Z ##[group]Fetching the repository
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.0441943Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7184294Z From https://github.com/<org>/drangler
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7185694Z  * [new branch]      gh-pages                -> origin/gh-pages
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7186564Z  * [new branch]      master                  -> origin/master
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7188209Z  * [new branch]      renovate/all-minor-patch -> origin/renovate/all-minor-patch
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7189248Z  * [new branch]      renovate/drupal         -> origin/renovate/drupal
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7190333Z  * [new branch]      renovate/major-vitest-monorepo -> origin/renovate/major-vitest-monorepo
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7191398Z  * [new branch]      renovate/typescript-7.x -> origin/renovate/typescript-7.x
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7192255Z  * [new tag]         v0.1.0                  -> v0.1.0
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7192898Z  * [new tag]         v0.2.0                  -> v0.2.0
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7197141Z [command]/usr/bin/git branch --list --remote origin/master
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7231000Z   origin/master
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7244021Z [command]/usr/bin/git rev-parse refs/remotes/origin/master
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7271352Z 558d2a621094d66464196822f8b7d17006930f13
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7276933Z ##[endgroup]
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7278433Z ##[group]Determining the checkout info
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7280054Z ##[endgroup]
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7282995Z [command]/usr/bin/git sparse-checkout disable
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7341578Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7379633Z ##[group]Checking out the ref
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7384125Z [command]/usr/bin/git checkout --progress --force -B master refs/remotes/origin/master
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7579134Z Reset branch 'master'
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7585676Z branch 'master' set up to track 'origin/master'.
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7594068Z ##[endgroup]
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7641067Z [command]/usr/bin/git log -1 --format=%H
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.7670525Z 558d2a621094d66464196822f8b7d17006930f13
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.8137141Z Post job cleanup.
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.8952272Z [command]/usr/bin/git version
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.8996057Z git version 2.55.0
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9044622Z Temporarily overriding HOME='/home/runner/work/_temp/<uuid>' before making global git config changes
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9050831Z Adding repository directory to the temporary git global config as a safe directory
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9055618Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/drangler/drangler
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9085568Z Removing SSH command configuration
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9092180Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9133984Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9388149Z Removing HTTP extra header
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9394244Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9431400Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9689075Z Removing includeIf entries pointing to credentials config files
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9696682Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9729384Z includeif.gitdir:/home/runner/work/drangler/drangler/.git.path
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9733813Z includeif.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9737308Z includeif.gitdir:/github/workspace/.git.path
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9740042Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9747125Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/drangler/drangler/.git.path
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9767713Z /home/runner/work/_temp/git-credentials-<uuid>.config
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9779392Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/drangler/drangler/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-<uuid>\.config
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9818291Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9845469Z /home/runner/work/_temp/git-credentials-<uuid>.config
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9855773Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-<uuid>\.config
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9897490Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9927809Z /github/runner_temp/git-credentials-<uuid>.config
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9942942Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-<uuid>\.config
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:00.9983767Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:01.0014352Z /github/runner_temp/git-credentials-<uuid>.config
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:01.0024720Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-<uuid>\.config
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:01.0060914Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:01.0284603Z Removing credentials config '/home/runner/work/_temp/git-credentials-<uuid>.config'
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:01.0513176Z Evaluate and set job outputs
+What the Diff Touches	UNKNOWN STEP	2026-09-30T10:29:01.0523272Z Cleaning up orphan processes
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0547469Z Current runner version: '2.337.0'
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0565296Z ##[group]Runner Image Provisioner
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0565893Z Hosted Compute Agent
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0566270Z Version: 20260828.587
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0566794Z Commit: <hex>
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0567279Z Build Date: 2026-08-28T16:44:25Z
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0567808Z Worker ID: {<uuid>}
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0568403Z Azure Region: centralus
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0568793Z ##[endgroup]
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0569737Z ##[group]Operating System
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0570149Z Ubuntu
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0570494Z 24.04.5
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0570868Z LTS
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0571212Z ##[endgroup]
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0571582Z ##[group]Runner Image
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0571976Z Image: ubuntu-24.04
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0572438Z Version: 20260920.314.1
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0573402Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260920.314/images/ubuntu/Ubuntu2404-Readme.md
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0574551Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260920.314
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0575192Z ##[endgroup]
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0575972Z ##[group]GITHUB_TOKEN Permissions
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0577512Z Contents: read
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0577900Z Metadata: read
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0578281Z ##[endgroup]
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0579675Z Secret source: Actions
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0580307Z Cache mode: write
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0580800Z Prepare workflow directory
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0841013Z Prepare all required actions
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.0891422Z Getting action download info
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.3493468Z Download action repository 'actions/checkout@v7' (SHA:<hex>)
+Live Clone	UNKNOWN STEP	2026-09-30T10:28:59.5734432Z Download action repository 'oven-sh/setup-bun@v2' (SHA:<hex>)
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.0905490Z Complete job name: Live Clone
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1723784Z ##[group]Run actions/checkout@v7
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1724548Z with:
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1724941Z   repository: <org>/drangler
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1727778Z   token: ***
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1728155Z   ssh-strict: true
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1728512Z   ssh-user: git
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1728886Z   persist-credentials: true
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1729304Z   clean: true
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1729668Z   sparse-checkout-cone-mode: true
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1730096Z   fetch-depth: 1
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1730442Z   fetch-tags: false
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1730821Z   show-progress: true
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1731175Z   lfs: false
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1731506Z   submodules: false
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1732071Z   set-safe-directory: true
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1732465Z   allow-unsafe-pr-checkout: false
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1732963Z env:
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1733537Z   REQUIRE_CLONE: 1
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.1733879Z ##[endgroup]
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.2488451Z Syncing repository: <org>/drangler
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.2490158Z ##[group]Getting Git version info
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.2490789Z Working directory is '/home/runner/work/drangler/drangler'
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.2491563Z [command]/usr/bin/git version
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.2576746Z git version 2.55.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.2585783Z ##[endgroup]
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.2610542Z Temporarily overriding HOME='/home/runner/work/_temp/<uuid>' before making global git config changes
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.2612223Z Adding repository directory to the temporary git global config as a safe directory
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.2615641Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/drangler/drangler
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.3413543Z Deleting the contents of '/home/runner/work/drangler/drangler'
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.3417250Z ##[group]Determining repository object format
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.3419197Z ##[endgroup]
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.3419902Z ##[group]Initializing the repository
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.3422200Z [command]/usr/bin/git init /home/runner/work/drangler/drangler
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4020347Z hint: Using 'master' as the name for the initial branch. This default branch name
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4021771Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4022620Z hint: to use in all of your new repositories, which will suppress this warning,
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4023549Z hint: call:
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4023989Z hint:
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4024498Z hint: 	git config --global init.defaultBranch <name>
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4025024Z hint:
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4025729Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4026887Z hint: 'development'. The just-created branch can be renamed via this command:
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4027697Z hint:
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4028118Z hint: 	git branch -m <name>
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4028543Z hint:
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4029556Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4030699Z Initialized empty Git repository in /home/runner/work/drangler/drangler/.git/
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4035830Z [command]/usr/bin/git remote add origin https://github.com/<org>/drangler
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4311558Z ##[endgroup]
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4312982Z ##[group]Disabling automatic garbage collection
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4314865Z [command]/usr/bin/git config --local gc.auto 0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4415533Z ##[endgroup]
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4416983Z ##[group]Setting up auth
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4418071Z Removing SSH command configuration
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4420118Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4446860Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4715905Z Removing HTTP extra header
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4722889Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4740311Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4881941Z Removing includeIf entries pointing to credentials config files
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4885294Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.4908140Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.5062674Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-<uuid>.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.5102573Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/drangler/drangler/.git.path /home/runner/work/_temp/git-credentials-<uuid>.config
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.5305192Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-<uuid>.config
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.5414724Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-<uuid>.config
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.5619452Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-<uuid>.config
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.5909515Z ##[endgroup]
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.5911526Z ##[group]Fetching the repository
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:00.5915047Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +558d2a621094d66464196822f8b7d17006930f13:refs/remotes/origin/master
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.4062782Z From https://github.com/<org>/drangler
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.4063581Z  * [new ref]         558d2a621094d66464196822f8b7d17006930f13 -> origin/master
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.4071082Z [command]/usr/bin/git branch --list --remote origin/master
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.4091933Z   origin/master
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.4099003Z [command]/usr/bin/git rev-parse refs/remotes/origin/master
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.4116369Z 558d2a621094d66464196822f8b7d17006930f13
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.4118019Z ##[endgroup]
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.4118689Z ##[group]Determining the checkout info
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.4119527Z ##[endgroup]
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.4123567Z [command]/usr/bin/git sparse-checkout disable
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.5332069Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.5506045Z ##[group]Checking out the ref
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.5511365Z [command]/usr/bin/git checkout --progress --force -B master refs/remotes/origin/master
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.7902739Z Reset branch 'master'
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.7906168Z branch 'master' set up to track 'origin/master'.
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.7930591Z ##[endgroup]
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.7958865Z [command]/usr/bin/git log -1 --format=%H
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.7982248Z 558d2a621094d66464196822f8b7d17006930f13
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.8535485Z ##[group]Run oven-sh/setup-bun@v2
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.8535851Z with:
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.8536067Z   bun-version: latest
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.8536339Z   no-cache: false
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.8538415Z   token: ***
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.8538701Z env:
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.8538922Z   REQUIRE_CLONE: 1
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:01.8539149Z ##[endgroup]
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:02.6425654Z Downloading a new version of Bun: https://github.com/oven-sh/bun/releases/download/bun-v1.4.2/bun-linux-x64.zip
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:02.9772450Z [command]/usr/bin/unzip -o -q /home/runner/work/_temp/<uuid>.zip
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:03.4916236Z [command]/home/runner/.bun/bin/bun --revision
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:03.4949669Z 1.4.2+744846f84
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:03.5084699Z ##[group]Run bun install --frozen-lockfile
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:03.5085097Z ^[[36;1mbun install --frozen-lockfile^[[0m
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:03.5262292Z shell: /usr/bin/bash -e {0}
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:03.5262598Z env:
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:03.5262915Z   REQUIRE_CLONE: 1
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:03.5263340Z ##[endgroup]
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:03.5350413Z bun install v1.4.2 (744846f84)
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8155614Z 
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8156800Z $ husky
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8870964Z 
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8872238Z + @cloudflare/workers-types@5.20260815.1
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8872988Z + @types/node@26.2.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8873660Z + @vitest/coverage-v8@4.1.10
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8874489Z + husky@9.1.7
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8874787Z + lint-staged@17.3.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8875134Z + prettier@3.9.6
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8875422Z + prettier-plugin-organize-imports@4.3.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8875719Z + prettier-plugin-sh@0.19.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8875999Z + typedoc@0.28.20
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8876213Z + typescript@5.9.3
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8876571Z + vitest@4.1.10
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8876782Z + wrangler@4.123.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8877020Z + <private-pkg>@0.1.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8877260Z + commander@15.0.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8877399Z 
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8877567Z 134 packages installed [3.35s]
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8912087Z ##[group]Run bun run test:e2e:clone
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8912396Z ^[[36;1mbun run test:e2e:clone^[[0m
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8950268Z shell: /usr/bin/bash -e {0}
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8950551Z env:
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8950770Z   REQUIRE_CLONE: 1
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.8951008Z ##[endgroup]
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:06.9032213Z $ vitest run --project=e2e tests/e2e/workspace-clone.spec.ts
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:07.6776235Z 
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:07.6779553Z ^[[1m^[[30m^[[46m RUN ^[[49m^[[39m^[[22m ^[[36mv4.1.10 ^[[39m^[[90m/home/runner/work/drangler/drangler^[[39m
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:07.6780016Z 
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:09.2611313Z Cloning into '/tmp/drangler-e2e-clone-GbKfOu/worker'...
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:10.4173649Z bun install v1.4.2 (744846f84)
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:11.2667943Z 
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:11.2669247Z $ bun scripts/gen-lock-versions.ts && bun scripts/restore-artifacts.ts
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:11.2778024Z {
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:11.2778877Z   "packages": 76,
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:11.2779192Z   "core": "11.4.7",
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:11.2779627Z   "bytes": 2990
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:11.2779892Z }
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:11.7805497Z restore-artifacts: .interp/php8.5.wasm (13401742 bytes, sha256 verified)
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:11.9026557Z restore-artifacts: .interp/php8.5-worker.mjs (876467 bytes, sha256 verified)
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.2172129Z restore-artifacts: tuned glue -> /tmp/drangler-e2e-clone-GbKfOu/worker/.interp/php8.5-worker.tuned.mjs
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.2372137Z restore-artifacts: tuned interpreter -> /tmp/drangler-e2e-clone-GbKfOu/worker/.interp/php8.5.tuned.wasm (80 MiB)
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.2372819Z restore-artifacts: 2 downloaded, 0 already current
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.2398932Z $ husky
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3610244Z 
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3610846Z + @cloudflare/containers@0.3.7
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3611312Z + @cloudflare/vitest-pool-workers@0.22.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3611645Z + @cloudflare/workers-types@5.20260829.1
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3611903Z + @playwright/test@1.62.1
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3612589Z + @prettier/plugin-php@0.25.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3613067Z + @types/bun@1.4.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3613576Z + @types/pg@8.23.1
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3613877Z + @vitest/coverage-istanbul@4.1.11
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3614223Z + husky@9.1.7
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3614552Z + lint-staged@17.4.1
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3614862Z + prettier@3.9.6
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3615171Z + prettier-plugin-organize-imports@4.3.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3615568Z + prettier-plugin-sh@0.20.2
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3615884Z + typedoc@0.28.20
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3616262Z + typescript@5.9.3
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3616532Z + vitest@4.1.11
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3616848Z + wrangler@4.127.1
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3617123Z + yaml@2.9.1
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3617407Z + <private-pkg>@1.1.1
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3617688Z + <private-pkg>@0.2.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3617992Z + <private-pkg>@0.1.3
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3618262Z + <private-pkg>@0.1.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3618504Z + @<user>/tinyimg@1.1.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3618752Z + @noble/ciphers@2.4.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3619073Z + @noble/hashes@2.4.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3619317Z + blakejs@1.2.1
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3619682Z + edgeport@1.0.6
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3619909Z + fflate@0.8.3
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3620164Z + fzstd@0.1.1
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3621092Z + mysql2@3.24.4
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3621351Z + pg@8.23.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3621569Z + php-wasm@0.1.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3621791Z 
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3621908Z 215 packages installed [1.94s]
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.3829680Z $ bun scripts/hydrate.ts
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:12.6660279Z fetching https://<host>/payloads/v1.0.2/<org>-worker-1.0.2.tar.gz (cdn)
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:13.0467356Z tarball sha256 <hex> matches SHA256SUMS
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:13.6253045Z hydrate: kept 2 tracked file(s) the repository owns: assets/robots.txt, assets/driver.json
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:13.6253738Z hydrated 4583 files, 52204416 bytes, from 1.0.2 (d896567)
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:13.6254171Z interpreter: .interp/php8.5-worker.tuned.mjs, .interp/php8.5.tuned.wasm
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:13.6254819Z the tree is deployable now: bunx wrangler deploy -c wrangler.jsonc
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:20.7906665Z  ^[[32m✓^[[39m ^[[30m^[[45m e2e ^[[49m^[[39m tests/e2e/workspace-clone.spec.ts ^[[2m(^[[22m^[[2m10 tests^[[22m^[[2m | ^[[22m^[[33m1 skipped^[[39m^[[2m)^[[22m^[[33m 11535^[[2mms^[[22m^[[39m
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:20.7908332Z      ^[[33m^[[2m✓^[[22m^[[39m clones the published repository and installs it from npm ^[[33m 3107^[[2mms^[[22m^[[39m
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:20.7909210Z      ^[[33m^[[2m✓^[[22m^[[39m hydrates from the <org>/worker release v1.0.2 ^[[33m 1288^[[2mms^[[22m^[[39m
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:20.7910069Z      ^[[33m^[[2m✓^[[22m^[[39m runs every check, and none of them reports "not run" ^[[33m 3631^[[2mms^[[22m^[[39m
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:20.7954677Z      ^[[33m^[[2m✓^[[22m^[[39m a published payload deploys clean ^[[33m 3027^[[2mms^[[22m^[[39m
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:20.7955029Z 
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:20.7955375Z ^[[2m Test Files ^[[22m ^[[1m^[[32m1 passed^[[39m^[[22m^[[90m (1)^[[39m
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:20.7956175Z ^[[2m      Tests ^[[22m ^[[1m^[[32m9 passed^[[39m^[[22m^[[2m | ^[[22m^[[33m1 skipped^[[39m^[[90m (10)^[[39m
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:20.7956596Z ^[[2m   Start at ^[[22m 10:29:07
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:20.7957146Z ^[[2m   Duration ^[[22m 13.11s^[[2m (transform 344ms, setup 0ms, import 1.48s, tests 11.53s, environment 0ms)^[[22m
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:20.7957535Z 
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:20.9596954Z Post job cleanup.
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.1705005Z Post job cleanup.
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.2364336Z [command]/usr/bin/git version
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.2398887Z git version 2.55.0
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.2429947Z Temporarily overriding HOME='/home/runner/work/_temp/<uuid>' before making global git config changes
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.2430575Z Adding repository directory to the temporary git global config as a safe directory
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.2431112Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/drangler/drangler
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.2811109Z Removing SSH command configuration
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.2816679Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.2859846Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.3068668Z Removing HTTP extra header
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.3077726Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.3109236Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.3272275Z Removing includeIf entries pointing to credentials config files
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.3276967Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.3305252Z includeif.gitdir:/home/runner/work/drangler/drangler/.git.path
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.3305897Z includeif.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.3306448Z includeif.gitdir:/github/workspace/.git.path
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.3306860Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.3311972Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/drangler/drangler/.git.path
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.3328237Z /home/runner/work/_temp/git-credentials-<uuid>.config
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.3336639Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/drangler/drangler/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-<uuid>\.config
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.3788530Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.3807874Z /home/runner/work/_temp/git-credentials-<uuid>.config
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.3820161Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-<uuid>\.config
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.4197704Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.4217228Z /github/runner_temp/git-credentials-<uuid>.config
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.4221647Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-<uuid>\.config
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.4596123Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.4614947Z /github/runner_temp/git-credentials-<uuid>.config
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.4620788Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-<uuid>\.config
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.5433872Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.5611550Z Removing credentials config '/home/runner/work/_temp/git-credentials-<uuid>.config'
+Live Clone	UNKNOWN STEP	2026-09-30T10:29:21.5746912Z Cleaning up orphan processes
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1076225Z Current runner version: '2.337.0'
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1093435Z ##[group]Runner Image Provisioner
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1094034Z Hosted Compute Agent
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1094395Z Version: 20260828.587
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1094858Z Commit: <hex>
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1095313Z Build Date: 2026-08-28T16:44:25Z
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1095769Z Worker ID: {<uuid>}
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1096263Z Azure Region: centralus
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1096649Z ##[endgroup]
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1097540Z ##[group]Operating System
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1097919Z Ubuntu
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1098285Z 24.04.5
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1098659Z LTS
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1099049Z ##[endgroup]
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1099436Z ##[group]Runner Image
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1099812Z Image: ubuntu-24.04
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1100162Z Version: 20260920.314.1
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1101022Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260920.314/images/ubuntu/Ubuntu2404-Readme.md
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1102199Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260920.314
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1102788Z ##[endgroup]
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1103559Z ##[group]GITHUB_TOKEN Permissions
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1104752Z Contents: read
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1105180Z Metadata: read
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1105554Z ##[endgroup]
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1106860Z Secret source: Actions
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1107537Z Cache mode: write
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1107975Z Prepare workflow directory
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1364745Z Prepare all required actions
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.1396823Z Getting action download info
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.3858601Z Download action repository 'actions/checkout@v7' (SHA:<hex>)
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.4957698Z Download action repository 'oven-sh/setup-bun@v2' (SHA:<hex>)
+Real Worker	UNKNOWN STEP	2026-09-30T10:28:59.9952725Z Complete job name: Real Worker
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0390861Z ##[group]Run actions/checkout@v7
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0391308Z with:
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0391566Z   repository: <org>/drangler
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0393792Z   token: ***
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0394036Z   ssh-strict: true
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0394287Z   ssh-user: git
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0394545Z   persist-credentials: true
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0394824Z   clean: true
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0395083Z   sparse-checkout-cone-mode: true
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0395384Z   fetch-depth: 1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0395631Z   fetch-tags: false
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0395886Z   show-progress: true
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0396139Z   lfs: false
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0396372Z   submodules: false
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0396630Z   set-safe-directory: true
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0396916Z   allow-unsafe-pr-checkout: false
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0397275Z env:
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0397502Z   REQUIRE_CLONE: 1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0397745Z   REQUIRE_WORKER: 1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.0397990Z ##[endgroup]
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1108054Z Syncing repository: <org>/drangler
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1109566Z ##[group]Getting Git version info
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1110182Z Working directory is '/home/runner/work/drangler/drangler'
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1111094Z [command]/usr/bin/git version
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1169919Z git version 2.55.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1185426Z ##[endgroup]
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1194753Z Temporarily overriding HOME='/home/runner/work/_temp/<uuid>' before making global git config changes
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1195957Z Adding repository directory to the temporary git global config as a safe directory
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1199527Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/drangler/drangler
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1243276Z Deleting the contents of '/home/runner/work/drangler/drangler'
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1245686Z ##[group]Determining repository object format
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1246841Z ##[endgroup]
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1247238Z ##[group]Initializing the repository
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1250304Z [command]/usr/bin/git init /home/runner/work/drangler/drangler
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1358951Z hint: Using 'master' as the name for the initial branch. This default branch name
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1372649Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1373488Z hint: to use in all of your new repositories, which will suppress this warning,
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1374130Z hint: call:
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1374486Z hint:
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1375013Z hint: 	git config --global init.defaultBranch <name>
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1375548Z hint:
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1376054Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1376872Z hint: 'development'. The just-created branch can be renamed via this command:
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1377520Z hint:
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1377889Z hint: 	git branch -m <name>
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1378446Z hint:
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1379029Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1379909Z Initialized empty Git repository in /home/runner/work/drangler/drangler/.git/
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1381596Z [command]/usr/bin/git remote add origin https://github.com/<org>/drangler
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1418475Z ##[endgroup]
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1419026Z ##[group]Disabling automatic garbage collection
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1423081Z [command]/usr/bin/git config --local gc.auto 0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1455619Z ##[endgroup]
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1456607Z ##[group]Setting up auth
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1457918Z Removing SSH command configuration
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1460716Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1492192Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1805993Z Removing HTTP extra header
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1810688Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.1840921Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.2019605Z Removing includeIf entries pointing to credentials config files
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.2023108Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.2056381Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.2235286Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-<uuid>.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.2271093Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/drangler/drangler/.git.path /home/runner/work/_temp/git-credentials-<uuid>.config
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.2298927Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-<uuid>.config
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.2345170Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-<uuid>.config
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.2373382Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-<uuid>.config
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.2399649Z ##[endgroup]
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.2400070Z ##[group]Fetching the repository
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.2404130Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +558d2a621094d66464196822f8b7d17006930f13:refs/remotes/origin/master
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.7927256Z From https://github.com/<org>/drangler
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.7928409Z  * [new ref]         558d2a621094d66464196822f8b7d17006930f13 -> origin/master
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.7933822Z [command]/usr/bin/git branch --list --remote origin/master
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.7960153Z   origin/master
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.7966263Z [command]/usr/bin/git rev-parse refs/remotes/origin/master
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.7989324Z 558d2a621094d66464196822f8b7d17006930f13
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.7993206Z ##[endgroup]
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.7994016Z ##[group]Determining the checkout info
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.7994883Z ##[endgroup]
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.8002389Z [command]/usr/bin/git sparse-checkout disable
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.8044360Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.8075559Z ##[group]Checking out the ref
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.8078152Z [command]/usr/bin/git checkout --progress --force -B master refs/remotes/origin/master
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.8218239Z Reset branch 'master'
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.8222298Z branch 'master' set up to track 'origin/master'.
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.8227364Z ##[endgroup]
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.8263795Z [command]/usr/bin/git log -1 --format=%H
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.8288511Z 558d2a621094d66464196822f8b7d17006930f13
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.8523033Z ##[group]Run oven-sh/setup-bun@v2
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.8523634Z with:
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.8524077Z   bun-version: latest
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.8524570Z   no-cache: false
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.8530331Z   token: ***
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.8530770Z env:
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.8531185Z   REQUIRE_CLONE: 1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.8531766Z   REQUIRE_WORKER: 1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:00.8532232Z ##[endgroup]
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:01.7322065Z Downloading a new version of Bun: https://github.com/oven-sh/bun/releases/download/bun-v1.4.2/bun-linux-x64.zip
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:02.1167365Z [command]/usr/bin/unzip -o -q /home/runner/work/_temp/<uuid>.zip
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:02.6267498Z [command]/home/runner/.bun/bin/bun --revision
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:02.6317618Z 1.4.2+744846f84
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:02.6466428Z ##[group]Run bun install --frozen-lockfile
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:02.6466739Z ^[[36;1mbun install --frozen-lockfile^[[0m
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:02.6695414Z shell: /usr/bin/bash -e {0}
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:02.6695595Z env:
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:02.6695714Z   REQUIRE_CLONE: 1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:02.6695837Z   REQUIRE_WORKER: 1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:02.6695965Z ##[endgroup]
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:02.6882415Z bun install v1.4.2 (744846f84)
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2652922Z 
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2653455Z $ husky
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2970194Z 
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2970896Z + @cloudflare/workers-types@5.20260815.1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2971399Z + @types/node@26.2.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2971839Z + @vitest/coverage-v8@4.1.10
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2972063Z + husky@9.1.7
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2972299Z + lint-staged@17.3.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2972504Z + prettier@3.9.6
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2972734Z + prettier-plugin-organize-imports@4.3.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2973015Z + prettier-plugin-sh@0.19.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2973233Z + typedoc@0.28.20
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2973485Z + typescript@5.9.3
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2973689Z + vitest@4.1.10
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2973864Z + wrangler@4.123.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2974067Z + <private-pkg>@0.1.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2974310Z + commander@15.0.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2974426Z 
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.2974557Z 134 packages installed [1.61s]
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.3031104Z ##[group]Run bunx vitest run --project=e2e tests/e2e/heal-real.spec.ts tests/e2e/heal.spec.ts
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.3031568Z ^[[36;1mbunx vitest run --project=e2e tests/e2e/heal-real.spec.ts tests/e2e/heal.spec.ts^[[0m
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.3091593Z shell: /usr/bin/bash -e {0}
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.3091882Z env:
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.3091995Z   REQUIRE_CLONE: 1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.3092146Z   REQUIRE_WORKER: 1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.3092268Z ##[endgroup]
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.6390448Z 
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.6392882Z ^[[1m^[[30m^[[46m RUN ^[[49m^[[39m^[[22m ^[[36mv4.1.10 ^[[39m^[[90m/home/runner/work/drangler/drangler^[[39m
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:04.6393605Z 
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:06.3327062Z  ^[[32m✓^[[39m ^[[30m^[[45m e2e ^[[49m^[[39m tests/e2e/heal.spec.ts ^[[2m(^[[22m^[[2m7 tests^[[22m^[[2m)^[[22m^[[33m 1442^[[2mms^[[22m^[[39m
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:07.8457520Z Cloning into '/tmp/drangler-e2e-heal-1apmcp/worker'...
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:09.1226861Z bun install v1.4.2 (744846f84)
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:09.9765362Z 
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:09.9766265Z $ bun scripts/gen-lock-versions.ts && bun scripts/restore-artifacts.ts
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:09.9852910Z {
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:09.9853082Z   "packages": 76,
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:09.9853218Z   "core": "11.4.7",
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:09.9853374Z   "bytes": 2990
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:09.9853487Z }
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:10.5012455Z restore-artifacts: .interp/php8.5.wasm (13401742 bytes, sha256 verified)
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:10.7565109Z restore-artifacts: .interp/php8.5-worker.mjs (876467 bytes, sha256 verified)
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.0628126Z restore-artifacts: tuned glue -> /tmp/drangler-e2e-heal-1apmcp/worker/.interp/php8.5-worker.tuned.mjs
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.0784640Z restore-artifacts: tuned interpreter -> /tmp/drangler-e2e-heal-1apmcp/worker/.interp/php8.5.tuned.wasm (80 MiB)
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.0785046Z restore-artifacts: 2 downloaded, 0 already current
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.0824049Z $ husky
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1108032Z 
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1108202Z + @cloudflare/containers@0.3.7
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1108503Z + @cloudflare/vitest-pool-workers@0.22.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1108765Z + @cloudflare/workers-types@5.20260829.1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1109005Z + @playwright/test@1.62.1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1109222Z + @prettier/plugin-php@0.25.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1109430Z + @types/bun@1.4.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1109616Z + @types/pg@8.23.1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1109811Z + @vitest/coverage-istanbul@4.1.11
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1110045Z + husky@9.1.7
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1110217Z + lint-staged@17.4.1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1110400Z + prettier@3.9.6
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1110606Z + prettier-plugin-organize-imports@4.3.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1110858Z + prettier-plugin-sh@0.20.2
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1111040Z + typedoc@0.28.20
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1111156Z + typescript@5.9.3
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1111270Z + vitest@4.1.11
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1111388Z + wrangler@4.127.1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1111527Z + yaml@2.9.1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1111798Z + <private-pkg>@1.1.1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1111974Z + <private-pkg>@0.2.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1112117Z + <private-pkg>@0.1.3
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1112257Z + <private-pkg>@0.1.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1112390Z + @<user>/tinyimg@1.1.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1112523Z + @noble/ciphers@2.4.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1112644Z + @noble/hashes@2.4.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1112762Z + blakejs@1.2.1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1112875Z + edgeport@1.0.6
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1112986Z + fflate@0.8.3
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1113093Z + fzstd@0.1.1
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1113202Z + mysql2@3.24.4
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1113309Z + pg@8.23.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1113414Z + php-wasm@0.1.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1113482Z 
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1113541Z 215 packages installed [1.99s]
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.1192501Z $ bun scripts/hydrate.ts
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.4171744Z fetching https://<host>/payloads/v1.0.2/<org>-worker-1.0.2.tar.gz (cdn)
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:11.8331931Z tarball sha256 <hex> matches SHA256SUMS
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:12.5721281Z hydrate: kept 2 tracked file(s) the repository owns: assets/robots.txt, assets/driver.json
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:12.5721807Z hydrated 4583 files, 52204416 bytes, from 1.0.2 (d896567)
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:12.5722121Z interpreter: .interp/php8.5-worker.tuned.mjs, .interp/php8.5.tuned.wasm
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:12.5722399Z the tree is deployable now: bunx wrangler deploy -c wrangler.jsonc
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.7471179Z  ^[[32m✓^[[39m ^[[30m^[[45m e2e ^[[49m^[[39m tests/e2e/heal-real.spec.ts ^[[2m(^[[22m^[[2m4 tests^[[22m^[[2m)^[[22m^[[33m 12904^[[2mms^[[22m^[[39m
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.7517509Z 
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.7518358Z ^[[2m Test Files ^[[22m ^[[1m^[[32m2 passed^[[39m^[[22m^[[90m (2)^[[39m
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.7518793Z ^[[2m      Tests ^[[22m ^[[1m^[[32m11 passed^[[39m^[[22m^[[90m (11)^[[39m
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.7519121Z ^[[2m   Start at ^[[22m 10:29:04
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.7519626Z ^[[2m   Duration ^[[22m 16.11s^[[2m (transform 147ms, setup 0ms, import 1.59s, tests 14.35s, environment 0ms)^[[22m
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.7520308Z 
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.7720364Z Post job cleanup.
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.8837035Z Post job cleanup.
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.9469946Z [command]/usr/bin/git version
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.9512355Z git version 2.55.0
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.9564496Z Temporarily overriding HOME='/home/runner/work/_temp/<uuid>' before making global git config changes
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.9566007Z Adding repository directory to the temporary git global config as a safe directory
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.9566705Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/drangler/drangler
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.9580513Z Removing SSH command configuration
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.9585568Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.9619122Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.9832606Z Removing HTTP extra header
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.9838649Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:20.9890403Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0103232Z Removing includeIf entries pointing to credentials config files
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0109537Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0140264Z includeif.gitdir:/home/runner/work/drangler/drangler/.git.path
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0140698Z includeif.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0141086Z includeif.gitdir:/github/workspace/.git.path
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0141443Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0147632Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/drangler/drangler/.git.path
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0174017Z /home/runner/work/_temp/git-credentials-<uuid>.config
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0182132Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/drangler/drangler/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-<uuid>\.config
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0220890Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0248677Z /home/runner/work/_temp/git-credentials-<uuid>.config
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0256584Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-<uuid>\.config
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0299251Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0324429Z /github/runner_temp/git-credentials-<uuid>.config
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0329786Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-<uuid>\.config
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0361739Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0386648Z /github/runner_temp/git-credentials-<uuid>.config
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0393102Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-<uuid>\.config
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0427259Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0619093Z Removing credentials config '/home/runner/work/_temp/git-credentials-<uuid>.config'
+Real Worker	UNKNOWN STEP	2026-09-30T10:29:21.0742431Z Cleaning up orphan processes
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0404443Z Current runner version: '2.337.0'
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0428844Z ##[group]Runner Image Provisioner
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0429722Z Hosted Compute Agent
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0430480Z Version: 20260828.587
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0431137Z Commit: <hex>
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0431919Z Build Date: 2026-08-28T16:44:25Z
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0432711Z Worker ID: {<uuid>}
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0433431Z Azure Region: eastus
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0434133Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0435582Z ##[group]Operating System
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0436331Z Ubuntu
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0436904Z 24.04.5
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0437404Z LTS
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0437997Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0438775Z ##[group]Runner Image
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0439511Z Image: ubuntu-24.04
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0440138Z Version: 20260920.314.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0441815Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260920.314/images/ubuntu/Ubuntu2404-Readme.md
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0443438Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260920.314
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0444536Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0445651Z ##[group]GITHUB_TOKEN Permissions
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0447819Z Contents: read
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0448885Z Metadata: read
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0449673Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0451758Z Secret source: Actions
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0452895Z Cache mode: write
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0453867Z Prepare workflow directory
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0846379Z Prepare all required actions
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.0894251Z Getting action download info
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.2860091Z Download action repository 'actions/checkout@v7' (SHA:<hex>)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.3840907Z Download action repository 'oven-sh/setup-bun@v2' (SHA:<hex>)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.5411630Z Download action repository 'actions/cache@v6' (SHA:<hex>)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.7084644Z Download action repository 'codecov/codecov-action@v7' (SHA:<hex>)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:28:59.9345447Z Getting action download info
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.0357605Z Download action repository 'actions/github-script@<hex>' (SHA:<hex>)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.2194318Z Complete job name: Docker E2E
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.2987360Z ##[group]Run actions/checkout@v7
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.2988277Z with:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.2988961Z   repository: <org>/drangler
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.2992783Z   token: ***
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.2993226Z   ssh-strict: true
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.2993674Z   ssh-user: git
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.3059501Z   persist-credentials: true
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.3060126Z   clean: true
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.3060653Z   sparse-checkout-cone-mode: true
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.3061252Z   fetch-depth: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.3061693Z   fetch-tags: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.3062175Z   show-progress: true
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.3062639Z   lfs: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.3063088Z   submodules: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.3063586Z   set-safe-directory: true
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.3064110Z   allow-unsafe-pr-checkout: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.3065326Z env:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.3065752Z   REQUIRE_DOCKER: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.3066201Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4076724Z Syncing repository: <org>/drangler
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4079277Z ##[group]Getting Git version info
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4080085Z Working directory is '/home/runner/work/drangler/drangler'
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4081330Z [command]/usr/bin/git version
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4156066Z git version 2.55.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4180523Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4193649Z Temporarily overriding HOME='/home/runner/work/_temp/<uuid>' before making global git config changes
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4196118Z Adding repository directory to the temporary git global config as a safe directory
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4200031Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/drangler/drangler
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4257869Z Deleting the contents of '/home/runner/work/drangler/drangler'
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4262292Z ##[group]Determining repository object format
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4263844Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4265240Z ##[group]Initializing the repository
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4268641Z [command]/usr/bin/git init /home/runner/work/drangler/drangler
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4396480Z hint: Using 'master' as the name for the initial branch. This default branch name
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4398585Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4400520Z hint: to use in all of your new repositories, which will suppress this warning,
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4401899Z hint: call:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4402652Z hint:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4403578Z hint: 	git config --global init.defaultBranch <name>
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4404687Z hint:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4405966Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4407769Z hint: 'development'. The just-created branch can be renamed via this command:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4411288Z hint:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4412098Z hint: 	git branch -m <name>
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4412900Z hint:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4413931Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4415796Z Initialized empty Git repository in /home/runner/work/drangler/drangler/.git/
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4419297Z [command]/usr/bin/git remote add origin https://github.com/<org>/drangler
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4474103Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4475834Z ##[group]Disabling automatic garbage collection
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4482527Z [command]/usr/bin/git config --local gc.auto 0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4521218Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4522569Z ##[group]Setting up auth
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4523522Z Removing SSH command configuration
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4526889Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4562764Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4974759Z Removing HTTP extra header
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.4990566Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.5019226Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.5245085Z Removing includeIf entries pointing to credentials config files
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.5251847Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.5289896Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.5552886Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-<uuid>.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.5593927Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/drangler/drangler/.git.path /home/runner/work/_temp/git-credentials-<uuid>.config
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.5628661Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-<uuid>.config
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.5665760Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-<uuid>.config
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.5701180Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-<uuid>.config
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.5735132Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.5736654Z ##[group]Fetching the repository
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.5743062Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +558d2a621094d66464196822f8b7d17006930f13:refs/remotes/origin/master
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9143524Z From https://github.com/<org>/drangler
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9145904Z  * [new ref]         558d2a621094d66464196822f8b7d17006930f13 -> origin/master
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9150045Z [command]/usr/bin/git branch --list --remote origin/master
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9175694Z   origin/master
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9183307Z [command]/usr/bin/git rev-parse refs/remotes/origin/master
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9210460Z 558d2a621094d66464196822f8b7d17006930f13
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9215424Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9216650Z ##[group]Determining the checkout info
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9218276Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9219809Z [command]/usr/bin/git sparse-checkout disable
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9276235Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9311590Z ##[group]Checking out the ref
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9316626Z [command]/usr/bin/git checkout --progress --force -B master refs/remotes/origin/master
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9494501Z Reset branch 'master'
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9502771Z branch 'master' set up to track 'origin/master'.
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9512608Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9558238Z [command]/usr/bin/git log -1 --format=%H
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9589119Z 558d2a621094d66464196822f8b7d17006930f13
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9949945Z ##[group]Run oven-sh/setup-bun@v2
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9951216Z with:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9952124Z   bun-version: latest
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9953173Z   no-cache: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9964083Z   token: ***
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9965022Z env:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9965888Z   REQUIRE_DOCKER: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:00.9966865Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:01.5326274Z Downloading a new version of Bun: https://github.com/oven-sh/bun/releases/download/bun-v1.4.2/bun-linux-x64.zip
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:01.7852335Z [command]/usr/bin/unzip -o -q /home/runner/work/_temp/<uuid>.zip
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:02.4024095Z [command]/home/runner/.bun/bin/bun --revision
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:02.4073233Z 1.4.2+744846f84
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:02.4240297Z ##[group]Run bun install --frozen-lockfile
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:02.4240775Z ^[[36;1mbun install --frozen-lockfile^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:02.4538549Z shell: /usr/bin/bash -e {0}
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:02.4538963Z env:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:02.4539237Z   REQUIRE_DOCKER: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:02.4539542Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:02.4668873Z bun install v1.4.2 (744846f84)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.7585946Z 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.7586414Z $ husky
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8108239Z 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8109052Z + @cloudflare/workers-types@5.20260815.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8109630Z + @types/node@26.2.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8110053Z + @vitest/coverage-v8@4.1.10
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8110474Z + husky@9.1.7
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8110856Z + lint-staged@17.3.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8111217Z + prettier@3.9.6
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8111626Z + prettier-plugin-organize-imports@4.3.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8112135Z + prettier-plugin-sh@0.19.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8112559Z + typedoc@0.28.20
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8112917Z + typescript@5.9.3
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8113338Z + vitest@4.1.10
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8113728Z + wrangler@4.123.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8114113Z + <private-pkg>@0.1.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8114528Z + commander@15.0.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8114746Z 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8114930Z 134 packages installed [1344.00ms]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8796457Z ##[group]Run actions/cache@v6
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8796787Z with:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8797005Z   path: /tmp/docker-images
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8797430Z   key: <redacted>
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8797904Z   enableCrossOsArchive: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8798204Z   fail-on-cache-miss: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8798836Z   lookup-only: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8799546Z   save-always: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8799774Z env:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8799965Z   REQUIRE_DOCKER: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:03.8800177Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:04.0761422Z Cache hit for: docker-Linux-<hex>
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:05.1629363Z Received 167772160 of 302728986 (55.4%), 160.0 MBs/sec
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:05.9072948Z Received 302728986 of 302728986 (100.0%), 165.4 MBs/sec
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:05.9075255Z Cache Size: ~289 MB (302728986 B)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:05.9146149Z [command]/usr/bin/tar -xf /home/runner/work/_temp/<uuid>/cache.tzst -P -C /home/runner/work/drangler/drangler --use-compress-program unzstd
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:07.4922786Z Cache restored successfully
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:07.6821230Z Cache restored from key: <redacted>
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:07.7253256Z ##[group]Run if [ -f /tmp/docker-images/images.tar ]; then
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:07.7253761Z ^[[36;1mif [ -f /tmp/docker-images/images.tar ]; then^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:07.7254168Z ^[[36;1m  docker load -i /tmp/docker-images/images.tar^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:07.7254494Z ^[[36;1melse^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:07.7254758Z ^[[36;1m  docker compose -f docker/compose.yml pull^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:07.7255106Z ^[[36;1m  mkdir -p /tmp/docker-images^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:07.7255693Z ^[[36;1m  docker compose -f docker/compose.yml config --images | sort -u | xargs docker save -o /tmp/docker-images/images.tar^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:07.7256241Z ^[[36;1mfi^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:07.7319029Z shell: /usr/bin/bash -e {0}
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:07.7319312Z env:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:07.7319544Z   REQUIRE_DOCKER: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:07.7319788Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:30.4543257Z Loaded image ID: sha256:<hex>
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:30.4544793Z Loaded image ID: sha256:<hex>
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:30.5725126Z ##[group]Run bun run test:e2e:coverage
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:30.5725507Z ^[[36;1mbun run test:e2e:coverage^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:30.5787920Z shell: /usr/bin/bash -e {0}
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:30.5788218Z env:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:30.5788696Z   REQUIRE_DOCKER: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:30.5788944Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:30.5900381Z $ vitest run --project=e2e --coverage
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:31.3841969Z 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:31.3845796Z ^[[1m^[[30m^[[46m RUN ^[[49m^[[39m^[[22m ^[[36mv4.1.10 ^[[39m^[[90m/home/runner/work/drangler/drangler^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:31.3846890Z       ^[[2mCoverage enabled with ^[[22m^[[33mv8^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:31.3847322Z 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:33.3612093Z Cloning into '/tmp/drangler-e2e-clone-tUxSXp/worker'...
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:34.3457861Z bun install v1.4.2 (744846f84)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:35.4214498Z 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:35.4215747Z $ bun scripts/gen-lock-versions.ts && bun scripts/restore-artifacts.ts
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:35.4338193Z {
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:35.4338947Z   "packages": 76,
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:35.4340313Z   "core": "11.4.7",
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:35.4340720Z   "bytes": 2990
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:35.4341068Z }
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:35.7185324Z restore-artifacts: .interp/php8.5.wasm (13401742 bytes, sha256 verified)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:35.7821713Z restore-artifacts: .interp/php8.5-worker.mjs (876467 bytes, sha256 verified)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.1958050Z restore-artifacts: tuned glue -> /tmp/drangler-e2e-clone-tUxSXp/worker/.interp/php8.5-worker.tuned.mjs
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2171071Z restore-artifacts: tuned interpreter -> /tmp/drangler-e2e-clone-tUxSXp/worker/.interp/php8.5.tuned.wasm (80 MiB)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2172111Z restore-artifacts: 2 downloaded, 0 already current
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2212445Z $ husky
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2782792Z 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2783221Z + @cloudflare/containers@0.3.7
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2783749Z + @cloudflare/vitest-pool-workers@0.22.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2784245Z + @cloudflare/workers-types@5.20260829.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2784708Z + @playwright/test@1.62.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2785172Z + @prettier/plugin-php@0.25.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2785897Z + @types/bun@1.4.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2786426Z + @types/pg@8.23.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2786818Z + @vitest/coverage-istanbul@4.1.11
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2787271Z + husky@9.1.7
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2787615Z + lint-staged@17.4.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2787979Z + prettier@3.9.6
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2788646Z + prettier-plugin-organize-imports@4.3.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2789174Z + prettier-plugin-sh@0.20.2
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2789584Z + typedoc@0.28.20
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2789944Z + typescript@5.9.3
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2790169Z + vitest@4.1.11
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2790377Z + wrangler@4.127.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2790581Z + yaml@2.9.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2790793Z + <private-pkg>@1.1.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2791040Z + <private-pkg>@0.2.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2791299Z + <private-pkg>@0.1.3
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2791547Z + <private-pkg>@0.1.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2791808Z + @<user>/tinyimg@1.1.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2792041Z + @noble/ciphers@2.4.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2792275Z + @noble/hashes@2.4.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2792512Z + blakejs@1.2.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2792716Z + edgeport@1.0.6
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2792916Z + fflate@0.8.3
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2793109Z + fzstd@0.1.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2793306Z + mysql2@3.24.4
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2793499Z + pg@8.23.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2793691Z + php-wasm@0.1.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2793816Z 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.2793934Z 215 packages installed [1.93s]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.3064787Z $ bun scripts/hydrate.ts
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.5747779Z fetching https://<host>/payloads/v1.0.2/<org>-worker-1.0.2.tar.gz (cdn)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:36.9433282Z tarball sha256 <hex> matches SHA256SUMS
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:37.9699553Z hydrate: kept 2 tracked file(s) the repository owns: assets/robots.txt, assets/driver.json
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:37.9700493Z hydrated 4583 files, 52204416 bytes, from 1.0.2 (d896567)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:37.9701598Z interpreter: .interp/php8.5-worker.tuned.mjs, .interp/php8.5.tuned.wasm
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:37.9702503Z the tree is deployable now: bunx wrangler deploy -c wrangler.jsonc
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:47.1875996Z  ^[[32m✓^[[39m ^[[30m^[[45m e2e ^[[49m^[[39m tests/e2e/workspace-clone.spec.ts ^[[2m(^[[22m^[[2m10 tests^[[22m^[[2m | ^[[22m^[[33m1 skipped^[[39m^[[2m)^[[22m^[[33m 13811^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:47.1877487Z      ^[[33m^[[2m✓^[[22m^[[39m clones the published repository and installs it from npm ^[[33m 2928^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:47.1878914Z      ^[[33m^[[2m✓^[[22m^[[39m hydrates from the <org>/worker release v1.0.2 ^[[33m 1774^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:47.1879690Z      ^[[33m^[[2m✓^[[22m^[[39m runs every check, and none of them reports "not run" ^[[33m 4525^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:47.1880358Z      ^[[33m^[[2m✓^[[22m^[[39m a published payload deploys clean ^[[33m 4083^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:47.3475221Z (node:2582) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+Docker E2E	UNKNOWN STEP	2026-09-30T10:29:47.3476402Z (Use `node --trace-warnings ...` to show where the warning was created)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:11.9265834Z  ^[[32m✓^[[39m ^[[30m^[[45m e2e ^[[49m^[[39m tests/e2e/detector.spec.ts ^[[2m(^[[22m^[[2m9 tests^[[22m^[[2m)^[[22m^[[33m 24507^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:11.9273851Z      ^[[33m^[[2m✓^[[22m^[[39m catches a multi-byte value mangled by the wrong connection charset ^[[33m 405^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:12.0885122Z (node:4109) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:12.0885879Z (Use `node --trace-warnings ...` to show where the warning was created)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:20.8797754Z  ^[[32m✓^[[39m ^[[30m^[[45m e2e ^[[49m^[[39m tests/e2e/to-worker.spec.ts ^[[2m(^[[22m^[[2m8 tests^[[22m^[[2m)^[[22m^[[33m 8694^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:20.8799894Z      ^[[33m^[[2m✓^[[22m^[[39m converts the whole dump without refusing a statement ^[[33m 2564^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:20.8801126Z      ^[[33m^[[2m✓^[[22m^[[39m the converted dump replays into a plain SQLite with the bytes intact ^[[33m 1224^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:20.8802237Z      ^[[33m^[[2m✓^[[22m^[[39m the converted dump loads into a real Durable Object with the bytes intact ^[[33m 331^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:20.8803407Z      ^[[33m^[[2m✓^[[22m^[[39m what the migration REPORTED matches what actually moved ^[[33m 1263^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:21.1025458Z (node:4451) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:21.1026119Z (Use `node --trace-warnings ...` to show where the warning was created)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:24.4742289Z  ^[[32m✓^[[39m ^[[30m^[[45m e2e ^[[49m^[[39m tests/e2e/to-vps.spec.ts ^[[2m(^[[22m^[[2m7 tests^[[22m^[[2m)^[[22m^[[33m 3305^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:26.6001431Z  ^[[32m✓^[[39m ^[[30m^[[45m e2e ^[[49m^[[39m tests/e2e/heal.spec.ts ^[[2m(^[[22m^[[2m7 tests^[[22m^[[2m)^[[22m^[[33m 1906^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:34.6389069Z  ^[[32m✓^[[39m ^[[30m^[[45m e2e ^[[49m^[[39m tests/e2e/survey.spec.ts ^[[2m(^[[22m^[[2m6 tests^[[22m^[[2m)^[[22m^[[33m 7823^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:34.6390542Z      ^[[33m^[[2m✓^[[22m^[[39m reads a real Drupal over a real ssh connection ^[[33m 3806^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:34.6391830Z      ^[[33m^[[2m✓^[[22m^[[39m fails without a usable key rather than hanging on a prompt ^[[33m 2913^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:35.7814363Z Cloning into '/tmp/drangler-e2e-modify-F1Vx1F/worker'...
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:36.8246030Z bun install v1.4.2 (744846f84)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.0994476Z 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.0995380Z $ bun scripts/gen-lock-versions.ts && bun scripts/restore-artifacts.ts
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.1137333Z {
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.1137578Z   "packages": 76,
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.1137822Z   "core": "11.4.7",
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.1138044Z   "bytes": 2990
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.1138242Z }
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.3050199Z restore-artifacts: .interp/php8.5.wasm (13401742 bytes, sha256 verified)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.3620591Z restore-artifacts: .interp/php8.5-worker.mjs (876467 bytes, sha256 verified)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.7663818Z restore-artifacts: tuned glue -> /tmp/drangler-e2e-modify-F1Vx1F/worker/.interp/php8.5-worker.tuned.mjs
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.7881263Z restore-artifacts: tuned interpreter -> /tmp/drangler-e2e-modify-F1Vx1F/worker/.interp/php8.5.tuned.wasm (80 MiB)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.7882316Z restore-artifacts: 2 downloaded, 0 already current
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.7932078Z $ husky
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8317575Z 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8318275Z + @cloudflare/containers@0.3.7
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8319231Z + @cloudflare/vitest-pool-workers@0.22.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8319773Z + @cloudflare/workers-types@5.20260829.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8320287Z + @playwright/test@1.62.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8320737Z + @prettier/plugin-php@0.25.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8321134Z + @types/bun@1.4.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8321478Z + @types/pg@8.23.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8322044Z + @vitest/coverage-istanbul@4.1.11
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8322638Z + husky@9.1.7
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8323124Z + lint-staged@17.4.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8323668Z + prettier@3.9.6
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8324315Z + prettier-plugin-organize-imports@4.3.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8325311Z + prettier-plugin-sh@0.20.2
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8326010Z + typedoc@0.28.20
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8326614Z + typescript@5.9.3
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8327239Z + vitest@4.1.11
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8327906Z + wrangler@4.127.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8328816Z + yaml@2.9.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8329545Z + <private-pkg>@1.1.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8330332Z + <private-pkg>@0.2.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8330954Z + <private-pkg>@0.1.3
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8331501Z + <private-pkg>@0.1.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8331985Z + @<user>/tinyimg@1.1.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8332408Z + @noble/ciphers@2.4.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8332803Z + @noble/hashes@2.4.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8333225Z + blakejs@1.2.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8333628Z + edgeport@1.0.6
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8334037Z + fflate@0.8.3
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8334410Z + fzstd@0.1.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8334765Z + mysql2@3.24.4
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8335135Z + pg@8.23.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8335530Z + php-wasm@0.1.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8335798Z 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8336185Z 215 packages installed [1007.00ms]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:37.8365901Z $ bun scripts/hydrate.ts
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:38.0286550Z fetching https://<host>/payloads/v1.0.2/<org>-worker-1.0.2.tar.gz (cdn)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:38.1607717Z tarball sha256 <hex> matches SHA256SUMS
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:39.1936926Z hydrate: kept 2 tracked file(s) the repository owns: assets/robots.txt, assets/driver.json
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:39.1937738Z hydrated 4583 files, 52204416 bytes, from 1.0.2 (d896567)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:39.1938672Z interpreter: .interp/php8.5-worker.tuned.mjs, .interp/php8.5.tuned.wasm
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:39.1939440Z the tree is deployable now: bunx wrangler deploy -c wrangler.jsonc
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:54.6290074Z  ^[[32m✓^[[39m ^[[30m^[[45m e2e ^[[49m^[[39m tests/e2e/modify.spec.ts ^[[2m(^[[22m^[[2m3 tests^[[22m^[[2m)^[[22m^[[33m 18829^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:54.6291590Z      ^[[33m^[[2m✓^[[22m^[[39m uploads a module and finds it on the site afterwards ^[[33m 457^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:54.6292858Z      ^[[33m^[[2m✓^[[22m^[[39m sends only the changed file on the second upload ^[[33m 372^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:54.9088839Z  ^[[2m^[[90m↓^[[39m^[[22m ^[[30m^[[45m e2e ^[[49m^[[39m tests/e2e/doctor-source.spec.ts ^[[2m(^[[22m^[[2m5 tests^[[22m^[[2m | ^[[22m^[[33m5 skipped^[[39m^[[2m)^[[22m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:55.3622040Z Cloning into '/tmp/drangler-e2e-heal-ToC8Ij/worker'...
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:56.3735658Z bun install v1.4.2 (744846f84)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:56.6393716Z 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:56.6394776Z $ bun scripts/gen-lock-versions.ts && bun scripts/restore-artifacts.ts
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:56.6500889Z {
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:56.6501302Z   "packages": 76,
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:56.6501709Z   "core": "11.4.7",
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:56.6502067Z   "bytes": 2990
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:56.6502407Z }
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:56.8903441Z restore-artifacts: .interp/php8.5.wasm (13401742 bytes, sha256 verified)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:56.9461075Z restore-artifacts: .interp/php8.5-worker.mjs (876467 bytes, sha256 verified)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.3472971Z restore-artifacts: tuned glue -> /tmp/drangler-e2e-heal-ToC8Ij/worker/.interp/php8.5-worker.tuned.mjs
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.3686882Z restore-artifacts: tuned interpreter -> /tmp/drangler-e2e-heal-ToC8Ij/worker/.interp/php8.5.tuned.wasm (80 MiB)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.3688234Z restore-artifacts: 2 downloaded, 0 already current
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.3742697Z $ husky
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4136854Z 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4137337Z + @cloudflare/containers@0.3.7
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4137895Z + @cloudflare/vitest-pool-workers@0.22.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4138268Z + @cloudflare/workers-types@5.20260829.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4138853Z + @playwright/test@1.62.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4139123Z + @prettier/plugin-php@0.25.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4139416Z + @types/bun@1.4.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4139634Z + @types/pg@8.23.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4139866Z + @vitest/coverage-istanbul@4.1.11
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4140135Z + husky@9.1.7
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4140336Z + lint-staged@17.4.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4140554Z + prettier@3.9.6
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4140965Z + prettier-plugin-organize-imports@4.3.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4141472Z + prettier-plugin-sh@0.20.2
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4141858Z + typedoc@0.28.20
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4142193Z + typescript@5.9.3
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4142549Z + vitest@4.1.11
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4142873Z + wrangler@4.127.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4143243Z + yaml@2.9.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4143587Z + <private-pkg>@1.1.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4144010Z + <private-pkg>@0.2.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4144432Z + <private-pkg>@0.1.3
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4144840Z + <private-pkg>@0.1.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4145245Z + @<user>/tinyimg@1.1.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4145636Z + @noble/ciphers@2.4.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4146021Z + @noble/hashes@2.4.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4146407Z + blakejs@1.2.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4146761Z + edgeport@1.0.6
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4147111Z + fflate@0.8.3
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4147451Z + fzstd@0.1.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4147804Z + mysql2@3.24.4
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4148134Z + pg@8.23.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4148738Z + php-wasm@0.1.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4148967Z 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4149465Z 215 packages installed [1040.00ms]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.4197201Z $ bun scripts/hydrate.ts
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.5612282Z fetching https://<host>/payloads/v1.0.2/<org>-worker-1.0.2.tar.gz (cdn)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:57.6879910Z tarball sha256 <hex> matches SHA256SUMS
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:58.7469793Z hydrate: kept 2 tracked file(s) the repository owns: assets/robots.txt, assets/driver.json
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:58.7470924Z hydrated 4583 files, 52204416 bytes, from 1.0.2 (d896567)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:58.7471544Z interpreter: .interp/php8.5-worker.tuned.mjs, .interp/php8.5.tuned.wasm
+Docker E2E	UNKNOWN STEP	2026-09-30T10:30:58.7472201Z the tree is deployable now: bunx wrangler deploy -c wrangler.jsonc
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.0820922Z  ^[[32m✓^[[39m ^[[30m^[[45m e2e ^[[49m^[[39m tests/e2e/heal-real.spec.ts ^[[2m(^[[22m^[[2m4 tests^[[22m^[[2m)^[[22m^[[33m 18708^[[2mms^[[22m^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5637362Z 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5642525Z ^[[2m Test Files ^[[22m ^[[1m^[[32m8 passed^[[39m^[[22m^[[2m | ^[[22m^[[33m1 skipped^[[39m^[[90m (9)^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5643716Z ^[[2m      Tests ^[[22m ^[[1m^[[32m53 passed^[[39m^[[22m^[[2m | ^[[22m^[[33m6 skipped^[[39m^[[90m (59)^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5644499Z ^[[2m   Start at ^[[22m 10:29:31
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5645496Z ^[[2m   Duration ^[[22m 103.17s^[[2m (transform 565ms, setup 0ms, import 3.70s, tests 97.58s, environment 1ms)^[[22m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5646359Z 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5671585Z ^[[34m % ^[[39m^[[2mCoverage report from ^[[22m^[[33mv8^[[39m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5750758Z -------------------|---------|----------|---------|---------|-------------------
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5751633Z File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5759900Z -------------------|---------|----------|---------|---------|-------------------
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5761041Z All files          |   35.01 |    25.65 |   35.07 |   36.55 |                   
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5779780Z  src               |   47.49 |    32.33 |   32.45 |   47.83 |                   
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5780540Z   cli.ts           |       0 |      100 |     100 |       0 | 5                 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5781045Z   context.ts       |      25 |    11.11 |      75 |   30.76 | 39-53             
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5781814Z   errors.ts        |   66.66 |    73.33 |   44.44 |   66.66 | 53,153-177        
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5782521Z   format.ts        |   65.51 |    38.88 |   91.66 |   65.21 | 51-59             
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5783179Z   index.ts         |       0 |        0 |       0 |       0 |                   
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5783821Z   io.ts            |      80 |      100 |      75 |      80 | 10-11             
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5784473Z   owner.ts         |   67.56 |     65.9 |    62.5 |   69.69 | ...17,120,135-155 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5785143Z   program.ts       |   39.13 |        0 |    8.57 |   39.13 | ...1272,1280-1281 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5785834Z   run.ts           |      55 |    23.07 |   66.66 |   61.11 | ...40,43,47,58,63 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5786527Z   version.ts       |     100 |      100 |     100 |     100 |                   
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5787249Z  src/cloudflare    |   29.95 |    19.51 |    18.6 |   30.52 |                   
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5787936Z   api.ts           |       0 |        0 |       0 |       0 | 29-85             
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5788841Z   auth.ts          |    3.03 |        0 |       0 |    3.12 | 41-142            
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5789508Z   client.ts        |       0 |      100 |       0 |       0 | 17-19             
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5790184Z   config.ts        |   53.78 |    36.69 |      40 |   54.28 | ...32,242,288-352 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5790842Z   tail.ts          |       0 |        0 |       0 |       0 | 18-88             
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5791513Z  src/commands      |   14.51 |    11.75 |      14 |   15.04 |                   
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5792224Z   cf-worker.ts     |    0.94 |        0 |       0 |    1.08 | 22-225,242-312    
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5792881Z   cf.ts            |       0 |        0 |       0 |       0 | 15-140            
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5793786Z   config.ts        |    1.05 |        0 |       0 |    1.16 | 40-256,273-340    
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5794446Z   doctor.ts        |     0.8 |        0 |       0 |    0.91 | 88-422            
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5795138Z   eligibility.ts   |       0 |        0 |       0 |       0 | 64-245            
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5795818Z   heal.ts          |   66.35 |    48.83 |   83.33 |   70.21 | ...15-321,328-338 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5796477Z   health.ts        |       0 |        0 |       0 |       0 | 12-97             
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5797127Z   init.ts          |    2.94 |        0 |       0 |    3.37 | 65-328            
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5797794Z   migrate.ts       |   37.98 |    35.59 |   38.63 |    36.2 | ...71,392,477-929 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5798683Z   modify.ts        |     9.9 |     9.06 |   11.32 |   10.17 | ...1029,1035-1037 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5799422Z   reconcile.ts     |       1 |        0 |       0 |    1.16 | 65-287            
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5800137Z   recover.ts       |       0 |        0 |       0 |       0 | 58-155            
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5800813Z   secrets.ts       |       0 |        0 |       0 |       0 | 23-48             
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5801478Z   setup.ts         |       0 |        0 |       0 |       0 | 52-173            
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5802137Z   site.ts          |   20.65 |     23.5 |   18.51 |   22.34 | ...03-604,614-618 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5802798Z   status.ts        |       0 |        0 |       0 |       0 | 46-197            
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5803464Z   sweep.ts         |    2.59 |        0 |       0 |    2.89 | 78-252            
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5804122Z   update.ts        |       0 |        0 |       0 |       0 | 47-232            
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5804806Z   workspace.ts     |   31.42 |       17 |   36.36 |   32.77 | ...72-173,223-428 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5805726Z  src/config        |   51.42 |    43.58 |   38.46 |   52.68 |                   
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5806189Z   file.ts          |   55.42 |    40.69 |   47.05 |   56.94 | ...86,305-307,324 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5806600Z   globals.ts       |   36.36 |    51.61 |   22.22 |   38.09 | 52,56,86,92-114   
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5807022Z  src/health        |   41.46 |    35.01 |   51.11 |   45.34 |                   
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5807424Z   probe.ts         |   57.01 |    46.21 |   76.92 |   59.59 | ...53-356,393-447 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5807842Z   repair.ts        |   51.25 |       45 |    64.7 |   57.97 | ...42-315,438,452 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5808223Z   site.ts          |    1.47 |        0 |       0 |    1.78 | 90,103-300        
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5809031Z   source.ts        |      48 |       50 |   33.33 |   52.17 | ...09,119,134,150 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5809440Z  src/host          |   39.02 |    32.69 |      50 |   42.25 |                   
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5809853Z   exec.ts          |   59.09 |       50 |   66.66 |      60 | 106-112,117-120   
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5810250Z   files.ts         |   31.66 |    15.38 |   41.66 |   35.29 | ...13-114,121-155 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5810658Z  src/migrate       |   59.01 |    51.75 |   57.14 |   61.98 |                   
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5811071Z   checkpoint.ts    |     5.4 |        0 |       0 |    6.89 | 49-150            
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5811481Z   convert.ts       |   83.75 |    79.49 |   91.66 |   84.48 | ...96,824,868-891 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5811868Z   delta.ts         |   16.66 |        0 |       0 |      20 | 93-184            
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5812252Z   files.ts         |    0.62 |        0 |       0 |    0.72 | 41-278            
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5812626Z   plan.ts          |   88.67 |    66.66 |    87.5 |   91.11 | 179-182           
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5813006Z   rules.ts         |   54.05 |    30.95 |   61.29 |   55.95 | ...77,387,413-555 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5813420Z   substitutions.ts |      25 |      100 |       0 |      50 | 108               
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5813998Z   survey.ts        |   70.08 |    59.72 |   68.75 |   75.23 | ...05,319-341,394 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5814618Z   ...et-runtime.ts |      32 |    31.81 |   57.14 |   36.36 | 51-56,92-107      
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5815019Z   target.ts        |   73.52 |    70.58 |     100 |   92.59 | 59,61             
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5815418Z   transport.ts     |   73.91 |       50 |   57.14 |   68.42 | 81-88,98          
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5815828Z  src/modify        |   61.96 |    35.15 |   74.07 |   62.77 |                   
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5816218Z   check.ts         |      45 |    23.07 |   61.53 |   46.42 | ...85,193,210-245 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5816607Z   detect.ts        |    64.1 |    38.02 |   69.56 |   66.33 | ...07-308,313-314 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5817001Z   upload.ts        |   71.79 |       40 |   88.88 |   70.27 | ...68-175,262-279 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5817393Z  src/secrets       |    5.35 |        0 |       0 |    5.88 |                   
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5817803Z   patterns.ts      |     100 |      100 |     100 |     100 |                   
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5818202Z   scan.ts          |    3.63 |        0 |       0 |       4 | 42-127            
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5818941Z  src/workspace     |    57.8 |    47.22 |   65.07 |   60.08 |                   
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5819369Z   artifacts.ts     |    84.9 |    73.07 |     100 |   91.11 | 121,169,183,191   
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5819775Z   build.ts         |   70.73 |    53.96 |   66.66 |   75.67 | 187,219-250       
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5820159Z   bundle.ts        |      75 |    33.33 |     100 |      80 | 31,33             
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5822914Z   copy.ts          |    1.63 |        0 |       0 |    1.81 | 8-53,77-204       
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5823615Z   layout.ts        |   70.58 |       70 |     100 |   71.42 | ...,73-76,112,125 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5824298Z   source.ts        |   88.88 |     37.5 |     100 |     100 | 28-60             
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5825229Z   update.ts        |       0 |        0 |       0 |       0 | 30-83             
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5825943Z   validate.ts      |   79.66 |    57.81 |   68.75 |   82.69 | ...03,232-244,286 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.5826640Z -------------------|---------|----------|---------|---------|-------------------
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7623172Z ##[group]Run codecov/codecov-action@v7
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7623497Z with:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7623889Z   token: ***
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7624101Z   slug: <org>/drangler
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7624351Z   fail_ci_if_error: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7624584Z   report_type: coverage
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7624806Z   flags: integration
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7625033Z   files: coverage/clover.xml
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7625461Z   cleanup: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7625813Z   disable_file_fixes: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7626200Z   disable_search: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7626586Z   disable_safe_directory: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7626977Z   disable_telem: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7627316Z   dry_run: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7627650Z   git_service: github
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7627993Z   gcov_executable: gcov
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7628605Z   handle_no_reports_found: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7629144Z   recurse_submodules: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7629607Z   run_command: upload-coverage
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7630110Z   skip_validation: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7630571Z   use_legacy_upload_endpoint: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7630951Z   use_oidc: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7631274Z   use_pypi: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7631561Z   verbose: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7631758Z   version: latest
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7632135Z env:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7632467Z   REQUIRE_DOCKER: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7632823Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7723847Z ##[start-action display=Check system dependencies;id=__codecov_codecov-action.__run]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7760768Z ##[group]Run missing_deps=""
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7761335Z ^[[36;1mmissing_deps=""^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7761794Z ^[[36;1m^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7762286Z ^[[36;1m# Check for always-required commands^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7762897Z ^[[36;1mfor cmd in bash git curl; do^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7763831Z ^[[36;1m  if ! command -v "$cmd" >/dev/null 2>&1; then^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7764484Z ^[[36;1m    missing_deps="$missing_deps $cmd"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7765081Z ^[[36;1m  fi^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7765597Z ^[[36;1mdone^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7766136Z ^[[36;1m^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7766803Z ^[[36;1m# Check for gpg only if validation is not being skipped^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7767601Z ^[[36;1mif [ "$INPUT_SKIP_VALIDATION" != "true" ]; then^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7768243Z ^[[36;1m  if ! command -v gpg >/dev/null 2>&1; then^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7769142Z ^[[36;1m    missing_deps="$missing_deps gpg"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7769679Z ^[[36;1m  fi^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7770069Z ^[[36;1mfi^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7770468Z ^[[36;1m^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7770908Z ^[[36;1m# Report missing required dependencies^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7771512Z ^[[36;1mif [ -n "$missing_deps" ]; then^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7772364Z ^[[36;1m  echo "Error: The following required dependencies are missing:$missing_deps"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7773468Z ^[[36;1m  echo "Please install these dependencies before using this action."^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7774152Z ^[[36;1m  exit 1^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7774665Z ^[[36;1mfi^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7775109Z ^[[36;1m^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7775679Z ^[[36;1mecho "All required system dependencies are available."^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7810773Z shell: /usr/bin/sh -e {0}
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7811248Z env:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7811624Z   REQUIRE_DOCKER: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7812009Z   INPUT_SKIP_VALIDATION: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7812474Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7861495Z All required system dependencies are available.
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7879249Z ##[end-action id=__codecov_codecov-action.__run;outcome=success;conclusion=success;duration_ms=15]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7881652Z ##[start-action display=Action version;id=__codecov_codecov-action.__run_2]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7897872Z ##[group]Run CC_ACTION_VERSION=$(cat ${GITHUB_ACTION_PATH}/src/version)
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7898714Z ^[[36;1mCC_ACTION_VERSION=$(cat ${GITHUB_ACTION_PATH}/src/version)^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7899438Z ^[[36;1mecho -e "\033[0;32m==>\033[0m Running Action version $CC_ACTION_VERSION"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7962759Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7963330Z env:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7963680Z   REQUIRE_DOCKER: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.7964126Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8073597Z ^[[0;32m==>^[[0m Running Action version 7.1.1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8080601Z ##[end-action id=__codecov_codecov-action.__run_2;outcome=success;conclusion=success;duration_ms=19]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8082975Z ##[start-action display=Set safe directory;id=__codecov_codecov-action.__run_3]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8106688Z ##[group]Run git config --global --add safe.directory "/home/runner/work/drangler/drangler"
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8107339Z ^[[36;1mgit config --global --add safe.directory "/home/runner/work/drangler/drangler"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8107898Z ^[[36;1mgit config --global --add safe.directory "$GITHUB_WORKSPACE"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8168521Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8168879Z env:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8169093Z   REQUIRE_DOCKER: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8169309Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8294331Z ##[end-action id=__codecov_codecov-action.__run_3;outcome=success;conclusion=success;duration_ms=21]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8299916Z ##[start-action display=Set fork;id=__codecov_codecov-action.__run_4]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8316041Z ##[group]Run CC_FORK="false"
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8316332Z ^[[36;1mCC_FORK="false"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8316935Z ^[[36;1mif [ -n "$GITHUB_EVENT_PULL_REQUEST_HEAD_REPO_FULL_NAME" ] && [ "$GITHUB_EVENT_PULL_REQUEST_HEAD_REPO_FULL_NAME" != "$GITHUB_REPOSITORY" ];^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8317551Z ^[[36;1mthen^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8317819Z ^[[36;1m  echo -e "\033[0;32m==>\033[0m Fork detected"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8318139Z ^[[36;1m  CC_FORK="true"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8318670Z ^[[36;1mfi^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8319128Z ^[[36;1mecho "CC_FORK=$CC_FORK" >> "$GITHUB_ENV"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8379949Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8380314Z env:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8380525Z   REQUIRE_DOCKER: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8380788Z   GITHUB_EVENT_PULL_REQUEST_HEAD_LABEL: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8381118Z   GITHUB_EVENT_PULL_REQUEST_HEAD_REPO_FULL_NAME: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8381452Z   GITHUB_REPOSITORY: <org>/drangler
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8381732Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8479987Z ##[end-action id=__codecov_codecov-action.__run_4;outcome=success;conclusion=success;duration_ms=17]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8483602Z ##[start-action display=Get OIDC token;id=__codecov_codecov-action.oidc]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8529192Z ##[group]Run actions/github-script@<hex>
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8529592Z with:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8530214Z   script: if (process.env.CC_USE_OIDC === 'true' && process.env.CC_FORK != 'true') {
+Docker E2E	UNKNOWN STEP	  const id_token = <redacted> core.getIDToken(process.env.CC_OIDC_AUDIENCE)
+Docker E2E	UNKNOWN STEP	  return id_token
+Docker E2E	UNKNOWN STEP	}
+Docker E2E	UNKNOWN STEP	
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8533153Z   github-token: ***
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8533384Z   debug: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8533619Z   user-agent: actions/github-script
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8533903Z   result-encoding: json
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8534133Z   retries: 0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8534367Z   retry-exempt-status-codes: 400,401,403,404,422
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8534684Z env:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8534875Z   REQUIRE_DOCKER: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8535092Z   CC_FORK: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8535328Z   CC_OIDC_AUDIENCE: https://codecov.io
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8535611Z   CC_USE_OIDC: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.8535825Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9432767Z ##[end-action id=__codecov_codecov-action.oidc;outcome=success;conclusion=success;duration_ms=94]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9443593Z ##[start-action display=Get and set token;id=__codecov_codecov-action.__run_5]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9461760Z ##[group]Run if [ "$INPUT_USE_OIDC" == 'true' ] && [ "$CC_FORK" != 'true' ];
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9462295Z ^[[36;1mif [ "$INPUT_USE_OIDC" == 'true' ] && [ "$CC_FORK" != 'true' ];^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9462657Z ^[[36;1mthen^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9463114Z ^[[36;1m  echo "CC_TOKEN=$CC_OIDC_TOKEN" >> "$GITHUB_ENV"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9463486Z ^[[36;1melif [ -n "$INPUT_CODECOV_TOKEN" ];^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9463778Z ^[[36;1mthen^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9464044Z ^[[36;1m  echo -e "\033[0;32m==>\033[0m Token set from env"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9464449Z ^[[36;1m    echo "CC_TOKEN=$INPUT_CODECOV_TOKEN" >> "$GITHUB_ENV"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9464792Z ^[[36;1melse^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9465008Z ^[[36;1m  if [ -n "$INPUT_TOKEN" ];^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9465325Z ^[[36;1m  then^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9465602Z ^[[36;1m    echo -e "\033[0;32m==>\033[0m Token set from input"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9465985Z ^[[36;1m    CC_TOKEN=$(echo "$INPUT_TOKEN" | tr -d '\n')^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9466355Z ^[[36;1m    echo "CC_TOKEN=$CC_TOKEN" >> "$GITHUB_ENV"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9466694Z ^[[36;1m  fi^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9466907Z ^[[36;1mfi^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9530710Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9531083Z env:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9531310Z   REQUIRE_DOCKER: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9531533Z   CC_FORK: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9531745Z   CC_OIDC_TOKEN: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9532003Z   CC_OIDC_AUDIENCE: https://codecov.io
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9532304Z   INPUT_USE_OIDC: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9532728Z   INPUT_TOKEN: ***
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9532962Z   INPUT_CODECOV_TOKEN: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9533196Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9657455Z ^[[0;32m==>^[[0m Token set from input
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9680719Z ##[end-action id=__codecov_codecov-action.__run_5;outcome=success;conclusion=success;duration_ms=23]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9685363Z ##[start-action display=Override branch for forks;id=__codecov_codecov-action.__run_6]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9701968Z ##[group]Run if [ -z "$CC_BRANCH" ] && [ -z "$CC_TOKEN" ] && [ "$CC_FORK" == 'true' ]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9702514Z ^[[36;1mif [ -z "$CC_BRANCH" ] && [ -z "$CC_TOKEN" ] && [ "$CC_FORK" == 'true' ]^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9703092Z ^[[36;1mthen^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9703634Z ^[[36;1m  echo -e "\033[0;32m==>\033[0m Fork detected, setting branch to $GITHUB_EVENT_PULL_REQUEST_HEAD_LABEL"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9721509Z ^[[36;1m  TOKENLESS="$GITHUB_EVENT_PULL_REQUEST_HEAD_LABEL"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9722005Z ^[[36;1m  CC_BRANCH="$GITHUB_EVENT_PULL_REQUEST_HEAD_LABEL"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9722429Z ^[[36;1m  echo "TOKENLESS=$TOKENLESS" >> "$GITHUB_ENV"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9722761Z ^[[36;1mfi^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9722971Z ^[[36;1m^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9723223Z ^[[36;1mecho "CC_BRANCH=$CC_BRANCH" >> "$GITHUB_ENV"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9786052Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9786445Z env:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9786655Z   REQUIRE_DOCKER: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9786890Z   CC_FORK: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9787287Z   CC_TOKEN: ***
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9787496Z   CC_BRANCH: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9787751Z   GITHUB_EVENT_PULL_REQUEST_HEAD_LABEL: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9788093Z   GITHUB_EVENT_PULL_REQUEST_HEAD_REPO_FULL_NAME: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9788736Z   GITHUB_REPOSITORY: <org>/drangler
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9789046Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9881740Z ##[end-action id=__codecov_codecov-action.__run_6;outcome=success;conclusion=success;duration_ms=19]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9886720Z ##[start-action display=Override commits and pr for pull requests;id=__codecov_codecov-action.__run_7]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9929184Z ##[group]Run if [ -z "$CC_SHA" ];
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9929545Z ^[[36;1mif [ -z "$CC_SHA" ];^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9929835Z ^[[36;1mthen^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9930138Z ^[[36;1m  CC_SHA="$GITHUB_EVENT_PULL_REQUEST_HEAD_SHA"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9930521Z ^[[36;1mfi^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9930826Z ^[[36;1mif [ -z "$CC_PR" ] && [ "$CC_FORK" == 'true' ];^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9931203Z ^[[36;1mthen^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9931468Z ^[[36;1m  CC_PR="$GITHUB_EVENT_NUMBER"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9931807Z ^[[36;1mfi^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9932030Z ^[[36;1m^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9932290Z ^[[36;1mecho "CC_SHA=$CC_SHA" >> "$GITHUB_ENV"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9932835Z ^[[36;1mecho "CC_PR=$CC_PR" >> "$GITHUB_ENV"^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9993393Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9993751Z env:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9993948Z   REQUIRE_DOCKER: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9994169Z   CC_FORK: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9994529Z   CC_TOKEN: ***
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9994756Z   CC_BRANCH: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9994952Z   CC_PR: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9995141Z   CC_SHA: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9995350Z   GITHUB_EVENT_NAME: schedule
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9995608Z   GITHUB_EVENT_NUMBER: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9995859Z   GITHUB_EVENT_PULL_REQUEST_HEAD_SHA: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:14.9996144Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0090870Z ##[end-action id=__codecov_codecov-action.__run_7;outcome=success;conclusion=success;duration_ms=20]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0101767Z ##[start-action display=Upload coverage to Codecov;id=__codecov_codecov-action.__run_8]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0119324Z ##[group]Run ${GITHUB_ACTION_PATH}/dist/codecov.sh
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0119733Z ^[[36;1m${GITHUB_ACTION_PATH}/dist/codecov.sh^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0182961Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0183356Z env:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0183560Z   REQUIRE_DOCKER: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0183790Z   CC_FORK: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0184191Z   CC_TOKEN: ***
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0184399Z   CC_BRANCH: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0184596Z   CC_SHA: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0184798Z   CC_PR: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0184989Z   CC_BASE_SHA: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0185190Z   CC_BINARY: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0185384Z   CC_BUILD: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0185587Z   CC_BUILD_URL: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0185803Z   CC_CLEANUP: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0186018Z   CC_CODE: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0186216Z   CC_DIR: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0186423Z   CC_DISABLE_FILE_FIXES: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0186695Z   CC_DISABLE_SEARCH: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0187224Z   CC_DISABLE_TELEM: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0187470Z   CC_DRY_RUN: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0187692Z   CC_ENTERPRISE_URL: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0187914Z   CC_ENV: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0188137Z   CC_EXCLUDES: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0188625Z   CC_FAIL_ON_ERROR: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0188903Z   CC_FILES: coverage/clover.xml
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0189176Z   CC_FLAGS: integration
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0189424Z   CC_FORCE: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0189636Z   CC_GCOV_ARGS: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0189875Z   CC_GCOV_EXECUTABLE: gcov
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0190144Z   CC_GCOV_IGNORE: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0190373Z   CC_GCOV_INCLUDE: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0190609Z   CC_GIT_SERVICE: github
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0190874Z   CC_HANDLE_NO_REPORTS_FOUND: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0191173Z   CC_JOB_CODE: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0191396Z   CC_LEGACY: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0191622Z   CC_NAME: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0191843Z   CC_NETWORK_FILTER: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0192080Z   CC_NETWORK_PREFIX: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0192330Z   CC_NETWORK_ROOT_FOLDER: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0192588Z   CC_OS: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0192794Z   CC_PARENT_SHA: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0193016Z   CC_PLUGINS: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0193260Z   CC_RECURSE_SUBMODULES: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0193543Z   CC_REPORT_TYPE: coverage
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0193809Z   CC_RUN_CMD: upload-coverage
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0194075Z   CC_SERVICE: github
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0194330Z   CC_SKIP_VALIDATION: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0194598Z   CC_SLUG: <org>/drangler
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0194878Z   CC_SWIFT_PROJECT: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0195116Z   CC_USE_PYPI: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0195354Z   CC_VERBOSE: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0195585Z   CC_VERSION: latest
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0195819Z   CC_YML_PATH: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0196049Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0311493Z      _____          _
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0311804Z     / ____|        | |
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0312072Z    | |     ___   __| | ___  ___ _____   __
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0312379Z    | |    / _ \ / _` |/ _ \/ __/ _ \ \ / /
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0312709Z    | |___| (_) | (_| |  __/ (_| (_) \ V /
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0313009Z     \_____\___/ \__,_|\___|\___\___/ \_/
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0313807Z                            ^[[0;31m Wrapper-0.3.1^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0314148Z                            
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0371263Z ^[[0;32m==>^[[0m Detected ^[[0;36mlinux^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0372250Z ^[[0;32m ->^[[0m Downloading ^[[0;36mhttps://cli.codecov.io/latest/linux/codecov^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0462295Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0463155Z                                  Dload  Upload   Total   Spent    Left  Speed
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.0463648Z 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.1309486Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.1310215Z 100  9.9M  100  9.9M    0     0   117M      0 --:--:-- --:--:-- --:--:--  118M
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.1334999Z ^[[0;32m==>^[[0m Finishing downloading ^[[0;36mlinux:latest^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.1842121Z       Version: ^[[0;36mv11.3.1^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.1842707Z  
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.2481762Z gpg: directory '/home/runner/.gnupg' created
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.2484434Z gpg: keybox '/home/runner/.gnupg/pubring.kbx' created
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.2997856Z gpg: /home/runner/.gnupg/trustdb.gpg: trustdb created
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.2999429Z gpg: key 806BB28AED779869: public key "Codecov Uploader (Codecov Uploader Verification Key) <<email>>" imported
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.3348048Z gpg: Total number processed: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.3348811Z gpg:               imported: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.3354410Z ^[[0;32m==>^[[0m Verifying GPG signature integrity
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.3355413Z ^[[0;32m ->^[[0m Downloading ^[[0;36mhttps://cli.codecov.io/latest/linux/codecov.SHA256SUM^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.3356652Z ^[[0;32m ->^[[0m Downloading ^[[0;36mhttps://cli.codecov.io/latest/linux/codecov.SHA256SUM.sig^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.3357441Z  
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.4295708Z gpg: Signature made Thu Jul  9 01:37:57 2026 UTC
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.4296863Z gpg:                using RSA key <hex>
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.4304034Z gpg: Good signature from "Codecov Uploader (Codecov Uploader Verification Key) <<email>>" [unknown]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.4305645Z gpg: WARNING: This key is not certified with a trusted signature!
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.4306769Z gpg:          There is no indication that the signature belongs to the owner.
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.4307938Z Primary key fingerprint: 2703 4E7F DB85 0E0B BC2C  62FF 806B B28A ED77 9869
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.5144291Z codecov: OK
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.5157056Z ^[[0;32m==>^[[0m CLI integrity verified
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.5157855Z 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.5875071Z ^[[0;32m ->^[[0m Token length: 36
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.5876049Z ^[[0;32m==>^[[0m Running upload-coverage
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.5887140Z       ^[[0;36m./codecov  upload-coverage -t <redacted> --git-service github --slug <org>/drangler --file coverage/clover.xml --flag integration --gcov-executable gcov --report-type coverage^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:15.9585430Z info - 2026-09-30 10:31:15,958 -- ci service found: github-actions
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:16.0084283Z warning - 2026-09-30 10:31:16,008 -- xcrun is not installed or can't be found.
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:16.0939894Z warning - 2026-09-30 10:31:16,093 -- No gcov data found.
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:16.0944191Z warning - 2026-09-30 10:31:16,094 -- coverage.py is not installed or can't be found.
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:16.1866248Z info - 2026-09-30 10:31:16,186 -- Found 3 coverage files to report
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:16.1867716Z info - 2026-09-30 10:31:16,186 -- > /home/runner/work/drangler/drangler/coverage/coverage-final.json
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:16.1869471Z info - 2026-09-30 10:31:16,186 -- > /home/runner/work/drangler/drangler/coverage/lcov.info
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:16.1870675Z info - 2026-09-30 10:31:16,186 -- > /home/runner/work/drangler/drangler/coverage/clover.xml
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:16.9967889Z info - 2026-09-30 10:31:16,996 -- Your upload is now queued for processing. When finished, results will be available at: https://app.codecov.io/github/<org>/drangler/commit/558d2a621094d66464196822f8b7d17006930f13
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:16.9970911Z info - 2026-09-30 10:31:16,996 -- Sending upload (345648 bytes) to storage
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:17.2183183Z info - 2026-09-30 10:31:17,217 -- Upload queued for processing complete
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:17.2896828Z ##[end-action id=__codecov_codecov-action.__run_8;outcome=success;conclusion=success;duration_ms=2279]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:17.2944508Z ##[group]Run docker compose -f docker/compose.yml down -v --remove-orphans
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:17.2945075Z ^[[36;1mdocker compose -f docker/compose.yml down -v --remove-orphans^[[0m
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:17.3007532Z shell: /usr/bin/bash -e {0}
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:17.3007796Z env:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:17.3007994Z   REQUIRE_DOCKER: 1
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:17.3008220Z   CC_FORK: false
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:17.3009122Z   CC_TOKEN: ***
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:17.3009343Z   CC_BRANCH: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:17.3009538Z   CC_SHA: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:17.3009751Z   CC_PR: 
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:17.3009942Z ##[endgroup]
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:17.3795633Z  Container docker-drupal-1  Stopping
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:18.6075027Z  Container docker-drupal-1  Stopped
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:18.6075845Z  Container docker-drupal-1  Removing
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:18.9113046Z  Container docker-drupal-1  Removed
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:18.9113657Z  Container docker-db-1  Stopping
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.0778280Z  Container docker-db-1  Stopped
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.0779135Z  Container docker-db-1  Removing
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.1176014Z  Container docker-db-1  Removed
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.1183338Z  Network docker_default  Removing
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.2124538Z  Network docker_default  Removed
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.2825954Z Post job cleanup.
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.4065715Z Cache hit occurred on the primary key docker-Linux-<hex>, not saving cache.
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.4175905Z Post job cleanup.
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.6087241Z Post job cleanup.
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7022633Z [command]/usr/bin/git version
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7071875Z git version 2.55.0
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7113960Z Copying '/home/runner/.gitconfig' to '/home/runner/work/_temp/<uuid>/.gitconfig'
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7124936Z Temporarily overriding HOME='/home/runner/work/_temp/<uuid>' before making global git config changes
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7126370Z Adding repository directory to the temporary git global config as a safe directory
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7131694Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/drangler/drangler
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7171478Z Removing SSH command configuration
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7179221Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7223623Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7498267Z Removing HTTP extra header
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7499902Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7542230Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7821241Z Removing includeIf entries pointing to credentials config files
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7822386Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7866809Z includeif.gitdir:/home/runner/work/drangler/drangler/.git.path
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7879518Z includeif.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7880488Z includeif.gitdir:/github/workspace/.git.path
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7881326Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7883234Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/drangler/drangler/.git.path
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7912711Z /home/runner/work/_temp/git-credentials-<uuid>.config
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7924085Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/drangler/drangler/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-<uuid>\.config
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7978903Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.7997107Z /home/runner/work/_temp/git-credentials-<uuid>.config
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.8024080Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-<uuid>\.config
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.8066275Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.8096473Z /github/runner_temp/git-credentials-<uuid>.config
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.8105476Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-<uuid>\.config
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.8149416Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.8189698Z /github/runner_temp/git-credentials-<uuid>.config
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.8208977Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-<uuid>\.config
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.8239968Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.8483243Z Removing credentials config '/home/runner/work/_temp/git-credentials-<uuid>.config'
+Docker E2E	UNKNOWN STEP	2026-09-30T10:31:19.8649269Z Cleaning up orphan processes
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.8993500Z Current runner version: '2.337.0'
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9020451Z ##[group]Runner Image Provisioner
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9021482Z Hosted Compute Agent
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9022176Z Version: 20260828.587
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9023035Z Commit: <hex>
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9023918Z Build Date: 2026-08-28T16:44:25Z
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9024760Z Worker ID: {<uuid>}
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9025693Z Azure Region: eastus
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9026385Z ##[endgroup]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9028380Z ##[group]Operating System
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9029123Z Ubuntu
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9029751Z 24.04.5
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9030432Z LTS
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9031036Z ##[endgroup]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9031718Z ##[group]Runner Image
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9032579Z Image: ubuntu-24.04
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9033291Z Version: 20260920.314.1
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9034825Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260920.314/images/ubuntu/Ubuntu2404-Readme.md
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9037085Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260920.314
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9038661Z ##[endgroup]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9040065Z ##[group]GITHUB_TOKEN Permissions
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9042269Z Contents: read
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9043054Z Metadata: read
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9043703Z ##[endgroup]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9046036Z Secret source: Actions
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9047284Z Cache mode: write
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9048379Z Prepare workflow directory
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9467651Z Prepare all required actions
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:04.9521548Z Getting action download info
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.1915419Z Download action repository 'actions/checkout@v7' (SHA:<hex>)
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.3048588Z Download action repository 'oven-sh/setup-bun@v2' (SHA:<hex>)
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5263628Z Complete job name: Broken VPS
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5843926Z ##[group]Run actions/checkout@v7
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5844615Z with:
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5845001Z   repository: <org>/drangler
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5848234Z   token: ***
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5848584Z   ssh-strict: true
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5848933Z   ssh-user: git
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5849284Z   persist-credentials: true
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5849665Z   clean: true
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5850013Z   sparse-checkout-cone-mode: true
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5850432Z   fetch-depth: 1
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5850769Z   fetch-tags: false
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5851110Z   show-progress: true
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5851460Z   lfs: false
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5851780Z   submodules: false
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5852131Z   set-safe-directory: true
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5852528Z   allow-unsafe-pr-checkout: false
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5853086Z env:
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5853398Z   REQUIRE_DOCKER: 1
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5853742Z   REQUIRE_BROKEN: 1
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.5854082Z ##[endgroup]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6682823Z Syncing repository: <org>/drangler
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6684751Z ##[group]Getting Git version info
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6685701Z Working directory is '/home/runner/work/drangler/drangler'
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6687143Z [command]/usr/bin/git version
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6716605Z git version 2.55.0
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6732490Z ##[endgroup]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6740671Z Temporarily overriding HOME='/home/runner/work/_temp/<uuid>' before making global git config changes
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6742384Z Adding repository directory to the temporary git global config as a safe directory
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6747824Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/drangler/drangler
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6788298Z Deleting the contents of '/home/runner/work/drangler/drangler'
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6791303Z ##[group]Determining repository object format
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6792664Z ##[endgroup]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6793634Z ##[group]Initializing the repository
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6796426Z [command]/usr/bin/git init /home/runner/work/drangler/drangler
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6869458Z hint: Using 'master' as the name for the initial branch. This default branch name
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6870711Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6872188Z hint: to use in all of your new repositories, which will suppress this warning,
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6873136Z hint: call:
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6873675Z hint:
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6874318Z hint: 	git config --global init.defaultBranch <name>
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6875085Z hint:
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6875833Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6877177Z hint: 'development'. The just-created branch can be renamed via this command:
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6878096Z hint:
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6878615Z hint: 	git branch -m <name>
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6879213Z hint:
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6880089Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6881009Z Initialized empty Git repository in /home/runner/work/drangler/drangler/.git/
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6882560Z [command]/usr/bin/git remote add origin https://github.com/<org>/drangler
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6924889Z ##[endgroup]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6925796Z ##[group]Disabling automatic garbage collection
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6927543Z [command]/usr/bin/git config --local gc.auto 0
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6954629Z ##[endgroup]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6955910Z ##[group]Setting up auth
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6956535Z Removing SSH command configuration
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6959267Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.6986108Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.7279335Z Removing HTTP extra header
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.7284670Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.7316265Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.7513415Z Removing includeIf entries pointing to credentials config files
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.7517614Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.7548848Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.7740832Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-<uuid>.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.7773933Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/drangler/drangler/.git.path /home/runner/work/_temp/git-credentials-<uuid>.config
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.7803282Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-<uuid>.config
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.7834518Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-<uuid>.config
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.7864676Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-<uuid>.config
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.7892140Z ##[endgroup]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.7892772Z ##[group]Fetching the repository
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:05.7897291Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +558d2a621094d66464196822f8b7d17006930f13:refs/remotes/origin/master
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.1519488Z From https://github.com/<org>/drangler
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.1520425Z  * [new ref]         558d2a621094d66464196822f8b7d17006930f13 -> origin/master
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.1527598Z [command]/usr/bin/git branch --list --remote origin/master
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.1552984Z   origin/master
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.1558893Z [command]/usr/bin/git rev-parse refs/remotes/origin/master
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.1581851Z 558d2a621094d66464196822f8b7d17006930f13
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.1585635Z ##[endgroup]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.1586528Z ##[group]Determining the checkout info
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.1587520Z ##[endgroup]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.1589022Z [command]/usr/bin/git sparse-checkout disable
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.1634060Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.1663109Z ##[group]Checking out the ref
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.1666249Z [command]/usr/bin/git checkout --progress --force -B master refs/remotes/origin/master
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.1817999Z Reset branch 'master'
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.1822424Z branch 'master' set up to track 'origin/master'.
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.1828428Z ##[endgroup]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.1866095Z [command]/usr/bin/git log -1 --format=%H
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.1890590Z 558d2a621094d66464196822f8b7d17006930f13
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.2116789Z ##[group]Run oven-sh/setup-bun@v2
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.2117298Z with:
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.2117664Z   bun-version: latest
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.2118074Z   no-cache: false
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.2121265Z   token: ***
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.2121644Z env:
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.2121989Z   REQUIRE_DOCKER: 1
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.2122380Z   REQUIRE_BROKEN: 1
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.2122753Z ##[endgroup]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.7100856Z Downloading a new version of Bun: https://github.com/oven-sh/bun/releases/download/bun-v1.4.2/bun-linux-x64.zip
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:06.9469084Z [command]/usr/bin/unzip -o -q /home/runner/work/_temp/<uuid>.zip
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:07.4767717Z [command]/home/runner/.bun/bin/bun --revision
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:07.4810134Z 1.4.2+744846f84
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:07.5009599Z ##[group]Run bun install --frozen-lockfile
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:07.5010025Z ^[[36;1mbun install --frozen-lockfile^[[0m
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:07.5914555Z shell: /usr/bin/bash -e {0}
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:07.5914876Z env:
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:07.5915097Z   REQUIRE_DOCKER: 1
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:07.5915313Z   REQUIRE_BROKEN: 1
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:07.5915527Z ##[endgroup]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:07.6030643Z bun install v1.4.2 (744846f84)
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.3659543Z 
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.3660084Z $ husky
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4632480Z 
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4633507Z + @cloudflare/workers-types@5.20260815.1
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4633936Z + @types/node@26.2.0
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4634229Z + @vitest/coverage-v8@4.1.10
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4634511Z + husky@9.1.7
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4634776Z + lint-staged@17.3.0
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4635036Z + prettier@3.9.6
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4635336Z + prettier-plugin-organize-imports@4.3.0
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4635704Z + prettier-plugin-sh@0.19.0
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4636010Z + typedoc@0.28.20
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4636353Z + typescript@5.9.3
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4636784Z + vitest@4.1.10
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4637034Z + wrangler@4.123.0
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4637293Z + <private-pkg>@0.1.0
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4637562Z + commander@15.0.0
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4637698Z 
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4637860Z 134 packages installed [861.00ms]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4698502Z ##[group]Run bun tests/e2e/stack.ts broken
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4698831Z ^[[36;1mbun tests/e2e/stack.ts broken^[[0m
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4756500Z shell: /usr/bin/bash -e {0}
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4756914Z env:
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4757081Z   REQUIRE_DOCKER: 1
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4757292Z   REQUIRE_BROKEN: 1
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4757457Z ##[endgroup]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:29:08.4920179Z [e2e] bringing the stack and the broken arm up
+Broken VPS	UNKNOWN STEP	2026-09-30T10:30:07.1228036Z [e2e] ready
+Broken VPS	UNKNOWN STEP	2026-09-30T10:30:07.1271256Z ##[group]Run bunx vitest run --project=e2e tests/e2e/doctor-source.spec.ts
+Broken VPS	UNKNOWN STEP	2026-09-30T10:30:07.1271747Z ^[[36;1mbunx vitest run --project=e2e tests/e2e/doctor-source.spec.ts^[[0m
+Broken VPS	UNKNOWN STEP	2026-09-30T10:30:07.1330951Z shell: /usr/bin/bash -e {0}
+Broken VPS	UNKNOWN STEP	2026-09-30T10:30:07.1331483Z env:
+Broken VPS	UNKNOWN STEP	2026-09-30T10:30:07.1331651Z   REQUIRE_DOCKER: 1
+Broken VPS	UNKNOWN STEP	2026-09-30T10:30:07.1331824Z   REQUIRE_BROKEN: 1
+Broken VPS	UNKNOWN STEP	2026-09-30T10:30:07.1331990Z ##[endgroup]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:30:07.6310859Z 
+Broken VPS	UNKNOWN STEP	2026-09-30T10:30:07.6313792Z ^[[1m^[[30m^[[46m RUN ^[[49m^[[39m^[[22m ^[[36mv4.1.10 ^[[39m^[[90m/home/runner/work/drangler/drangler^[[39m
+Broken VPS	UNKNOWN STEP	2026-09-30T10:30:07.6314423Z 
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.1896099Z  ^[[32m✓^[[39m ^[[30m^[[45m e2e ^[[49m^[[39m tests/e2e/doctor-source.spec.ts ^[[2m(^[[22m^[[2m5 tests^[[22m^[[2m)^[[22m^[[33m 122218^[[2mms^[[22m^[[39m
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.1897476Z      ^[[33m^[[2m✓^[[22m^[[39m reports php-broken, and stops there because nothing below it was measured ^[[33m 23779^[[2mms^[[22m^[[39m
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.1898370Z      ^[[33m^[[2m✓^[[22m^[[39m reports drush-absent as a warning rather than as four blockers ^[[33m 17881^[[2mms^[[22m^[[39m
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.1899321Z      ^[[33m^[[2m✓^[[22m^[[39m reports db-unreachable with the driver named ^[[33m 19042^[[2mms^[[22m^[[39m
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.1900193Z      ^[[33m^[[2m✓^[[22m^[[39m reports files-missing when the directory is not there ^[[33m 24489^[[2mms^[[22m^[[39m
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.1901102Z      ^[[33m^[[2m✓^[[22m^[[39m reports bootstrap-fail on a truncated settings.php ^[[33m 23587^[[2mms^[[22m^[[39m
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.1926644Z 
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.1930574Z ^[[2m Test Files ^[[22m ^[[1m^[[32m1 passed^[[39m^[[22m^[[90m (1)^[[39m
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.1931157Z ^[[2m      Tests ^[[22m ^[[1m^[[32m5 passed^[[39m^[[22m^[[90m (5)^[[39m
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.1931611Z ^[[2m   Start at ^[[22m 10:30:07
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.1932216Z ^[[2m   Duration ^[[22m 122.56s^[[2m (transform 130ms, setup 0ms, import 246ms, tests 122.22s, environment 0ms)^[[22m
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.1933354Z 
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.2130045Z ##[group]Run docker compose -f docker/compose.yml --profile broken down -v --remove-orphans
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.2130581Z ^[[36;1mdocker compose -f docker/compose.yml --profile broken down -v --remove-orphans^[[0m
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.2186327Z shell: /usr/bin/bash -e {0}
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.2186520Z env:
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.2186850Z   REQUIRE_DOCKER: 1
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.2187034Z   REQUIRE_BROKEN: 1
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.2187190Z ##[endgroup]
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.2792211Z  Container docker-vps-broken-1  Stopping
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:10.2792641Z  Container docker-drupal-1  Stopping
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:12.1183886Z  Container docker-vps-broken-1  Stopped
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:12.1184625Z  Container docker-vps-broken-1  Removing
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:12.1185857Z  Container docker-drupal-1  Stopped
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:12.1186894Z  Container docker-drupal-1  Removing
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:12.6671183Z  Container docker-vps-broken-1  Removed
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:12.6671598Z  Container docker-drupal-1  Removed
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:12.6671905Z  Container docker-db-1  Stopping
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:12.9240751Z  Container docker-db-1  Stopped
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:12.9837002Z  Container docker-db-1  Removing
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:12.9837268Z  Container docker-db-1  Removed
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:12.9844146Z  Network docker_default  Removing
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.0646023Z  Network docker_default  Removed
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.0770704Z Post job cleanup.
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.2200654Z Post job cleanup.
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.2924096Z [command]/usr/bin/git version
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.2960274Z git version 2.55.0
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.2995277Z Temporarily overriding HOME='/home/runner/work/_temp/<uuid>' before making global git config changes
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.2996300Z Adding repository directory to the temporary git global config as a safe directory
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.2998084Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/drangler/drangler
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3027679Z Removing SSH command configuration
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3032445Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3063382Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3273241Z Removing HTTP extra header
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3278237Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3309137Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3510686Z Removing includeIf entries pointing to credentials config files
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3517380Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3546284Z includeif.gitdir:/home/runner/work/drangler/drangler/.git.path
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3547217Z includeif.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3547753Z includeif.gitdir:/github/workspace/.git.path
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3548180Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3554302Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/drangler/drangler/.git.path
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3577666Z /home/runner/work/_temp/git-credentials-<uuid>.config
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3586631Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/drangler/drangler/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-<uuid>\.config
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3625765Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3651602Z /home/runner/work/_temp/git-credentials-<uuid>.config
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3660155Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/drangler/drangler/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-<uuid>\.config
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3694634Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3721568Z /github/runner_temp/git-credentials-<uuid>.config
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3729511Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-<uuid>\.config
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3762544Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3784701Z /github/runner_temp/git-credentials-<uuid>.config
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3822975Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-<uuid>\.config
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.3855630Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.4043411Z Removing credentials config '/home/runner/work/_temp/git-credentials-<uuid>.config'
+Broken VPS	UNKNOWN STEP	2026-09-30T10:32:13.4173816Z Cleaning up orphan processes
