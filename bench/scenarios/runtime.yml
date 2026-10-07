@@ -1,0 +1,110 @@
+schema: 1
+templates:
+  - id: runtime-python-feature
+    title: The program uses a language feature the red Python does not have
+    dimension: runtime
+    instances: 2
+    variants:
+      - green_image: "python:3.12-slim"
+        red_image: "python:3.9-slim"
+        src: "import tomllib"
+        sig: "No module named 'tomllib'"
+        gate: "1000"
+        trials: "20"
+      - green_image: "python:3.11-slim"
+        red_image: "python:3.9-slim"
+        src: "match 1:\\n case 1: pass\\n"
+        sig: SyntaxError
+        gate: "500"
+        trials: "40"
+    gate: "{{gate}}"
+    trials: "{{trials}}"
+    runtime: python3
+    program: |
+      import os
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      exec(compile("{{src}}", "app.py", "exec"))
+      print("ok")
+    signature: "{{sig}}"
+    green:
+      image: "{{green_image}}"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: runtime
+      path: tool.python.version
+      attribute: python version
+      direction: lower
+    bundle:
+      - dimension: runtime
+        path: env.PYTHON_VERSION
+      - dimension: runtime
+        path: env.PYTHON_SHA256
+
+  - id: runtime-node-api
+    title: The program calls a Node API the red Node does not have
+    dimension: runtime
+    instances: 2
+    variants:
+      - red_image: "node:16-slim"
+        expr: "structuredClone({ a: 1 })"
+        sig: "structuredClone is not defined"
+      - red_image: "node:18-slim"
+        expr: "[3, 1, 2].toSorted()"
+        sig: "toSorted is not a function"
+    runtime: node
+    program: |
+      if (process.env.BENCH_FLAKE !== '1') {
+        console.log('ok');
+        process.exit(0);
+      }
+      {{expr}};
+      console.log('ok');
+    signature: "{{sig}}"
+    green:
+      image: "node:20-slim"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: runtime
+      path: tool.node.version
+      attribute: node version
+      direction: lower
+    bundle:
+      - dimension: runtime
+        path: env.NODE_VERSION
+
+  - id: runtime-java-virtual-basic
+    title: The program starts a virtual thread on a JDK that predates them
+    dimension: runtime
+    instances: 1
+    trials: 10
+    runtime: java
+    program: |
+      public class Prog {
+        public static void main(String[] args) throws Exception {
+          if (!"1".equals(System.getenv("BENCH_FLAKE"))) {
+            System.out.println("ok");
+            return;
+          }
+          Object builder = Thread.class.getMethod("ofVirtual").invoke(null);
+          System.out.println("ok " + builder.getClass().getSimpleName());
+        }
+      }
+    signature: NoSuchMethodException
+    green:
+      image: "eclipse-temurin:21-jdk"
+    red:
+      image: "eclipse-temurin:17-jdk"
+    cause:
+      dimension: runtime
+      path: tool.java.version
+      attribute: java version
+      direction: lower
+    bundle:
+      - dimension: runtime
+        path: env.JAVA_VERSION

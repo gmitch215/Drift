@@ -1,0 +1,106 @@
+schema: 1
+templates:
+  - id: locale-tz-date
+    title: A batch compares the local calendar day with the UTC day
+    dimension: locale
+    instances: 2
+    variants:
+      - gate: "1000"
+        trials: "20"
+      - gate: "500"
+        trials: "40"
+    draw:
+      tz: [Asia/Tokyo, Asia/Kolkata, Pacific/Auckland]
+    gate: "{{gate}}"
+    trials: "{{trials}}"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      day=$(date -d @1700000000 +%F)
+      if [ "$day" != 2023-11-14 ]; then
+        echo "report: date $day does not match the UTC batch day"
+        exit 1
+      fi
+      echo ok
+    signature: "does not match the UTC batch day"
+    base:
+      image: "debian:12-slim"
+    green:
+      env:
+        TZ: UTC
+    red:
+      env:
+        TZ: "{{tz}}"
+    cause:
+      dimension: locale
+      path: env.TZ
+      attribute: timezone
+      direction: changed
+
+  - id: locale-setlocale
+    title: A program asks for the environment locale and it is not installed
+    dimension: locale
+    instances: 2
+    draw:
+      lang: [de_DE.UTF-8, fr_FR.UTF-8, ja_JP.UTF-8]
+    runtime: python3
+    program: |
+      import locale
+      import os
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      locale.setlocale(locale.LC_ALL, "")
+      print("ok")
+    signature: "unsupported locale setting"
+    base:
+      image: "python:3.12-slim"
+    green:
+      env:
+        LANG: C.UTF-8
+    red:
+      env:
+        LANG: "{{lang}}"
+    cause:
+      dimension: locale
+      path: env.LANG
+      attribute: LANG
+      direction: changed
+
+  - id: locale-tz-decoy
+    title: The timezone shift, with a language setting changed beside it
+    dimension: locale
+    instances: 2
+    draw:
+      tz: [Asia/Tokyo, Asia/Kolkata, Pacific/Auckland]
+      lang: [POSIX, C, en_US.UTF-8]
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      day=$(date -d @1700000000 +%F)
+      if [ "$day" != 2023-11-14 ]; then
+        echo "report: date $day does not match the UTC batch day"
+        exit 1
+      fi
+      echo ok
+    signature: "does not match the UTC batch day"
+    base:
+      image: "debian:12-slim"
+    green:
+      env:
+        TZ: UTC
+        LANG: C.UTF-8
+    red:
+      env:
+        TZ: "{{tz}}"
+        LANG: "{{lang}}"
+    cause:
+      dimension: locale
+      path: env.TZ
+      attribute: timezone
+      direction: changed
+    decoys:
+      - dimension: locale
+        path: env.LANG

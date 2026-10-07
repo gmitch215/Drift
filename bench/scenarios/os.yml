@@ -1,0 +1,122 @@
+schema: 1
+templates:
+  - id: os-glibc-floor
+    title: The program needs a newer glibc than the red image ships
+    dimension: os
+    instances: 2
+    variants:
+      - green_image: "ubuntu:24.04"
+        red_image: "ubuntu:22.04"
+      - green_image: "debian:12-slim"
+        red_image: "debian:11-slim"
+      - green_image: "ubuntu:24.04"
+        red_image: "debian:11-slim"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      have=$(getconf GNU_LIBC_VERSION | cut -d' ' -f2)
+      first=$(printf '%s\n%s\n' 2.36 "$have" | sort -V | head -n 1)
+      if [ "$first" != 2.36 ]; then
+        echo "app: libc.so.6: version GLIBC_2.36 not found (have $have)"
+        exit 1
+      fi
+      echo ok
+    signature: "version GLIBC_2.36 not found"
+    green:
+      image: "{{green_image}}"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: os
+      path: tool.libc.version
+      attribute: glibc version
+      direction: lower
+    bundle:
+      - dimension: os
+        path: os.release.VERSION_ID
+      - dimension: os
+        path: os.release.PRETTY_NAME
+      - dimension: userland
+        path: tool.coreutils.version
+    note: An image change moves the OS release, glibc and coreutils together.
+
+  - id: os-distro-family-basic
+    title: The installer only supports one distribution family
+    dimension: os
+    instances: 2
+    variants:
+      - green_image: "ubuntu:22.04"
+        red_image: "debian:11-slim"
+        want: ubuntu
+        coreutils: ""
+      - green_image: "debian:12-slim"
+        red_image: "ubuntu:24.04"
+        want: debian
+        coreutils: tool.coreutils.version
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      . /etc/os-release
+      if [ "$ID" != "{{want}}" ]; then
+        echo "installer: unsupported distribution $ID"
+        exit 1
+      fi
+      echo ok
+    signature: "installer: unsupported distribution"
+    green:
+      image: "{{green_image}}"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: os
+      path: os.release.ID
+      attribute: distribution id
+      direction: changed
+    bundle:
+      - dimension: os
+        path: os.release.VERSION_ID
+      - dimension: os
+        path: os.release.PRETTY_NAME
+      - dimension: os
+        path: tool.libc.version
+      - dimension: userland
+        path: "{{coreutils}}"
+
+  - id: os-version-gate
+    title: A preflight check wants a minimum release
+    dimension: os
+    instances: 2
+    variants:
+      - green_image: "ubuntu:24.04"
+        red_image: "ubuntu:22.04"
+        min: "24.04"
+      - green_image: "debian:12-slim"
+        red_image: "debian:11-slim"
+        min: "12"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      . /etc/os-release
+      first=$(printf '%s\n%s\n' '{{min}}' "$VERSION_ID" | sort -V | head -n 1)
+      if [ "$first" != '{{min}}' ]; then
+        echo "preflight: requires release {{min}} or newer, found $VERSION_ID"
+        exit 1
+      fi
+      echo ok
+    signature: "preflight: requires release"
+    green:
+      image: "{{green_image}}"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: os
+      path: os.release.VERSION_ID
+      attribute: os release version
+      direction: lower
+    bundle:
+      - dimension: os
+        path: os.release.PRETTY_NAME
+      - dimension: os
+        path: tool.libc.version
+      - dimension: userland
+        path: tool.coreutils.version

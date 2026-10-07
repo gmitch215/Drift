@@ -1,0 +1,140 @@
+schema: 1
+templates:
+  - id: network-proxy
+    title: A proxy variable points at a closed port and a loopback call goes through it
+    dimension: network
+    instances: 2
+    variants:
+      - gate: "1000"
+        trials: "20"
+      - gate: "600"
+        trials: "40"
+    draw:
+      port: ["9", "1", "7"]
+    gate: "{{gate}}"
+    trials: "{{trials}}"
+    runtime: python3
+    program: |
+      import os
+      import sys
+      import threading
+      import urllib.request
+      from http.server import BaseHTTPRequestHandler, HTTPServer
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+
+
+      class Handler(BaseHTTPRequestHandler):
+          def do_GET(self):
+              self.send_response(200)
+              self.end_headers()
+              self.wfile.write(b"pong")
+
+          def log_message(self, *args):
+              pass
+
+
+      server = HTTPServer(("127.0.0.1", 0), Handler)
+      threading.Thread(target=server.serve_forever, daemon=True).start()
+      url = "http://127.0.0.1:%d/" % server.server_port
+      print(urllib.request.urlopen(url, timeout=5).read())
+    signature: "Connection refused"
+    base:
+      image: "python:3.12-slim"
+    red:
+      env:
+        HTTP_PROXY: "http://127.0.0.1:{{port}}"
+    cause:
+      dimension: network
+      path: env.HTTP_PROXY
+      attribute: HTTP_PROXY
+      direction: added
+
+  - id: network-hosts
+    title: A service name resolves through a hosts entry the red container lacks
+    dimension: network
+    instances: 2
+    variants:
+      - host: api.internal
+      - host: db.internal
+    runtime: python3
+    program: |
+      import os
+      import socket
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      print(socket.gethostbyname("{{host}}"))
+    signature: gaierror
+    base:
+      image: "python:3.12-slim"
+    green:
+      files:
+        /etc/hosts: "127.0.0.1 localhost\n127.0.0.1 {{host}}\n"
+    red:
+      files:
+        /etc/hosts: "127.0.0.1 localhost\n"
+    cause:
+      dimension: network
+      path: network.hosts
+      attribute: hosts file
+      direction: changed
+    visible: false
+    note: The capsule does not read /etc/hosts yet.
+
+  - id: network-proxy-decoy
+    title: The proxy variable, with an unrelated no-proxy list changed beside it
+    dimension: network
+    instances: 2
+    variants:
+      - red_no_proxy: internal.example
+      - red_no_proxy: "corp.example,10.0.0.0/8"
+    runtime: python3
+    program: |
+      import os
+      import sys
+      import threading
+      import urllib.request
+      from http.server import BaseHTTPRequestHandler, HTTPServer
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+
+
+      class Handler(BaseHTTPRequestHandler):
+          def do_GET(self):
+              self.send_response(200)
+              self.end_headers()
+              self.wfile.write(b"pong")
+
+          def log_message(self, *args):
+              pass
+
+
+      server = HTTPServer(("127.0.0.1", 0), Handler)
+      threading.Thread(target=server.serve_forever, daemon=True).start()
+      url = "http://127.0.0.1:%d/" % server.server_port
+      print(urllib.request.urlopen(url, timeout=5).read())
+    signature: "Connection refused"
+    base:
+      image: "python:3.12-slim"
+    green:
+      env:
+        NO_PROXY: "other.example"
+    red:
+      env:
+        HTTP_PROXY: "http://127.0.0.1:9"
+        NO_PROXY: "{{red_no_proxy}}"
+    cause:
+      dimension: network
+      path: env.HTTP_PROXY
+      attribute: HTTP_PROXY
+      direction: added
+    decoys:
+      - dimension: network
+        path: env.NO_PROXY

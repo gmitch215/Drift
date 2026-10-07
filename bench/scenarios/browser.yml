@@ -1,0 +1,67 @@
+schema: 1
+templates:
+  - id: browser-engine-api
+    title: A page script calls an API the red browser engine lacks (no browser runs in these containers)
+    dimension: browser
+    instances: 2
+    draw:
+      red_version: ["96.0.4664.110", "98.0.4758.102", "92.0.4515.159"]
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      echo "TypeError: Array.prototype.findLast is not a function"
+      exit 1
+    signature: "findLast is not a function"
+    controllable: false
+    base:
+      image: "debian:12-slim"
+    green:
+      gate: 0
+    red:
+      gate: 1000
+    cause:
+      dimension: browser
+      path: browser.engine.version
+      attribute: browser engine version
+      direction: lower
+    capsule-overrides:
+      - path: browser.engine.version
+        green: "120.0.6099.109"
+        red: "{{red_version}}"
+    note: Manual class. No browser runs here; the red failure is by construction and the capsule values are written in.
+
+  - id: browser-engine-flaky-std
+    title: The engine API gap shows on part of the runs, with an engine name decoy
+    dimension: browser
+    instances: 2
+    draw:
+      red_version: ["96.0.4664.110", "98.0.4758.102", "92.0.4515.159"]
+      red_name: [chrome, edge, brave]
+    gate: 550
+    trials: 40
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      echo "TypeError: structuredClone is not a function"
+      exit 1
+    signature: "structuredClone is not a function"
+    controllable: false
+    base:
+      image: "debian:12-slim"
+    green:
+      gate: 0
+    cause:
+      dimension: browser
+      path: browser.engine.version
+      attribute: browser engine version
+      direction: lower
+    decoys:
+      - dimension: browser
+        path: browser.engine.name
+    capsule-overrides:
+      - path: browser.engine.version
+        green: "120.0.6099.109"
+        red: "{{red_version}}"
+      - path: browser.engine.name
+        green: chromium
+        red: "{{red_name}}"

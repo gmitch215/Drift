@@ -1,0 +1,62 @@
+schema: 1
+templates:
+  - id: cpu-count-pool
+    title: A worker pool sizes itself from the visible CPUs and divides by zero on one
+    dimension: cpu
+    instances: 2
+    variants:
+      - green_cpuset: "0-3"
+      - green_cpuset: "0-1"
+    runtime: python3
+    program: |
+      import os
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      workers = len(os.sched_getaffinity(0)) - 1
+      print("chunk", 100 // workers)
+    signature: ZeroDivisionError
+    base:
+      image: "python:3.12-slim"
+    green:
+      cpuset: "{{green_cpuset}}"
+    red:
+      cpuset: "0"
+    cause:
+      dimension: cpu
+      path: cpu.count
+      attribute: CPUs the process may run on
+      direction: lower
+    visible: false
+    note: The capsule reads the host CPU count, so a cpuset is not visible in it.
+
+  - id: cpu-model-flag-base
+    title: An instruction is missing on the red CPU model (a container cannot vary the CPU)
+    dimension: cpu
+    instances: 2
+    draw:
+      red_model: ["Intel Xeon E5-2650 v2", "AMD Opteron 6272", "Intel Core i7-3770"]
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      echo "Illegal instruction (core dumped)"
+      exit 132
+    signature: "Illegal instruction"
+    controllable: false
+    base:
+      image: "debian:12-slim"
+    green:
+      gate: 0
+    red:
+      gate: 1000
+    cause:
+      dimension: cpu
+      path: cpu.model
+      attribute: CPU model
+      direction: changed
+    capsule-overrides:
+      - path: cpu.model
+        green: "AMD EPYC 7B13"
+        red: "{{red_model}}"

@@ -1,0 +1,51 @@
+schema: 1
+templates:
+  - id: compiler-c2x-plain
+    title: The source uses a C23 feature the red gcc rejects
+    dimension: compiler
+    instances: 2
+    variants:
+      - decl: "constexpr int limit = 4; (void)limit;"
+      - decl: "void *p = nullptr; (void)p;"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      cd /tmp
+      cat > app.c <<'EOF'
+      int main(void) {
+        {{decl}}
+        return 0;
+      }
+      EOF
+      gcc -std=c2x -o app app.c
+    signature: "error:"
+    green:
+      image: "gcc:13.2"
+    red:
+      image: "gcc:11.4"
+    cause:
+      dimension: compiler
+      path: tool.cc.version
+      attribute: gcc version
+      direction: lower
+    bundle:
+      - dimension: compiler
+        path: env.GCC_VERSION
+      - dimension: compiler
+        path: env.GCC_MIRRORS
+      - dimension: os
+        path: os.release.VERSION_ID
+      - dimension: os
+        path: os.release.PRETTY_NAME
+      - dimension: os
+        path: tool.libc.version
+      - dimension: userland
+        path: tool.coreutils.version
+      - dimension: userland
+        path: tool.git.version
+      - dimension: runtime
+        path: tool.go.raw
+      - dimension: runtime
+        path: tool.python.version
+      - dimension: runtime
+        path: tool.python.externally-managed

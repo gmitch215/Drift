@@ -1,0 +1,128 @@
+schema: 1
+templates:
+  - id: control-env-noise
+    title: Only a log level differs and the red runs fail on their own
+    dimension: env
+    instances: 2
+    variants:
+      - green_level: info
+        red_level: debug
+        gate: "400"
+      - green_level: warn
+        red_level: trace
+        gate: "650"
+    gate: "{{gate}}"
+    trials: 50
+    runtime: python3
+    program: |
+      import os
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      raise RuntimeError("upstream timeout while fetching the manifest")
+    signature: "upstream timeout while fetching the manifest"
+    base:
+      image: "python:3.12-slim"
+    green:
+      gate: 0
+      env:
+        LOG_LEVEL: "{{green_level}}"
+    red:
+      env:
+        LOG_LEVEL: "{{red_level}}"
+    cause: none
+    decoys:
+      - dimension: env
+        path: env.LOG_LEVEL
+
+  - id: control-locale-noise-fixed
+    title: Only a language and a timezone differ and the red runs fail on their own
+    dimension: locale
+    instances: 2
+    draw:
+      red_tz: [Europe/Berlin, America/Chicago, Asia/Singapore]
+    gate: 500
+    trials: 50
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      echo "worker: lost heartbeat from the scheduler"
+      exit 1
+    signature: "lost heartbeat from the scheduler"
+    base:
+      image: "debian:12-slim"
+    green:
+      gate: 0
+      env:
+        TZ: UTC
+        LANG: C.UTF-8
+    red:
+      env:
+        TZ: "{{red_tz}}"
+        LANG: POSIX
+    cause: none
+    decoys:
+      - dimension: locale
+        path: env.TZ
+      - dimension: locale
+        path: env.LANG
+
+  - id: control-runtime-noise
+    title: Only a Python patch line differs, the program uses nothing from it, and the red runs fail on their own
+    dimension: runtime
+    instances: 2
+    variants:
+      - red_image: "python:3.11-slim"
+        gate: "450"
+      - red_image: "python:3.10-slim"
+        gate: "600"
+    gate: "{{gate}}"
+    trials: 50
+    runtime: python3
+    program: |
+      import os
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      raise OSError("temporary failure fetching the index")
+    signature: "temporary failure fetching the index"
+    green:
+      gate: 0
+      image: "python:3.12-slim"
+    red:
+      image: "{{red_image}}"
+    cause: none
+    decoys:
+      - dimension: runtime
+        path: tool.python.version
+      - dimension: runtime
+        path: env.PYTHON_VERSION
+      - dimension: runtime
+        path: env.PYTHON_SHA256
+
+  - id: control-identical-fixed
+    title: Nothing differs between the arms and the red runs fail on their own
+    dimension: os
+    instances: 2
+    variants:
+      - image: "debian:12-slim"
+        gate: "500"
+      - image: "ubuntu:24.04"
+        gate: "350"
+    gate: "{{gate}}"
+    trials: 50
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      echo "job: remote end closed the connection without a response"
+      exit 1
+    signature: "remote end closed the connection"
+    base:
+      image: "{{image}}"
+    green:
+      gate: 0
+    cause: none

@@ -1,0 +1,78 @@
+schema: 1
+templates:
+  - id: build-npm-sbom-plain
+    title: A build step runs an npm command the red npm does not have
+    dimension: build
+    instances: 1
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      npm sbom --help
+    signature: "Unknown command"
+    green:
+      image: "node:20-slim"
+    red:
+      image: "node:16-slim"
+    cause:
+      dimension: build
+      path: tool.npm.version
+      attribute: npm version
+      direction: lower
+    bundle:
+      - dimension: runtime
+        path: tool.node.version
+      - dimension: runtime
+        path: env.NODE_VERSION
+      - dimension: build
+        path: env.YARN_VERSION
+      - dimension: os
+        path: os.release.VERSION_ID
+      - dimension: os
+        path: os.release.PRETTY_NAME
+      - dimension: os
+        path: tool.libc.version
+      - dimension: userland
+        path: tool.coreutils.version
+    visible: false
+    note: The capsule has no npm attribute; the node version that comes with it is visible.
+
+  - id: build-lockfile-pin
+    title: A lockfile pins a dependency release that dropped an API
+    dimension: build
+    instances: 2
+    variants:
+      - lib: widgetkit
+        good: 1.4.2
+        bad: 1.5.0
+        gate: "1000"
+        trials: "20"
+      - lib: schemakit
+        good: 2.9.1
+        bad: 3.0.0
+        gate: "450"
+        trials: "40"
+    gate: "{{gate}}"
+    trials: "{{trials}}"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      ver=$(sed -n 's/^{{lib}}==//p' /etc/app/lock.txt)
+      case "$ver" in
+        {{bad}}) echo "ImportError: cannot import name legacy_api from {{lib}} ($ver)"; exit 1 ;;
+      esac
+      echo ok
+    signature: "ImportError: cannot import name legacy_api"
+    base:
+      image: "debian:12-slim"
+    green:
+      files:
+        /etc/app/lock.txt: "{{lib}}=={{good}}\n"
+    red:
+      files:
+        /etc/app/lock.txt: "{{lib}}=={{bad}}\n"
+    cause:
+      dimension: build
+      path: "deps.{{lib}}.version"
+      attribute: locked release of {{lib}}
+      direction: higher
+    visible: false

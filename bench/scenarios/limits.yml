@@ -1,0 +1,116 @@
+schema: 1
+templates:
+  - id: limits-nofile
+    title: A program opens more files than the red descriptor limit allows
+    dimension: limits
+    instances: 2
+    variants:
+      - open: "200"
+        red_limit: "64:64"
+      - open: "300"
+        red_limit: "128:128"
+    runtime: python3
+    program: |
+      import os
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      handles = [open("/dev/null") for _ in range({{open}})]
+      print("opened", len(handles))
+    signature: "Too many open files"
+    base:
+      image: "python:3.12-slim"
+    green:
+      ulimits:
+        nofile: "1024:1024"
+    red:
+      ulimits:
+        nofile: "{{red_limit}}"
+    cause:
+      dimension: limits
+      path: limits.nofile
+      attribute: open file descriptor limit
+      direction: lower
+    visible: false
+    note: The capsule has no ulimit attribute yet.
+
+  - id: limits-fsize
+    title: A program writes a file larger than the red file size limit
+    dimension: limits
+    instances: 2
+    variants:
+      - bytes: "300000"
+        red_limit: "100000:100000"
+      - bytes: "600000"
+        red_limit: "200000:200000"
+    runtime: python3
+    program: |
+      import os
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      with open("/tmp/out.bin", "wb") as f:
+          f.write(b"x" * {{bytes}})
+      print("written")
+    signature: "File too large"
+    base:
+      image: "python:3.12-slim"
+    red:
+      ulimits:
+        fsize: "{{red_limit}}"
+    cause:
+      dimension: limits
+      path: limits.fsize
+      attribute: file size limit
+      direction: lower
+    visible: false
+
+  - id: limits-nofile-decoy
+    title: The descriptor limit, with a memory limit and a log level changed beside it
+    dimension: limits
+    instances: 2
+    variants:
+      - red_memory: 384m
+        red_level: debug
+      - red_memory: 256m
+        red_level: trace
+    runtime: python3
+    program: |
+      import os
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      handles = [open("/dev/null") for _ in range(200)]
+      print("opened", len(handles))
+    signature: "Too many open files"
+    base:
+      image: "python:3.12-slim"
+    green:
+      memory: 512m
+      env:
+        LOG_LEVEL: info
+      ulimits:
+        nofile: "1024:1024"
+    red:
+      memory: "{{red_memory}}"
+      env:
+        LOG_LEVEL: "{{red_level}}"
+      ulimits:
+        nofile: "64:64"
+    cause:
+      dimension: limits
+      path: limits.nofile
+      attribute: open file descriptor limit
+      direction: lower
+    decoys:
+      - dimension: memory
+        path: cgroup.memory.max
+      - dimension: env
+        path: env.LOG_LEVEL
+    visible: false

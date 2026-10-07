@@ -1,0 +1,67 @@
+schema: 1
+templates:
+  - id: kernel-release-gate-basic
+    title: A syscall is missing on the red kernel (a container cannot vary the kernel)
+    dimension: kernel
+    instances: 2
+    draw:
+      red_kernel: ["5.4.0-150-generic", "4.19.0-25-amd64", "5.10.0-28-amd64"]
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      echo "app: io_uring_setup failed: Function not implemented"
+      exit 1
+    signature: "io_uring_setup failed"
+    controllable: false
+    base:
+      image: "debian:12-slim"
+    green:
+      gate: 0
+    red:
+      gate: 1000
+    cause:
+      dimension: kernel
+      path: kernel.release
+      attribute: kernel version
+      direction: lower
+    capsule-overrides:
+      - path: kernel.release
+        green: "6.8.0-45-generic"
+        red: "{{red_kernel}}"
+    note: Manual class. Both arms run one configuration; the red failure is by construction and the capsule values are written in.
+
+  - id: kernel-clocksource-flaky-basic
+    title: A timer misbehaves on the red clocksource, with a kernel patch-level decoy
+    dimension: kernel
+    instances: 2
+    draw:
+      red_source: [hpet, acpi_pm, jiffies]
+    gate: 450
+    trials: 40
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      echo "app: clock_gettime went backwards by 3 ms"
+      exit 1
+    signature: "clock_gettime went backwards"
+    controllable: false
+    base:
+      image: "debian:12-slim"
+    green:
+      gate: 0
+    cause:
+      dimension: kernel
+      path: hw.clocksource
+      attribute: clocksource
+      direction: changed
+    decoys:
+      - dimension: kernel
+        path: kernel.release
+    capsule-overrides:
+      - path: hw.clocksource
+        green: tsc
+        red: "{{red_source}}"
+      - path: kernel.release
+        green: "6.8.0-45-generic"
+        red: "6.8.0-48-generic"
+    note: Manual class and intermittent; the kernel patch level is a decoy.

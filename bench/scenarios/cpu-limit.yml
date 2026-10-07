@@ -1,0 +1,78 @@
+schema: 1
+templates:
+  - id: cpu-limit-quota-basic
+    title: A pool refuses to start under less than one CPU of quota
+    dimension: cpu-limit
+    instances: 2
+    variants:
+      - red_cpus: "0.5"
+        gate: "1000"
+        trials: "20"
+      - red_cpus: "0.25"
+        gate: "400"
+        trials: "50"
+    gate: "{{gate}}"
+    trials: "{{trials}}"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      read quota period < /sys/fs/cgroup/cpu.max
+      if [ "$quota" != max ] && [ "$quota" -lt "$period" ]; then
+        echo "pool: cpu quota $quota/$period is below one full cpu, refusing to start"
+        exit 1
+      fi
+      echo ok
+    signature: "refusing to start"
+    base:
+      image: "debian:12-slim"
+    green:
+      cpus: "2"
+    red:
+      cpus: "{{red_cpus}}"
+    cause:
+      dimension: cpu-limit
+      path: cgroup.cpu.max
+      attribute: cpu quota
+      direction: lower
+
+  - id: cpu-limit-quota-decoy
+    title: The quota check with a memory limit and a log level changed beside it
+    dimension: cpu-limit
+    instances: 2
+    variants:
+      - red_memory: 384m
+        red_level: debug
+      - red_memory: 256m
+        red_level: trace
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      read quota period < /sys/fs/cgroup/cpu.max
+      if [ "$quota" != max ] && [ "$quota" -lt "$period" ]; then
+        echo "pool: cpu quota $quota/$period is below one full cpu, refusing to start"
+        exit 1
+      fi
+      echo ok
+    signature: "refusing to start"
+    base:
+      image: "debian:12-slim"
+    green:
+      cpus: "2"
+      memory: 512m
+      env:
+        LOG_LEVEL: info
+    red:
+      cpus: "0.5"
+      memory: "{{red_memory}}"
+      env:
+        LOG_LEVEL: "{{red_level}}"
+    cause:
+      dimension: cpu-limit
+      path: cgroup.cpu.max
+      attribute: cpu quota
+      direction: lower
+    decoys:
+      - dimension: memory
+        path: cgroup.memory.max
+      - dimension: env
+        path: env.LOG_LEVEL

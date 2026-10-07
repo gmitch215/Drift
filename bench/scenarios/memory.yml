@@ -1,0 +1,80 @@
+schema: 1
+templates:
+  - id: memory-oom
+    title: A job loads a data set larger than the red memory limit
+    dimension: memory
+    instances: 2
+    variants:
+      - mb: "200"
+        red_memory: 96m
+        gate: "1000"
+        trials: "20"
+      - mb: "256"
+        red_memory: 128m
+        gate: "350"
+        trials: "50"
+    gate: "{{gate}}"
+    trials: "{{trials}}"
+    runtime: python3
+    program: |
+      import os
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      data = b"x" * ({{mb}} * 1024 * 1024)
+      print("loaded", len(data))
+    exit: "137"
+    base:
+      image: "python:3.12-slim"
+    green:
+      memory: 512m
+    red:
+      memory: "{{red_memory}}"
+    cause:
+      dimension: memory
+      path: cgroup.memory.max
+      attribute: memory limit
+      direction: lower
+
+  - id: memory-oom-decoy
+    title: The same load with a CPU limit and an allocator setting changed beside it
+    dimension: memory
+    instances: 2
+    variants:
+      - red_cpus: "1"
+        arenas: "1"
+      - red_cpus: "0.5"
+        arenas: "2"
+    runtime: python3
+    program: |
+      import os
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      data = b"x" * (200 * 1024 * 1024)
+      print("loaded", len(data))
+    exit: "137"
+    base:
+      image: "python:3.12-slim"
+    green:
+      memory: 512m
+      cpus: "2"
+    red:
+      memory: 96m
+      cpus: "{{red_cpus}}"
+      env:
+        MALLOC_ARENA_MAX: "{{arenas}}"
+    cause:
+      dimension: memory
+      path: cgroup.memory.max
+      attribute: memory limit
+      direction: lower
+    decoys:
+      - dimension: cpu-limit
+        path: cgroup.cpu.max
+      - dimension: env
+        path: env.MALLOC_ARENA_MAX

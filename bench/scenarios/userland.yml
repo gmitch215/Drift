@@ -1,0 +1,64 @@
+schema: 1
+templates:
+  - id: userland-cp-update
+    title: A script uses a cp option newer than the red coreutils
+    dimension: userland
+    instances: 2
+    variants:
+      - red_image: "ubuntu:22.04"
+        id_path: ""
+      - red_image: "debian:12-slim"
+        id_path: os.release.ID
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      cd /tmp
+      echo old > keep.txt
+      echo new > incoming.txt
+      cp --update=none incoming.txt keep.txt
+    signature: "doesn't allow an argument"
+    green:
+      image: "ubuntu:24.04"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: userland
+      path: tool.coreutils.version
+      attribute: coreutils version
+      direction: lower
+    bundle:
+      - dimension: os
+        path: os.release.VERSION_ID
+      - dimension: os
+        path: os.release.PRETTY_NAME
+      - dimension: os
+        path: tool.libc.version
+      - dimension: os
+        path: "{{id_path}}"
+
+  - id: userland-shell-bashism
+    title: A script written for bash is started with sh
+    dimension: userland
+    instances: 2
+    variants:
+      - stmt: '[[ abc == a* ]] && echo ok'
+        sig: "[[: not found"
+      - stmt: 'name=value; echo "${name^^}"'
+        sig: "Bad substitution"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      {{stmt}}
+    signature: "{{sig}}"
+    base:
+      image: "debian:12-slim"
+    green:
+      interpreter: bash
+    red:
+      interpreter: sh
+    cause:
+      dimension: userland
+      path: tool.shell.flavor
+      attribute: shell that runs the script
+      direction: changed
+    visible: false
