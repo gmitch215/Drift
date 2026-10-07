@@ -1,0 +1,11 @@
+build/
+.gradle/
+.kotlin/
+.idea/
+kotlin-js-store/
+fixtures/
+bench/data/
+gradlew.bat
+.gitattributes
+.editorconfig
+renovate.json

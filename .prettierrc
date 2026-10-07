@@ -1,0 +1,23 @@
+{
+	"printWidth": 100,
+	"singleQuote": true,
+	"useTabs": true,
+	"tabWidth": 4,
+	"endOfLine": "lf",
+	"overrides": [
+		{
+			"files": "*.{yml,yaml,md}",
+			"options": {
+				"useTabs": false,
+				"tabWidth": 2
+			}
+		},
+		{
+			"files": [".prettierrc"],
+			"options": {
+				"parser": "json",
+				"singleQuote": false
+			}
+		}
+	]
+}
