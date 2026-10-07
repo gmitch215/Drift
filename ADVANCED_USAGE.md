@@ -941,7 +941,7 @@ curl -s -o /dev/null -w '%{http_code} %{content_type}\n' http://localhost:PORT/p
 200 text/html; charset=utf-8
 ```
 
-The `docs.yml` workflow runs `./gradlew dokkaGenerate atlasSite` and pushes the site, with the engine documentation under `engine/`, to the `gh-pages` branch when a release is published or when someone starts it by hand. It has not run yet.
+The `docs.yml` workflow runs `./gradlew dokkaGenerate atlasSite` and pushes the site, with the engine documentation under `engine/`, to the `gh-pages` branch. It builds on pushes to `master`, `ver/*`, `feat/*` and `renovate/*` and deploys only from `master`. It has not run yet.
 
 ## Install and Uninstall
 
@@ -1361,7 +1361,7 @@ The server reads each file whole into memory for each request, so a few large co
 `install.sh` (POSIX `sh`) and `install.ps1` (PowerShell 5.1 and 7) download a release archive, verify its checksum, check that the executable runs and hand over to `drift install`. They live in the repository root. Both fail with `cannot download` until a release exists.
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/main/install.sh | sh -s -- --dry-run
+curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh | sh -s -- --dry-run
 ```
 
 | Option | Effect |

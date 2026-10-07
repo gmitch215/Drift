@@ -1,13 +1,13 @@
 name: Deploy Documentation
 
 on:
-  release:
-    types: [published]
+  push:
+    branches: [master, ver/*, feat/*, renovate/*]
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 jobs:
   deploy:
@@ -46,6 +46,7 @@ jobs:
             exit 1
           fi
       - name: Deploy Documentation
+        if: github.ref == 'refs/heads/master'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"

@@ -75,8 +75,8 @@ target, then shows the recorded one.
 
 `drift atlas record`, `build`, `compare` and `show` do the same work from the command line.
 `./gradlew atlasSite` builds the static site: Studio at the root, a page per probe and the dataset
-as JSON. The `docs.yml` workflow publishes that site and the engine documentation to GitHub Pages
-when a release is published or the workflow is run by hand.
+as JSON. The `docs.yml` workflow builds that site and the engine documentation on every push and
+publishes them to GitHub Pages from `master`.
 
 ---
 
@@ -142,13 +142,13 @@ choco install drift-studio
 ### Install Script
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh | sh
 ```
 
 On Windows, in PowerShell:
 
 ```powershell
-irm https://raw.githubusercontent.com/gmitch215/Drift/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/gmitch215/Drift/master/install.ps1 | iex
 ```
 
 Each script finds your OS and architecture, downloads the archive and its `.sha256` file from the
