@@ -74,9 +74,12 @@ device it runs on, measured live. A predict-and-reveal mode asks for the output 
 target, then shows the recorded one.
 
 `drift atlas record`, `build`, `compare` and `show` do the same work from the command line.
-`./gradlew atlasSite` builds the static site: Studio at the root, a page per probe and the dataset
-as JSON. The `docs.yml` workflow builds that site and the engine documentation on every push and
-publishes them to GitHub Pages from `master`, with the custom domain `drift.gmitch215.dev`.
+`./gradlew atlasSite` builds the static Atlas site: Studio, a page per probe and the dataset as
+JSON. `./gradlew docsSite` assembles the documentation site around it: this README as the front
+page, the two documents listed under Documentation as pages of their own, the Atlas site under
+`atlas/` and the engine documentation under `engine/`. The `docs.yml` workflow builds that site on
+every push and publishes it to GitHub Pages from `master`, with the custom domain
+`drift.gmitch215.dev`.
 
 ---
 
@@ -464,8 +467,9 @@ The measurements and their instruments are in the
 - [TECHNICAL_REPORT.md](./TECHNICAL_REPORT.md) describes the design, the evidence and the numbers.
 - [ADVANCED_USAGE.md](./ADVANCED_USAGE.md) covers every command and flag, with output from real runs.
 - Engine documentation for the modules is generated with Dokka by `./gradlew :dokkaGenerate` into
-  `build/dokka/html`. It describes how the code is organized. Drift ships as an application, and the
-  modules are not a public API or a published library.
+  `build/dokka/html`, and `docsSite` copies it to `engine/`. It describes how the code is
+  organized. Drift ships as an application, and the modules are not a public API or a published
+  library.
 
 ---
 

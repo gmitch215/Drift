@@ -27,24 +27,18 @@ jobs:
           java-version: '21'
           cache: 'gradle'
       - name: Build Documentation
-        run: ./gradlew dokkaGenerate atlasSite
-      - name: Assemble Site
-        run: |
-          cp -R build/atlas-site "$RUNNER_TEMP/site"
-          mkdir -p "$RUNNER_TEMP/site/engine"
-          cp -R build/dokka/html/. "$RUNNER_TEMP/site/engine/"
-          touch "$RUNNER_TEMP/site/.nojekyll"
-          echo "drift.gmitch215.dev" > "$RUNNER_TEMP/site/CNAME"
+        run: ./gradlew dokkaGenerate atlasSite docsSite
       - name: Check Site Layout
         run: |
-          test -f "$RUNNER_TEMP/site/index.html"
-          test -f "$RUNNER_TEMP/site/probe/index.html"
-          test -f "$RUNNER_TEMP/site/data/dataset.json"
-          test -f "$RUNNER_TEMP/site/engine/index.html"
-          test -f "$RUNNER_TEMP/site/.nojekyll"
-          test "$(cat "$RUNNER_TEMP/site/CNAME")" = "drift.gmitch215.dev"
-          if find "$RUNNER_TEMP/site" \( -name build -o -name .gradle -o -name .kotlin -o -name '*.kexe' \) | grep -q .; then
-            echo "build output outside the two site outputs"
+          site=build/site
+          for file in index.html advanced-usage.html technical-report.html \
+            atlas/index.html atlas/probe/index.html atlas/data/dataset.json engine/index.html \
+            drift.png drift_128.png drift.ico .nojekyll CNAME; do
+            test -f "$site/$file" || { echo "missing $site/$file"; exit 1; }
+          done
+          test "$(cat "$site/CNAME")" = "drift.gmitch215.dev"
+          if find "$site" \( -name build -o -name .gradle -o -name .kotlin -o -name '*.kexe' \) | grep -q .; then
+            echo "build output inside the site"
             exit 1
           fi
       - name: Deploy Documentation
@@ -60,7 +54,7 @@ jobs:
           fi
           cd "$RUNNER_TEMP/pages"
           git rm -rf . >/dev/null 2>&1 || true
-          cp -R "$RUNNER_TEMP/site/." .
+          cp -R "$GITHUB_WORKSPACE/build/site/." .
           git add .
           if git diff --cached --quiet; then
             echo "No changes to deploy"

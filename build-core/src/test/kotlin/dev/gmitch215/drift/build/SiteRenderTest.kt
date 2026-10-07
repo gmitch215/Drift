@@ -145,6 +145,13 @@ class SiteRenderTest {
 	}
 
 	@Test
+	fun everyPageLinksBackToTheDirectoryAboveTheSite() {
+		assertTrue("<a href=\"../../\">Drift</a>" in page("kotlin.a.same"))
+		assertTrue("<a href=\"../../\">Drift</a>" in SiteRender.index(dataset, columns, "d", files))
+		assertTrue("<a href=\"./../\">Drift</a>" in SiteRender.notFound())
+	}
+
+	@Test
 	fun malformedDatasetsAreRefused() {
 		for (bad in listOf("[]", "{\"schema\":1}", "{\"schema\":2,\"probes\":[]}")) {
 			val e = kotlin.runCatching { SiteData.dataset(bad) }.exceptionOrNull()

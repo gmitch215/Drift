@@ -99,6 +99,7 @@ object SiteRender {
 		|<a class="skip" href="#main">Skip to content</a>
 		|<header>
 		|<nav aria-label="Atlas">
+		|<a href="$root../">Drift</a>
 		|<a href="$root">Interactive Atlas</a>
 		|<a href="${root}probe/">All probes</a>
 		|<a href="${root}data/dataset.json">dataset.json</a>

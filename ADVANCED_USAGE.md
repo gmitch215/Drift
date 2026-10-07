@@ -941,7 +941,9 @@ curl -s -o /dev/null -w '%{http_code} %{content_type}\n' http://localhost:PORT/p
 200 text/html; charset=utf-8
 ```
 
-The `docs.yml` workflow runs `./gradlew dokkaGenerate atlasSite` and pushes the site, with the engine documentation under `engine/`, to the `gh-pages` branch. It builds on pushes to `master`, `ver/*`, `feat/*` and `renovate/*` and deploys only from `master`, with a `CNAME` file for `drift.gmitch215.dev`. It has not run yet.
+`./gradlew docsSite` runs `dokkaGenerate` and `atlasSite` first, then assembles `build/site` (3,089 files): `README.md` as `index.html`, `ADVANCED_USAGE.md` as `advanced-usage.html` and `TECHNICAL_REPORT.md` as `technical-report.html`, each rendered into `assets/site-template.html`, the Atlas site under `atlas/`, the Dokka site under `engine/`, the icons from `assets/`, `CNAME` and `.nojekyll`. A relative link in the three Markdown files to a repository path that does not exist fails the render, and a link to one that does exist becomes a GitHub URL on `master`. `checkSiteLinks` runs after it and fails on a relative `href` or `src` that does not resolve inside `build/site`. It scanned 73,286 links and found none unresolved outside `engine/`, where Dokka leaves 14 unresolved; those are counted and printed and do not fail it.
+
+The `docs.yml` workflow runs `./gradlew dokkaGenerate atlasSite docsSite` and pushes `build/site` to the `gh-pages` branch. It builds on pushes to `master`, `ver/*`, `feat/*` and `renovate/*` and deploys only from `master`, with a `CNAME` file for `drift.gmitch215.dev`. It has not run yet.
 
 ## Install and Uninstall
 

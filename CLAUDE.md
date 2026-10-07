@@ -13,6 +13,7 @@ Drift is a Kotlin Multiplatform application, version 1.0.0: the `drift` command 
 - `./gradlew :studio:run` runs Studio on the desktop; `:studio:wasmJsBrowserDistribution` builds the web bundle into `studio/build/dist/wasmJs/productionExecutable`
 - `./gradlew -Pdrift.mobile=true :androidApp:assembleDebug` builds the debug APK; `iosApp/iosApp.xcodeproj` builds the simulator app with `xcodebuild` (see README.md)
 - `./gradlew :dokkaGenerate` writes the engine documentation to `build/dokka/html`; it is not part of `build` or `check`
+- `./gradlew docsSite` writes the whole documentation site to `build/site`: `README.md`, `ADVANCED_USAGE.md` and `TECHNICAL_REPORT.md` rendered into `assets/site-template.html` as `index.html`, `advanced-usage.html` and `technical-report.html`, the Atlas site under `atlas/`, the Dokka site under `engine/`, the icons, `CNAME` and `.nojekyll`. It runs `dokkaGenerate` and `atlasSite` first and `checkSiteLinks` after, which fails on a relative link that does not resolve outside `engine/`; a link in the three Markdown files to a repository path that does not exist fails the render
 - `./gradlew atlasSite` writes the static Atlas site to `build/atlas-site`; `./gradlew :cli:stageStudio` stages the Studio web build for `drift serve --dir cli/build/serve/studio`
 - `./gradlew renderPackaging -Pdrift.sums=<SHA256SUMS>` fills the Homebrew and Chocolatey templates in `packaging/` into `build/packaging`
 - `.github/release/stage.sh archive <exe> <name>` and `stage.sh sums <dir>` build a CLI archive and `SHA256SUMS`; `sh tools/test-installers.sh <drift executable>` runs `drift install` and `uninstall` in a scratch home directory
@@ -25,7 +26,7 @@ Drift is a Kotlin Multiplatform application, version 1.0.0: the `drift` command 
 - `build-core` is an included build holding the `drift.kmp`, `drift.layout`, `drift.coverage`, `drift.quality`, `drift.mobile`, `drift.docs`, `drift.docs-root`, `drift.atlas` and `drift.packaging` plugins and their task classes; its tests run through `:build-core:check`
 - Modules: `core` and `scan` have no platform source sets; `host` holds every `expect`/`actual` pair; `cli` is the command; `studio` is the Compose app; `bench` is DriftBench; `tools` freezes fixtures, builds the Atlas ladder (`tools/ladder`) and drives the browser columns (`tools/browsers`); `androidApp` exists only with `-Pdrift.mobile=true`
 - `iosApp/` is the Xcode project for the iOS simulator app; it calls Gradle with `-Pdrift.mobile=true`
-- `fixtures/` holds recorded capsules, Atlas transcripts and solved cases that tests read; `assets/` holds the logo
+- `fixtures/` holds recorded capsules, Atlas transcripts and solved cases that tests read; `assets/` holds the logo and the documentation site template
 - `atlas/` holds the hand-maintained probe classification (`classification.yml`), how each column was measured (`columns.yml`) and repro drafts; `fixtures/atlas` is the only transcript directory embedded in the dataset and Studio (`fixtures/atlas-extra` and `fixtures/atlas-variants` hold transcripts that stay out; the native Linux tests read the variants)
 - `packaging/` holds the Homebrew formula and cask and the two Chocolatey packages as templates; `install.sh` and `install.ps1` at the root are the installers that download a release archive and run `drift install`; `.github/release/` holds the release scripts
 - `TECHNICAL_REPORT.md` is the design and measurement reference and `ADVANCED_USAGE.md` is the full CLI guide; both quote real runs, so rerun a command before changing its output in them
@@ -40,7 +41,7 @@ Drift is a Kotlin Multiplatform application, version 1.0.0: the `drift` command 
 - Warnings are errors, with `extraWarnings` and `progressiveMode`
 - Coverage measures JVM only. Native and wasm have no coverage tool in Kotlin 2.4.20: `konanc` ignores `-Xcoverage`
 - No Maven publication or signing; Drift is an application. Dokka builds engine documentation only, and the modules are not a public API
-- Workflows, none of which has run on GitHub: `build.yml` (lint, tests, coverage, browsers), `atlas.yml` (records Atlas transcripts per OS and builds the site), `docs.yml` (publishes the Dokka and Atlas sites), `release.yml` (archives, installers, APK, tap and Chocolatey push)
+- Workflows, none of which has run on GitHub: `build.yml` (lint, tests, coverage, browsers), `atlas.yml` (records Atlas transcripts per OS and builds the site), `docs.yml` (publishes the documentation site), `release.yml` (archives, installers, APK, tap and Chocolatey push)
 - The version is `version=` in `gradle.properties`; `core` embeds it for `--version` and the Studio and Android packages read it. The Xcode project keeps its own copy of the marketing version
 - Secrets are referenced by name only: `CODECOV_TOKEN` in `build.yml`, `HOMEBREW_TAP_TOKEN` and `CHOCOLATEY_API_KEY` in `release.yml`
 - Commit messages carry no AI trailers (no `Co-Authored-By` lines)

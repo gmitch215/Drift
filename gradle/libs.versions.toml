@@ -9,6 +9,7 @@ junit = "6.0.2"
 oshi = "7.7.0"
 slf4j = "2.0.20"
 snakeyaml-engine = "3.2"
+commonmark = "0.30.0"
 compose = "1.12.1"
 agp = "9.4.1"
 androidx-activity = "1.13.0"
@@ -23,6 +24,10 @@ clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
 junit-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit" }
 oshi-core = { module = "com.github.oshi:oshi-core", version.ref = "oshi" }
 snakeyaml-engine = { module = "org.snakeyaml:snakeyaml-engine", version.ref = "snakeyaml-engine" }
+commonmark = { module = "org.commonmark:commonmark", version.ref = "commonmark" }
+commonmark-autolink = { module = "org.commonmark:commonmark-ext-autolink", version.ref = "commonmark" }
+commonmark-heading-anchor = { module = "org.commonmark:commonmark-ext-heading-anchor", version.ref = "commonmark" }
+commonmark-tables = { module = "org.commonmark:commonmark-ext-gfm-tables", version.ref = "commonmark" }
 slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "slf4j" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
