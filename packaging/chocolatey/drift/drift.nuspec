@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+	<metadata>
+		<id>drift</id>
+		<version>@version@</version>
+		<packageSourceUrl>https://github.com/gmitch215/Drift/tree/v@version@/packaging/chocolatey/drift</packageSourceUrl>
+		<owners>gmitch215</owners>
+		<title>Drift</title>
+		<authors>Gregory Mitchell</authors>
+		<projectUrl>https://github.com/gmitch215/Drift</projectUrl>
+		<iconUrl>https://cdn.jsdelivr.net/gh/gmitch215/Drift@v@version@/assets/drift.png</iconUrl>
+		<copyright>Copyright (c) 2026 Gregory Mitchell</copyright>
+		<licenseUrl>https://github.com/gmitch215/Drift/blob/v@version@/LICENSE</licenseUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<projectSourceUrl>https://github.com/gmitch215/Drift/tree/v@version@</projectSourceUrl>
+		<docsUrl>https://github.com/gmitch215/Drift/blob/v@version@/ADVANCED_USAGE.md</docsUrl>
+		<bugTrackerUrl>https://github.com/gmitch215/Drift/issues</bugTrackerUrl>
+		<tags>drift kotlin diagnostics reproducibility cli</tags>
+		<summary>Diagnose why a program passes in one environment and fails in another</summary>
+		<description>Drift is the command line tool of a diagnosis engine for a program that passes in one environment and fails in another. It records each environment as a capsule, ranks what differs between a passing run and a failing one, proposes the experiment that would remove the most uncertainty, and writes a certificate that a second command can verify.
+
+The package installs the native `drift` executable for Windows x64 from the GitHub release and puts it on the PATH through a Chocolatey shim. Run `drift --help` to list the commands. `drift solve` needs Docker; every other command runs without it.
+
+The desktop app is the separate `drift-studio` package.</description>
+		<releaseNotes>https://github.com/gmitch215/Drift/releases/tag/v@version@</releaseNotes>
+	</metadata>
+	<files>
+		<file src="tools\**" target="tools" />
+	</files>
+</package>

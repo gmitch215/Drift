@@ -1,0 +1,23 @@
+VERIFICATION
+
+This package downloads drift.exe inside an archive from the project's GitHub release and checks it
+against the SHA-256 value written in tools\chocolateyInstall.ps1. It contains no binary itself.
+
+Archive:  https://github.com/gmitch215/Drift/releases/download/v@version@/drift-@version@-windows-x64.zip
+SHA-256:  @sha256:windows-x64.zip@
+
+To verify the archive by hand:
+
+1. Download the archive from the URL above.
+2. Run `Get-FileHash -Algorithm SHA256 drift-@version@-windows-x64.zip` in PowerShell, or
+   `certutil -hashfile drift-@version@-windows-x64.zip SHA256` in cmd.
+3. Compare the result with the SHA-256 above and with the line for the archive in the SHA256SUMS
+   file attached to the same release:
+   https://github.com/gmitch215/Drift/releases/download/v@version@/SHA256SUMS
+
+The release assets carry build provenance attestations. With the GitHub CLI installed,
+`gh attestation verify drift-@version@-windows-x64.zip --repo gmitch215/Drift` checks the archive
+against the workflow run that built it.
+
+The license of the software is in LICENSE.txt, copied from
+https://github.com/gmitch215/Drift/blob/v@version@/LICENSE
