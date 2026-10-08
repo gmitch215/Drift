@@ -277,6 +277,7 @@ jobs:
       - name: Build Studio Web
         run: ./gradlew :studio:wasmJsBrowserDistribution
       - name: Install Playwright Browsers
+        timeout-minutes: 10
         working-directory: tools/browsers
         run: |
           npm ci
