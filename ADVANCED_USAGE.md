@@ -1298,7 +1298,7 @@ upgrade-check: drupal-10-site
   drupal   project.composer.drupal/core          10.3.6 -> 11
   symfony  project.composer.symfony/http-kernel  v6.4.12 -> 7.1
   php      tool.php.version                      8.1.34 -> 8.3
-71 of 296 rules read a target key
+73 of 298 rules read a target key
 
 Will break (0)
   none
@@ -1342,7 +1342,7 @@ The groups come from the three-valued verdict of the rule engine, not from a sco
 | Version boundary crossed | the rule matches, but every clause that matched reads only a target key, so the evidence is the version crossing and nothing about the project; the change applies to those versions and the project may not use the affected feature |
 | Unknown | the capsule has no current value for a target key, or the target is not a version the rule can compare, so the boundary cannot be judged |
 
-Only rules that read a target key on side `b` and give a different verdict for the targets than for the capsule alone are listed. The line `71 of 296 rules read a target key` counts the rules that read one before that filter. Probe results and run facts describe today's environment, so side `b` has none, and a rule that reads one is unknown.
+Only rules that read a target key on side `b` and give a different verdict for the targets than for the capsule alone are listed. The line `73 of 298 rules read a target key` counts the rules that read one before that filter. Probe results and run facts describe today's environment, so side `b` has none, and a rule that reads one is unknown.
 
 `--json` prints the same findings. A finding holds `rule`, `title`, `severity`, `basis`, `status`, `mechanism`, `crossings` (`key`, `from`, `to`, `was`, `now`), `missing`, `evidence` and `sources`, under the keys `will-break`, `may-break`, `version-boundary` and `unknown`, next to `targets`, `rules` and `touched`:
 
@@ -1352,7 +1352,7 @@ drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=8.3,d
 ```
 
 ```
-{"rules":296,"touched":71,"willBreak":[],"versionBoundary":[{"rule":"php-8-2-dynamic-properties-deprecated","crossings":[{"key":"tool.php.version","from":"8.1.34","to":"8.3"}]},{"rule":"drupal-10-to-11-symfony-6-2-to-7-1","crossings":[{"key":"project.composer.drupal/core","from":"10.3.6","to":"11"},{"key":"project.composer.symfony/http-kernel","from":"v6.4.12","to":"7.1"}]}]}
+{"rules":298,"touched":73,"willBreak":[],"versionBoundary":[{"rule":"php-8-2-dynamic-properties-deprecated","crossings":[{"key":"tool.php.version","from":"8.1.34","to":"8.3"}]},{"rule":"drupal-10-to-11-symfony-6-2-to-7-1","crossings":[{"key":"project.composer.drupal/core","from":"10.3.6","to":"11"},{"key":"project.composer.symfony/http-kernel","from":"v6.4.12","to":"7.1"}]}]}
 ```
 
 The targets can sit in a file instead. This file gives the same result:
@@ -1380,7 +1380,7 @@ drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=7.4
 ```
 upgrade-check: drupal-10-site
   php  tool.php.version  8.1.34 -> 7.4
-44 of 296 rules read a target key
+46 of 298 rules read a target key
 
 Will break (2)
   1. [high, inferred] Drupal 10 cannot run on PHP 8.0 or earlier; PHP 8.0 sites must move to 8.1 before upgrading core
@@ -1422,7 +1422,7 @@ drift upgrade-check bench/data/capsules/migration-php-json-validate-1.red.json -
 ```
 upgrade-check: red
   drupal  project.composer.drupal/core  unknown -> 11
-21 of 296 rules read a target key
+21 of 298 rules read a target key
 
 Will break (0)
   none
@@ -1845,6 +1845,8 @@ Symptom text comes from the rule's `symptoms`: quoted strings, `ERR_CODE` names 
 
 ### Claims
 
+The claim check is experimental. On 67 labelled maintainer-correction threads it flags none, and on the 222,707-issue corpus it fires once, on a sentence that is not a claim (details in `TECHNICAL_REPORT.md`). Treat a flagged sentence as a lead to read, not as a finding.
+
 A claim check flags a sentence that contradicts something Drift knows. Each claim names its source: a rule, or two columns of an Atlas probe. A test checks that every rule exists and that the two Atlas columns print different results.
 
 ```sh
@@ -1880,7 +1882,7 @@ Draft rule: none
 | `jaxb-in-jdk` | rule `jdk-11-java-ee-modules-removed`, with Java 11 or newer stated |
 | `security-manager-enable` | rule `jdk-24-security-manager-disabled`, with Java 24 or newer stated |
 
-A claim fires on a sentence outside code blocks that has a phrase from each of its word groups and no negation. A claim that depends on the environment stays silent when the fact is missing. The confidence is 0.700, times the weakest fact the claim depends on.
+A claim fires on a sentence outside code blocks that has a phrase from each of its word groups and no negation, question mark or sign that the sentence is not an assertion (`deprecat`, `slated`, `instead`, `alternativ`, `would`, `please`, `overflow`, `non-`). A claim that depends on the environment stays silent when the fact is missing. The confidence is 0.700, times the weakest fact the claim depends on.
 
 ### Draft Rules
 
@@ -1947,13 +1949,13 @@ Secrets are masked before anything is stored or printed, with the same redactor 
 
 ### Fixtures and Scores
 
-[`fixtures/triage/`](./fixtures/triage/) holds 66 issue bodies, each with an expectation file. The first 52 are strict forms (10), forms with blank issues (8), free text (12), sparse or wrong beginner reports (10) and mixed phrasing (12); the other 14 cover false positives of the key-value path and claim wording. The bodies are invented for this repository; none is copied from an issue. The expectation lists every fact the text states, the rules and claims it should trigger and whether a draft follows. `TriageTest` scores the extractor on them and prints the result:
+[`fixtures/triage/`](./fixtures/triage/) holds 70 issue bodies, each with an expectation file. The first 52 are strict forms (10), forms with blank issues (8), free text (12), sparse or wrong beginner reports (10) and mixed phrasing (12); the other 18 cover false positives of the key-value path and claim wording. The bodies are invented for this repository; none is copied from an issue. The expectation lists every fact the text states, the rules and claims it should trigger and whether a draft follows. `TriageTest` scores the extractor on them and prints the result:
 
 | | |
 | --- | --- |
-| facts extracted | 185 |
-| precision, recall | 0.989, 0.978 (183 true positives, 2 false positives, 4 false negatives) |
-| Brier score | 0.0855 |
+| facts extracted | 189 |
+| precision, recall | 0.989, 0.979 (187 true positives, 2 false positives, 4 false negatives) |
+| Brier score | 0.0851 |
 
 The misses are the intended hard cases: a form field that still holds the old version (`b07-form-wrong-version`), a fix reported as `upgraded to node 20 ... went away` (`h05-form-then-fix`), `Go 1.22 tutorials` read as an environment (`h11-lookalike-prose`) and `on my mac` not read as macOS (`b01-form-no-response`). The test fails when precision drops below 0.95, recall below 0.93 or the Brier score above 0.12, and when any path's mean confidence exceeds its accuracy by more than 0.05. The scores are an upper bound for real issues.
 

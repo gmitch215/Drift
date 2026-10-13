@@ -60,7 +60,7 @@ log. `drift diagnose --against BASELINE` compares a saved passing run with the c
 `drift bisect plan` and `drift bisect apply` narrow a green and red pair one test at a time. None of
 them opens a network connection.
 
-`drift capture --project` adds the dependency versions, imports and call sites of the working directory to a capsule. `drift upgrade-check --to php=8.3,drupal=11` lists what a move to other versions breaks, from one capsule and the rule catalog (296 rules). `drift triage` reads an issue body offline and says which environment facts and rules it names. `drift contract` writes what a program needs from an environment and checks other capsules against it. Studio has a screen for each of the last three.
+`drift capture --project` adds the dependency versions, imports and call sites of the working directory to a capsule. `drift upgrade-check --to php=8.3,drupal=11` lists what a move to other versions breaks, from one capsule and the rule catalog (298 rules). `drift triage` reads an issue body offline and says which environment facts and rules it names. `drift contract` writes what a program needs from an environment and checks other capsules against it. Studio has a screen for each of the last three.
 
 The repository also holds a GitHub Action (`action.yml`) and a GitLab CI/CD component
 (`templates/drift.yml`) that run these steps in a pipeline; see
@@ -470,8 +470,9 @@ What a result does and does not show:
   more often wrong than right (14 of 25).
 - `upgrade-check` was scored once, on a PHP 7.4 to 8.3 move of one library: 0 true positives and 12
   false positives, and what did break had no rule.
-- The `triage` claim check flags none of 67 labelled issue threads, and its facts score a precision of
-  0.78 on form-labelled issues of large trackers.
+- The `triage` claim check is experimental: it flags none of 67 labelled issue threads and fires once in
+  222,707 corpus issues, and that hit is a false positive. The facts it extracts score a precision of 0.78 on
+  form-labelled issues of large trackers.
 - The Lab confirms a cause only under a rule fixed before the first trial, and `verify` checks the
   arithmetic of a case, not that the experiment would repeat.
 - Some Atlas probes depend on hardware and on the build host. NaN bit patterns and the last digits of
