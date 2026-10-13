@@ -1,0 +1,234 @@
+{
+  "facts": {
+    "cpus": 12,
+    "load1Start": 5.68994140625,
+    "python": "3.14.7",
+    "uname": "Darwin <host> 25.5.0 Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:24 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T6020 arm64 arm"
+  },
+  "host": "mac",
+  "kind": "native",
+  "label": "native",
+  "runs": 15,
+  "size": {
+    "bytes": 7232024
+  },
+  "stamp": "2026-10-12T20:58:16Z",
+  "timer": "python perf_counter around Popen + os.wait4 (ru_maxrss per child)",
+  "warmup": 3,
+  "workloads": {
+    "capture": {
+      "argv": [
+        "cli/build/bin/macosArm64/releaseExecutable/drift.kexe",
+        "capture",
+        "--label",
+        "perf"
+      ],
+      "load1After": 5.68994140625,
+      "load1Before": 5.68994140625,
+      "runs": [
+        {
+          "ms": 26.982,
+          "rssKb": 10784
+        },
+        {
+          "ms": 23.154,
+          "rssKb": 10752
+        },
+        {
+          "ms": 26.26,
+          "rssKb": 10720
+        },
+        {
+          "ms": 23.115,
+          "rssKb": 10736
+        },
+        {
+          "ms": 23.53,
+          "rssKb": 10720
+        },
+        {
+          "ms": 22.242,
+          "rssKb": 10720
+        },
+        {
+          "ms": 24.281,
+          "rssKb": 10784
+        },
+        {
+          "ms": 23.432,
+          "rssKb": 10800
+        },
+        {
+          "ms": 25.914,
+          "rssKb": 10736
+        },
+        {
+          "ms": 23.933,
+          "rssKb": 10720
+        },
+        {
+          "ms": 23.736,
+          "rssKb": 10720
+        },
+        {
+          "ms": 26.187,
+          "rssKb": 10768
+        },
+        {
+          "ms": 24.422,
+          "rssKb": 10720
+        },
+        {
+          "ms": 24.72,
+          "rssKb": 10720
+        },
+        {
+          "ms": 24.847,
+          "rssKb": 10800
+        }
+      ]
+    },
+    "diagnose": {
+      "argv": [
+        "cli/build/bin/macosArm64/releaseExecutable/drift.kexe",
+        "diagnose",
+        "./fixtures/drangler/capsules/36702683742.json",
+        "./fixtures/drangler/capsules/36995781138.json"
+      ],
+      "load1After": 5.68994140625,
+      "load1Before": 5.68994140625,
+      "runs": [
+        {
+          "ms": 9.535,
+          "rssKb": 13360
+        },
+        {
+          "ms": 9.642,
+          "rssKb": 13376
+        },
+        {
+          "ms": 8.656,
+          "rssKb": 13360
+        },
+        {
+          "ms": 9.35,
+          "rssKb": 13344
+        },
+        {
+          "ms": 8.917,
+          "rssKb": 13344
+        },
+        {
+          "ms": 8.582,
+          "rssKb": 13360
+        },
+        {
+          "ms": 8.119,
+          "rssKb": 13376
+        },
+        {
+          "ms": 10.196,
+          "rssKb": 13360
+        },
+        {
+          "ms": 9.512,
+          "rssKb": 13360
+        },
+        {
+          "ms": 8.655,
+          "rssKb": 13360
+        },
+        {
+          "ms": 9.932,
+          "rssKb": 13328
+        },
+        {
+          "ms": 8.98,
+          "rssKb": 13360
+        },
+        {
+          "ms": 8.955,
+          "rssKb": 13328
+        },
+        {
+          "ms": 8.219,
+          "rssKb": 13328
+        },
+        {
+          "ms": 8.04,
+          "rssKb": 13312
+        }
+      ]
+    },
+    "version": {
+      "argv": [
+        "cli/build/bin/macosArm64/releaseExecutable/drift.kexe",
+        "--version"
+      ],
+      "load1After": 5.68994140625,
+      "load1Before": 5.68994140625,
+      "runs": [
+        {
+          "ms": 7.6,
+          "rssKb": 11552
+        },
+        {
+          "ms": 7.137,
+          "rssKb": 11584
+        },
+        {
+          "ms": 7.6,
+          "rssKb": 11552
+        },
+        {
+          "ms": 7.468,
+          "rssKb": 11568
+        },
+        {
+          "ms": 7.993,
+          "rssKb": 11568
+        },
+        {
+          "ms": 8.64,
+          "rssKb": 11584
+        },
+        {
+          "ms": 7.056,
+          "rssKb": 11552
+        },
+        {
+          "ms": 7.748,
+          "rssKb": 11584
+        },
+        {
+          "ms": 7.14,
+          "rssKb": 11584
+        },
+        {
+          "ms": 7.461,
+          "rssKb": 11552
+        },
+        {
+          "ms": 6.95,
+          "rssKb": 11552
+        },
+        {
+          "ms": 6.864,
+          "rssKb": 11536
+        },
+        {
+          "ms": 9.617,
+          "rssKb": 11552
+        },
+        {
+          "ms": 7.112,
+          "rssKb": 11552
+        },
+        {
+          "ms": 6.981,
+          "rssKb": 11552
+        }
+      ]
+    }
+  }
+}

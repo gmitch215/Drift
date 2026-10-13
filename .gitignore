@@ -12,3 +12,4 @@ build
 node_modules/
 kotlin-js-store
 local.properties
+tools/perf/stage/

@@ -1,0 +1,22 @@
+{
+  "facts": {
+    "cpus": 12,
+    "load1Start": 5.85009765625,
+    "python": "3.14.7",
+    "uname": "Darwin <host> 25.5.0 Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:24 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T6020 arm64 arm"
+  },
+  "host": "mac",
+  "kind": "wasm",
+  "label": "wasm",
+  "note": "size only: the Wasm build has no CLI executable, files or process access",
+  "runs": 15,
+  "size": {
+    "wasmBytes": 12067278,
+    "wasmFiles": 2,
+    "wasmGzipBytes": 4395398
+  },
+  "stamp": "2026-10-12T20:58:31Z",
+  "timer": "python perf_counter around Popen + os.wait4 (ru_maxrss per child)",
+  "warmup": 3,
+  "workloads": {}
+}

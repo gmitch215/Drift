@@ -1,0 +1,80 @@
+schema: "1"
+purpose: "Drift startup, capture, diagnose, peak RSS and size across Native, JVM and Wasm"
+repo: .
+results: tools/perf/results
+runs: "15"
+warmup: "3"
+workloads:
+  version: "drift --version"
+  capture: "drift capture --label perf"
+  diagnose: "drift diagnose fixtures/drangler/capsules/36702683742.json fixtures/drangler/capsules/36995781138.json"
+rules:
+  - "run every step from the repo root unless it says otherwise, in the order listed"
+  - "before each mac measurement step: pgrep -fl 'gradle-wrapper|konan' must print nothing and uptime load1 must be below 4; otherwise wait and retry"
+  - "before each paisley step follow the paisley-park rules in .claude/batch/rules.md (uptime load1 below 12, free memory above 8 GB, df -h / above 25 GB free)"
+  - "a step that fails is recorded with its error in the results file and not worked around; continue with the next step"
+  - "after the last step run: python3 tools/perf/summarize.py > tools/perf/results/SUMMARY.md"
+steps:
+  - id: mac-native
+    host: mac
+    build: "./gradlew :cli:linkReleaseExecutableMacosArm64"
+    run: "RUNS=15 WARMUP=3 sh tools/perf/perf.sh native cli/build/bin/macosArm64/releaseExecutable/drift.kexe tools/perf/results/mac-native.json mac native"
+    out: tools/perf/results/mac-native.json
+  - id: mac-jvm
+    host: mac
+    build: "./gradlew -I tools/perf/jvm-launcher.init.gradle :cli:perfLauncher"
+    run: "DRIFT_JAVA=/Library/Java/JavaVirtualMachines/temurin-25.jdk/Contents/Home/bin/java RUNS=15 WARMUP=3 sh tools/perf/perf.sh jvm cli/build/perf/drift-jvm tools/perf/results/mac-jvm.json mac jvm cli/build/libs/cli-jvm-1.0.0.jar"
+    out: tools/perf/results/mac-jvm.json
+  - id: mac-wasm
+    host: mac
+    build: "./gradlew :studio:wasmJsBrowserDistribution"
+    run: "sh tools/perf/perf.sh wasm studio/build/dist/wasmJs/productionExecutable tools/perf/results/mac-wasm.json mac wasm"
+    out: tools/perf/results/mac-wasm.json
+  - id: linux-cross-build
+    host: mac
+    build: "./gradlew :cli:linkReleaseExecutableLinuxX64"
+    run: "mkdir -p tools/perf/stage && cp cli/build/bin/linuxX64/releaseExecutable/drift.kexe tools/perf/stage/drift-linuxX64-cross.kexe"
+    out: tools/perf/stage/drift-linuxX64-cross.kexe
+  - id: paisley-prepare
+    host: mac
+    run:
+      - "ssh paisley-park 'mkdir -p ~/drift-rig/src ~/drift-rig/perf/results ~/drift-rig/home ~/drift-rig/gradle ~/drift-rig/konan && df -h / && free -g && uptime && docker ps && du -sh ~/drift-rig/*'"
+      - "git ls-files -co --exclude-standard | while IFS= read -r f; do [ -e \"$f\" ] && printf '%s\\n' \"$f\"; done | tar -czf - -T - | ssh paisley-park 'tar -xzf - -C ~/drift-rig/src'"
+      - "scp tools/perf/stage/drift-linuxX64-cross.kexe paisley-park:drift-rig/perf/drift-linuxX64-cross.kexe"
+      - "ssh paisley-park 'chmod +x ~/drift-rig/perf/drift-linuxX64-cross.kexe'"
+  - id: paisley-build
+    host: paisley
+    note: "builds the Linux x64 executable and the JVM launcher inside a container; copies the JDK so the JVM runs in the measuring image; log the image pulls in ~/drift-rig/PULLS.md"
+    run: "ssh paisley-park 'docker run --rm --user \"$(id -u):$(id -g)\" --memory 10g --cpus 8 -e HOME=/rig/home -e GRADLE_USER_HOME=/rig/gradle -e KONAN_DATA_DIR=/rig/konan -v $HOME/drift-rig:/rig -w /rig/src eclipse-temurin:21-jdk sh -c \"./gradlew --no-daemon -Dorg.gradle.jvmargs=-Xmx6g :cli:linkReleaseExecutableLinuxX64 && ./gradlew --no-daemon -Dorg.gradle.jvmargs=-Xmx6g -I tools/perf/jvm-launcher.init.gradle :cli:perfLauncher && mkdir -p /rig/jdk25 && cp -r \\$JAVA_HOME/. /rig/jdk25/\"'"
+    out: "~/drift-rig/src/cli/build/bin/linuxX64/releaseExecutable/drift.kexe and ~/drift-rig/src/cli/build/perf/drift-jvm"
+  - id: paisley-native-cross
+    host: paisley
+    run: "ssh paisley-park 'docker run --rm --user \"$(id -u):$(id -g)\" --memory 10g --cpus 8 -v $HOME/drift-rig:/rig -w /rig/src python:3.13-bookworm env RUNS=15 WARMUP=3 sh tools/perf/perf.sh native /rig/perf/drift-linuxX64-cross.kexe /rig/perf/results/paisley-native-cross.json paisley native-cross'"
+    out: "~/drift-rig/perf/results/paisley-native-cross.json"
+  - id: paisley-native-built
+    host: paisley
+    run: "ssh paisley-park 'docker run --rm --user \"$(id -u):$(id -g)\" --memory 10g --cpus 8 -v $HOME/drift-rig:/rig -w /rig/src python:3.13-bookworm env RUNS=15 WARMUP=3 sh tools/perf/perf.sh native /rig/src/cli/build/bin/linuxX64/releaseExecutable/drift.kexe /rig/perf/results/paisley-native-built.json paisley native-built'"
+    out: "~/drift-rig/perf/results/paisley-native-built.json"
+  - id: paisley-jvm
+    host: paisley
+    run: "tar -cf - -C <stage> drift-jvm lib | ssh paisley-park 'docker run -i --rm --user \"$(id -u):$(id -g)\" --memory 10g --cpus 8 --tmpfs /jvm:rw,exec,mode=1777,size=256m --mount type=image,source=eclipse-temurin:25-jre,destination=/jre -v $HOME/drift-rig:/rig -w /rig/src python:3.13-bookworm sh -c \"tar -xf - -C /jvm && chmod +x /jvm/drift-jvm && env DRIFT_JAVA=/jre/opt/java/openjdk/bin/java RUNS=15 WARMUP=3 sh tools/perf/perf.sh jvm /jvm/drift-jvm /rig/perf/results/paisley-jvm.json paisley jvm /jvm/lib/cli-jvm-1.0.0.jar\"'"
+    out: "~/drift-rig/perf/results/paisley-jvm.json"
+  - id: paisley-2core-native-cross
+    host: paisley-2core
+    run: "ssh paisley-park 'docker run --rm --user \"$(id -u):$(id -g)\" --memory 4g --cpus 2 -v $HOME/drift-rig:/rig -w /rig/src python:3.13-bookworm env RUNS=15 WARMUP=3 sh tools/perf/perf.sh native /rig/perf/drift-linuxX64-cross.kexe /rig/perf/results/paisley-2core-native-cross.json paisley-2core native-cross'"
+    out: "~/drift-rig/perf/results/paisley-2core-native-cross.json"
+  - id: paisley-2core-native-built
+    host: paisley-2core
+    run: "ssh paisley-park 'docker run --rm --user \"$(id -u):$(id -g)\" --memory 4g --cpus 2 -v $HOME/drift-rig:/rig -w /rig/src python:3.13-bookworm env RUNS=15 WARMUP=3 sh tools/perf/perf.sh native /rig/src/cli/build/bin/linuxX64/releaseExecutable/drift.kexe /rig/perf/results/paisley-2core-native-built.json paisley-2core native-built'"
+    out: "~/drift-rig/perf/results/paisley-2core-native-built.json"
+  - id: paisley-2core-jvm
+    host: paisley-2core
+    run: "tar -cf - -C <stage> drift-jvm lib | ssh paisley-park 'docker run -i --rm --user \"$(id -u):$(id -g)\" --memory 4g --cpus 2 --tmpfs /jvm:rw,exec,mode=1777,size=256m --mount type=image,source=eclipse-temurin:25-jre,destination=/jre -v $HOME/drift-rig:/rig -w /rig/src python:3.13-bookworm sh -c \"tar -xf - -C /jvm && chmod +x /jvm/drift-jvm && env DRIFT_JAVA=/jre/opt/java/openjdk/bin/java RUNS=15 WARMUP=3 sh tools/perf/perf.sh jvm /jvm/drift-jvm /rig/perf/results/paisley-2core-jvm.json paisley-2core jvm /jvm/lib/cli-jvm-1.0.0.jar\"'"
+    out: "~/drift-rig/perf/results/paisley-2core-jvm.json"
+  - id: paisley-collect
+    host: mac
+    run:
+      - "scp 'paisley-park:drift-rig/perf/results/*.json' tools/perf/results/"
+      - "ssh paisley-park 'du -sh ~/drift-rig/*'"
+      - "ssh paisley-park 'sha256sum ~/drift-rig/src/cli/build/bin/linuxX64/releaseExecutable/drift.kexe ~/drift-rig/perf/drift-linuxX64-cross.kexe'"
+      - "ls -l tools/perf/stage/drift-linuxX64-cross.kexe"

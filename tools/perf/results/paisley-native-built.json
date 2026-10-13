@@ -1,0 +1,235 @@
+{
+  "facts": {
+    "cgroupCpus": 8.0,
+    "cpus": 24,
+    "load1Start": 0.8095703125,
+    "python": "3.13.16",
+    "uname": "Linux 40aa33356447 6.8.0-138-generic #138-Ubuntu SMP PREEMPT_DYNAMIC Fri Jul 31 22:41:49 UTC 2026 x86_64 "
+  },
+  "host": "paisley",
+  "kind": "native",
+  "label": "native-built",
+  "runs": 15,
+  "size": {
+    "bytes": 7694968
+  },
+  "stamp": "2026-10-12T21:08:32Z",
+  "timer": "python perf_counter around Popen + os.wait4 (ru_maxrss per child)",
+  "warmup": 3,
+  "workloads": {
+    "capture": {
+      "argv": [
+        "/rig/src/cli/build/bin/linuxX64/releaseExecutable/drift.kexe",
+        "capture",
+        "--label",
+        "perf"
+      ],
+      "load1After": 0.8095703125,
+      "load1Before": 0.8095703125,
+      "runs": [
+        {
+          "ms": 3.255,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.859,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.72,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.709,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.729,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.677,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.788,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.74,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.672,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.786,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.924,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.909,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.637,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.711,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.683,
+          "rssKb": 17240
+        }
+      ]
+    },
+    "diagnose": {
+      "argv": [
+        "/rig/src/cli/build/bin/linuxX64/releaseExecutable/drift.kexe",
+        "diagnose",
+        "/rig/src/fixtures/drangler/capsules/36702683742.json",
+        "/rig/src/fixtures/drangler/capsules/36995781138.json"
+      ],
+      "load1After": 0.8095703125,
+      "load1Before": 0.8095703125,
+      "runs": [
+        {
+          "ms": 2.785,
+          "rssKb": 17240
+        },
+        {
+          "ms": 3.578,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.767,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.587,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.54,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.528,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.547,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.525,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.533,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.537,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.521,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.527,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.55,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.523,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.643,
+          "rssKb": 17240
+        }
+      ]
+    },
+    "version": {
+      "argv": [
+        "/rig/src/cli/build/bin/linuxX64/releaseExecutable/drift.kexe",
+        "--version"
+      ],
+      "load1After": 0.8095703125,
+      "load1Before": 0.8095703125,
+      "runs": [
+        {
+          "ms": 1.617,
+          "rssKb": 17240
+        },
+        {
+          "ms": 1.597,
+          "rssKb": 17240
+        },
+        {
+          "ms": 1.595,
+          "rssKb": 17240
+        },
+        {
+          "ms": 1.593,
+          "rssKb": 17240
+        },
+        {
+          "ms": 1.596,
+          "rssKb": 17240
+        },
+        {
+          "ms": 1.615,
+          "rssKb": 17240
+        },
+        {
+          "ms": 1.59,
+          "rssKb": 17240
+        },
+        {
+          "ms": 1.597,
+          "rssKb": 17240
+        },
+        {
+          "ms": 1.589,
+          "rssKb": 17240
+        },
+        {
+          "ms": 1.599,
+          "rssKb": 17240
+        },
+        {
+          "ms": 1.614,
+          "rssKb": 17240
+        },
+        {
+          "ms": 2.029,
+          "rssKb": 17240
+        },
+        {
+          "ms": 1.707,
+          "rssKb": 17240
+        },
+        {
+          "ms": 1.598,
+          "rssKb": 17240
+        },
+        {
+          "ms": 1.578,
+          "rssKb": 17240
+        }
+      ]
+    }
+  }
+}

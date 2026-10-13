@@ -1,0 +1,21 @@
+allprojects {
+    if (path == ':cli') {
+        afterEvaluate {
+            tasks.register('perfLauncher') {
+                dependsOn 'jvmJar'
+                def jar = tasks.named('jvmJar').flatMap { it.archiveFile }
+                def runtime = configurations.getByName('jvmRuntimeClasspath')
+                def out = layout.buildDirectory.file('perf/drift-jvm')
+                doLast {
+                    def cp = [jar.get().asFile] + runtime.files
+                    def javaHome = System.getProperty('java.home')
+                    def file = out.get().asFile
+                    file.parentFile.mkdirs()
+                    file.text = "#!/bin/sh\nexec \"\${DRIFT_JAVA:-${javaHome}/bin/java}\" -cp '${cp.join(':')}' dev.gmitch215.drift.cli.MainKt \"\$@\"\n"
+                    file.setExecutable(true)
+                    println "launcher ${file}"
+                }
+            }
+        }
+    }
+}
