@@ -123,7 +123,7 @@ object DocsSiteBuilder {
     private val NAV = listOf(
         Triple("Usage", "advanced-usage.html", "Every command and flag, with real output."),
         Triple("Report", "technical-report.html", "The design, the evidence and the numbers."),
-        Triple("Atlas", "atlas/", "Kotlin behavior recorded per target, with Studio."),
+        Triple("Atlas", "atlas/#atlas", "Kotlin behavior recorded per target, with Studio."),
         Triple("Engine", "engine/", "KDoc for the engine modules, from Dokka."),
         Triple("GitHub", REPO, "Source, releases and issues."),
     )

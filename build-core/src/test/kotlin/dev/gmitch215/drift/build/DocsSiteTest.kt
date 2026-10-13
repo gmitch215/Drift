@@ -230,7 +230,7 @@ class DocsSiteTest {
         for (label in listOf("Usage", "Report", "Atlas", "Engine", "GitHub")) {
             assertTrue(">$label</a>" in usage, label)
         }
-        assertTrue("<a href=\"atlas/\">Atlas</a>" in usage)
+        assertTrue("<a href=\"atlas/#atlas\">Atlas</a>" in usage)
         assertTrue("<a href=\"engine/\">Engine</a>" in usage)
         assertTrue("<a href=\"${DocsSiteBuilder.REPO}\">GitHub</a>" in usage)
     }

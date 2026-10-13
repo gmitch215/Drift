@@ -84,9 +84,9 @@ classification from primary sources: 10 are `documented` (a Kotlin page states t
 found no explanation. A divergence is data, not a verdict that something is a bug. `drift atlas diff`
 lists what changed between two compiler versions.
 
-Studio opens on the Atlas. The matrix groups columns by target family and adds a column for the
-device it runs on, measured live. A predict-and-reveal mode asks for the output you expect on a
-target, then shows the recorded one.
+Studio's Atlas tab holds the matrix. It groups columns by target family and adds a column for the
+device it runs on, measured live when the tab opens. A predict-and-reveal mode asks for the output
+you expect on a target, then shows the recorded one.
 
 `drift atlas record`, `build`, `compare` and `show` do the same work from the command line.
 `./gradlew atlasSite` builds the static Atlas site: Studio, a page per probe and the dataset as
@@ -245,7 +245,8 @@ The default path runs offline: `drift capture` and `drift diagnose` complete und
 ./gradlew :studio:run
 ```
 
-A window opens on the Atlas, with the Investigation view on the second tab.
+A window opens on the Home tab, with the Atlas, Investigation, Upgrade, Contract and Bisect views
+beside it.
 
 ### Studio on the Web
 
@@ -257,11 +258,12 @@ A window opens on the Atlas, with the Investigation view on the second tab.
 drift serve --dir cli/build/serve/studio
 ```
 
-Open `http://localhost:8080/`. The page title is "Drift Studio". `--port 0` takes a free port,
-`--cert` and `--key` (or `--mkcert` with an existing mkcert CA) serve HTTPS on the JVM, macOS and
-Linux builds, and `--domain` adds names such as `drift.local`. Any static server works too: serve
-`studio/build/dist/wasmJs/productionExecutable` after `./gradlew :studio:wasmJsBrowserDistribution`.
-Nothing hosts the site until `docs.yml` has run.
+Open `http://localhost:8080/`, or `http://localhost:8080/#atlas` to start on the Atlas tab. The page
+title is "Drift Studio". `--port 0` takes a free port, `--cert` and `--key` (or `--mkcert` with an
+existing mkcert CA) serve HTTPS on the JVM, macOS and Linux builds, and `--domain` adds names such
+as `drift.local`. Any static server works too: serve `studio/build/dist/wasmJs/productionExecutable`
+after `./gradlew :studio:wasmJsBrowserDistribution`. Nothing hosts the site until `docs.yml` has
+run.
 
 ### Android
 
