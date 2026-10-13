@@ -1,0 +1,50 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1(some-peer@1.0.0)
+    devDependencies:
+      '@types/node':
+        specifier: ^20.14.0
+        version: 20.14.12
+
+  packages/other:
+    dependencies:
+      lodash:
+        specifier: ^3.0.0
+        version: 3.10.1
+
+packages:
+
+  '@types/node@20.14.12':
+    resolution: {integrity: sha512-abc}
+
+  js-tokens@4.0.0:
+    resolution: {integrity: sha512-def}
+
+  lodash@4.17.21:
+    resolution: {integrity: sha512-ghi}
+
+  loose-envify@1.4.0:
+    resolution: {integrity: sha512-jkl}
+    hasBin: true
+
+  react@18.3.1:
+    resolution: {integrity: sha512-mno}
+
+snapshots:
+
+  react@18.3.1(some-peer@1.0.0):
+    dependencies:
+      loose-envify: 1.4.0

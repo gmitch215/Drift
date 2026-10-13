@@ -1,0 +1,66 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state"
+    ],
+    "content-hash": "0f1e2d3c4b5a69788796a5b4c3d2e1f0",
+    "packages": [
+        {
+            "name": "composer/installers",
+            "version": "2.3.0",
+            "type": "composer-plugin"
+        },
+        {
+            "name": "drupal/core",
+            "version": "10.3.6",
+            "type": "drupal-core"
+        },
+        {
+            "name": "drupal/core-composer-scaffold",
+            "version": "10.3.6",
+            "type": "composer-plugin"
+        },
+        {
+            "name": "drupal/core-recommended",
+            "version": "10.3.6",
+            "type": "metapackage"
+        },
+        {
+            "name": "drush/drush",
+            "version": "13.2.3",
+            "type": "library"
+        },
+        {
+            "name": "symfony/console",
+            "version": "v6.4.12",
+            "type": "library"
+        },
+        {
+            "name": "symfony/http-kernel",
+            "version": "v6.4.12",
+            "type": "library"
+        },
+        {
+            "name": "twig/twig",
+            "version": "v3.14.0",
+            "type": "library"
+        }
+    ],
+    "packages-dev": [
+        {
+            "name": "phpunit/phpunit",
+            "version": "10.5.20",
+            "type": "library"
+        }
+    ],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": "^8.1",
+        "ext-json": "*"
+    },
+    "platform-dev": [],
+    "plugin-api-version": "2.6.0"
+}

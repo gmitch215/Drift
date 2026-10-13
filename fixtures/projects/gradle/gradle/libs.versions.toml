@@ -1,0 +1,17 @@
+[versions]
+agp = "9.0.0"
+kotlin = "2.4.0"
+kotlinx-coroutines = "1.11.0"
+serialization = { strictly = "1.11.0" }
+
+[libraries]
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
+junit = "junit:junit:4.13.2"
+okio = { module = "com.squareup.okio:okio", version = "3.9.0" }
+no-version = { module = "example:managed" }
+
+[plugins]
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
