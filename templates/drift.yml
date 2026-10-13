@@ -1,0 +1,88 @@
+spec:
+  inputs:
+    stage:
+      default: test
+    image:
+      default: ubuntu:24.04
+    version:
+      default: v1.0.0
+    command:
+      description: Shell command to run and capture
+    job_name:
+      default: drift
+    expire_in:
+      default: 30 days
+---
+$[[ inputs.job_name ]]:
+  stage: $[[ inputs.stage ]]
+  image: $[[ inputs.image ]]
+  variables:
+    DRIFT_COMMAND: $[[ inputs.command ]]
+    DRIFT_TAG: $[[ inputs.version ]]
+  script:
+    - |
+      set -eu
+      if ! command -v curl > /dev/null || ! command -v unzip > /dev/null; then
+        apt-get update -qq && apt-get install -y -qq curl unzip ca-certificates > /dev/null
+      fi
+      case "$(uname -m)" in
+        x86_64) arch=x64 ;;
+        aarch64) arch=arm64 ;;
+        *) echo "drift: no release asset for $(uname -m)" >&2; exit 1 ;;
+      esac
+      version=${DRIFT_TAG#v}
+      asset="drift-$version-linux-$arch.tar.gz"
+      base=${DRIFT_BASE_URL:-https://github.com/gmitch215/Drift/releases/download}
+      mkdir -p .drift-bin
+      curl -fsSL -o ".drift-bin/$asset" "$base/v$version/$asset"
+      curl -fsSL -o ".drift-bin/$asset.sha256" "$base/v$version/$asset.sha256"
+      expected=$(cut -d ' ' -f 1 ".drift-bin/$asset.sha256")
+      actual=$(sha256sum ".drift-bin/$asset" | cut -d ' ' -f 1)
+      [ "$expected" = "$actual" ] || { echo "drift: checksum mismatch for $asset" >&2; exit 1; }
+      tar -xzf ".drift-bin/$asset" -C .drift-bin
+      PATH="$PWD/.drift-bin:$PATH"
+      cmd=$DRIFT_COMMAND
+      label=$CI_JOB_NAME
+      job=$CI_JOB_NAME
+      unset DRIFT_COMMAND DRIFT_TAG DRIFT_BASE_URL
+      (
+        for v in $(env | grep -E '^CI_JOB_(TOKEN|JWT)' | cut -d = -f 1); do
+          unset "$v"
+        done
+        drift capture --label "$label" > .drift-capture.json
+      )
+      ec=0
+      drift run --out drift-capsule --label "$label" -- sh -c "$cmd" || ec=$?
+      mv .drift-capture.json drift-capsule/capsule.json
+      [ "$ec" != 0 ] || exit 0
+      if [ -n "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-}" ]; then
+        first=$CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+      else
+        first=$CI_COMMIT_BRANCH
+      fi
+      baseline=
+      for ref in "$first" "$CI_DEFAULT_BRANCH"; do
+        [ -n "$ref" ] || continue
+        url="$CI_API_V4_URL/projects/$CI_PROJECT_ID/jobs/artifacts/$ref/download"
+        if curl -fsSL -G --header "JOB-TOKEN: $CI_JOB_TOKEN" --data-urlencode "job=$job" \
+          -o .drift-baseline.zip "$url"; then
+          unzip -q -o .drift-baseline.zip -d .drift-baseline
+          baseline=.drift-baseline/drift-capsule
+          echo "drift: baseline is the latest green $job on $ref"
+          break
+        fi
+      done
+      if [ -z "$baseline" ]; then
+        echo "drift: no green baseline found for $job on $first or $CI_DEFAULT_BRANCH" >&2
+      elif drift diagnose --against "$baseline" drift-capsule --detail summary > drift-capsule/diagnosis.txt; then
+        cat drift-capsule/diagnosis.txt
+      else
+        echo "drift: the comparison failed" >&2
+      fi
+      exit "$ec"
+  artifacts:
+    when: always
+    access: developer
+    expire_in: $[[ inputs.expire_in ]]
+    paths:
+      - drift-capsule/

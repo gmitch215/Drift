@@ -1,0 +1,100 @@
+name: Drift
+description: Capture the job environment, rank what differs from the last green run, and triage issues
+author: gmitch215
+
+inputs:
+  version:
+    description: Release tag of the Drift CLI to install
+    default: v1.0.0
+  mode:
+    description: run (run a command and capture), capture (capture only), diagnose (capture and compare) or triage (issues events only; comments on the issue)
+    default: run
+  command:
+    description: Shell command for mode run
+    default: ''
+  baseline:
+    description: Capsule path or baseline artifact name; empty looks up the artifact of this branch, the pull request base and the default branch
+    default: ''
+  label:
+    description: Name of the capsule and part of the artifact names; matrix jobs need distinct values
+    default: ${{ github.job }}-${{ runner.os }}-${{ runner.arch }}
+  directory:
+    description: Directory the capsule is written to
+    default: drift-capsule
+  save-baseline:
+    description: Upload the capsule of a green push run as the baseline for this branch
+    default: 'true'
+  retention-days:
+    description: Days the capsule and baseline artifacts are kept
+    default: '30'
+  token:
+    description: Token for gh, which lists and downloads baseline artifacts and posts the triage comment
+    default: ${{ github.token }}
+  publish-threshold:
+    description: Mode triage; confidence from 0 to 1 at which a draft rule is published; empty keeps every rule a draft
+    default: ''
+  slack-webhook:
+    description: Mode triage; Slack incoming webhook URL, passed from a secret (for example secrets.SLACK_WEBHOOK_URL); empty sends nothing
+    default: ''
+
+outputs:
+  exit-code:
+    description: Exit code of the command in mode run, 0 otherwise
+    value: ${{ steps.drift.outputs.exit-code }}
+  capsule:
+    description: Directory holding the capsule
+    value: ${{ steps.drift.outputs.capsule }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install Drift
+      shell: bash
+      env:
+        DRIFT_VERSION: ${{ inputs.version }}
+        ACTION_PATH: ${{ github.action_path }}
+      run: bash "$ACTION_PATH/.github/action/drift.sh" install
+    - name: Run Drift
+      id: drift
+      if: ${{ inputs.mode != 'triage' }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        ACTION_PATH: ${{ github.action_path }}
+        INPUT_MODE: ${{ inputs.mode }}
+        INPUT_COMMAND: ${{ inputs.command }}
+        INPUT_BASELINE: ${{ inputs.baseline }}
+        INPUT_LABEL: ${{ inputs.label }}
+        INPUT_DIRECTORY: ${{ inputs.directory }}
+        INPUT_SAVE_BASELINE: ${{ inputs.save-baseline }}
+        DRIFT_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        DRIFT_HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+      run: bash "$ACTION_PATH/.github/action/drift.sh" run
+    - name: Triage Issue
+      if: ${{ inputs.mode == 'triage' }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        ACTION_PATH: ${{ github.action_path }}
+        INPUT_PUBLISH_THRESHOLD: ${{ inputs.publish-threshold }}
+        ISSUE_NUMBER: ${{ github.event.issue.number }}
+        ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+        ISSUE_BODY: ${{ github.event.issue.body }}
+        SLACK_WEBHOOK_URL: ${{ inputs.slack-webhook }}
+      run: bash "$ACTION_PATH/.github/action/drift.sh" triage
+    - name: Upload Capsule
+      if: ${{ always() && steps.drift.outputs.capsule != '' }}
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ steps.drift.outputs.capsule-artifact }}
+        path: ${{ steps.drift.outputs.capsule }}
+        retention-days: ${{ inputs.retention-days }}
+        overwrite: true
+    - name: Upload Baseline
+      if: ${{ always() && steps.drift.outputs.save-baseline == 'true' }}
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ steps.drift.outputs.baseline-artifact }}
+        path: ${{ steps.drift.outputs.capsule }}
+        retention-days: ${{ inputs.retention-days }}
+        overwrite: true

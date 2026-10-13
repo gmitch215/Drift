@@ -106,6 +106,12 @@ jobs:
         run: ./gradlew ${{ matrix.tasks }} ${{ matrix.link }} --continue
       - name: Check Executable
         run: ${{ matrix.exe }} --version
+      - name: Test Action Script
+        if: ${{ runner.os != 'Windows' }}
+        run: .github/action/test-drift.sh ${{ matrix.exe }}
+      - name: Test GitLab Component Script
+        if: ${{ runner.os == 'Linux' }}
+        run: .github/action/test-gitlab.sh ${{ matrix.exe }}
       - name: Collect Coverage
         if: ${{ matrix.coverage && !cancelled() }}
         run: ./gradlew jvmJacocoAggregateReport verifyCoverage coverageSummary
