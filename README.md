@@ -54,20 +54,35 @@ app, a web app, an Android app and an iOS app from the same shared code.
 `drift reproduce` writes a `Dockerfile` and a run script that mirror a capsule as far as a container
 can. The full command reference is in [ADVANCED_USAGE.md](./ADVANCED_USAGE.md).
 
+In CI, `drift run -- COMMAND` runs a command and keeps its environment, exit code and log tail as a
+capsule directory. `drift import` builds the same directory from a saved GitHub Actions or GitLab CI
+log. `drift diagnose --against BASELINE` compares a saved passing run with the current one, and
+`drift bisect plan` and `drift bisect apply` narrow a green and red pair one test at a time. None of
+them opens a network connection.
+
+`drift capture --project` adds the dependency versions, imports and call sites of the working directory to a capsule. `drift upgrade-check --to php=8.3,drupal=11` lists what a move to other versions breaks, from one capsule and the rule catalog (296 rules). `drift triage` reads an issue body offline and says which environment facts and rules it names. `drift contract` writes what a program needs from an environment and checks other capsules against it. Studio has a screen for each of the last three.
+
+The repository also holds a GitHub Action (`action.yml`) and a GitLab CI/CD component
+(`templates/drift.yml`) that run these steps in a pipeline; see
+[CI Integration](./ADVANCED_USAGE.md#ci-integration).
+
 ---
 
 ## The Kotlin Portability Atlas
 
 Kotlin code that compiles everywhere does not always print the same thing everywhere. The Atlas holds
 38 probes of Kotlin behavior. Each probe is a small program with a recorded output per target.
-Thirteen columns are recorded on Kotlin 2.4.20: the JVM on JDK 17, 21 and 25, Linux x64 and arm64
-and macOS native, Wasm on Node, Chromium, Firefox and WebKit, Android and the iOS simulator. Five more
-(JVM, macOS native, Wasm, Android and iOS) are recorded on Kotlin 2.5.0-Beta1.
+Sixteen columns are recorded on Kotlin 2.4.20: the JVM on JDK 17, 21 and 25, Linux x64 and arm64
+and macOS native, Wasm on Node, Chromium, Firefox and WebKit, Kotlin/JS IR on Node, Android, the iOS
+simulator and two Cloudflare Workers runtimes. Five more (JVM, macOS native, Wasm, Android and iOS)
+are recorded on Kotlin 2.5.0-Beta1, and a ladder of 14 compiler versions from 1.3.72 to 2.4.21
+covers the JVM, macOS, Linux and Kotlin/JS targets that have a standalone compiler.
 
-23 probes differ between targets on 2.4.20, and 18 on 2.5.0-Beta1. Every probe carries a
-classification from primary sources: 18 are `documented` (a Kotlin page states the behavior), 4 are
-`platform-defined` (a JDK or ECMAScript page does) and 16 are `unclassified`, with the search that
-found no explanation. A divergence is data, not a verdict that something is a bug.
+32 probes differ between targets on 2.4.20, and 18 on 2.5.0-Beta1. Every probe carries a
+classification from primary sources: 10 are `documented` (a Kotlin page states the behavior), 3 are
+`platform-defined` (a JDK or ECMAScript page does) and 25 are `unclassified`, with the search that
+found no explanation. A divergence is data, not a verdict that something is a bug. `drift atlas diff`
+lists what changed between two compiler versions.
 
 Studio opens on the Atlas. The matrix groups columns by target family and adds a column for the
 device it runs on, measured live. A predict-and-reveal mode asks for the output you expect on a
@@ -191,6 +206,7 @@ toolchain if one is missing. A cold build downloads toolchains and dependencies 
 | CLI, Windows x64 | any host Kotlin/Native supports | `./gradlew :cli:linkReleaseExecutableMingwX64` |
 | Studio on the desktop | JDK 21 | `./gradlew :studio:run` |
 | Studio on the web | JDK 21, a browser | `./gradlew :cli:stageStudio`, then `drift serve` |
+| Wasm tests on Node | JDK 21 (Gradle fetches Node.js) | `./gradlew :core:wasmJsNodeTest` |
 | Studio on Android | Android SDK with platform 37 | see [Android](#android) |
 | Studio on iOS | macOS, Xcode with a simulator runtime | see [iOS Simulator](#ios-simulator) |
 
@@ -198,6 +214,10 @@ The installers are built by `release.yml` with `./gradlew :studio:packageDmg :st
 macOS, `:studio:packageDeb :studio:packageRpm :studio:packageAppImage` on Linux and
 `:studio:packageMsi :studio:packageExe` on Windows (WiX Toolset). `drift solve` also needs Docker.
 Everything else runs without it.
+
+The wasmJs target builds Studio for the browser (see Studio on the Web; `./gradlew
+:studio:wasmJsBrowserDistribution` builds the bundle without staging it) and runs the common `core`
+tests under Node.
 
 ### Command Line
 
@@ -216,6 +236,8 @@ drift version 1.0.0 (macos)
 On the JVM, `./gradlew :cli:jvmRun --args=--version` prints `drift version 1.0.0 (jvm)`, and any other
 command goes in `--args`. The macOS executable and the JVM build were run. The Linux arm64 and x64
 executables ran inside Debian containers. The Windows executable ran under Wine, not on Windows.
+
+The default path runs offline: `drift capture` and `drift diagnose` complete under `docker run --network none`.
 
 ### Studio on the Desktop
 
@@ -302,7 +324,7 @@ drift diagnose --detail summary $G $R
 ```
 
 ```
-8 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
+9 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
 so the data does not name one cause.
 ```
 
@@ -339,7 +361,7 @@ drift install --dir "$PWD/scratch-bin" --no-modify-path --dry-run
 dry run: nothing is changed
 scope: user
 create directory /path/to/scratch-bin
-write /path/to/scratch-bin/drift (mode 0755, 6742776 bytes)
+write /path/to/scratch-bin/drift (mode 0755, 9866776 bytes)
 create directory ~/.config
 create directory ~/.config/drift
 PATH is not modified
@@ -395,16 +417,17 @@ wrote 38 probes for macos on kotlin 2.4.20 to tr/macos.txt
 | `core` | Capsule model, canonical JSON, SHA-256, fixed-point math, diff, ranking, rules, planner, Lab. Common code only. |
 | `host` | Operating system access, one implementation per target (JVM, Linux, macOS, Windows, Wasm, Android, iOS). |
 | `scan` | Probes, toolchain scanners, the Atlas dataset builder and the probe classification. |
-| `cli` | The `drift` command, including `install`, `uninstall` and `serve`. |
-| `studio` | The Compose Multiplatform app: Atlas and Investigation views for desktop, web, Android and iOS, and the installer packaging. |
+| `cli` | The `drift` command and its 21 subcommands, including `upgrade-check`, `triage`, `contract`, `install`, `uninstall` and `serve`. |
+| `studio` | The Compose Multiplatform app for desktop, web, Android and iOS: Home, Case, Atlas, Investigation, Upgrade, Contract and Bisect screens, and the installer packaging. |
 | `bench` | DriftBench, a seeded benchmark of container pairs with an injected cause. |
-| `tools` | Fixture freezing, Atlas ladder tooling and the installer test scripts. |
+| `tools` | Fixture freezing, Atlas ladder tooling, the triage corpus builder and scorer, the performance rig and the installer test scripts. |
 | `androidApp`, `iosApp` | The Android and iOS app shells. They exist only under `-Pdrift.mobile=true`. |
 | `packaging` | Homebrew formula and cask and Chocolatey package templates, rendered by `./gradlew renderPackaging` after a release. |
 | `atlas` | Hand-written probe classification, column descriptions and repro drafts in YAML. The build embeds the classification and builds the static site from it. |
 | `build-core` | Gradle convention plugins and build tasks: rules, Atlas site, packaging templates, Dokka. |
 | `rules` | Hand-written rule files in YAML. The build generates the JSON that `core` reads. |
-| `fixtures` | Recorded capsules, Atlas transcripts and solved cases. |
+| `triage` | The manifest of the issue corpus that `drift triage` is measured on, and the claim-check labels. |
+| `fixtures` | Recorded capsules, Atlas transcripts, solved cases, flagship cases, project trees, issue bodies and upgrade-check captures. |
 | `install.sh`, `install.ps1` | Download, verify and install a release. |
 
 ---
@@ -417,16 +440,16 @@ lines per module and fails the build if a floor or budget is broken:
 
 ```
 module     common  platform  shared
-host          176       388   31.2%
-core         9712         0  100.0%
-scan         3542         0  100.0%
-cli          2576      1549   62.4%
-studio        822        67   92.5%
+host          344       622   35.6%
+core        13526         0  100.0%
+scan         4920         0  100.0%
+cli          3605      1555   69.9%
+studio       2950       155   95.0%
 bench        1996       466   81.1%
-total       18824      2470   88.4%
+total       27341      2798   90.7%
 ```
 
-The platform lines of `cli` are the file, process and socket code behind `install` and `serve`. The
+`host` is about a third common code and its platform lines are the process runners (POSIX, Windows and JVM) and the file and environment access; its budget is 630 lines. The platform lines of `cli` are the file and socket code behind `install` and `serve`. The
 ratio counts the default targets: JVM, Linux, macOS, Windows and Wasm. `core` and the common code of
 `bench` use no `Double` or `Float`, so their results are the same on every target.
 
@@ -440,8 +463,13 @@ No real Android or iOS device has been tried, and the iOS build is a simulator b
 
 What a result does and does not show:
 
-- The ranking weights are hand-set. On the development benchmark the ranker beats a random order at the
-  top only narrowly, and a `plausible` tier candidate is more often wrong than right.
+- The ranking weights are hand-set. On the development benchmark the ranker beats a random order at
+  top-1 (21 of 45, P = 0.018) and top-3 (29 of 45, P = 0.009), and a `plausible` tier candidate is
+  more often wrong than right (14 of 25).
+- `upgrade-check` was scored once, on a PHP 7.4 to 8.3 move of one library: 0 true positives and 12
+  false positives, and what did break had no rule.
+- The `triage` claim check flags none of 67 labelled issue threads, and its facts score a precision of
+  0.78 on form-labelled issues of large trackers.
 - The Lab confirms a cause only under a rule fixed before the first trial, and `verify` checks the
   arithmetic of a case, not that the experiment would repeat.
 - Some Atlas probes depend on hardware and on the build host. NaN bit patterns and the last digits of

@@ -9,6 +9,8 @@ Drift is a Kotlin Multiplatform application, version 1.0.0: the `drift` command 
 - `./gradlew checkLineLength` fails on any Kotlin line over the `.editorconfig` limit, with a tab counted to the next 4-column stop
 - `./gradlew sharedRatio` prints common versus platform lines per module and enforces the floor, the `host` budget and a common-only `core`
 - `./gradlew jvmJacocoAggregateReport verifyCoverage coverageSummary` writes `build/jacoco.xml`, `build/jacocoHtml` and `build/coverage/summary.txt`
+- `./gradlew :tools:buildCorpus`, `:tools:downloadCorpus` and `:tools:evalTriage` build, fetch by pinned SHA-256 and score the triage corpus (`-Pdrift.corpus=<file>` skips the download); none is part of `build`
+- `./gradlew atlasLadderDataset` builds the 74-column Kotlin version ladder dataset into `build/atlas-work/ladder.json`
 - `./gradlew :cli:linkReleaseExecutable<Target>` links an executable; `:cli:jvmRun --args=--version` runs the JVM build
 - `./gradlew :studio:run` runs Studio on the desktop; `:studio:wasmJsBrowserDistribution` builds the web bundle into `studio/build/dist/wasmJs/productionExecutable`
 - `./gradlew -Pdrift.mobile=true :androidApp:assembleDebug` builds the debug APK; `iosApp/iosApp.xcodeproj` builds the simulator app with `xcodebuild` (see README.md)
@@ -20,24 +22,27 @@ Drift is a Kotlin Multiplatform application, version 1.0.0: the `drift` command 
 - `drift install`, `drift uninstall` and `drift serve` are CLI commands, tested in `cli/src/*/test`; run the release workflow by hand with `dry-run` set to build every asset without attesting or publishing
 - `node tools/browsers/run.mjs` records the browser Atlas columns with Playwright and `serve.mjs` loads a served URL in each engine (both need `npm ci` in `tools/browsers`)
 - `tools/capture-transcripts.sh` regenerates `fixtures/transcripts` by running toolchain images in Docker
+- `sh tools/perf/test.sh` tests the performance rig and `python3 tools/perf/summarize.py` writes `tools/perf/results/SUMMARY.md` from the recorded runs
+- `.github/action/test-drift.sh <drift executable>`, `test-triage.sh` and `test-gitlab.sh` test the GitHub Action and the GitLab component with stubs for `gh` and the artifact API
 
 ## Layout
 
 - `build-core` is an included build holding the `drift.kmp`, `drift.layout`, `drift.coverage`, `drift.quality`, `drift.mobile`, `drift.docs`, `drift.docs-root`, `drift.atlas` and `drift.packaging` plugins and their task classes; its tests run through `:build-core:check`
-- Modules: `core` and `scan` have no platform source sets; `host` holds every `expect`/`actual` pair; `cli` is the command; `studio` is the Compose app; `bench` is DriftBench; `tools` freezes fixtures, builds the Atlas ladder (`tools/ladder`) and drives the browser columns (`tools/browsers`); `androidApp` exists only with `-Pdrift.mobile=true`
+- Modules: `core` and `scan` have no platform source sets; `host` holds every `expect`/`actual` pair, with a `posix` source set shared by Linux and macOS; `cli` is the command; `studio` is the Compose app; `bench` is DriftBench; `tools` freezes fixtures, builds the Atlas ladder (`tools/ladder`), drives the browser columns (`tools/browsers`), builds and scores the triage corpus (`tools/src/jvm/main/.../corpus`) and holds the performance rig (`tools/perf`); `androidApp` exists only with `-Pdrift.mobile=true`
 - `iosApp/` is the Xcode project for the iOS simulator app; it calls Gradle with `-Pdrift.mobile=true`
-- `fixtures/` holds recorded capsules, Atlas transcripts and solved cases that tests read; `assets/` holds the logo and the documentation site template
+- `fixtures/` holds recorded capsules, Atlas transcripts and solved cases that tests read: `fixtures/cases` (flagship cases a to d), `fixtures/projects` (project trees for `--project`), `fixtures/triage` (issue bodies and expectations for `drift triage`), `fixtures/upgrade-check` (a real capture for `drift upgrade-check`) and `fixtures/lab` (packed cases); `assets/` holds the logo and the documentation site template
 - `atlas/` holds the hand-maintained probe classification (`classification.yml`), how each column was measured (`columns.yml`) and repro drafts; `fixtures/atlas` is the only transcript directory embedded in the dataset and Studio (`fixtures/atlas-extra` and `fixtures/atlas-variants` hold transcripts that stay out; the native Linux tests read the variants)
+- `triage/` holds `corpus.yml` (the repositories, issue-template policy and pinned corpus hash), `claim-labels.yml` and `claim-protocol.md`; the corpus file itself is a release asset and is not in the repository; `notices/` holds the third-party notices that every artifact ships
 - `packaging/` holds the Homebrew formula and cask and the two Chocolatey packages as templates; `install.sh` and `install.ps1` at the root are the installers that download a release archive and run `drift install`; `.github/release/` holds the release scripts
 - `TECHNICAL_REPORT.md` is the design and measurement reference and `ADVANCED_USAGE.md` is the full CLI guide; both quote real runs, so rerun a command before changing its output in them
 - Sources sit at `src/<set>/main/<package path>` and `src/<set>/test/<package path>` with no `kotlin` directory; resources are `src/<set>/resources` and `src/<set>/test-resources`
 - Platform files carry the set suffix, as in `Host.jvm.kt`
-- `rules/` holds the hand-written rule files as `*.yml`; every scalar is a string and `schema` is the only integer. The `embedRules` task in `build-core` parses them with snakeyaml-engine (failsafe schema) and embeds the JSON that `core` reads, so common code never parses YAML. A stray `rules/*.json` fails the build. YAML is hand-maintained and JSON is generated; the same holds for `bench/scenarios/*.yml`, `bench/data` and `atlas/classification.yml`
+- `rules/` holds the hand-written rule files as `*.yml`, grouped by subject in folders (`rules/do-sqlite/`, `rules/gcc/`, `rules/jdk/`, ...); every scalar is a string and `schema` is the only integer. A rule id is its file name, so it must be unique across folders. The `embedRules` task in `build-core` parses them with snakeyaml-engine (failsafe schema) and embeds the JSON that `core` reads, so common code never parses YAML. A stray `rules/**/*.json` fails the build. YAML is hand-maintained and JSON is generated; the same holds for `bench/scenarios/*.yml`, `bench/data` and `atlas/classification.yml`
 
 ## Conventions
 
-- Tabs, 4 wide, 100 columns, LF. ktlint runs through spotless with `ktlint_standard_indent` disabled because ktlint 1.8.0 rewrites tabs to spaces
-- ktlint counts a tab as one column, so `checkLineLength` is the 100-column gate
+- Four spaces, no tabs, 100 columns, LF, following the Kotlin coding conventions. ktlint runs through spotless
+- `checkLineLength` is the 100-column gate for Kotlin
 - Warnings are errors, with `extraWarnings` and `progressiveMode`
 - Coverage measures JVM only. Native and wasm have no coverage tool in Kotlin 2.4.20: `konanc` ignores `-Xcoverage`
 - No Maven publication or signing; Drift is an application. Dokka builds engine documentation only, and the modules are not a public API
