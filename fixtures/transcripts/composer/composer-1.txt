@@ -1,0 +1,7 @@
+
+Deprecated: Composer\Util\ErrorHandler::register(): Implicitly marking parameter $io as nullable is deprecated, the explicit nullable type must be used instead in phar:///usr/bin/composer/src/Composer/Util/ErrorHandler.php on line 85
+Deprecation Notice: Composer\Json\JsonFile::__construct(): Implicitly marking parameter $rfs as nullable is deprecated, the explicit nullable type must be used instead in phar:///usr/bin/composer/src/Composer/Json/JsonFile.php:51
+Deprecation Notice: Composer\Json\JsonFile::__construct(): Implicitly marking parameter $io as nullable is deprecated, the explicit nullable type must be used instead in phar:///usr/bin/composer/src/Composer/Json/JsonFile.php:51
+Deprecation Notice: Composer\Config::prohibitUrlByConfig(): Implicitly marking parameter $io as nullable is deprecated, the explicit nullable type must be used instead in phar:///usr/bin/composer/src/Composer/Config.php:450
+Deprecation Notice: Constant E_STRICT is deprecated since 8.4, the error level was removed in phar:///usr/bin/composer/src/Composer/Util/Silencer.php:36
+Composer version 1.10.28 2026-05-13 11:02:17

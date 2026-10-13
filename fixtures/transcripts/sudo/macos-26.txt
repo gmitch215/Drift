@@ -1,0 +1,5 @@
+Sudo version 1.9.17p2
+Sudoers policy plugin version 1.9.17p2
+Sudoers file grammar version 50
+Sudoers I/O plugin version 1.9.17p2
+Sudoers audit plugin version 1.9.17p2

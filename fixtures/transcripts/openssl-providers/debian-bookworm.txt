@@ -1,0 +1,5 @@
+Providers:
+  default
+    name: OpenSSL Default Provider
+    version: 3.0.22
+    status: active

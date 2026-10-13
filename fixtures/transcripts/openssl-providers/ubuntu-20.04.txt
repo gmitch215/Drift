@@ -1,0 +1,3 @@
+list: Option unknown option -providers
+list: Use -help for summary.
+exit 1

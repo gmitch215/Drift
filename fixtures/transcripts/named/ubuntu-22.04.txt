@@ -1,0 +1,1 @@
+BIND 9.18.39-0ubuntu0.22.04.6-Ubuntu (Extended Support Version) <id:>

@@ -1,0 +1,4 @@
+curl 8.12.1 (aarch64-alpine-linux-musl) libcurl/8.12.1 OpenSSL/3.1.8 zlib/1.2.13 brotli/1.0.9 libidn2/2.3.4 libpsl/0.21.5 nghttp2/1.57.0
+Release-Date: 2025-02-13
+Protocols: dict file ftp ftps gopher gophers http https imap imaps ipfs ipns mqtt pop3 pop3s rtsp smb smbs smtp smtps telnet tftp ws wss
+Features: alt-svc AsynchDNS brotli HSTS HTTP2 HTTPS-proxy IDN IPv6 Largefile libz NTLM PSL SSL threadsafe TLS-SRP UnixSockets
