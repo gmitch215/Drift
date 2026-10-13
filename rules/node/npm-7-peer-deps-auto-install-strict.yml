@@ -1,0 +1,57 @@
+schema: 1
+id: npm-7-peer-deps-auto-install-strict
+title: npm 7 installs peerDependencies automatically, so a peer conflict that npm 6 ignored can fail the install
+applies:
+  - build
+difference: >-
+  the npm version is 6.x (peerDependencies ignored) on the passing side and 7.0.0 or later (peerDependencies resolved) on the failing side
+symptoms:
+  - text: npm install fails with ERESOLVE on a peer conflict
+    basis: inferred
+mechanism: >-
+  npm 7 resolves peerDependencies when it builds the tree, and legacy-peer-deps restores the behaviour of npm 3 through 6, which ignored them.
+detect:
+  all:
+    - a: tool.npm.version
+      ver: '<7.0.0'
+    - b: tool.npm.version
+      ver: '>=7.0.0'
+    - b: run:signature
+      has: ERESOLVE
+severity: high
+provenance:
+  - url: https://docs.npmjs.com/cli/v7/using-npm/config
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: legacy-peer-deps (ignores peerDependencies as in npm versions 3 through 6)
+fixtures:
+  positive:
+    - name: npm 6.14.18 to npm 7.10.0 with the ERESOLVE error
+      a:
+        attrs:
+          tool.npm.version: '6.14.18'
+      b:
+        attrs:
+          tool.npm.version: '7.10.0'
+        run:
+          signature: 'npm ERR! code ERESOLVE'
+  negative:
+    - name: failing side is on npm 7, so the passing side must be below 7
+      a:
+        attrs:
+          tool.npm.version: '7.10.0'
+      b:
+        attrs:
+          tool.npm.version: '7.10.0'
+        run:
+          signature: 'npm ERR! code ERESOLVE'
+    - name: failing side is below 7
+      a:
+        attrs:
+          tool.npm.version: '6.14.18'
+      b:
+        attrs:
+          tool.npm.version: '6.14.18'
+        run:
+          signature: 'npm ERR! code ERESOLVE'
+status: active

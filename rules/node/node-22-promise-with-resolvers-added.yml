@@ -1,0 +1,52 @@
+schema: 1
+id: node-22-promise-with-resolvers-added
+title: Node 22 adds Promise.withResolvers
+applies:
+  - runtime
+difference: >-
+  the Node version is 22.0.0 or newer on the passing side and older than 22.0.0 on the failing side
+symptoms:
+  - text: "TypeError: Promise.withResolvers is not a function"
+    basis: inferred
+mechanism: Node 22.0.0 ships Promise.withResolvers, so a call to it fails on earlier Node versions.
+detect:
+  all:
+    - a: tool.node.version
+      ver: '>=22.0.0'
+    - b: tool.node.version
+      ver: '<22.0.0'
+    - b: project.js.calls.Promise.withResolvers
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://cdn.jsdelivr.net/npm/@mdn/browser-compat-data/data.json
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: "javascript.builtins.Promise.withResolvers.__compat.support.nodejs: version_added 22.0.0"
+fixtures:
+  positive:
+    - name: node 20 target still calling Promise.withResolvers (22.12.0 to 20.11.1)
+      a:
+        attrs:
+          tool.node.version: '22.12.0'
+      b:
+        attrs:
+          tool.node.version: '20.11.1'
+          project.js.calls.Promise.withResolvers: 'true'
+  negative:
+    - name: target without the call
+      a:
+        attrs:
+          tool.node.version: '22.12.0'
+      b:
+        attrs:
+          tool.node.version: '20.11.1'
+    - name: target on a runtime that has the API
+      a:
+        attrs:
+          tool.node.version: '22.12.0'
+      b:
+        attrs:
+          tool.node.version: '22.12.0'
+          project.js.calls.Promise.withResolvers: 'true'
+status: active

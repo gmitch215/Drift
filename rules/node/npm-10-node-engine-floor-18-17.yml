@@ -1,0 +1,63 @@
+schema: 1
+id: npm-10-node-engine-floor-18-17
+title: npm 10 supports only Node ^18.17.0 or >=20.5.0, so npm 10 on Node 16 or early 18 is outside its engine range
+applies:
+  - build
+difference: >-
+  the npm version is 9.x on the passing side and 10.x on the failing side, on the same Node line outside npm 10's engine range
+symptoms:
+  - text: npm 10 prints an engine warning, or fails, on the unsupported Node version
+    basis: inferred
+mechanism: >-
+  npm 10 drops Node 14 and 16 and supports only ^18.17.0 or >=20.5.0, so npm 10 on any other Node line is outside its engine range.
+detect:
+  all:
+    - a: tool.npm.version
+      ver: '<10.0.0'
+    - b: tool.npm.version
+      ver: '>=10.0.0'
+    - a: tool.node.version
+      ver:
+        - '<18.17.0'
+        - '>=19.0.0,<20.5.0'
+    - b: tool.node.version
+      ver:
+        - '<18.17.0'
+        - '>=19.0.0,<20.5.0'
+severity: medium
+provenance:
+  - url: https://github.com/npm/cli/releases/tag/v10.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Node.js version requirement: npm now supports node ^18.17.0 || >=20.5.0'
+fixtures:
+  positive:
+    - name: npm 9.8.1 to npm 10.2.0 on node 16.20.2
+      a:
+        attrs:
+          tool.npm.version: '9.8.1'
+          tool.node.version: '16.20.2'
+      b:
+        attrs:
+          tool.npm.version: '10.2.0'
+          tool.node.version: '16.20.2'
+  negative:
+    - name: failing side is npm 9, so it is not 10 or later
+      a:
+        attrs:
+          tool.npm.version: '10.2.0'
+          tool.node.version: '16.20.2'
+      b:
+        attrs:
+          tool.npm.version: '10.2.0'
+          tool.node.version: '16.20.2'
+    - name: node 20.11.1 is inside npm 10's engine range
+      a:
+        attrs:
+          tool.npm.version: '9.8.1'
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.npm.version: '10.2.0'
+          tool.node.version: '20.11.1'
+status: active

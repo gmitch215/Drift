@@ -1,0 +1,58 @@
+schema: 1
+id: node-12-tls-min-v1-2-default
+title: Node.js 12 and later default the TLS minimum to TLSv1.2, so TLSv1 and TLSv1.1 peers fail unless the minimum is lowered
+applies:
+  - runtime
+  - network
+difference: >-
+  a = Node.js before 12.0.0 on the passing side; b = Node.js 12.0.0 or later with default flags on the failing side, and the peer offers only TLSv1 or TLSv1.1
+symptoms:
+  - text: the handshake fails with a protocol-version or handshake error against a TLSv1 or TLSv1.1 only peer (error text not checked)
+    basis: inferred
+mechanism: Node.js 12.x and later default the TLS minimum to TLSv1.2 unless CLI options change it.
+detect:
+  all:
+    - a: tool.node.version
+      ver: '<12.0.0'
+    - b: tool.node.version
+      ver: '>=12.0.0'
+    - b: network.tls-version-offered
+      has: TLSv1.0
+severity: medium
+provenance:
+  - url: https://nodejs.org/api/tls.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: tls.DEFAULT_MIN_VERSION
+  - url: https://nodejs.org/api/cli.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: --tls-min-v1.2
+fixtures:
+  positive:
+    - name: node 11.15.0 to node 12.22.0 with a TLSv1.0 only peer
+      a:
+        attrs:
+          tool.node.version: '11.15.0'
+      b:
+        attrs:
+          tool.node.version: '12.22.0'
+          network.tls-version-offered: TLSv1.0
+  negative:
+    - name: node 11.15.0 to node 12.22.0 with a TLSv1.2 peer
+      a:
+        attrs:
+          tool.node.version: '11.15.0'
+      b:
+        attrs:
+          tool.node.version: '12.22.0'
+          network.tls-version-offered: TLSv1.2
+    - name: node 20.18.0 to node 22.12.0 with a TLSv1.0 peer (both past the 12.x default)
+      a:
+        attrs:
+          tool.node.version: '20.18.0'
+      b:
+        attrs:
+          tool.node.version: '22.12.0'
+          network.tls-version-offered: TLSv1.0
+status: pending-scanner

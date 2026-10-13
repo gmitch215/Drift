@@ -1,0 +1,59 @@
+schema: 1
+id: node-17-openssl3-err-ossl-evp-unsupported
+title: Node 17 ships OpenSSL 3, and code that hashes with MD4 fails with ERR_OSSL_EVP_UNSUPPORTED from 17.0.0
+applies:
+  - runtime
+difference: >-
+  the Node version is 16.x (OpenSSL 1.1.1) on the passing side and 17.0.0 or later (OpenSSL 3.0) on the failing side
+symptoms:
+  - text: the build or app fails with ERR_OSSL_EVP_UNSUPPORTED
+    basis: verified
+mechanism: >-
+  Node 17 ships OpenSSL 3, which tightens the algorithms and key sizes allowed by default, so code that hashes with MD4 fails on 17.0.0 and later.
+detect:
+  all:
+    - a: tool.node.version
+      ver: '<17.0.0'
+    - b: tool.node.version
+      ver: '>=17.0.0'
+    - b: run:signature
+      has: ERR_OSSL_EVP_UNSUPPORTED
+severity: high
+provenance:
+  - url: https://nodejs.org/en/blog/release/v17.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: Other major changes (OpenSSL 3.0 restrictions on algorithms and key sizes)
+  - url: https://github.com/webpack/webpack/issues/14532
+    kind: measurement
+    verified: '2026-10-13'
+    section: comments on ERR_OSSL_EVP_UNSUPPORTED and the md4 hash
+fixtures:
+  positive:
+    - name: node 16.20.2 to node 17.0.0 with the OpenSSL error
+      a:
+        attrs:
+          tool.node.version: '16.20.2'
+      b:
+        attrs:
+          tool.node.version: '17.0.0'
+        run:
+          signature: 'Error: ERR_OSSL_EVP_UNSUPPORTED'
+  negative:
+    - name: the failing side is 16.20.2, so the error text does not place it on 17
+      a:
+        attrs:
+          tool.node.version: '16.20.2'
+      b:
+        attrs:
+          tool.node.version: '16.20.2'
+        run:
+          signature: 'Error: ERR_OSSL_EVP_UNSUPPORTED'
+    - name: no error text on the failing side
+      a:
+        attrs:
+          tool.node.version: '16.20.2'
+      b:
+        attrs:
+          tool.node.version: '18.20.8'
+status: active

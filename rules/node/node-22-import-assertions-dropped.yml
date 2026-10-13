@@ -1,0 +1,61 @@
+schema: 1
+id: node-22-import-assertions-dropped
+title: Node 22 drops import assertions, so modules with an assert clause for JSON fail to load
+applies:
+  - runtime
+difference: >-
+  Node 18.20 or later on the passing side (import assertions accepted) and Node 22.0.0 or later on
+  the failing side, for a module that uses import assertions
+symptoms:
+  - text: >-
+      a SyntaxError at module load for an import assertion on Node 22 (inferred; the error text was
+      not read)
+    basis: inferred
+mechanism: >-
+  Node 22.0.0 drops support for import assertions, which Node 18.20, 20.10 and 21.0 had already
+  moved to import attributes.
+detect:
+  all:
+    - a: tool.node.version
+      ver: '>=18.20'
+    - b: tool.node.version
+      ver: '>=22'
+    - b: project.js.calls.import-assert
+      present: 'true'
+severity: high
+provenance:
+  - url: https://nodejs.org/api/esm.html
+    kind: spec
+    verified: '2026-10-13'
+    section: 'history'
+  - url: https://nodejs.org/en/blog/release/v22.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Semver-Major Commits'
+fixtures:
+  positive:
+    - name: Node 20.10.0 to Node 22.0.0 with an import assertion
+      a:
+        attrs:
+          tool.node.version: '20.10.0'
+      b:
+        attrs:
+          tool.node.version: '22.0.0'
+          project.js.calls.import-assert: 'true'
+  negative:
+    - name: Node 20.10.0 to Node 22.0.0 with no import assertion
+      a:
+        attrs:
+          tool.node.version: '20.10.0'
+      b:
+        attrs:
+          tool.node.version: '22.0.0'
+    - name: Node 18.19.0 to Node 22.0.0 with an import assertion
+      a:
+        attrs:
+          tool.node.version: '18.19.0'
+      b:
+        attrs:
+          tool.node.version: '22.0.0'
+          project.js.calls.import-assert: 'true'
+status: active

@@ -1,0 +1,58 @@
+schema: 1
+id: npm-9-lockfile-v3-default
+title: npm 9 writes lockfileVersion 3 by default
+applies:
+  - build
+difference: >-
+  npm 8 on the passing side and npm 9 or later on the failing side, where the lockfile is written as
+  lockfileVersion 3
+symptoms:
+  - text: >-
+      the lockfile is rewritten to v3 on the first npm 9 install (the size of the diff was not
+      measured)
+    basis: inferred
+  - text: older tools that do not read lockfile v3 may fail (not checked)
+    basis: inferred
+mechanism: 'npm 9.0.0 writes lockfile version 3 by default (commit #5605).'
+detect:
+  all:
+    - a: tool.npm.version
+      ver: '<9'
+    - b: tool.npm.version
+      ver: '>=9'
+    - b: project.npm.lockfile-version
+      eq: '3'
+severity: low
+provenance:
+  - url: https://github.com/npm/cli/releases/tag/v9.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Features'
+fixtures:
+  positive:
+    - name: npm 8.19.4 to npm 9.0.0 with a v3 lockfile
+      a:
+        attrs:
+          tool.npm.version: '8.19.4'
+      b:
+        attrs:
+          tool.npm.version: '9.0.0'
+          project.npm.lockfile-version: '3'
+  negative:
+    - name: npm 8.19.4 to npm 9.0.0 with a v2 lockfile
+      a:
+        attrs:
+          tool.npm.version: '8.19.4'
+      b:
+        attrs:
+          tool.npm.version: '9.0.0'
+          project.npm.lockfile-version: '2'
+    - name: npm 9.0.0 to npm 10.0.0 with a v3 lockfile
+      a:
+        attrs:
+          tool.npm.version: '9.0.0'
+      b:
+        attrs:
+          tool.npm.version: '10.0.0'
+          project.npm.lockfile-version: '3'
+status: active

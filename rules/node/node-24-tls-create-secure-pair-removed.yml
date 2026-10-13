@@ -1,0 +1,57 @@
+schema: 1
+id: node-24-tls-create-secure-pair-removed
+title: Node 24 removes tls.createSecurePair, so code that calls it fails with a not-a-function error from 24.0.0
+applies:
+  - runtime
+difference: >-
+  the Node version is before 24.0.0 (function present, deprecated) on the passing side and 24.0.0 or later (function removed) on the failing side
+symptoms:
+  - text: 'TypeError: tls.createSecurePair is not a function'
+    basis: inferred
+mechanism: >-
+  Node 24.0.0 removes the deprecated tls.createSecurePair, so a call to it throws on 24.0.0 and later.
+detect:
+  all:
+    - a: tool.node.version
+      ver: '<24.0.0'
+    - b: tool.node.version
+      ver: '>=24.0.0'
+    - b: run:signature
+      has: createSecurePair
+severity: medium
+provenance:
+  - url: https://nodejs.org/en/blog/release/v24.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Removals: removal of deprecated tls.createSecurePair'
+fixtures:
+  positive:
+    - name: node 22.11.0 to node 24.0.0 with the TypeError
+      a:
+        attrs:
+          tool.node.version: '22.11.0'
+      b:
+        attrs:
+          tool.node.version: '24.0.0'
+        run:
+          signature: 'TypeError: tls.createSecurePair is not a function'
+  negative:
+    - name: failing side is on 24, so the passing side must be below 24
+      a:
+        attrs:
+          tool.node.version: '24.0.0'
+      b:
+        attrs:
+          tool.node.version: '24.0.0'
+        run:
+          signature: 'TypeError: tls.createSecurePair is not a function'
+    - name: below 24 on the failing side
+      a:
+        attrs:
+          tool.node.version: '20.18.0'
+      b:
+        attrs:
+          tool.node.version: '22.11.0'
+        run:
+          signature: 'TypeError: tls.createSecurePair is not a function'
+status: active

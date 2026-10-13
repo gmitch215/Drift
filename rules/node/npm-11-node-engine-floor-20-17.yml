@@ -1,0 +1,63 @@
+schema: 1
+id: npm-11-node-engine-floor-20-17
+title: npm 11 supports only Node ^20.17.0 or >=22.9.0, so npm 11 on Node 18, 20.0 to 20.16 or 22.0 to 22.8 is outside its engine range
+applies:
+  - build
+difference: >-
+  npm 11 runs on both sides; the passing side runs Node 20.17 to 20.x or 22.9 or later, and the failing side runs Node 18, 20.0 to 20.16 or 22.0 to 22.8
+symptoms:
+  - text: npm 11 reports an unsupported Node engine on the older line
+    basis: inferred
+mechanism: >-
+  npm 11 supports only Node ^20.17.0 or >=22.9.0, so npm 11 on any other Node line is outside its engine range.
+detect:
+  all:
+    - a: tool.npm.version
+      ver: '>=11.0.0'
+    - b: tool.npm.version
+      ver: '>=11.0.0'
+    - a: tool.node.version
+      ver:
+        - '>=20.17.0,<21.0.0'
+        - '>=22.9.0'
+    - b: tool.node.version
+      ver:
+        - '<20.17.0'
+        - '>=22.0.0,<22.9.0'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/npm/cli/latest/CHANGELOG.md
+    kind: release-note
+    verified: '2026-10-13'
+    section: '11.0.0-pre.0 BREAKING CHANGES: npm now supports node ^20.17.0 || >=22.9.0'
+fixtures:
+  positive:
+    - name: npm 11.6.0 on node 20.18.0 to npm 11.6.0 on node 18.20.8
+      a:
+        attrs:
+          tool.npm.version: '11.6.0'
+          tool.node.version: '20.18.0'
+      b:
+        attrs:
+          tool.npm.version: '11.6.0'
+          tool.node.version: '18.20.8'
+  negative:
+    - name: failing side is on node 22.11.0, which npm 11 supports
+      a:
+        attrs:
+          tool.npm.version: '11.6.0'
+          tool.node.version: '22.11.0'
+      b:
+        attrs:
+          tool.npm.version: '11.6.0'
+          tool.node.version: '22.11.0'
+    - name: npm 10 is outside the claim
+      a:
+        attrs:
+          tool.npm.version: '10.9.0'
+          tool.node.version: '20.18.0'
+      b:
+        attrs:
+          tool.npm.version: '10.9.0'
+          tool.node.version: '18.20.8'
+status: active

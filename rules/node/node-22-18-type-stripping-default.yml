@@ -1,0 +1,56 @@
+schema: 1
+id: node-22-18-type-stripping-default
+title: Node 22.18 runs .ts files without a flag, so node file.ts fails on Node 22.17 and earlier
+applies:
+  - runtime
+difference: >-
+  Node 22.18.0 or later on the passing side and Node 22.17 or earlier on the failing side, for a
+  project whose entry point is a .ts file
+symptoms:
+  - text: >-
+      node file.ts is rejected on Node 22.17 and earlier (inferred; the error was not checked)
+    basis: inferred
+mechanism: >-
+  Node 22.18.0 enables type stripping by default, so node runs .ts files without additional
+  configuration; the feature is experimental and --no-experimental-strip-types turns it off.
+detect:
+  all:
+    - a: tool.node.version
+      ver: '>=22.18.0'
+    - b: tool.node.version
+      ver: '<22.18.0'
+    - b: project.npm.ts-entry
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://nodejs.org/en/blog/release/v22.18.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Type stripping is enabled by default'
+fixtures:
+  positive:
+    - name: Node 22.18.0 to Node 22.17.0 with a .ts entry
+      a:
+        attrs:
+          tool.node.version: '22.18.0'
+      b:
+        attrs:
+          tool.node.version: '22.17.0'
+          project.npm.ts-entry: 'true'
+  negative:
+    - name: Node 22.18.0 to Node 22.17.0 with no .ts entry
+      a:
+        attrs:
+          tool.node.version: '22.18.0'
+      b:
+        attrs:
+          tool.node.version: '22.17.0'
+    - name: Node 22.17.0 to Node 22.18.0 with a .ts entry
+      a:
+        attrs:
+          tool.node.version: '22.17.0'
+      b:
+        attrs:
+          tool.node.version: '22.18.0'
+          project.npm.ts-entry: 'true'
+status: active

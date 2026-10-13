@@ -1,0 +1,52 @@
+schema: 1
+id: node-22-array-fromasync-added
+title: Node 22 adds Array.fromAsync
+applies:
+  - runtime
+difference: >-
+  the Node version is 22.0.0 or newer on the passing side and older than 22.0.0 on the failing side
+symptoms:
+  - text: "TypeError: Array.fromAsync is not a function"
+    basis: inferred
+mechanism: Node 22.0.0 ships Array.fromAsync, so a call to it fails on earlier Node versions.
+detect:
+  all:
+    - a: tool.node.version
+      ver: '>=22.0.0'
+    - b: tool.node.version
+      ver: '<22.0.0'
+    - b: project.js.calls.Array.fromAsync
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://cdn.jsdelivr.net/npm/@mdn/browser-compat-data/data.json
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: "javascript.builtins.Array.fromAsync.__compat.support.nodejs: version_added 22.0.0"
+fixtures:
+  positive:
+    - name: node 18 target still calling Array.fromAsync (22.12.0 to 18.20.8)
+      a:
+        attrs:
+          tool.node.version: '22.12.0'
+      b:
+        attrs:
+          tool.node.version: '18.20.8'
+          project.js.calls.Array.fromAsync: 'true'
+  negative:
+    - name: target without the call
+      a:
+        attrs:
+          tool.node.version: '22.12.0'
+      b:
+        attrs:
+          tool.node.version: '18.20.8'
+    - name: target on a runtime that has the API
+      a:
+        attrs:
+          tool.node.version: '22.12.0'
+      b:
+        attrs:
+          tool.node.version: '22.12.0'
+          project.js.calls.Array.fromAsync: 'true'
+status: active

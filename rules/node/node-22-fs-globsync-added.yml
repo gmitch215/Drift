@@ -1,0 +1,52 @@
+schema: 1
+id: node-22-fs-globsync-added
+title: Node 22 adds fs.globSync
+applies:
+  - runtime
+difference: >-
+  the Node version is 22.0 or newer on the passing side and older than 22.0 on the failing side
+symptoms:
+  - text: "TypeError: fs.globSync is not a function"
+    basis: inferred
+mechanism: Node 22 adds the fs.globSync function, so a call to it fails on earlier Node versions.
+detect:
+  all:
+    - a: tool.node.version
+      ver: '>=22.0.0'
+    - b: tool.node.version
+      ver: '<22.0.0'
+    - b: project.js.calls.fs.globSync
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/nodejs/node/main/doc/api/fs.md
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: "fs.globSync(pattern[, options]): added v22.0.0"
+fixtures:
+  positive:
+    - name: "node 20.18.0 target using fs.globSync (22.12.0 to 20.18.0)"
+      a:
+        attrs:
+          tool.node.version: '22.12.0'
+      b:
+        attrs:
+          tool.node.version: '20.18.0'
+          project.js.calls.fs.globSync: 'true'
+  negative:
+    - name: target without the call
+      a:
+        attrs:
+          tool.node.version: '22.12.0'
+      b:
+        attrs:
+          tool.node.version: '20.18.0'
+    - name: target on a runtime that has the API
+      a:
+        attrs:
+          tool.node.version: '22.12.0'
+      b:
+        attrs:
+          tool.node.version: '22.12.0'
+          project.js.calls.fs.globSync: 'true'
+status: active

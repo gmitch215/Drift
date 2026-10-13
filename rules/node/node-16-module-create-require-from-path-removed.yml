@@ -1,0 +1,55 @@
+schema: 1
+id: node-16-module-create-require-from-path-removed
+title: Node 16 removes module.createRequireFromPath, so code that calls it throws a TypeError from 16.0.0
+applies:
+  - runtime
+difference: >-
+  the Node version is before 16.0.0 (function present) on the passing side and 16.0.0 or later (function removed) on the failing side
+symptoms:
+  - text: 'TypeError: module.createRequireFromPath is not a function'
+    basis: inferred
+mechanism: >-
+  Node 16.0.0 removes module.createRequireFromPath, so a call to it throws on 16.0.0 and later.
+detect:
+  all:
+    - a: tool.node.version
+      ver: '<16.0.0'
+    - b: tool.node.version
+      ver: '>=16.0.0'
+    - b: run:signature
+      has: createRequireFromPath
+severity: low
+provenance:
+  - url: https://nodejs.org/en/blog/release/v16.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Removals: (SEMVER-MAJOR) module: remove module.createRequireFromPath'
+fixtures:
+  positive:
+    - name: node 14.21.3 to node 16.20.2 with the TypeError
+      a:
+        attrs:
+          tool.node.version: '14.21.3'
+      b:
+        attrs:
+          tool.node.version: '16.20.2'
+        run:
+          signature: 'TypeError: module.createRequireFromPath is not a function'
+  negative:
+    - name: failing side is on 16, so the passing side must be below 16
+      a:
+        attrs:
+          tool.node.version: '16.20.2'
+      b:
+        attrs:
+          tool.node.version: '16.20.2'
+        run:
+          signature: 'TypeError: module.createRequireFromPath is not a function'
+    - name: no TypeError on the failing side
+      a:
+        attrs:
+          tool.node.version: '14.21.3'
+      b:
+        attrs:
+          tool.node.version: '18.20.8'
+status: active

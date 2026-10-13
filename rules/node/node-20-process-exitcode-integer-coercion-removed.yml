@@ -1,0 +1,55 @@
+schema: 1
+id: node-20-process-exitcode-integer-coercion-removed
+title: Node 20 stops coercing process.exitCode to an integer
+applies:
+  - runtime
+difference: >-
+  Node 18 on the passing side and Node 20.0.0 or later on the other side, for a script that sets
+  process.exitCode to a non-integer value
+symptoms:
+  - text: >-
+      a string or non-integer process.exitCode gives a different exit status than on Node 18 (the
+      resulting status was not checked)
+    basis: inferred
+mechanism: 'Node 20.0.0 removes the coercion of process.exitCode to an integer (commit #43716).'
+detect:
+  all:
+    - a: tool.node.version
+      ver: '<20'
+    - b: tool.node.version
+      ver: '>=20'
+    - b: project.js.calls.exitcode-string
+      present: 'true'
+severity: low
+provenance:
+  - url: https://nodejs.org/en/blog/release/v20.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Semver-Major Commits'
+fixtures:
+  positive:
+    - name: Node 18.20.0 to Node 20.0.0 with a string process.exitCode
+      a:
+        attrs:
+          tool.node.version: '18.20.0'
+      b:
+        attrs:
+          tool.node.version: '20.0.0'
+          project.js.calls.exitcode-string: 'true'
+  negative:
+    - name: Node 18.20.0 to Node 20.0.0 with no string exitCode
+      a:
+        attrs:
+          tool.node.version: '18.20.0'
+      b:
+        attrs:
+          tool.node.version: '20.0.0'
+    - name: Node 20.0.0 to Node 20.1.0 with a string exitCode
+      a:
+        attrs:
+          tool.node.version: '20.0.0'
+      b:
+        attrs:
+          tool.node.version: '20.1.0'
+          project.js.calls.exitcode-string: 'true'
+status: active

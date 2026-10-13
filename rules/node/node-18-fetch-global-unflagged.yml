@@ -1,0 +1,55 @@
+schema: 1
+id: node-18-fetch-global-unflagged
+title: Node 18 exposes a global fetch by default, so code that calls fetch on Node 16 fails with a ReferenceError
+applies:
+  - runtime
+difference: >-
+  the Node version is 18.x (global fetch enabled by default, marked experimental) on the passing side and a line before 18 (no global fetch) on the failing side
+symptoms:
+  - text: 'ReferenceError: fetch is not defined'
+    basis: inferred
+mechanism: >-
+  Node 18.0.0 enables an experimental global fetch by default, and a bare fetch call throws on earlier lines that lack it.
+detect:
+  all:
+    - a: tool.node.version
+      ver: '>=18.0.0'
+    - b: tool.node.version
+      ver: '<18.0.0'
+    - b: run:signature
+      has: 'fetch is not defined'
+severity: medium
+provenance:
+  - url: https://nodejs.org/en/blog/release/v18.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'fetch (experimental): an experimental fetch API is available on the global scope by default'
+fixtures:
+  positive:
+    - name: node 18.20.8 to node 16.20.2 with the fetch error
+      a:
+        attrs:
+          tool.node.version: '18.20.8'
+      b:
+        attrs:
+          tool.node.version: '16.20.2'
+        run:
+          signature: 'ReferenceError: fetch is not defined'
+  negative:
+    - name: failing side is on 18, so it is not below 18
+      a:
+        attrs:
+          tool.node.version: '18.20.8'
+      b:
+        attrs:
+          tool.node.version: '18.20.8'
+        run:
+          signature: 'ReferenceError: fetch is not defined'
+    - name: passing side is below 18
+      a:
+        attrs:
+          tool.node.version: '16.20.2'
+      b:
+        attrs:
+          tool.node.version: '18.20.8'
+status: active
