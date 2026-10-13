@@ -1,0 +1,53 @@
+{
+	"captureSha256": "142aa3b7248f097cd7d4e29bbd0223a078401e29657e21b2bd7216f7c309d224",
+	"case": "d",
+	"command": "drift upgrade-check fixtures/cases/d/capture-php-7-4.json --to php=8.3 --json",
+	"engine": {
+		"rules": 296,
+		"schema": 2,
+		"touched": 44
+	},
+	"frozenPredictionSha256": "a8ada4b9af3180f2174cb6a09eacd3250af4071b40a6a6bf59bfdd86efc63192",
+	"grouping": {
+		"may-break": [
+			"php-8-2-string-case-functions-ascii-only"
+		],
+		"unknown": [],
+		"version-boundary": [
+			"php-8-0-concat-precedence-changed",
+			"php-8-1-htmlspecialchars-ent-quotes-default",
+			"php-8-non-numeric-typeerror",
+			"php-8-0-create-function-each-removed",
+			"php-8-0-pdo-error-mode-exceptions-default",
+			"php-8-1-mysqli-error-mode-exceptions-default",
+			"php-8-0-at-operator-no-longer-silences-fatal",
+			"php-8-1-null-to-internal-param-deprecated",
+			"php-8-2-dynamic-properties-deprecated",
+			"php-8-string-number-comparison",
+			"php-8-0-implode-reversed-arguments-removed"
+		],
+		"will-break": []
+	},
+	"label": "POST-FIX rerun, outside the frozen protocol",
+	"note": "Run after the grouping change in core/upgrade; the frozen selection, prediction and score files are untouched. The capture is the frozen capture-php-7-4.json; the engine is the current tree (JVM, :cli:jvmRun), which has 296 rules where the frozen executable had 260.",
+	"realOutcome": {
+		"newFailingTests": 0,
+		"source": "score.json (frozen)",
+		"unpredictedBreak": "mikey179/vfsstream 1.6.8 getIterator() fatal on PHP 8.1+ (supplementary run); no rule covers it"
+	},
+	"sameRulesAsFrozen": {
+		"frozenMayBreakUnchanged": true,
+		"frozenWillBreakNowVersionBoundary": true
+	},
+	"schema": 1,
+	"scoreIfScoredNow": {
+		"FP": 0,
+		"MISS": 0,
+		"TP": 0,
+		"mayBreakFP": 1,
+		"mayBreakPredicted": 1,
+		"note": "Frozen protocol counted 11 will-break plus 1 may-break as 12 FP. Now no failure is claimed from the version crossing alone: will-break is empty, 1 may-break is FP, and the 11 version-boundary entries are checks the report says have no project evidence. Counting those 11 as predictions again gives 12 FP, the frozen score. Nothing here finds the vfsStream break, so MISS in the sense of a real break not listed stays 1 outside the protocol.",
+		"versionBoundaryListed": 11,
+		"willBreakPredicted": 0
+	}
+}
