@@ -1,0 +1,57 @@
+schema: 1
+id: drupal-10-removed-core-modules-and-themes
+title: Drupal 10 removes the Aggregator, Color, HAL, Quick Edit and RDF modules and the Bartik, Seven, Classy and Stable themes from core
+applies:
+  - build
+difference: >-
+  side a is Drupal 9.x with one of those modules enabled or one of those themes in use; side b is Drupal 10.0.0, where
+  they are not in core; themes that extend Classy or Stable break on b
+symptoms:
+  - text: Drupal 10 upgrade reports missing extensions; missing active themes cause fatal errors or a white screen
+    basis: verified
+mechanism: >-
+  The Drupal 10.0.0 release notes list Aggregator, Color, HAL, Quick Edit and RDF as removed modules and Bartik, Seven, Classy and Stable as removed themes.
+detect:
+  all:
+    - a: project.composer.drupal/core
+      ver: '<10'
+    - b: project.composer.drupal/core
+      ver: '>=10'
+    - any:
+        - a: project.drupal.modules.aggregator
+          present: 'true'
+        - a: project.drupal.modules.color
+          present: 'true'
+        - a: project.drupal.modules.hal
+          present: 'true'
+        - a: project.drupal.modules.quickedit
+          present: 'true'
+        - a: project.drupal.modules.rdf
+          present: 'true'
+        - a: project.drupal.themes.bartik
+          present: 'true'
+        - a: project.drupal.themes.seven
+          present: 'true'
+        - a: project.drupal.themes.classy
+          present: 'true'
+        - a: project.drupal.themes.stable
+          present: 'true'
+severity: high
+provenance:
+  - url: https://www.drupal.org/project/drupal/releases/10.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: Removed modules and themes
+fixtures:
+  positive:
+    - name: drupal 9.5.0 with the color module to drupal 10.3.6
+      a: {attrs: {project.composer.drupal/core: '9.5.0', project.drupal.modules.color: 'true'}}
+      b: {attrs: {project.composer.drupal/core: '10.3.6'}}
+  negative:
+    - name: drupal 10.3.6 to drupal 9.5.0 with the color module (reverse direction)
+      a: {attrs: {project.composer.drupal/core: '10.3.6'}}
+      b: {attrs: {project.composer.drupal/core: '9.5.0', project.drupal.modules.color: 'true'}}
+    - name: drupal 9.5.0 with the node module to drupal 10.3.6 (module is still in core)
+      a: {attrs: {project.composer.drupal/core: '9.5.0', project.drupal.modules.node: 'true'}}
+      b: {attrs: {project.composer.drupal/core: '10.3.6'}}
+status: pending-scanner

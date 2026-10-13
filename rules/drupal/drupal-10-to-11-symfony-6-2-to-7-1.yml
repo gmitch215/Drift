@@ -1,0 +1,46 @@
+schema: 1
+id: drupal-10-to-11-symfony-6-2-to-7-1
+title: Drupal 10 uses Symfony 6.2; Drupal 11.0 moves core to Symfony 7.1.1, so Symfony 6 code that relies on changed APIs breaks
+applies:
+  - build
+difference: >-
+  side a is Drupal 10.x with Symfony 6.x; side b is Drupal 11.0 or later with Symfony 7.x. Custom services, event
+  subscribers and Symfony component calls resolve on a and may not on b
+symptoms:
+  - text: service or class errors at container build, or a method signature mismatch in a custom subscriber
+    basis: inferred
+mechanism: >-
+  The Drupal 11.0.0 release notes state that Symfony has been upgraded to 7.1.1.
+detect:
+  all:
+    - a: project.composer.symfony/http-kernel
+      ver: '>=6.2,<7'
+    - b: project.composer.symfony/http-kernel
+      ver: '>=7'
+    - a: project.composer.drupal/core
+      ver: '<11'
+    - b: project.composer.drupal/core
+      ver: '>=11'
+severity: medium
+provenance:
+  - url: https://www.drupal.org/project/drupal/releases/11.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: Updated PHP dependencies
+  - url: https://www.drupal.org/project/drupal/releases/10.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: Backend (PHP) dependency changes
+fixtures:
+  positive:
+    - name: symfony 6.4.12 on drupal 10.3.6 to symfony 7.1.1 on drupal 11.0.0
+      a: {attrs: {project.composer.symfony/http-kernel: '6.4.12', project.composer.drupal/core: '10.3.6'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '7.1.1', project.composer.drupal/core: '11.0.0'}}
+  negative:
+    - name: symfony 7.1.1 to symfony 6.4.12 (reverse direction)
+      a: {attrs: {project.composer.symfony/http-kernel: '7.1.1', project.composer.drupal/core: '11.0.0'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '6.4.12', project.composer.drupal/core: '10.3.6'}}
+    - name: symfony 6.4.12 to symfony 6.4.12 on drupal 10.3.6 (same band)
+      a: {attrs: {project.composer.symfony/http-kernel: '6.4.12', project.composer.drupal/core: '10.3.6'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '6.4.12', project.composer.drupal/core: '10.3.6'}}
+status: active

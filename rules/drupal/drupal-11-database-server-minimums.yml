@@ -1,0 +1,43 @@
+schema: 1
+id: drupal-11-database-server-minimums
+title: Drupal 11 minimum database versions are MySQL 8.0, MariaDB 10.6, PostgreSQL 16 and SQLite 3.45 (json1); Drupal 10 minimums are no longer enough
+applies:
+  - runtime
+  - env
+difference: >-
+  side a is a MySQL server at or above the Drupal 11 minimum; side b is a MySQL server that met the Drupal 10 minimum
+  but not the Drupal 11 minimum (for example MySQL 5.7) on a Drupal 11 site
+symptoms:
+  - text: Drupal 11 installer or update refuses the database, or the upgrade blocks at the requirements check
+    basis: inferred
+mechanism: >-
+  The Drupal 11.0.0 release notes list the database driver minimums as MySQL 8.0, MariaDB 10.6, PostgreSQL 16 and SQLite 3.45 with the json1 extension.
+detect:
+  all:
+    - a: runtime.database.server.version
+      ver: '>=8.0'
+    - b: runtime.database.server.version
+      ver: '<8.0'
+    - b: runtime.database.server.kind
+      eq: mysql
+    - b: project.composer.drupal/core
+      ver: '>=11'
+severity: high
+provenance:
+  - url: https://www.drupal.org/project/drupal/releases/11.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: Platform requirements changes
+fixtures:
+  positive:
+    - name: mysql 8.0.36 to mysql 5.7.44 on drupal 11.0.0
+      a: {attrs: {runtime.database.server.kind: mysql, runtime.database.server.version: '8.0.36', project.composer.drupal/core: '11.0.0'}}
+      b: {attrs: {runtime.database.server.kind: mysql, runtime.database.server.version: '5.7.44', project.composer.drupal/core: '11.0.0'}}
+  negative:
+    - name: mysql 5.7.44 to mysql 8.0.36 on drupal 11.0.0 (reverse direction)
+      a: {attrs: {runtime.database.server.kind: mysql, runtime.database.server.version: '5.7.44', project.composer.drupal/core: '11.0.0'}}
+      b: {attrs: {runtime.database.server.kind: mysql, runtime.database.server.version: '8.0.36', project.composer.drupal/core: '11.0.0'}}
+    - name: mysql 8.0.36 to mysql 5.7.44 on drupal 10.3.6 (not a drupal 11 site)
+      a: {attrs: {runtime.database.server.kind: mysql, runtime.database.server.version: '8.0.36', project.composer.drupal/core: '10.3.6'}}
+      b: {attrs: {runtime.database.server.kind: mysql, runtime.database.server.version: '5.7.44', project.composer.drupal/core: '10.3.6'}}
+status: pending-scanner

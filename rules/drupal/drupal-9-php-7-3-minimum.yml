@@ -1,0 +1,39 @@
+schema: 1
+id: drupal-9-php-7-3-minimum
+title: Drupal 9 requires PHP 7.3 or higher; a site on PHP below 7.3 cannot run Drupal 9
+applies:
+  - runtime
+difference: >-
+  side a is PHP 7.3 or newer with Drupal 9; side b is PHP below 7.3 with Drupal 9
+symptoms:
+  - text: install or update refuses to run, or the status report shows an unsupported PHP version
+    basis: inferred
+mechanism: >-
+  The Drupal 9.0.0 release notes state that Drupal 9 requires PHP 7.3 or higher.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '>=7.3'
+    - b: tool.php.version
+      ver: '<7.3'
+    - b: project.composer.drupal/core
+      ver: '>=9,<10'
+severity: high
+provenance:
+  - url: https://www.drupal.org/project/drupal/releases/9.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: Server and database requirements
+fixtures:
+  positive:
+    - name: php 7.4.33 to php 7.2.34 on drupal 9.0.0
+      a: {attrs: {tool.php.version: '7.4.33', project.composer.drupal/core: '9.0.0'}}
+      b: {attrs: {tool.php.version: '7.2.34', project.composer.drupal/core: '9.0.0'}}
+  negative:
+    - name: php 7.2.34 to php 7.4.33 on drupal 9.0.0 (reverse direction)
+      a: {attrs: {tool.php.version: '7.2.34', project.composer.drupal/core: '9.0.0'}}
+      b: {attrs: {tool.php.version: '7.4.33', project.composer.drupal/core: '9.0.0'}}
+    - name: php 7.4.33 to php 7.4.33 on drupal 9.0.0 (same band)
+      a: {attrs: {tool.php.version: '7.4.33', project.composer.drupal/core: '9.0.0'}}
+      b: {attrs: {tool.php.version: '7.4.33', project.composer.drupal/core: '9.0.0'}}
+status: active

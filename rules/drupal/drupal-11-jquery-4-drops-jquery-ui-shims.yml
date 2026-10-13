@@ -1,0 +1,45 @@
+schema: 1
+id: drupal-11-jquery-4-drops-jquery-ui-shims
+title: Drupal 11 ships jQuery 4, which drops the jQuery UI method shims; custom or contrib JavaScript that calls uniqueId() throws
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is Drupal 10.x with jQuery 3.x and the jQuery UI shims; side b is Drupal 11.x with jQuery 4. The Drupal 11.0.0
+  release notes list jQuery 4.0.0-beta2 and jQuery UI 1.14; the stable jQuery 4 release date is not stated there.
+symptoms:
+  - text: uniqueId is not a function in the browser console; the widget output is never enhanced
+    basis: verified
+mechanism: >-
+  A Webform issue reports that Drupal 11 ships jQuery 4, which drops the old jQuery UI method shims, so uniqueId() is not a function.
+detect:
+  all:
+    - a: project.composer.drupal/core
+      ver: '<11'
+    - b: project.composer.drupal/core
+      ver: '>=11'
+    - a: project.drupal.libraries.jquery-ui-refs
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://www.drupal.org/project/webform/issues/3605746
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Issue 3605746 body (contrib, one module)
+  - url: https://www.drupal.org/project/drupal/releases/11.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: Frontend (CSS and JavaScript) dependency changes
+fixtures:
+  positive:
+    - name: drupal 10.3.6 with a jquery ui shim reference to drupal 11.0.0
+      a: {attrs: {project.composer.drupal/core: '10.3.6', project.drupal.libraries.jquery-ui-refs: 'true'}}
+      b: {attrs: {project.composer.drupal/core: '11.0.0'}}
+  negative:
+    - name: drupal 11.0.0 to drupal 10.3.6 with a reference (reverse direction)
+      a: {attrs: {project.composer.drupal/core: '11.0.0'}}
+      b: {attrs: {project.composer.drupal/core: '10.3.6', project.drupal.libraries.jquery-ui-refs: 'true'}}
+    - name: drupal 10.3.6 without a jquery ui shim reference to drupal 11.0.0
+      a: {attrs: {project.composer.drupal/core: '10.3.6'}}
+      b: {attrs: {project.composer.drupal/core: '11.0.0'}}
+status: pending-scanner

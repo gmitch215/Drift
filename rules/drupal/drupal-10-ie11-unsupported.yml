@@ -1,0 +1,41 @@
+schema: 1
+id: drupal-10-ie11-unsupported
+title: Drupal 10 drops Internet Explorer 11 support; sites serving IE 11 users get no supported front end
+applies:
+  - browser
+difference: >-
+  side a is a Drupal 9.x site where IE 11 is a supported browser; side b is Drupal 10.0.0, where IE 11 is not supported
+symptoms:
+  - text: IE 11 users see a broken layout or no JavaScript behaviour; no server error is logged
+    basis: inferred
+mechanism: >-
+  The Drupal 10.0.0 release notes state that Internet Explorer 11 is not supported in Drupal 10.
+detect:
+  all:
+    - a: project.composer.drupal/core
+      ver: '<10'
+    - b: project.composer.drupal/core
+      ver: '>=10'
+    - b: browser.name
+      eq: ie
+    - b: browser.version
+      ver: '<12'
+severity: low
+provenance:
+  - url: https://www.drupal.org/project/drupal/releases/10.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: Browser support changes
+fixtures:
+  positive:
+    - name: drupal 9.5.0 to drupal 10.3.6 with an ie 11 client
+      a: {attrs: {project.composer.drupal/core: '9.5.0'}}
+      b: {attrs: {project.composer.drupal/core: '10.3.6', browser.name: ie, browser.version: '11'}}
+  negative:
+    - name: drupal 10.3.6 to drupal 9.5.0 with an ie 11 client (reverse direction)
+      a: {attrs: {project.composer.drupal/core: '10.3.6'}}
+      b: {attrs: {project.composer.drupal/core: '9.5.0', browser.name: ie, browser.version: '11'}}
+    - name: drupal 9.5.0 to drupal 10.3.6 with a chrome client
+      a: {attrs: {project.composer.drupal/core: '9.5.0'}}
+      b: {attrs: {project.composer.drupal/core: '10.3.6', browser.name: chrome, browser.version: '126'}}
+status: pending-scanner

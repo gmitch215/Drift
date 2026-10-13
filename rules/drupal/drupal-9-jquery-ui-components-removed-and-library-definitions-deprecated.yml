@@ -1,0 +1,45 @@
+schema: 1
+id: drupal-9-jquery-ui-components-removed-and-library-definitions-deprecated
+title: Drupal 9.0 removes jQuery UI components from core; Drupal 9.2 deprecates nine jQuery UI library definitions that contrib and themes still load
+applies:
+  - build
+  - runtime
+difference: >-
+  side a is Drupal 8.x or 9.0 or 9.1 where a module or theme loads core/jquery.ui.* libraries; side b is Drupal 9.0.0 or
+  later, where most components are gone; the nine library definitions are deprecated but loadable from 9.2.0
+symptoms:
+  - text: JavaScript console error for a missing dialog, autocomplete, sortable or draggable widget; the widget does not initialise
+    basis: inferred
+mechanism: >-
+  The Drupal 9.0.0 release notes state that jQuery UI components were deprecated in Drupal 8.8 and removed in Drupal 9.0.
+detect:
+  all:
+    - a: project.composer.drupal/core
+      ver: '<9'
+    - b: project.composer.drupal/core
+      ver: '>=9'
+    - a: project.drupal.libraries.jquery-ui-refs
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://www.drupal.org/project/drupal/releases/9.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: Frontend (CSS and JavaScript) dependency changes
+  - url: https://www.drupal.org/node/3156376
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Description
+fixtures:
+  positive:
+    - name: drupal 8.9.20 with a jquery.ui library reference to drupal 9.0.0
+      a: {attrs: {project.composer.drupal/core: '8.9.20', project.drupal.libraries.jquery-ui-refs: 'true'}}
+      b: {attrs: {project.composer.drupal/core: '9.0.0'}}
+  negative:
+    - name: drupal 9.0.0 to drupal 8.9.20 with a reference (reverse direction)
+      a: {attrs: {project.composer.drupal/core: '9.0.0'}}
+      b: {attrs: {project.composer.drupal/core: '8.9.20', project.drupal.libraries.jquery-ui-refs: 'true'}}
+    - name: drupal 8.9.20 without a jquery.ui library reference to drupal 9.0.0
+      a: {attrs: {project.composer.drupal/core: '8.9.20'}}
+      b: {attrs: {project.composer.drupal/core: '9.0.0'}}
+status: pending-scanner

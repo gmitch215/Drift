@@ -1,0 +1,45 @@
+schema: 1
+id: drupal-10-php-8-1-minimum
+title: Drupal 10 cannot run on PHP 8.0 or earlier; PHP 8.0 sites must move to 8.1 before upgrading core
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is PHP 8.1.0 or later with Drupal 10; side b is PHP 8.0 or earlier with Drupal 10, or with the
+  Drupal 10 upgrade in progress
+symptoms:
+  - text: Drupal 10 install or update fails the PHP version check and the upgrade cannot proceed
+    basis: inferred
+mechanism: >-
+  The Drupal 10.0.0 release notes state that Drupal 10 requires PHP 8.1 or higher, and the Drupal 10 minimum PHP change record states that it will not be possible to run Drupal 10 on PHP 8.0 or earlier.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '>=8.1'
+    - b: tool.php.version
+      ver: '<8.1'
+    - b: project.composer.drupal/core
+      ver: '>=10'
+severity: high
+provenance:
+  - url: https://www.drupal.org/project/drupal/releases/10.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: Platform requirements changes
+  - url: https://www.drupal.org/node/3264830
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Minimum PHP requirement increased
+fixtures:
+  positive:
+    - name: php 8.1.34 to php 8.0.30 on drupal 10.3.6
+      a: {attrs: {tool.php.version: '8.1.34', project.composer.drupal/core: '10.3.6'}}
+      b: {attrs: {tool.php.version: '8.0.30', project.composer.drupal/core: '10.3.6'}}
+  negative:
+    - name: php 8.0.30 to php 8.1.34 on drupal 10.3.6 (reverse direction)
+      a: {attrs: {tool.php.version: '8.0.30', project.composer.drupal/core: '10.3.6'}}
+      b: {attrs: {tool.php.version: '8.1.34', project.composer.drupal/core: '10.3.6'}}
+    - name: php 8.0.30 to php 8.1.34 on drupal 9.5.0 (not a drupal 10 site)
+      a: {attrs: {tool.php.version: '8.1.34', project.composer.drupal/core: '9.5.0'}}
+      b: {attrs: {tool.php.version: '8.0.30', project.composer.drupal/core: '9.5.0'}}
+status: active

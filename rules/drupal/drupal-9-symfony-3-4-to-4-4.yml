@@ -1,0 +1,40 @@
+schema: 1
+id: drupal-9-symfony-3-4-to-4-4
+title: Drupal 9.0 moves core from Symfony 3.4 to Symfony 4.4; code that calls Symfony 3.4 APIs that changed in 4.x breaks
+applies:
+  - build
+difference: >-
+  side a is Drupal 8.x with Symfony 3.4.32; side b is Drupal 9.0.0 with Symfony 4.4.9; the same custom service or
+  event subscriber resolves on a and fails on b
+symptoms:
+  - text: service container or class-not-found errors on Drupal 9 for code that relies on Symfony 3.4 signatures
+    basis: inferred
+mechanism: >-
+  The Drupal 9.0.0 release notes state that Symfony has been updated from Symfony 3.4.32 to 4.4.9.
+detect:
+  all:
+    - a: project.composer.symfony/http-kernel
+      ver: '<4'
+    - b: project.composer.symfony/http-kernel
+      ver: '>=4,<5'
+    - b: project.composer.drupal/core
+      ver: '>=9'
+severity: medium
+provenance:
+  - url: https://www.drupal.org/project/drupal/releases/9.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: Backend (PHP) dependency changes
+fixtures:
+  positive:
+    - name: symfony 3.4.32 on drupal 8.9.20 to symfony 4.4.9 on drupal 9.0.0
+      a: {attrs: {project.composer.symfony/http-kernel: '3.4.32', project.composer.drupal/core: '8.9.20'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '4.4.9', project.composer.drupal/core: '9.0.0'}}
+  negative:
+    - name: symfony 4.4.9 to symfony 3.4.32 (reverse direction)
+      a: {attrs: {project.composer.symfony/http-kernel: '4.4.9', project.composer.drupal/core: '9.0.0'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '3.4.32', project.composer.drupal/core: '8.9.20'}}
+    - name: symfony 4.4.9 to symfony 4.4.9 on drupal 9.0.0 (same band)
+      a: {attrs: {project.composer.symfony/http-kernel: '4.4.9', project.composer.drupal/core: '9.0.0'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '4.4.9', project.composer.drupal/core: '9.0.0'}}
+status: active

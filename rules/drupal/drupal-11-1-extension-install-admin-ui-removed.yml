@@ -1,0 +1,45 @@
+schema: 1
+id: drupal-11-1-extension-install-admin-ui-removed
+title: Drupal 11.1 removes the admin pages that add modules or themes; installs must go through Composer
+applies:
+  - build
+difference: >-
+  side a is Drupal 10.x or 11.0.x where a module or theme can be added from the admin UI; side b is Drupal 11.1.0 or
+  later, where those pages are gone. The 11.0.0 release notes also list the pages as removed; the band starts at 11.1
+  so that 11.0.x hosts match neither side
+symptoms:
+  - text: a runbook step that uses the admin Add new module page is missing, and the admin path returns not found
+    basis: inferred
+mechanism: >-
+  The Drupal 11.1.0 release notes state that, because Composer is the only way to safely add new code, the Add new module, Add new theme and Add new module or theme pages have been removed without replacement.
+detect:
+  all:
+    - a: project.composer.drupal/core
+      ver: '<11'
+    - b: project.composer.drupal/core
+      ver: '>=11.1'
+    - a: project.drupal.install-method
+      eq: admin-ui
+severity: medium
+provenance:
+  - url: https://www.drupal.org/project/drupal/releases/11.1.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: API and behavior changes
+  - url: https://www.drupal.org/node/3530905
+    kind: release-note
+    verified: '2026-10-13'
+    section: Removed features
+fixtures:
+  positive:
+    - name: drupal 10.3.6 with admin-ui installs to drupal 11.1.0
+      a: {attrs: {project.composer.drupal/core: '10.3.6', project.drupal.install-method: admin-ui}}
+      b: {attrs: {project.composer.drupal/core: '11.1.0'}}
+  negative:
+    - name: drupal 11.1.0 to drupal 10.3.6 with admin-ui installs (reverse direction)
+      a: {attrs: {project.composer.drupal/core: '11.1.0'}}
+      b: {attrs: {project.composer.drupal/core: '10.3.6', project.drupal.install-method: admin-ui}}
+    - name: drupal 10.3.6 with composer installs to drupal 11.1.0
+      a: {attrs: {project.composer.drupal/core: '10.3.6', project.drupal.install-method: composer}}
+      b: {attrs: {project.composer.drupal/core: '11.1.0'}}
+status: pending-scanner

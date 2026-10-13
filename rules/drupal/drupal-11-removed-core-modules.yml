@@ -1,0 +1,51 @@
+schema: 1
+id: drupal-11-removed-core-modules
+title: Drupal 11 moves Actions UI, Activity Tracker, Book, Forum, Statistics and Tour out of core to contrib
+applies:
+  - build
+difference: >-
+  side a is Drupal 10.x with one of those modules enabled; side b is Drupal 11.0.0 or later where the module must be
+  installed from contrib before the upgrade
+symptoms:
+  - text: after the upgrade, pages or config from those modules are missing, or the module is reported as not found
+    basis: inferred
+mechanism: >-
+  The Drupal 11.0.0 release notes list Actions UI, Activity Tracker, Book, Forum, Statistics and Tour among the removed modules.
+detect:
+  all:
+    - a: project.composer.drupal/core
+      ver: '>=10,<11'
+    - b: project.composer.drupal/core
+      ver: '>=11'
+    - any:
+        - a: project.drupal.modules.book
+          present: 'true'
+        - a: project.drupal.modules.forum
+          present: 'true'
+        - a: project.drupal.modules.statistics
+          present: 'true'
+        - a: project.drupal.modules.tour
+          present: 'true'
+        - a: project.drupal.modules.activity_tracker
+          present: 'true'
+        - a: project.drupal.modules.actions_ui
+          present: 'true'
+severity: high
+provenance:
+  - url: https://www.drupal.org/project/drupal/releases/11.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: Numerous modules and themes have been removed from Drupal core and moved to contributed projects
+fixtures:
+  positive:
+    - name: drupal 10.3.6 with the book module to drupal 11.0.0
+      a: {attrs: {project.composer.drupal/core: '10.3.6', project.drupal.modules.book: 'true'}}
+      b: {attrs: {project.composer.drupal/core: '11.0.0'}}
+  negative:
+    - name: drupal 11.0.0 to drupal 10.3.6 with the book module (reverse direction)
+      a: {attrs: {project.composer.drupal/core: '11.0.0'}}
+      b: {attrs: {project.composer.drupal/core: '10.3.6', project.drupal.modules.book: 'true'}}
+    - name: drupal 10.3.6 with the node module to drupal 11.0.0 (module is still in core)
+      a: {attrs: {project.composer.drupal/core: '10.3.6', project.drupal.modules.node: 'true'}}
+      b: {attrs: {project.composer.drupal/core: '11.0.0'}}
+status: pending-scanner

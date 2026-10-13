@@ -1,0 +1,41 @@
+schema: 1
+id: drupal-11-php-8-3-minimum
+title: Drupal 11 requires PHP 8.3 or higher; PHP 8.2 or older sites cannot run Drupal 11
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is PHP 8.3 or newer with Drupal 11; side b is PHP 8.2 or older with Drupal 11. The zlib
+  extension requirement is not checked: no key captures loaded PHP extensions yet
+symptoms:
+  - text: Drupal 11 install or update refuses to run on the PHP requirements check
+    basis: inferred
+mechanism: >-
+  The Drupal 11.0.0 release notes state that Drupal 11 requires PHP 8.3 with the zlib extension enabled.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '>=8.3'
+    - b: tool.php.version
+      ver: '<8.3'
+    - b: project.composer.drupal/core
+      ver: '>=11'
+severity: high
+provenance:
+  - url: https://www.drupal.org/project/drupal/releases/11.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: Platform requirements changes
+fixtures:
+  positive:
+    - name: php 8.3.12 to php 8.2.23 on drupal 11.0.0
+      a: {attrs: {tool.php.version: '8.3.12', project.composer.drupal/core: '11.0.0'}}
+      b: {attrs: {tool.php.version: '8.2.23', project.composer.drupal/core: '11.0.0'}}
+  negative:
+    - name: php 8.2.23 to php 8.3.12 on drupal 11.0.0 (reverse direction)
+      a: {attrs: {tool.php.version: '8.2.23', project.composer.drupal/core: '11.0.0'}}
+      b: {attrs: {tool.php.version: '8.3.12', project.composer.drupal/core: '11.0.0'}}
+    - name: php 8.2.23 to php 8.3.12 on drupal 10.3.6 (not a drupal 11 site)
+      a: {attrs: {tool.php.version: '8.3.12', project.composer.drupal/core: '10.3.6'}}
+      b: {attrs: {tool.php.version: '8.2.23', project.composer.drupal/core: '10.3.6'}}
+status: active

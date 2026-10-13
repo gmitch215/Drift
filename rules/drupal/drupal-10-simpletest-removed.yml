@@ -1,0 +1,40 @@
+schema: 1
+id: drupal-10-simpletest-removed
+title: Drupal 10 removes SimpleTest support from the core test runner; contrib and custom tests that extend SimpleTest base classes do not run
+applies:
+  - build
+difference: >-
+  side a is Drupal 9.x with SimpleTest-based tests (WebTestBase or legacy base classes); side b is Drupal 10.0.0, where
+  the SimpleTest runner is gone
+symptoms:
+  - text: the test command reports no tests run, or a fatal class-not-found error for the test base class
+    basis: inferred
+mechanism: >-
+  The Drupal 10.0.0 release notes state that Drupal 10 removes support for SimpleTest from the core test runner.
+detect:
+  all:
+    - a: project.composer.drupal/core
+      ver: '<10'
+    - b: project.composer.drupal/core
+      ver: '>=10'
+    - a: project.drupal.tests.simpletest-base-class
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://www.drupal.org/project/drupal/releases/10.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: SimpleTest support removed from the core test runner
+fixtures:
+  positive:
+    - name: drupal 9.5.0 with a simpletest base class to drupal 10.3.6
+      a: {attrs: {project.composer.drupal/core: '9.5.0', project.drupal.tests.simpletest-base-class: 'true'}}
+      b: {attrs: {project.composer.drupal/core: '10.3.6'}}
+  negative:
+    - name: drupal 10.3.6 to drupal 9.5.0 with a simpletest base class (reverse direction)
+      a: {attrs: {project.composer.drupal/core: '10.3.6'}}
+      b: {attrs: {project.composer.drupal/core: '9.5.0', project.drupal.tests.simpletest-base-class: 'true'}}
+    - name: drupal 9.5.0 without a simpletest base class to drupal 10.3.6
+      a: {attrs: {project.composer.drupal/core: '9.5.0'}}
+      b: {attrs: {project.composer.drupal/core: '10.3.6'}}
+status: pending-scanner

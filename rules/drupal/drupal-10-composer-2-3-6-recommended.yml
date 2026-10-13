@@ -1,0 +1,40 @@
+schema: 1
+id: drupal-10-composer-2-3-6-recommended
+title: Drupal 10 recommends Composer 2.3.6 or higher and will not install or update with Composer below 2.1
+applies:
+  - build
+difference: >-
+  side a is Composer 2.3.6 or newer running a Drupal 10 install or update; side b is Composer below 2.1 running the
+  same command; on Composer 2.1 to 2.2 the site shows a warning instead
+symptoms:
+  - text: composer install or composer update refuses to proceed on Composer below 2.1; on 2.1 to 2.2 the site shows a Composer warning
+    basis: inferred
+mechanism: >-
+  The Drupal 10.0.0 release notes state that Drupal 10 recommends Composer 2.3.6 or higher and that Drupal will not install or update with Composer versions lower than 2.1.
+detect:
+  all:
+    - a: tool.composer.version
+      ver: '>=2.3.6'
+    - b: tool.composer.version
+      ver: '<2.1'
+    - b: project.composer.drupal/core
+      ver: '>=10'
+severity: medium
+provenance:
+  - url: https://www.drupal.org/project/drupal/releases/10.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: Platform requirements changes
+fixtures:
+  positive:
+    - name: composer 2.3.6 to composer 2.0.14 on drupal 10.3.6
+      a: {attrs: {tool.composer.version: '2.3.6', project.composer.drupal/core: '10.3.6'}}
+      b: {attrs: {tool.composer.version: '2.0.14', project.composer.drupal/core: '10.3.6'}}
+  negative:
+    - name: composer 2.0.14 to composer 2.3.6 on drupal 10.3.6 (reverse direction)
+      a: {attrs: {tool.composer.version: '2.0.14', project.composer.drupal/core: '10.3.6'}}
+      b: {attrs: {tool.composer.version: '2.3.6', project.composer.drupal/core: '10.3.6'}}
+    - name: composer 2.3.6 to composer 2.0.14 on drupal 9.5.0 (not a drupal 10 site)
+      a: {attrs: {tool.composer.version: '2.3.6', project.composer.drupal/core: '9.5.0'}}
+      b: {attrs: {tool.composer.version: '2.0.14', project.composer.drupal/core: '9.5.0'}}
+status: active

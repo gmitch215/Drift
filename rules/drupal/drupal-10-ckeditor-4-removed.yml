@@ -1,0 +1,45 @@
+schema: 1
+id: drupal-10-ckeditor-4-removed
+title: Drupal 10 removes CKEditor 4 from core; sites using the CKEditor 4 text format must move to CKEditor 5 or install the contributed CKEditor 4 module
+applies:
+  - build
+  - runtime
+difference: >-
+  side a is Drupal 9.x with the core CKEditor 4 editor configured on a text format; side b is Drupal 10.0.0 or later
+  with the same text format; the editor is present on a and gone on b
+symptoms:
+  - text: text formats that use CKEditor 4 lose their editor on Drupal 10
+    basis: inferred
+mechanism: >-
+  The Drupal 10 change record states that CKEditor 4 has been removed from core, and the Drupal 9.5.0 release notes describe the move to CKEditor 5 as a manual process that requires human supervision.
+detect:
+  all:
+    - a: project.composer.drupal/core
+      ver: '<10'
+    - b: project.composer.drupal/core
+      ver: '>=10'
+    - a: project.drupal.modules.ckeditor4
+      present: 'true'
+severity: high
+provenance:
+  - url: https://www.drupal.org/node/3308802
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Description
+  - url: https://www.drupal.org/project/drupal/releases/9.5.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: Deprecated modules
+fixtures:
+  positive:
+    - name: drupal 9.5.0 with ckeditor 4 to drupal 10.3.6
+      a: {attrs: {project.composer.drupal/core: '9.5.0', project.drupal.modules.ckeditor4: 'true'}}
+      b: {attrs: {project.composer.drupal/core: '10.3.6'}}
+  negative:
+    - name: drupal 10.3.6 to drupal 9.5.0 with ckeditor 4 (reverse direction)
+      a: {attrs: {project.composer.drupal/core: '10.3.6'}}
+      b: {attrs: {project.composer.drupal/core: '9.5.0', project.drupal.modules.ckeditor4: 'true'}}
+    - name: drupal 9.5.0 with ckeditor 4 to drupal 9.5.0 (same band)
+      a: {attrs: {project.composer.drupal/core: '9.5.0', project.drupal.modules.ckeditor4: 'true'}}
+      b: {attrs: {project.composer.drupal/core: '9.5.0'}}
+status: pending-scanner

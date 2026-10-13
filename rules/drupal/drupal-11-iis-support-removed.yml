@@ -1,0 +1,42 @@
+schema: 1
+id: drupal-11-iis-support-removed
+title: Drupal 11 drops IIS support; sites served from IIS on Windows cannot move to Drupal 11 without a different web server
+applies:
+  - os
+  - build
+difference: >-
+  side a is Drupal 10.x served by IIS on Windows; side b is Drupal 11.0.0 on the same host
+symptoms:
+  - text: the Drupal 11 upgrade is not supported on the IIS host; the requirements check flags the web server
+    basis: inferred
+mechanism: >-
+  The Drupal 11.0.0 release notes state that support for IIS is removed under platform requirements changes.
+detect:
+  all:
+    - a: project.composer.drupal/core
+      ver: '<11'
+    - b: project.composer.drupal/core
+      ver: '>=11'
+    - a: runtime.web-server.kind
+      eq: iis
+    - b: os.name
+      eq: windows
+severity: medium
+provenance:
+  - url: https://www.drupal.org/project/drupal/releases/11.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: Web server
+fixtures:
+  positive:
+    - name: drupal 10.3.6 on iis to drupal 11.0.0 on iis, windows host
+      a: {attrs: {project.composer.drupal/core: '10.3.6', runtime.web-server.kind: iis, os.name: windows}}
+      b: {attrs: {project.composer.drupal/core: '11.0.0', runtime.web-server.kind: iis, os.name: windows}}
+  negative:
+    - name: drupal 11.0.0 to drupal 10.3.6 on iis (reverse direction)
+      a: {attrs: {project.composer.drupal/core: '11.0.0', runtime.web-server.kind: iis, os.name: windows}}
+      b: {attrs: {project.composer.drupal/core: '10.3.6', runtime.web-server.kind: iis, os.name: windows}}
+    - name: drupal 10.3.6 on apache to drupal 11.0.0 on apache, linux host
+      a: {attrs: {project.composer.drupal/core: '10.3.6', runtime.web-server.kind: apache, os.name: linux}}
+      b: {attrs: {project.composer.drupal/core: '11.0.0', runtime.web-server.kind: apache, os.name: linux}}
+status: pending-scanner

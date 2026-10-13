@@ -1,0 +1,40 @@
+schema: 1
+id: drupal-10-per-table-db-prefix-removed
+title: Drupal 10 removes per-table database prefixing; a settings.php that maps table prefixes per table stops working
+applies:
+  - env
+  - runtime
+difference: >-
+  side a is Drupal 9.x with a per-table prefix array in settings.php; side b is Drupal 10.0.0 with the same settings file
+symptoms:
+  - text: Drupal 10 cannot find tables it expects, and the site shows a database error on the first request
+    basis: inferred
+mechanism: >-
+  The Drupal 10.0.0 release notes state that per-table database prefixing, deprecated since Drupal 8.2, has been removed from Drupal 10.
+detect:
+  all:
+    - a: project.composer.drupal/core
+      ver: '<10'
+    - b: project.composer.drupal/core
+      ver: '>=10'
+    - a: project.drupal.settings.db-prefix-table-array
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://www.drupal.org/project/drupal/releases/10.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: Database API changes
+fixtures:
+  positive:
+    - name: drupal 9.5.0 with a per-table prefix array to drupal 10.3.6
+      a: {attrs: {project.composer.drupal/core: '9.5.0', project.drupal.settings.db-prefix-table-array: 'true'}}
+      b: {attrs: {project.composer.drupal/core: '10.3.6'}}
+  negative:
+    - name: drupal 10.3.6 to drupal 9.5.0 with a per-table prefix array (reverse direction)
+      a: {attrs: {project.composer.drupal/core: '10.3.6'}}
+      b: {attrs: {project.composer.drupal/core: '9.5.0', project.drupal.settings.db-prefix-table-array: 'true'}}
+    - name: drupal 9.5.0 with a plain prefix string to drupal 10.3.6
+      a: {attrs: {project.composer.drupal/core: '9.5.0'}}
+      b: {attrs: {project.composer.drupal/core: '10.3.6'}}
+status: pending-scanner

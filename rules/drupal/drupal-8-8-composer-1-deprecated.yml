@@ -1,0 +1,40 @@
+schema: 1
+id: drupal-8-8-composer-1-deprecated
+title: Drupal 8.8 and later work with Composer 2; Composer 1 is deprecated, and older Drush versions are incompatible
+applies:
+  - build
+difference: >-
+  side a is Composer 1 with a Drupal 8.8 or later site; side b is Composer 2 with the same site; both work on a, and b
+  is the recommended path
+symptoms:
+  - text: Drush or a dependency fails with a Composer version conflict when the Composer 1 path is kept
+    basis: inferred
+mechanism: >-
+  The Drupal 8.8 Composer 2 change record states that this does not mean Composer 2 is required for site owners.
+detect:
+  all:
+    - a: tool.composer.version
+      ver: '>=2'
+    - b: tool.composer.version
+      ver: '<2'
+    - b: project.composer.drupal/core
+      ver: '>=8.8'
+severity: low
+provenance:
+  - url: https://www.drupal.org/node/3178837
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Composer 2 change record (branch 9.1.x)
+fixtures:
+  positive:
+    - name: composer 2.7.7 to composer 1.10.27 on drupal 9.1.0
+      a: {attrs: {tool.composer.version: '2.7.7', project.composer.drupal/core: '9.1.0'}}
+      b: {attrs: {tool.composer.version: '1.10.27', project.composer.drupal/core: '9.1.0'}}
+  negative:
+    - name: composer 1.10.27 to composer 2.7.7 on drupal 9.1.0 (reverse direction)
+      a: {attrs: {tool.composer.version: '1.10.27', project.composer.drupal/core: '9.1.0'}}
+      b: {attrs: {tool.composer.version: '2.7.7', project.composer.drupal/core: '9.1.0'}}
+    - name: composer 2.7.7 to composer 1.10.27 on drupal 8.7.0 (before drupal 8.8)
+      a: {attrs: {tool.composer.version: '2.7.7', project.composer.drupal/core: '8.7.0'}}
+      b: {attrs: {tool.composer.version: '1.10.27', project.composer.drupal/core: '8.7.0'}}
+status: active

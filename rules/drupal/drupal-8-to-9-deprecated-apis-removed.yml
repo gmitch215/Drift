@@ -1,0 +1,41 @@
+schema: 1
+id: drupal-8-to-9-deprecated-apis-removed
+title: Drupal 9.0 removed all code marked deprecated in Drupal 8; contrib and custom modules calling those APIs fail on Drupal 9
+applies:
+  - build
+  - runtime
+difference: >-
+  side a is Drupal 8.x with a contrib or custom module calling a deprecated Drupal 8 API; side b is Drupal 9.0.0 or
+  later with the same module; the call resolves on a and not on b
+symptoms:
+  - text: fatal PHP error (undefined function or method) or missing service or class on Drupal 9 after the module is enabled
+    basis: inferred
+mechanism: >-
+  The Drupal 9.0.0 release notes state under "Removal of Drupal 8's deprecated APIs" that all code that was marked deprecated in Drupal 8 has been removed from Drupal 9.0.0.
+detect:
+  all:
+    - a: project.composer.drupal/core
+      ver: '<9'
+    - b: project.composer.drupal/core
+      ver: '>=9'
+    - b: project.drupal.deprecated-api-hits
+      present: 'true'
+severity: high
+provenance:
+  - url: https://www.drupal.org/project/drupal/releases/9.0.0
+    kind: release-note
+    verified: '2026-10-13'
+    section: Removal of Drupal 8's deprecated APIs
+fixtures:
+  positive:
+    - name: drupal 8.9.20 to drupal 9.0.0 with deprecated-api hits
+      a: {attrs: {project.composer.drupal/core: '8.9.20'}}
+      b: {attrs: {project.composer.drupal/core: '9.0.0', project.drupal.deprecated-api-hits: 'true'}}
+  negative:
+    - name: drupal 9.0.0 to drupal 8.9.20 with hits (reverse direction)
+      a: {attrs: {project.composer.drupal/core: '9.0.0', project.drupal.deprecated-api-hits: 'true'}}
+      b: {attrs: {project.composer.drupal/core: '8.9.20'}}
+    - name: drupal 8.9.20 to drupal 9.0.0 without hits
+      a: {attrs: {project.composer.drupal/core: '8.9.20'}}
+      b: {attrs: {project.composer.drupal/core: '9.0.0'}}
+status: pending-scanner
