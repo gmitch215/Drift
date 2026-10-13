@@ -67,9 +67,25 @@ await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
 const url = `http://127.0.0.1:${server.address().port}/#atlas`;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+// compose gives a node an empty box while it is off screen or the scroll is still settling
+const reveal = async (page, selector) => {
+    const { width, height } = page.viewportSize();
+    const node = page.locator(selector).first();
+    await node.waitFor({ state: 'attached', timeout });
+    const shown = (b) => b && b.height > 0 && b.y >= 0 && b.y + b.height <= height;
+    await page.mouse.move(width / 2, height / 2);
+    let box = await node.boundingBox();
+    for (const step of [...Array(40).fill(200), ...Array(80).fill(-200)]) {
+        if (shown(box)) break;
+        await page.mouse.wheel(0, box?.height > 0 ? box.y + box.height / 2 - height / 2 : step);
+        await sleep(500);
+        box = await node.boundingBox();
+    }
+    if (!shown(box)) throw new Error(`${selector} never on screen: ${JSON.stringify(box)}`);
+    return box;
+};
 const tap = async (page, selector) => {
-    const box = await page.locator(selector).first().boundingBox({ timeout });
-    if (!box) throw new Error(`no box for ${selector}`);
+    const box = await reveal(page, selector);
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.down();
     await sleep(100);
@@ -167,22 +183,12 @@ async function run(name) {
         await page.screenshot({ path: join(out, `${name}.png`) });
 
         await tap(page, '[id="mode:predict"]');
-        await page.mouse.move(600, 300);
-        for (
-            let i = 0;
-            i < 40 && (await page.locator('[id="choice:unknown"]').count()) === 0;
-            i++
-        ) {
-            await page.mouse.wheel(0, 200);
-            await sleep(100);
-        }
-        await page.waitForSelector('[id="prompt"]', { timeout });
+        await reveal(page, '[id="prompt"]');
         result.predictPrompt = await text(page, '[id="prompt"]');
         await tap(page, '[id="choice:unknown"]');
-        await page.waitForSelector('[id="verdict"]', { timeout });
+        await reveal(page, '[id="verdict"]');
         result.predictVerdict = await text(page, '[id="verdict"]');
-        await page.mouse.wheel(0, -5000);
-        await page.waitForSelector('[id="score"]', { timeout });
+        await reveal(page, '[id="score"]');
         result.predictScore = await text(page, '[id="score"]');
         if (!/1 skipped/.test(result.predictScore))
             result.failures.push(`predict score: ${result.predictScore}`);
