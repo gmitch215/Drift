@@ -22,6 +22,8 @@ if (!values.url || !values.out || names.some((n) => !engines[n])) {
     );
     process.exit(2);
 }
+const target = new URL(values.url);
+if (!target.hash) target.hash = 'atlas';
 mkdirSync(values.out, { recursive: true });
 
 async function run(name) {
@@ -36,7 +38,7 @@ async function run(name) {
         const page = await context.newPage();
         page.on('console', (m) => m.type() === 'error' && result.consoleErrors.push(m.text()));
         page.on('requestfailed', (r) => result.failed.push(`${r.url()} ${r.failure()?.errorText}`));
-        const response = await page.goto(values.url, { waitUntil: 'load', timeout });
+        const response = await page.goto(target.href, { waitUntil: 'load', timeout });
         result.status = response?.status();
         await page.waitForFunction(() => globalThis.driftDevice, null, { timeout });
         Object.assign(
