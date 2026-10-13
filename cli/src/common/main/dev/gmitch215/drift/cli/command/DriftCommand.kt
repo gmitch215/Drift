@@ -18,36 +18,44 @@ import dev.gmitch215.drift.host.Host
 import dev.gmitch215.drift.host.systemHost
 
 class DriftCommand(
-	host: Host = systemHost(),
-	files: CaseFiles = HostCaseFiles(host),
-	archives: ArchiveFiles = HostArchiveFiles(),
-	install: InstallSystem = systemInstall(),
-	serve: ServeSystem = systemServe(),
+    host: Host = systemHost(),
+    files: CaseFiles = HostCaseFiles(host),
+    archives: ArchiveFiles = HostArchiveFiles(),
+    install: InstallSystem = systemInstall(),
+    serve: ServeSystem = systemServe(),
 ) : CliktCommand(name = "drift") {
-	init {
-		context {
-			helpFormatter = {
-				MordantHelpFormatter(it, showRequiredTag = true, showDefaultValues = true)
-			}
-		}
-		versionOption("$DRIFT_VERSION (${host.platform})")
-		subcommands(
-			CaptureCommand(host),
-			DiagnoseCommand(host, files),
-			NextCommand(files),
-			CaseCommand(files),
-			ReproduceCommand(host, files),
-			AtlasCommand(host, files),
-			SolveCommand(host, files),
-			IngestCommand(host, files),
-			PackCommand(files, archives),
-			VerifyCommand(archives, files),
-			ReportCommand(files, archives),
-			InstallCommand(host, install),
-			UninstallCommand(host, install),
-			ServeCommand(host, install, serve),
-		)
-	}
+    init {
+        context {
+            helpFormatter = {
+                MordantHelpFormatter(it, showRequiredTag = true, showDefaultValues = true)
+            }
+        }
+        versionOption("$DRIFT_VERSION (${host.platform})")
+        subcommands(
+            CaptureCommand(host),
+            RunCommand(host, files),
+            ImportCommand(host, files),
+            BisectCommand(host, files),
+            DiagnoseCommand(host, files),
+            NextCommand(files),
+            CaseCommand(files),
+            ReproduceCommand(host, files),
+            AtlasCommand(host, files),
+            ProbeCommand(host, files),
+            SolveCommand(host, files),
+            IngestCommand(host, files),
+            PackCommand(files, archives),
+            VerifyCommand(archives, files),
+            ReportCommand(files, archives),
+            OpenCommand(host, files, archives),
+            InstallCommand(host, install),
+            UninstallCommand(host, install),
+            ServeCommand(host, install, serve),
+            ContractCommand(host, files),
+            TriageCommand(host, files),
+            UpgradeCheckCommand(host, files),
+        )
+    }
 
-	override fun run() = Unit
+    override fun run() = Unit
 }
