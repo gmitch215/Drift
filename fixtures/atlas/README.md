@@ -12,6 +12,8 @@ dataset; measured transcripts that are left out are in `fixtures/atlas-extra`.
 | `macos.txt` | `macos` | Kotlin/Native macosArm64, Apple Silicon |
 | `wasm.txt` | `wasm` | wasmJs on Node 26.8.2, Apple Silicon |
 | `wasm-chromium.txt`, `wasm-firefox.txt`, `wasm-webkit.txt` | `wasm-chromium`, `wasm-firefox`, `wasm-webkit` | the Studio web build in three browser engines, x86-64 Linux container |
+| `cloudflare-wasm.txt`, `cloudflare-jvm.txt` | `cloudflare-wasm`, `cloudflare-jvm` | Workers on workerd 1.20261001.1 under `wrangler dev`, macOS arm64: the wasmJs probe module, and the probes compiled by TeaVM through bytebox 1.0.3 |
+| `js-ir.txt` | `js-ir` | Kotlin/JS IR on Node 26.8.2, Apple Silicon; the standalone Kotlin 2.4.20 compiler through `tools/ladder`, which compiles the displayed probe source |
 | `android.txt` | `android` | arm64 emulator, API 37 |
 | `ios.txt` | `ios` | iPhone 17 Pro simulator, iOS 26.5, arm64 |
 
@@ -47,3 +49,5 @@ prints `3ff8eb245cbee3a5` for `tan1` and `...7365` for `asin-half` and `acos-hal
 `...7366`. The `linux` and `linux-arm64` columns here are the macOS-linked release builds; the
 Ubuntu-linked transcripts are in `fixtures/atlas-variants`, whose README has the measurements. The
 atlas workflow links on Ubuntu runners, so a run would record the `...a6` values.
+
+`cloudflare-wasm.txt` and `cloudflare-jvm.txt` come from `drift probe cloudflare` over the Workers that `tools/cloudflare` builds. They are embedded like the browser columns because workerd is a runtime of its own, not a duplicate of an embedded column. `cloudflare-wasm.txt` is byte-identical to `wasm.txt` apart from the target line. `cloudflare-jvm.txt` runs TeaVM's class library instead of a JDK and records four probes as unavailable; `tools/cloudflare/README.md` lists them.

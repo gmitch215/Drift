@@ -48,3 +48,26 @@ Existing tracker issues (read through the YouTrack REST API on 2026-10-07; nothi
 What is known: Four lines, three causes; the probe stays unclassified because kclass-list has none.
 
 What is NOT known: the intended behavior where no page read states one; whether the divergent column is a defect or by design; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device of the same target differs (one device per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies; the ladder agent re-compiled the displayed text and matched 37 of 38 probes on JVM and macOS Native).
+
+## Cloudflare columns
+
+Recorded 2026-10-12 on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local, macOS arm64), one run per cell. cloudflare-wasm is the Kotlin/Wasm probe module with a hand-written Worker entry; cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 plugin (TeaVM), so its Java classes are not a JDK. These rows are not part of the results above.
+
+Rows for the differing lines of this draft:
+
+- `list-doubles`
+  - `[1.0, 2.5, 1.0E10]`: android+cloudflare-jvm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos
+  - `[1.0, 2.5, 10000000000.0]`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `result-failure`
+  - `Failure(java.lang.IllegalStateException: x)`: android+cloudflare-jvm+jvm-17+jvm-21+jvm-25+jvm
+  - `Failure(kotlin.IllegalStateException: x)`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `kclass-int`
+  - `int (Kotlin reflection is not available)`: android+cloudflare-jvm+jvm-17+jvm-21+jvm-25+jvm
+  - `class kotlin.Int`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `kclass-qualified`
+  - `ok:kotlin.String`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `ok:java.lang.String`: cloudflare-jvm
+- `kclass-list`
+  - `SingletonList`: android+jvm-17+jvm-21+jvm-25+jvm
+  - ``: cloudflare-jvm
+  - `ArrayList`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm

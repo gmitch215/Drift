@@ -46,3 +46,19 @@ Existing tracker issues (read through the YouTrack REST API on 2026-10-07; nothi
 What is known: Three lines differ at 2.4.20. 0/0-raw follows the CPU in every column (x86 fff8..., arm64 7ff8...; the browsers on x86 print fff8 like x86 JVM and Linux, Node on arm64 prints 7ff8; checked for Wasm with a hand-assembled f64.div module on Node arm64 and Node x64). sqrt-neg-raw follows the CPU on JVM and Native but not in the three x86 browsers (7ff8). neg-nan-raw follows the Kotlin target: Native 7ff8 on every host, JVM, Android and Wasm fff8 on every host; no FULL doc explains it. The source is the constant expression -Double.NaN; whether the compiler folds it was not checked. The ladder fixtures show Native neg-nan-raw fff8 on 1.6.21 and 7ff8 from 1.9.25 on macos and linux.
 
 What is NOT known: the intended behavior where no page read states one; whether the divergent column is a defect or by design; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device of the same target differs (one device per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies; the ladder agent re-compiled the displayed text and matched 37 of 38 probes on JVM and macOS Native).
+
+## Cloudflare columns
+
+Recorded 2026-10-12 on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local, macOS arm64), one run per cell. cloudflare-wasm is the Kotlin/Wasm probe module with a hand-written Worker entry; cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 plugin (TeaVM), so its Java classes are not a JDK. These rows are not part of the results above.
+
+Rows for the differing lines of this draft:
+
+- `0/0-raw`
+  - `7ff8000000000000`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm+linux-arm64+macos+wasm
+  - `fff8000000000000`: jvm-17+jvm-21+jvm-25+linux+wasm-chromium+wasm-firefox+wasm-webkit
+- `neg-nan-raw`
+  - `fff8000000000000`: android+cloudflare-jvm+cloudflare-wasm+jvm-17+jvm-21+jvm-25+jvm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `7ff8000000000000`: ios+linux-arm64+linux+macos
+- `sqrt-neg-raw`
+  - `7ff8000000000000`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm+linux-arm64+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `fff8000000000000`: jvm-17+jvm-21+jvm-25+linux

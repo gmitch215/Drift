@@ -27,7 +27,10 @@ probes:
   columns:
     2.4.20:
     - [android]
-    - [ios, jvm-17, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [cloudflare-jvm]
+    - [cloudflare-wasm, ios, jvm-17, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox,
+      wasm-webkit]
+    - [js-ir]
     - [jvm, jvm-21]
     - [jvm-25]
     2.5.0-Beta1:
@@ -40,7 +43,10 @@ probes:
     (created 2023-04-24) says UnicodeData 12.0 for Native, which does not match the observed numbers (stale
     or other tables). Android prints its own numbers and the Android Character page read names no Unicode
     version. The Kotlin isLetter KDoc defines letters by category and names no version, so the version
-    is left to the platform.'
+    is left to the platform.
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on
+    upper-checksum, lower-checksum, title-checksum, upper-changed, lower-changed, title-changed,
+    upper-string-length-sum, lower-string-length-sum.'
 - id: kotlin.char.bmp-categories
   classification: platform-defined
   basis: inferred
@@ -61,7 +67,9 @@ probes:
   columns:
     2.4.20:
     - [android]
-    - [ios, jvm-17, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [cloudflare-jvm]
+    - [cloudflare-wasm, ios, js-ir, jvm-17, linux, linux-arm64, macos, wasm, wasm-chromium,
+      wasm-firefox, wasm-webkit]
     - [jvm, jvm-21]
     - [jvm-25]
     2.5.0-Beta1:
@@ -70,17 +78,29 @@ probes:
     - [jvm]
   note: Same evidence and same limits as char.bmp-case-mapping (UNASSIGNED 1585, 1454, 1432 for JDK 17,
     21, 25).
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on
+    letters, upper, categories.
 - id: kotlin.char.case-special
-  classification: documented
+  classification: unclassified
   basis: verified
   causes: [a]
+  downgradedFrom: documented
   references:
   - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/uppercase.html
     quote: Converts this character to upper case using Unicode mapping rules of the invariant locale.
-  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Probe notes:
-    Identical on every column measured. uppercase and lowercase use the Unicode mapping rules of the invariant
-    locale and allow one-to-many mappings (KDoc, read), so sharp s becomes SS and i stays I without a
-    Turkish locale.'
+  searched: 'Not searched beyond the pages quoted above: the cloudflare-jvm lines were compared with the quoted
+    pages only, and no tracker (Kotlin, TeaVM or bytebox) was queried for them.'
+  repro: atlas/repros/kotlin.char.case-special.md
+  columns:
+    2.4.20:
+    - [android, cloudflare-wasm, ios, js-ir, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos,
+      wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [cloudflare-jvm]
+  note: 'Downgraded from documented: the KDoc pages read say uppercase and lowercase use Unicode mapping
+    rules and allow one-to-many mappings, and cloudflare-jvm prints one-to-one results on ten lines
+    (upper-sharp-s is [df] where every other column prints [53, 53]). No page read explains the
+    cloudflare-jvm lines. The Java classes on that column are TeaVM''s class library. cloudflare-wasm
+    prints what wasm prints.'
 - id: kotlin.char.whitespace-set
   classification: documented
   basis: verified
@@ -100,9 +120,15 @@ probes:
   - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/
     quote: List.equals should consider two lists equal if and only if they contain the same number of
       elements
-  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Probe notes:
-    Identical on every column measured. The List and Set pages (read) define equals by size and element-wise
-    match; the pages read give no hash formula, so the hash lines have no documented value.'
+  columns:
+    2.4.20:
+    - [android, cloudflare-jvm, cloudflare-wasm, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64,
+      macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [js-ir]
+  note: 'Identical on every column of fixtures/atlas at 2.4.20 except js-ir: double-list-hash differs,
+    because js-ir prints different Double hash codes (see kotlin.string.hashcode). The List and Set pages
+    (read) define equals by size and element-wise match; the pages read give no hash formula, so the hash
+    lines have no documented value.'
 - id: kotlin.collections.hash-order
   classification: documented
   basis: verified
@@ -115,13 +141,19 @@ probes:
   columns:
     2.4.20:
     - [android, jvm, jvm-17, jvm-21, jvm-25]
-    - [ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [cloudflare-jvm]
+    - [cloudflare-wasm, ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox,
+      wasm-webkit]
+    - [js-ir]
     2.5.0-Beta1:
     - [android, jvm]
     - [ios, macos, wasm]
   note: JVM and Android iterate in bucket order, Native, Wasm and browsers in insertion order (observed).
+    js-ir forms its own group and matches neither order named here (observed).
     The KDoc says no order is guaranteed, which is why either result is allowed; the insertion order is
     not promised either.
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on ints,
+    strings, chars, longs, doubles, map-keys.
 - id: kotlin.collections.iterator-modification
   classification: platform-defined
   basis: verified
@@ -142,8 +174,10 @@ probes:
       Native/Wasm, returns false on JVM'
   columns:
     2.4.20:
-    - [android]
-    - [ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [android, cloudflare-jvm]
+    - [cloudflare-wasm, ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox,
+      wasm-webkit]
+    - [js-ir]
     - [jvm, jvm-17, jvm-21, jvm-25]
     2.5.0-Beta1:
     - [android]
@@ -158,7 +192,8 @@ probes:
     columns: android throws; others ok
   note: 'Two lines differ, not one: list-remove-last (JVM throws, others and Android finish) and list-remove-second
     (Android throws ConcurrentModificationException, JVM and Native finish). The probe notes mention only
-    the first. KT-88775 and KT-89031 are other iterator and sub list cases, not these two lines.'
+    the first. KT-88775 and KT-89031 are other iterator and sub list cases, not these two lines.
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android print.'
 - id: kotlin.collections.sorting
   classification: documented
   basis: inferred
@@ -172,15 +207,20 @@ probes:
   columns:
     2.4.20:
     - [android, jvm, jvm-17, jvm-21, jvm-25]
-    - [ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [cloudflare-jvm, cloudflare-wasm, ios, linux, linux-arm64, macos, wasm, wasm-chromium,
+      wasm-firefox, wasm-webkit]
+    - [js-ir]
     2.5.0-Beta1:
     - [android, jvm]
     - [ios, macos, wasm]
-  note: Only the four lines with a broken comparator differ (always-positive, always-negative, parity,
+  note: Only the four lines with a broken comparator differ, and the zero lines on js-ir (it prints 0 for
+    -0.0; see kotlin.double.equality-order) (always-positive, always-negative, parity,
     broken-40); stability and total-order lines are identical. The JDK Comparator Javadoc says the implementor
     must keep signum(compare(x, y)) == -signum(compare(y, x)); all four comparators break it. No FULL
     page says the result for a contract-violating comparator is undefined, so "documented" rests on the
     precondition being broken (inference). No YouTrack match for this behavior.
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what ios, linux, linux-arm64,
+    macos and 4 more print.
 - id: kotlin.collections.tostring-forms
   classification: unclassified
   basis: verified
@@ -213,8 +253,10 @@ probes:
   columns:
     2.4.20:
     - [android, jvm, jvm-17, jvm-21, jvm-25]
+    - [cloudflare-jvm]
+    - [cloudflare-wasm, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
     - [ios, linux, linux-arm64, macos]
-    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [js-ir]
     2.5.0-Beta1:
     - [android, jvm]
     - [ios, macos, wasm]
@@ -236,17 +278,28 @@ probes:
     columns: jvm family SingletonList, others ArrayList
     issue: none found; listOf KDoc promises no runtime class
   note: Four lines, three causes; the probe stays unclassified because kclass-list has none.
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on
+    kclass-qualified, kclass-list.
 - id: kotlin.double.equality-order
-  classification: documented
+  classification: unclassified
   basis: verified
-  causes: [a]
+  causes: []
+  downgradedFrom: documented
   references:
   - url: https://kotlinlang.org/docs/numbers.html
     quote: NaN is considered equal to itself
-  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Probe notes:
-    Identical on every column measured. The numbers page (read) says generic and Any typed comparison
-    uses equals and compareTo: NaN equals itself, NaN is greater than every element and -0.0 is less than
-    0.0; statically typed comparison follows IEEE 754.'
+  columns:
+    2.4.20:
+    - [android, cloudflare-jvm, cloudflare-wasm, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64,
+      macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [js-ir]
+  searched: 'Not searched beyond the numbers page quoted above; no tracker was queried for the js-ir lines.'
+  repro: atlas/repros/kotlin.double.equality-order.md
+  note: 'Downgraded from documented: js-ir prints the zero lines (minOf, maxOf, distinct) as 0 where every
+    other column prints 0.0 or -0.0, and distinct still keeps two elements. The numbers page (read) says
+    generic and Any typed comparison uses equals and compareTo, with -0.0 less than 0.0. Whether js-ir keeps
+    the sign of -0.0 is not shown by these lines: it may be the JavaScript number printing, or the value.
+    kotlin.string.hashcode prints hash 0 for -0.0 on js-ir where the others print -2147483648.'
 - id: kotlin.double.extremes
   classification: unclassified
   basis: verified
@@ -272,10 +325,13 @@ probes:
   repro: atlas/repros/kotlin.double.extremes.md
   columns:
     2.4.20:
-    - [android, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos]
-    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [android, cloudflare-jvm, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos]
+    - [cloudflare-wasm, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [js-ir]
   note: Wasm family only. KT-88414 Fixed 2026-08-30; Wasm equals JVM on the 2.5.0-Beta1 transcript. No
     Kotlin page specifies the Double.toString format.
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, ios, jvm, jvm-17
+    and 5 more print.
 - id: kotlin.double.nan-bits
   classification: unclassified
   basis: inferred
@@ -300,8 +356,9 @@ probes:
   repro: atlas/repros/kotlin.double.nan-bits.md
   columns:
     2.4.20:
-    - [android, jvm, wasm]
+    - [android, cloudflare-jvm, cloudflare-wasm, jvm, wasm]
     - [ios, linux-arm64, macos]
+    - [js-ir]
     - [jvm-17, jvm-21, jvm-25]
     - [linux]
     - [wasm-chromium, wasm-firefox, wasm-webkit]
@@ -329,7 +386,8 @@ probes:
     JVM and Native but not in the three x86 browsers (7ff8). neg-nan-raw follows the Kotlin target: Native
     7ff8 on every host, JVM, Android and Wasm fff8 on every host; no FULL doc explains it. The source
     is the constant expression -Double.NaN; whether the compiler folds it was not checked. The ladder
-    fixtures show Native neg-nan-raw fff8 on 1.6.21 and 7ff8 from 1.9.25 on macos and linux.'
+    fixtures show Native neg-nan-raw fff8 on 1.6.21 and 7ff8 from 1.9.25 on macos and linux.
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, jvm, wasm print.'
 - id: kotlin.double.parse
   classification: unclassified
   basis: verified
@@ -348,9 +406,12 @@ probes:
   repro: atlas/repros/kotlin.double.parse.md
   columns:
     2.4.20:
-    - [android, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos]
-    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [android, cloudflare-jvm, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos]
+    - [cloudflare-wasm, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [js-ir]
   note: Wasm family returns null for 0x1p3, 1d, 1f. KT-88414 Fixed; equal on 2.5.0-Beta1.
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, ios, jvm, jvm-17
+    and 5 more print.
 - id: kotlin.double.shortest-digits
   classification: unclassified
   basis: verified
@@ -377,8 +438,9 @@ probes:
   columns:
     2.4.20:
     - [android, jvm-17]
-    - [ios, jvm, jvm-21, jvm-25, linux, linux-arm64, macos]
-    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [cloudflare-jvm, ios, jvm, jvm-21, jvm-25, linux, linux-arm64, macos]
+    - [cloudflare-wasm, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [js-ir]
     2.5.0-Beta1:
     - [android]
     - [ios, jvm, macos, wasm]
@@ -394,7 +456,9 @@ probes:
     (1.9999999999999998E23 for 2e23), explained by the JDK 19 release note JDK-4511638 (verified for jvm-17;
     Android matching the old algorithm is observed, the Android Double page read carries the old spec
     text); Wasm family prints 1.9999999999999998e+23 and plain form (KT-88414, Fixed, equal on 2.5.0-Beta1).
-    Android is still the odd column on 2.5.0-Beta1.'
+    Android is still the odd column on 2.5.0-Beta1.
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what ios, jvm, jvm-21, jvm-25 and
+    3 more print.'
 - id: kotlin.double.tostring-boundaries
   classification: unclassified
   basis: verified
@@ -413,9 +477,12 @@ probes:
   repro: atlas/repros/kotlin.double.tostring-boundaries.md
   columns:
     2.4.20:
-    - [android, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos]
-    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [android, cloudflare-jvm, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos]
+    - [cloudflare-wasm, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [js-ir]
   note: Wasm family only; 7 lines; equal on 2.5.0-Beta1.
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, ios, jvm, jvm-17
+    and 5 more print.
 - id: kotlin.exceptions.messages
   classification: unclassified
   basis: inferred
@@ -433,10 +500,12 @@ probes:
   columns:
     2.4.20:
     - [android]
+    - [cloudflare-jvm]
+    - [cloudflare-wasm, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
     - [ios, linux, linux-arm64, macos]
+    - [js-ir]
     - [jvm, jvm-21, jvm-25]
     - [jvm-17]
-    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
     2.5.0-Beta1:
     - [android]
     - [ios, macos]
@@ -448,11 +517,15 @@ probes:
     elsewhere (KT-88829 Open is the generic-cast sibling, not this exact line). jvm-17 differs from jvm-21
     in string-index, substring (message text) and removeFirst-empty (harness artefact: compiled on JDK
     21, run on 17); no JDK release note for 18, 19, 20, 21 mentions the message change (searched). Android
-    prints ART texts (length=3; index=10).'
+    prints ART texts (length=3; index=10).
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm records the probe as unavailable
+    (refused, the compiled module traps on integer division and a trap aborts the request
+    (RuntimeError: divide by zero)).'
 - id: kotlin.exceptions.tostring-cause
-  classification: documented
+  classification: unclassified
   basis: verified
   causes: [a]
+  downgradedFrom: documented
   references:
   - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-exception/
     quote: actual typealias Exception = java.lang.Exception
@@ -466,17 +539,23 @@ probes:
     state: Fixed
     resolved: '2025-10-03'
     summary: 'Wasm: Throwable.toString uses simple class name'
+  searched: 'Not searched beyond the pages quoted above: the cloudflare-jvm lines were compared with the quoted
+    pages only, and no tracker (Kotlin, TeaVM or bytebox) was queried for them.'
+  repro: atlas/repros/kotlin.exceptions.tostring-cause.md
   columns:
     2.4.20:
     - [android, jvm, jvm-17, jvm-21, jvm-25]
-    - [ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [cloudflare-jvm]
+    - [cloudflare-wasm, ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox,
+      wasm-webkit]
+    - [js-ir]
     2.5.0-Beta1:
     - [android, jvm]
     - [ios, macos, wasm]
-  note: JVM and Android print java.lang.X because Exception, IllegalStateException and the others are
-    typealiases to the java.lang classes on JVM, and Throwable.toString prints the class name. Native
-    and Wasm print kotlin.X; KT-78708 (Fixed 2025-10-03) states the intent that toString includes the
-    fully qualified name.
+  note: 'Downgraded from documented: the pages read explain the java.lang versus kotlin prefix (typealiases
+    on the JVM), but on cloudflare-jvm the probe fails as a whole with a NullPointerException and is
+    recorded as unavailable, which no page read covers. The cause inside TeaVM''s class library was
+    not isolated. cloudflare-wasm prints what wasm prints.'
 - id: kotlin.float.tostring
   classification: unclassified
   basis: verified
@@ -495,30 +574,52 @@ probes:
   repro: atlas/repros/kotlin.float.tostring.md
   columns:
     2.4.20:
-    - [android, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos]
-    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [android, cloudflare-jvm, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos]
+    - [cloudflare-wasm, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [js-ir]
   note: Wasm family only; 6 lines; equal on 2.5.0-Beta1.
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, ios, jvm, jvm-17
+    and 5 more print.
 - id: kotlin.int.division-modulo
-  classification: documented
+  classification: unclassified
   basis: verified
   causes: [a]
+  downgradedFrom: documented
   references:
   - url: https://kotlinlang.org/docs/numbers.html
     quote: Division between integer values always returns an integer result.
-  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Probe notes:
-    Identical on every column measured and matches the independently computed values in the test. The
-    numbers page (read) says integer division discards the fractional part; mod and floorDiv are not covered
-    by a page read.'
+  searched: 'Not searched beyond the pages quoted above: the cloudflare-jvm lines were compared with the quoted
+    pages only, and no tracker (Kotlin, TeaVM or bytebox) was queried for them.'
+  repro: atlas/repros/kotlin.int.division-modulo.md
+  columns:
+    2.4.20:
+    - [android, cloudflare-wasm, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos, wasm,
+      wasm-chromium, wasm-firefox, wasm-webkit]
+    - [cloudflare-jvm]
+    - [js-ir]
+  note: 'Downgraded from documented: cloudflare-jvm prints 5.0 for 5%0.0 where every other column prints
+    NaN. The numbers page read covers integer division only; no page read states the remainder of a
+    Double by zero. cloudflare-wasm prints what wasm prints.'
 - id: kotlin.int.overflow
-  classification: documented
+  classification: unclassified
   basis: verified
   causes: [a]
+  downgradedFrom: documented
   references:
   - url: https://kotlinlang.org/docs/numbers.html
     quote: If the result of an operation falls outside that range, overflow occurs.
-  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Probe notes:
-    Identical on every column measured. The numbers page (read) documents wrap-around on overflow, including
-    negation of Int.MIN_VALUE. The Long.MIN_VALUE divided by -1 and shift-count lines have no page read.'
+  searched: 'Not searched beyond the pages quoted above: the cloudflare-jvm lines were compared with the quoted
+    pages only, and no tracker (Kotlin, TeaVM or bytebox) was queried for them.'
+  repro: atlas/repros/kotlin.int.overflow.md
+  columns:
+    2.4.20:
+    - [android, cloudflare-wasm, ios, js-ir, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos,
+      wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [cloudflare-jvm]
+  note: 'Downgraded from documented: cloudflare-jvm records the probe as unavailable. The compiled module
+    traps on the integer division by -1 (RuntimeError: divide result unrepresentable) and a trap
+    aborts the request, so the probe is skipped, not run. Every other column is identical and matches
+    the numbers page, which says nothing about a trap. cloudflare-wasm prints what wasm prints.'
 - id: kotlin.int.radix
   classification: documented
   basis: verified
@@ -571,10 +672,11 @@ probes:
   columns:
     2.4.20:
     - [android]
+    - [cloudflare-jvm, jvm-17, jvm-21, jvm-25]
+    - [cloudflare-wasm, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
     - [ios, linux, linux-arm64, macos]
+    - [js-ir]
     - [jvm]
-    - [jvm-17, jvm-21, jvm-25]
-    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
     2.5.0-Beta1:
     - [android]
     - [ios, macos]
@@ -598,7 +700,9 @@ probes:
     issue: JDK Math allows 1 ulp; jvm-21 x86 vs jvm-21-arm64 differ on the same JDK
   note: 'Downgraded from documented: the Kotlin KDoc states b.pow(NaN) is NaN, so Native violates a documented
     contract (open defect, not a documented difference). The Android column is also off the Kotlin contract,
-    but its own Math.pow page documents the 1.0 results (verified).'
+    but its own Math.pow page documents the 1.0 results (verified).
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what jvm-17, jvm-21, jvm-25
+    print.'
 - id: kotlin.math.rounding
   classification: unclassified
   basis: verified
@@ -617,17 +721,22 @@ probes:
   columns:
     2.4.20:
     - [android, jvm, jvm-17, jvm-21, jvm-25]
+    - [cloudflare-jvm]
+    - [cloudflare-wasm, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
     - [ios, linux, linux-arm64, macos]
-    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [js-ir]
     2.5.0-Beta1:
     - [android, jvm]
     - [ios, macos, wasm]
   note: 'Downgraded from documented: the KDoc says "nearest integer" and the inputs are not ties, so Native
-    and Wasm results (1, 4503599627370498, 8388610) violate it. KT-89074 Open. Unchanged on 2.5.0-Beta1.'
+    and Wasm results (1, 4503599627370498, 8388610) violate it. KT-89074 Open. Unchanged on 2.5.0-Beta1.
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on 0.5,
+    2.5, -0.5, -1.5, -2.5, 0.49999999999999994, 4503599627370497, float-neg-2.5.'
 - id: kotlin.math.transcendental-bits
-  classification: platform-defined
+  classification: unclassified
   basis: verified
   causes: [b, d, f]
+  downgradedFrom: platform-defined
   references:
   - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Math.html
     quote: all implementations of the equivalent functions of class Math are not defined to return the
@@ -637,28 +746,28 @@ probes:
       bit-for-bit same results
   - url: https://tc39.es/ecma262/#sec-math.acos
     quote: Return an implementation-approximated Number value representing the inverse cosine
+  searched: 'Not searched beyond the pages quoted above: the cloudflare-jvm lines were compared with the quoted
+    pages only, and no tracker (Kotlin, TeaVM or bytebox) was queried for them.'
+  repro: atlas/repros/kotlin.math.transcendental-bits.md
   columns:
     2.4.20:
     - [android]
+    - [cloudflare-jvm]
+    - [cloudflare-wasm, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
     - [ios, macos]
+    - [js-ir]
     - [jvm]
     - [jvm-17, jvm-21, jvm-25]
     - [linux, linux-arm64]
-    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
     2.5.0-Beta1:
     - [android]
     - [ios, macos]
     - [jvm]
     - [wasm]
-  note: Last-bit differences in tan, exp, log2, asin, acos, cosh, cbrt, expm1. The JDK and Android Math
-    pages allow 1 ulp and say Math is not defined to return bit-for-bit results; ECMAScript returns an
-    implementation-approximated value. That Native calls libm and Wasm calls the JS engine is NOT verified.
-    linux x86 and arm64 differ from macos on cbrt2 and cbrt27; mingw-wine differs on expm1-tiny.
-    Build host also matters (measured 2026-10-07), two linuxX64 executables from the same sources,
-    one cross-linked on macOS and one built on Ubuntu 24.04, printed different last bits for tan1,
-    asin-half and acos-half when run in the same debian and ubuntu containers; the macOS-linked one
-    matches the macos column on those lines. The mechanism, for example constant folding by the build host, was not
-    established.
+  note: 'Downgraded from platform-defined: the Math pages read allow results to differ in the last bit, and
+    cloudflare-jvm differs by far more on expm1-tiny (3ddb7ce000000000 against 3ddb7cdfd9dda4e3, about
+    6e8 ulps) and ln1p-tiny (3ddb7cdffffa18d8 against 3ddb7cdfd9d1d693); log10-1000 is one ulp below 3
+    (4007ffffffffffff). No page read allows the first two. cloudflare-wasm prints what wasm prints.'
 - id: kotlin.numbers.float-conversions
   classification: unclassified
   basis: verified
@@ -683,10 +792,11 @@ probes:
   repro: atlas/repros/kotlin.numbers.float-conversions.md
   columns:
     2.4.20:
-    - [android, jvm, jvm-21, jvm-25]
+    - [android, cloudflare-jvm, jvm, jvm-21, jvm-25]
+    - [cloudflare-wasm, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
     - [ios, linux, linux-arm64, macos]
+    - [js-ir]
     - [jvm-17]
-    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
   lines:
   - line: long-max-double, long-max-float, int-max-float, ulong-max-double (plain form)
     cause: c
@@ -703,14 +813,24 @@ probes:
   note: 'Downgraded from documented: the ULong.toDouble KDoc says "closest Double", Native 2.4.20 printed
     1.844674407370955E19 (not the closest double to 2^64-1) and prints 1.8446744073709552E19 on 2.5.0-Beta1;
     no YouTrack issue and no GitHub commit found for that fix (queries listed). Wasm lines: KT-88414.
-    jvm-17 int-max-float 2.14748365E9 versus 2.1474836E9: JDK 19 note (Float.toString too).'
+    jvm-17 int-max-float 2.14748365E9 versus 2.1474836E9: JDK 19 note (Float.toString too).
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, jvm, jvm-21, jvm-25
+    print.'
 - id: kotlin.numbers.type-checks
   classification: unclassified
   basis: inferred
   causes: []
-  searched: 'Not searched: no column differs, so there is no divergence to explain.'
-  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Not researched:
-    nothing to explain.'
+  searched: 'Not searched: the only column that differs is cloudflare-jvm, and no page or tracker issue was
+    read for it.'
+  repro: atlas/repros/kotlin.numbers.type-checks.md
+  columns:
+    2.4.20:
+    - [android, cloudflare-wasm, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos, wasm,
+      wasm-chromium, wasm-firefox, wasm-webkit]
+    - [cloudflare-jvm]
+    - [js-ir]
+  note: 'cloudflare-jvm prints Integer for the runtime class name of 1 (1-class) where every other column
+    prints Int. No page was read for this line. cloudflare-wasm prints what wasm prints.'
 - id: kotlin.random.seeded
   classification: documented
   basis: verified
@@ -727,19 +847,40 @@ probes:
   classification: unclassified
   basis: inferred
   causes: []
-  searched: 'Not searched: no column differs, so there is no divergence to explain.'
-  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Not researched:
-    nothing to explain.'
+  searched: 'Not searched: the only column that differs is cloudflare-jvm, and no page or tracker issue was
+    read for it.'
+  repro: atlas/repros/kotlin.regex.anchors-lines.md
+  columns:
+    2.4.20:
+    - [android, cloudflare-wasm, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos, wasm,
+      wasm-chromium, wasm-firefox, wasm-webkit]
+    - [cloudflare-jvm]
+    - [js-ir]
+  note: 'cloudflare-jvm records the probe as unavailable: the build refuses
+    java.util.regex.Matcher.useAnchoringBounds, which Regex.matchAt calls, so the matchAt lines are
+    replaced by a thrown UnsupportedOperationException in the Worker''s copy of the source and the
+    whole probe fails. Every other column is identical. No page or tracker issue was read for it.
+    cloudflare-wasm prints what wasm prints.'
 - id: kotlin.regex.groups-replace
-  classification: documented
+  classification: unclassified
   basis: verified
   causes: [a]
+  downgradedFrom: documented
   references:
   - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/replace.html
     quote: Occurrences of ${name} or $index in the replacement string will be substituted
-  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Probe notes:
-    Identical on every column measured. The replace page (read) documents dollar-index and dollar-brace-name
-    group references in the replacement; the other lines have no page read.'
+  searched: 'Not searched beyond the pages quoted above: the cloudflare-jvm lines were compared with the quoted
+    pages only, and no tracker (Kotlin, TeaVM or bytebox) was queried for them.'
+  repro: atlas/repros/kotlin.regex.groups-replace.md
+  columns:
+    2.4.20:
+    - [android, cloudflare-wasm, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos, wasm,
+      wasm-chromium, wasm-firefox, wasm-webkit]
+    - [cloudflare-jvm, js-ir]
+  note: 'Downgraded from documented: cloudflare-jvm prints [ab, ] and null for the group of a repeated
+    alternation where every other column prints [ab, a] and a. The replace page read covers
+    dollar-index and dollar-brace-name references only; no page read states what a repeated group
+    captures. cloudflare-wasm prints what wasm prints.'
 - id: kotlin.regex.syntax-support
   classification: documented
   basis: verified
@@ -760,15 +901,21 @@ probes:
   columns:
     2.4.20:
     - [android]
-    - [ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [cloudflare-jvm]
+    - [cloudflare-wasm, ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox,
+      wasm-webkit]
+    - [js-ir]
     - [jvm, jvm-17, jvm-21, jvm-25]
     2.5.0-Beta1:
     - [android]
     - [ios, macos, wasm]
     - [jvm]
-  note: The Regex KDoc says the pattern syntax differs on each platform; the Android Pattern page says
+  note: js-ir returns err:null (an error with no class name) on the possessive, atomic and Unicode-property
+    lines where the JVM accepts them (observed). The Regex KDoc says the pattern syntax differs on each platform; the Android Pattern page says
     ICU4C is the backend and names the literal right brace as an example. The seven differing lines are
     not each named in a doc; the classification rests on the general statement.
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on
+    unicode-letter, unicode-upper.
 - id: kotlin.regex.unicode-matching
   classification: unclassified
   basis: inferred
@@ -803,7 +950,10 @@ probes:
   columns:
     2.4.20:
     - [android]
-    - [ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [cloudflare-jvm]
+    - [cloudflare-wasm, ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox,
+      wasm-webkit]
+    - [js-ir]
     - [jvm, jvm-21, jvm-25]
     - [jvm-17]
     2.5.0-Beta1:
@@ -829,11 +979,14 @@ probes:
   note: 'Three groups of lines. Android: Unicode classes always on (documented). jvm-17 versus jvm-21
     and jvm-25 on boundary-accent: JDK 19 note on \b (consistent with the note; Native, Wasm and Android
     match JDK 17). Native and Wasm versus JVM on ic-final-sigma, ic-dotless-i, ic-deseret: unexplained.
-    KT-51859 says UNICODE_CASE is always on in Native, which does not predict these three lines.'
+    KT-51859 says UNICODE_CASE is always on in Native, which does not predict these three lines.
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on
+    letter-deseret, upper-deseret, ic-kelvin.'
 - id: kotlin.string.compare-order
-  classification: documented
+  classification: unclassified
   basis: verified
   causes: [a]
+  downgradedFrom: documented
   references:
   - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/compare-to.html
     quote: Returns zero if this object is equal to the specified other object, a negative number if it's
@@ -841,15 +994,22 @@ probes:
   - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/compare-to.html
     quote: If ignoreCase is true, the result of Char.uppercaseChar().lowercaseChar() on each character
       is compared.
+  searched: 'Not searched beyond the pages quoted above: the cloudflare-jvm lines were compared with the quoted
+    pages only, and no tracker (Kotlin, TeaVM or bytebox) was queried for them.'
+  repro: atlas/repros/kotlin.string.compare-order.md
   columns:
     2.4.20:
-    - [android, jvm, jvm-17, jvm-21, jvm-25]
-    - [ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [android, js-ir, jvm, jvm-17, jvm-21, jvm-25]
+    - [cloudflare-jvm]
+    - [cloudflare-wasm, ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox,
+      wasm-webkit]
     2.5.0-Beta1:
     - [android, jvm]
     - [ios, macos, wasm]
-  note: Magnitude only (108, -6 on JVM family and Android; 1, -1 elsewhere); the sign is identical. The
-    KDoc promises only the sign class.
+  note: 'Downgraded from documented: cloudflare-jvm differs in value, not only in magnitude: dotless-i-vs-I
+    and final-sigma print false where every other column prints true, and compare-ignore-case-sigma is
+    -1 where the others print 0. The ignoreCase page read says Char.uppercaseChar().lowercaseChar() is
+    compared, which the other columns follow. cloudflare-wasm prints what wasm prints.'
 - id: kotlin.string.hashcode
   classification: unclassified
   basis: inferred
@@ -863,11 +1023,18 @@ probes:
     state: Fixed
     resolved: '2023-08-07'
     summary: Behavioural changes to the Native stdlib API
-  searched: 'Not searched: no column differs at 2.4.20, so there is no divergence to explain. The ladder
-    (fixtures/atlas-ladder) shows changes on older Kotlin versions; KT-44746 and KT-61028 were read for
-    that.'
-  note: 'Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Changed across
-    older versions (ladder): KT-44746 Fixed (Available in 1.5.0-M1), KT-61028 Fixed (Available in 1.9.20).
+  searched: 'Searched the Kotlin/JS IR column (fixtures/atlas/js-ir.txt) against the other 2.4.20 columns; the
+    tracker issues below were read for the older-version change (ladder). No Kotlin doc page was read for
+    the Double and Float hash values.'
+  repro: atlas/repros/kotlin.string.hashcode.md
+  columns:
+    2.4.20:
+    - [android, cloudflare-jvm, cloudflare-wasm, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64,
+      macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [js-ir]
+  note: 'The js-ir column prints different Double and Float hash codes from every other 2.4.20 column (for
+    example double-1.5 = -1089994752 against 1073217536). Every other column agrees. Changed across older
+    versions (ladder): KT-44746 Fixed (Available in 1.5.0-M1), KT-61028 Fixed (Available in 1.9.20).
     Not researched further.'
 - id: kotlin.string.padding
   classification: documented
@@ -905,31 +1072,42 @@ probes:
   repro: atlas/repros/kotlin.string.split-replace-lines.md
   columns:
     2.4.20:
-    - [android, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos]
-    - [wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [android, ios, js-ir, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos]
+    - [cloudflare-jvm, cloudflare-wasm, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
     2.5.0-Beta1:
     - [android, ios, jvm, macos]
     - [wasm]
   note: 'Downgraded from documented: the cited doc covers lines(), the divergent line is indexOf("", 10)
     on a 3-char string (3 on every column except the Wasm family: -1). The Kotlin indexOf KDoc gives no
     rule for startIndex past the end. JDK 21 gives the formula that yields 3 and an API note that says
-    -1 for fromIndex past the end; KT-63088 (Answered) points to the JDK behavior. Unchanged on 2.5.0-Beta1.'
+    -1 for fromIndex past the end; KT-63088 (Answered) points to the JDK behavior. Unchanged on 2.5.0-Beta1.
+    cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what wasm, wasm-chromium,
+    wasm-firefox, wasm-webkit print.'
 - id: kotlin.string.supplementary
-  classification: documented
+  classification: unclassified
   basis: verified
   causes: [a]
+  downgradedFrom: documented
   references:
   - url: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/compare-to.html
     quote: Returns zero if this object is equal to the specified other object, a negative number if it's
       less than other
+  searched: 'Not searched beyond the pages quoted above: the cloudflare-jvm lines were compared with the quoted
+    pages only, and no tracker (Kotlin, TeaVM or bytebox) was queried for them.'
+  repro: atlas/repros/kotlin.string.supplementary.md
   columns:
     2.4.20:
     - [android, jvm, jvm-17, jvm-21, jvm-25]
-    - [ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit]
+    - [cloudflare-jvm]
+    - [cloudflare-wasm, ios, js-ir, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox,
+      wasm-webkit]
     2.5.0-Beta1:
     - [android, jvm]
     - [ios, macos, wasm]
-  note: Magnitude only (-10178, -1987 versus -1); same quote as compare-order.
+  note: 'Downgraded from documented: cloudflare-jvm reverses a surrogate pair into [de00, d83d] and does
+    not change the case of the Deseret letters (deseret-lower [d801, dc00], deseret-upper-of-lower
+    [d801, dc28]), where every other column keeps the pair and maps it. The compareTo page read covers
+    only the sign of a comparison. cloudflare-wasm prints what wasm prints.'
 - id: kotlin.time.duration-format
   classification: documented
   basis: verified

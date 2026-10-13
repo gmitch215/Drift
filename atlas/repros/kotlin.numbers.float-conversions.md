@@ -8,7 +8,7 @@ Question: How do out-of-range floating point conversions behave?
 
 Classification now: unclassified (was documented); cause letters: c e; basis: verified.
 
-Measured: Kotlin 2.4.20 on 16 columns (android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, jvm 21 arm64 in a container, linux x64, linux arm64 and linux-ubuntu Native, mingw Native under wine); Kotlin 2.5.0-Beta1 on jvm, macos, wasm, android and ios. Single run per cell; no spread measured.
+Measured: Kotlin 2.4.20 on 17 columns (js-ir on Node 26.8.2 arm64, android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, jvm 21 arm64 in a container, linux x64, linux arm64 and linux-ubuntu Native, mingw Native under wine); Kotlin 2.5.0-Beta1 on jvm, macos, wasm, android and ios. Single run per cell; no spread measured.
 
 Helpers (not shown below): `line(label, v)` prints `label = v`; `outcome(label) { }` prints `ok:<value>` or `err:<ExceptionClass>`; `failure(label) { }` prints `err:<Class>:<message>`; `bits(d)` prints `d.toRawBits()` as unsigned hex.
 
@@ -26,17 +26,21 @@ Results at 2.4.20, one row per distinct output (columns that agree share a row):
 - `long-max-double`
   - `9.223372036854776E18`: android+jvm+jvm-21+jvm-21-arm64+jvm-25, ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine, jvm-17
   - `9223372036854776000.0`: wasm+3browsers
+  - `9223372036854776000`: js-ir
 - `long-max-float`
   - `9.223372E18`: android+jvm+jvm-21+jvm-21-arm64+jvm-25, ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine, jvm-17
   - `9223372000000000000.0`: wasm+3browsers
+  - `9223372036854776000`: js-ir
 - `int-max-float`
   - `2.1474836E9`: android+jvm+jvm-21+jvm-21-arm64+jvm-25, ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
   - `2147483600.0`: wasm+3browsers
   - `2.14748365E9`: jvm-17
+  - `2147483647`: js-ir
 - `ulong-max-double`
   - `1.8446744073709552E19`: android+jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
   - `1.844674407370955E19`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
   - `18446744073709552000.0`: wasm+3browsers
+  - `18446744073709552000`: js-ir
 
 On 2.5.0-Beta1 all five measured columns agree.
 
@@ -49,3 +53,24 @@ Existing tracker issues (read through the YouTrack REST API on 2026-10-07; nothi
 What is known: Downgraded from documented: the ULong.toDouble KDoc says "closest Double", Native 2.4.20 printed 1.844674407370955E19 (not the closest double to 2^64-1) and prints 1.8446744073709552E19 on 2.5.0-Beta1; no YouTrack issue and no GitHub commit found for that fix (queries listed). Wasm lines: KT-88414. jvm-17 int-max-float 2.14748365E9 versus 2.1474836E9: JDK 19 note (Float.toString too).
 
 What is NOT known: the intended behavior where no page read states one; whether the divergent column is a defect or by design; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device of the same target differs (one device per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies; the ladder agent re-compiled the displayed text and matched 37 of 38 probes on JVM and macOS Native).
+
+## Cloudflare columns
+
+Recorded 2026-10-12 on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local, macOS arm64), one run per cell. cloudflare-wasm is the Kotlin/Wasm probe module with a hand-written Worker entry; cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 plugin (TeaVM), so its Java classes are not a JDK. These rows are not part of the results above.
+
+Rows for the differing lines of this draft:
+
+- `long-max-double`
+  - `9.223372036854776E18`: android+cloudflare-jvm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos
+  - `9223372036854776000.0`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `long-max-float`
+  - `9.223372E18`: android+cloudflare-jvm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos
+  - `9223372000000000000.0`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `int-max-float`
+  - `2.1474836E9`: android+cloudflare-jvm+ios+jvm-21+jvm-25+jvm+linux-arm64+linux+macos
+  - `2147483600.0`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `2.14748365E9`: jvm-17
+- `ulong-max-double`
+  - `1.8446744073709552E19`: android+cloudflare-jvm+jvm-17+jvm-21+jvm-25+jvm
+  - `18446744073709552000.0`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `1.844674407370955E19`: ios+linux-arm64+linux+macos

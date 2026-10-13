@@ -55,3 +55,25 @@ Existing tracker issues (read through the YouTrack REST API on 2026-10-07; nothi
 What is known: Downgraded from documented: the Kotlin KDoc states b.pow(NaN) is NaN, so Native violates a documented contract (open defect, not a documented difference). The Android column is also off the Kotlin contract, but its own Math.pow page documents the 1.0 results (verified).
 
 What is NOT known: the intended behavior where no page read states one; whether the divergent column is a defect or by design; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device of the same target differs (one device per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies; the ladder agent re-compiled the displayed text and matched 37 of 38 probes on JVM and macOS Native).
+
+## Cloudflare columns
+
+Recorded 2026-10-12 on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local, macOS arm64), one run per cell. cloudflare-wasm is the Kotlin/Wasm probe module with a hand-written Worker entry; cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 plugin (TeaVM), so its Java classes are not a JDK. These rows are not part of the results above.
+
+Rows for the differing lines of this draft:
+
+- `1^nan`
+  - `1.0`: android+ios+linux-arm64+linux+macos
+  - `NaN`: cloudflare-jvm+cloudflare-wasm+jvm-17+jvm-21+jvm-25+jvm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `1^inf`
+  - `1.0`: android
+  - `NaN`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `-1^inf`
+  - `1.0`: android
+  - `NaN`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `2^-1074`
+  - `4.9E-324`: android+cloudflare-jvm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos
+  - `5e-324`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `10^-5`
+  - `3ee4f8b588e368f1`: android+cloudflare-jvm+ios+jvm-17+jvm-21+jvm-25+linux-arm64+linux+macos
+  - `3ee4f8b588e368f0`: cloudflare-wasm+jvm+wasm-chromium+wasm-firefox+wasm-webkit+wasm

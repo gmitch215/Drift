@@ -1,6 +1,6 @@
 # Ladder
 
-Builds the Kotlin probe transcripts for older compilers (1.3.72 to 2.4.20) from the probe source text, one standalone compiler per version.
+Builds the Kotlin probe transcripts for compilers (1.3.72 to 2.4.21, and the 2.5.0-Beta1 JS IR column) from the probe source text, one standalone compiler per version.
 
 - `LadderProbes` reads the `*Probes.kt` catalog files and writes one Kotlin file per probe, plus `Core.kt` and a `Main.kt` that prints the `atlas record` transcript format.
 - `ladder.sh compile|run|assemble|separate VERSION TARGET` drives one compiler. `compile` drops every probe file that fails to compile and records the first error, `assemble` writes `transcript.txt`, `separate` compiles each probe alone and compares the dropped set.

@@ -83,3 +83,58 @@ Existing tracker issues (read through the YouTrack REST API on 2026-10-07; nothi
 What is known: Three groups of lines. Android: Unicode classes always on (documented). jvm-17 versus jvm-21 and jvm-25 on boundary-accent: JDK 19 note on \b (consistent with the note; Native, Wasm and Android match JDK 17). Native and Wasm versus JVM on ic-final-sigma, ic-dotless-i, ic-deseret: unexplained. KT-51859 says UNICODE_CASE is always on in Native, which does not predict these three lines.
 
 What is NOT known: the intended behavior where no page read states one; whether the divergent column is a defect or by design; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device of the same target differs (one device per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies; the ladder agent re-compiled the displayed text and matched 37 of 38 probes on JVM and macOS Native).
+
+## Cloudflare columns
+
+Recorded 2026-10-12 on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local, macOS arm64), one run per cell. cloudflare-wasm is the Kotlin/Wasm probe module with a hand-written Worker entry; cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 plugin (TeaVM), so its Java classes are not a JDK. These rows are not part of the results above.
+
+Rows for the differing lines of this draft:
+
+- `digit-arabic`
+  - `ok:true`: android
+  - `ok:false`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `digit-fullwidth`
+  - `ok:true`: android
+  - `ok:false`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `word-accent`
+  - `ok:true`: android
+  - `ok:false`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `word-greek`
+  - `ok:true`: android
+  - `ok:false`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `space-nbsp`
+  - `ok:true`: android
+  - `ok:false`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `space-em`
+  - `ok:true`: android
+  - `ok:false`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `space-nel`
+  - `ok:true`: android
+  - `ok:false`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `boundary-accent`
+  - `ok:false`: android+cloudflare-wasm+ios+jvm-17+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `ok:true`: cloudflare-jvm+jvm-21+jvm-25+jvm
+- `letter-deseret`
+  - `ok:true`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:PatternSyntaxException`: cloudflare-jvm
+- `upper-deseret`
+  - `ok:true`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:PatternSyntaxException`: cloudflare-jvm
+- `ic-sharp-s`
+  - `ok:true`: android
+  - `ok:false`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `ic-kelvin`
+  - `ok:true`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `ok:false`: cloudflare-jvm
+- `ic-final-sigma`
+  - `ok:true`: android+cloudflare-jvm+jvm-17+jvm-21+jvm-25+jvm
+  - `ok:false`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `ic-dotted-i`
+  - `ok:false`: android+cloudflare-jvm
+  - `ok:true`: cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `ic-dotless-i`
+  - `ok:false`: android+cloudflare-jvm+cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `ok:true`: jvm-17+jvm-21+jvm-25+jvm
+- `ic-deseret`
+  - `ok:true`: android+jvm-17+jvm-21+jvm-25+jvm
+  - `ok:false`: cloudflare-jvm+cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm

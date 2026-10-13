@@ -35,3 +35,13 @@ Existing tracker issues (read through the YouTrack REST API on 2026-10-07; nothi
 What is known: Downgraded from documented: the cited doc covers lines(), the divergent line is indexOf("", 10) on a 3-char string (3 on every column except the Wasm family: -1). The Kotlin indexOf KDoc gives no rule for startIndex past the end. JDK 21 gives the formula that yields 3 and an API note that says -1 for fromIndex past the end; KT-63088 (Answered) points to the JDK behavior. Unchanged on 2.5.0-Beta1.
 
 What is NOT known: the intended behavior where no page read states one; whether the divergent column is a defect or by design; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device of the same target differs (one device per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies; the ladder agent re-compiled the displayed text and matched 37 of 38 probes on JVM and macOS Native).
+
+## Cloudflare columns
+
+Recorded 2026-10-12 on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local, macOS arm64), one run per cell. cloudflare-wasm is the Kotlin/Wasm probe module with a hand-written Worker entry; cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 plugin (TeaVM), so its Java classes are not a JDK. These rows are not part of the results above.
+
+Rows for the differing lines of this draft:
+
+- `indexOf-empty`
+  - `3`: android+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos
+  - `-1`: cloudflare-jvm+cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm

@@ -39,3 +39,19 @@ Existing tracker issues (read through the YouTrack REST API on 2026-10-07; nothi
 What is known: Wasm family returns null for 0x1p3, 1d, 1f. KT-88414 Fixed; equal on 2.5.0-Beta1.
 
 What is NOT known: the intended behavior where no page read states one; whether the divergent column is a defect or by design; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device of the same target differs (one device per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies; the ladder agent re-compiled the displayed text and matched 37 of 38 probes on JVM and macOS Native).
+
+## Cloudflare columns
+
+Recorded 2026-10-12 on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local, macOS arm64), one run per cell. cloudflare-wasm is the Kotlin/Wasm probe module with a hand-written Worker entry; cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 plugin (TeaVM), so its Java classes are not a JDK. These rows are not part of the results above.
+
+Rows for the differing lines of this draft:
+
+- `'0x1p3'`
+  - `8.0`: android+cloudflare-jvm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos
+  - `null`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `'1d'`
+  - `1.0`: android+cloudflare-jvm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos
+  - `null`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `'1f'`
+  - `1.0`: android+cloudflare-jvm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos
+  - `null`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
