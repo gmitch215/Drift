@@ -1,0 +1,38 @@
+{
+	"schema": 1,
+	"case": "d",
+	"unit": "a test id (class::method with data set) that fails or errors on PHP 8.3",
+	"baseline": "the PHP 7.4 run of the same tree; a test that also fails there is not attributed",
+	"outcomes": {
+		"TP": "a predicted rule (will break or may break) with at least one new failing test attributed to it",
+		"FP": "a predicted rule with no new failing test attributed to it",
+		"MISS": "a new failing test attributed to no predicted rule; the reason the catalog lacked it is written in score.json"
+	},
+	"attribution": [
+		"a failing test is attributed to a rule when its failure message or stack matches that rule's pattern below",
+		"a null pattern means the change is silent; such a rule is attributed only by tracing the failing assertion to the changed behaviour by hand, and the trace is written in score.json",
+		"a test that matches no pattern and cannot be traced to a predicted rule is a MISS",
+		"a deprecation, warning or risky result that PHPUnit reports without failing the run is not a failure; it is listed in score.json as emitted-only and does not make a TP"
+	],
+	"patterns": {
+		"php-8-0-concat-precedence-changed": null,
+		"php-8-1-htmlspecialchars-ent-quotes-default": null,
+		"php-8-non-numeric-typeerror": "Unsupported operand types: string|A non-numeric value encountered|Unsupported operand types",
+		"php-8-0-create-function-each-removed": "Call to undefined function (create_function|each)\\(|__autoload",
+		"php-8-0-pdo-error-mode-exceptions-default": "PDOException|SQLSTATE\\[",
+		"php-8-1-mysqli-error-mode-exceptions-default": "mysqli_sql_exception",
+		"php-8-0-at-operator-no-longer-silences-fatal": null,
+		"php-8-1-null-to-internal-param-deprecated": "Passing null to parameter #[0-9]+",
+		"php-8-2-dynamic-properties-deprecated": "Creation of dynamic property",
+		"php-8-string-number-comparison": null,
+		"php-8-0-implode-reversed-arguments-removed": "implode\\(\\): (Argument #[0-9]|Passing the separator)",
+		"php-8-2-string-case-functions-ascii-only": null
+	},
+	"install": [
+		"old stack: composer install from the committed composer.lock on PHP 7.4.33, then vendor/bin/phpunit",
+		"new stack, in order, first that succeeds: (1) composer install from the same lock on PHP 8.3; (2) composer update within the project's own constraints; (3) composer install --ignore-platform-reqs; every failed step is a finding, not a fix",
+		"both stacks: a failure that names allow-plugins is retried once with --no-plugins",
+		"no change to a source or test file, to phpunit.xml.dist or to composer.json; a change that is needed to run is a finding"
+	],
+	"followUp": "rules learned from the misses go in a separate file, follow-up-rules.md, after the score; nothing in rules/ changes between this freeze and the score"
+}

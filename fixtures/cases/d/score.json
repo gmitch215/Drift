@@ -1,0 +1,187 @@
+{
+	"baseline": {
+		"assertions": 522,
+		"errors": 0,
+		"failed": 0,
+		"status": "pass",
+		"tests": 280
+	},
+	"candidate": "lcobucci/jwt 4.1.4",
+	"case": "d",
+	"emittedOnly": {
+		"assertions": 522,
+		"errors": 0,
+		"failed": 0,
+		"note": "no deprecation, notice or warning was emitted by the project or its dependencies on PHP 8.3",
+		"scan": "suite rerun with deprecations, notices and warnings fatal and error_reporting=-1",
+		"status": "pass",
+		"tests": 280
+	},
+	"migrated": {
+		"assertions": 522,
+		"errors": 0,
+		"failed": 0,
+		"installStep": "2-update",
+		"status": "pass",
+		"tests": 280
+	},
+	"migrationFindings": [
+		{
+			"id": "lock-install-refused",
+			"predictedByCatalog": false,
+			"reason": "no rule reads a locked package whose own php constraint excludes the target; the capture held project.composer.phpspec/prophecy = 1.12.2 and project.composer.phpunit/phpunit = 9.5.0",
+			"step": "1-install",
+			"text": "composer install from the committed lock on PHP 8.3 refused: phpspec/prophecy 1.12.2 (locked, required by phpunit 9.5.0) requires php ^7.2 || ~8.0, <8.1"
+		},
+		{
+			"id": "update-moves-60-packages",
+			"predictedByCatalog": false,
+			"reason": "dependency drift is outside what a capture of today can say about a target stack",
+			"step": "2-update",
+			"text": "composer update changed 60 packages, added 4 and removed 5 (phpunit 9.5.0 to 9.6.38, mikey179/vfsstream 1.6.8 to 1.6.12, phpspec/prophecy removed); the scored run used these versions"
+		},
+		{
+			"id": "allow-plugins",
+			"predictedByCatalog": "not applicable (composer version did not change between the stacks)",
+			"reason": "the capture lists project.composer.json.plugins.unlisted with 4 plugins; rule composer-2-2-allow-plugins-default-empty reads a composer version change, and the version was the same on both sides",
+			"step": "both stacks",
+			"text": "composer 2.10.3 refuses the lock because composer.json has no allow-plugins block (composer 2.2 behaviour); both stacks retried with --no-plugins"
+		}
+	],
+	"predictionSha256": "a8ada4b9af3180f2174cb6a09eacd3250af4071b40a6a6bf59bfdd86efc63192",
+	"rows": [
+		{
+			"attributedTests": [],
+			"basis": "verified",
+			"group": "will-break",
+			"outcome": "FP",
+			"pattern": null,
+			"rule": "php-8-0-concat-precedence-changed",
+			"severity": "high"
+		},
+		{
+			"attributedTests": [],
+			"basis": "verified",
+			"group": "will-break",
+			"outcome": "FP",
+			"pattern": null,
+			"rule": "php-8-1-htmlspecialchars-ent-quotes-default",
+			"severity": "high"
+		},
+		{
+			"attributedTests": [],
+			"basis": "verified",
+			"group": "will-break",
+			"outcome": "FP",
+			"pattern": "Unsupported operand types: string|A non-numeric value encountered|Unsupported operand types",
+			"rule": "php-8-non-numeric-typeerror",
+			"severity": "high"
+		},
+		{
+			"attributedTests": [],
+			"basis": "inferred",
+			"group": "will-break",
+			"outcome": "FP",
+			"pattern": "Call to undefined function (create_function|each)\\(|__autoload",
+			"rule": "php-8-0-create-function-each-removed",
+			"severity": "high"
+		},
+		{
+			"attributedTests": [],
+			"basis": "inferred",
+			"group": "will-break",
+			"outcome": "FP",
+			"pattern": "PDOException|SQLSTATE\\[",
+			"rule": "php-8-0-pdo-error-mode-exceptions-default",
+			"severity": "high"
+		},
+		{
+			"attributedTests": [],
+			"basis": "inferred",
+			"group": "will-break",
+			"outcome": "FP",
+			"pattern": "mysqli_sql_exception",
+			"rule": "php-8-1-mysqli-error-mode-exceptions-default",
+			"severity": "high"
+		},
+		{
+			"attributedTests": [],
+			"basis": "verified",
+			"group": "will-break",
+			"outcome": "FP",
+			"pattern": null,
+			"rule": "php-8-0-at-operator-no-longer-silences-fatal",
+			"severity": "medium"
+		},
+		{
+			"attributedTests": [],
+			"basis": "verified",
+			"group": "will-break",
+			"outcome": "FP",
+			"pattern": "Passing null to parameter #[0-9]+",
+			"rule": "php-8-1-null-to-internal-param-deprecated",
+			"severity": "medium"
+		},
+		{
+			"attributedTests": [],
+			"basis": "verified",
+			"group": "will-break",
+			"outcome": "FP",
+			"pattern": "Creation of dynamic property",
+			"rule": "php-8-2-dynamic-properties-deprecated",
+			"severity": "medium"
+		},
+		{
+			"attributedTests": [],
+			"basis": "verified",
+			"group": "will-break",
+			"outcome": "FP",
+			"pattern": null,
+			"rule": "php-8-string-number-comparison",
+			"severity": "medium"
+		},
+		{
+			"attributedTests": [],
+			"basis": "inferred",
+			"group": "will-break",
+			"outcome": "FP",
+			"pattern": "implode\\(\\): (Argument #[0-9]|Passing the separator)",
+			"rule": "php-8-0-implode-reversed-arguments-removed",
+			"severity": "medium"
+		},
+		{
+			"attributedTests": [],
+			"basis": "inferred",
+			"group": "may-break",
+			"outcome": "FP",
+			"pattern": null,
+			"rule": "php-8-2-string-case-functions-ascii-only",
+			"severity": "high"
+		}
+	],
+	"schema": 1,
+	"score": "On the frozen protocol the prediction had 0 true positives, 12 false positives and 0 misses, because the migrated suite had no failing test. The one real PHP 8 failure (the vfsStream fatal) appears only with the old dependency set held, and the catalog has no rule for it.",
+	"scoreProtocolSha256": "01badfb841c7b5d39ba82ab7b82b1c19648ed02cbb0839c8f2d1822c45b0be6d",
+	"stacks": {
+		"new": "PHP 8.3.35, Composer 2.10.3",
+		"old": "PHP 7.4.33, Composer 2.10.3"
+	},
+	"supplementary": {
+		"label": "not scored; run after the protocol was frozen, to separate the PHP change from the dependency change",
+		"lockHeldOnPhp83": {
+			"command": "composer install --no-plugins --ignore-platform-reqs from the same lock, then vendor/bin/phpunit (protocol step 3, run out of order)",
+			"note": "phpunit 9.5.0 starts; after 63 of 280 tests, PHP stops with a fatal error: mikey179/vfsstream 1.6.8 vfsStreamDirectory::getIterator() is incompatible with IteratorAggregate::getIterator(): Traversable (PHP 8.1 tentative return types)",
+			"predictedByCatalog": false,
+			"reason": "no rule covers tentative return types or #[ReturnTypeWillChange]",
+			"result": "did-not-complete"
+		}
+	},
+	"testLevel": {
+		"FP": 12,
+		"MISS": 0,
+		"TP": 0,
+		"mayBreakPredicted": 1,
+		"newFailingTests": 0,
+		"willBreakPredicted": 11
+	}
+}

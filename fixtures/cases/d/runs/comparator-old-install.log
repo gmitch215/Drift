@@ -1,0 +1,11 @@
+PHP 7.4.33 (cli) (built: Nov 15 2022 03:39:38) ( NTS )
+No composer.lock file present. Updating dependencies to latest instead of installing from lock file. See https://getcomposer.org/install for more information.
+Loading composer repositories with package information
+Updating dependencies
+Your requirements could not be resolved to an installable set of packages.
+
+  Problem 1
+    - Root composer.json requires phpunit/phpunit ^8.5 -> satisfiable by phpunit/phpunit[8.5.52, ..., 8.5.56].
+    - phpunit/phpunit[8.5.52, ..., 8.5.56] require sebastian/comparator ^3.0.7 -> satisfiable by sebastian/comparator[3.0.7] from composer repo (https://repo.packagist.org) but sebastian/comparator 3.0.3 is the root package and cannot be modified. See https://getcomposer.org/dep-on-root for details and assistance.
+
+composer-exit: 2

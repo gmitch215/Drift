@@ -1,0 +1,22 @@
+PHP 8.3.35 (cli) (built: Oct  6 2026 01:30:47) (NTS)
+Generating autoload files
+49 packages you are using are looking for funding.
+Use the `composer fund` command to find out more!
+
+Deprecated: PHPUnit\Runner\DefaultTestResultCache implements the Serializable interface, which is deprecated. Implement __serialize() and __unserialize() instead (or in addition, if support for old PHP versions is necessary) in /work/vendor/phpunit/phpunit/src/Runner/DefaultTestResultCache.php on line 34
+PHPUnit 9.5.0 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.3.35
+Configuration: /work/phpunit.xml.dist
+
+...............................................................  63 / 280 ( 22%)
+............
+Fatal error: During inheritance of IteratorAggregate: Uncaught Return type of org\bovigo\vfs\vfsStreamDirectory::getIterator() should either be compatible with IteratorAggregate::getIterator(): Traversable, or the #[\ReturnTypeWillChange] attribute should be used to temporarily suppress the notice
+
+/work/vendor/mikey179/vfsstream/src/main/php/org/bovigo/vfs/vfsStreamDirectory.php:248
+/work/vendor/mikey179/vfsstream/src/main/php/org/bovigo/vfs/vfsStreamDirectory.php:16
+/work/vendor/mikey179/vfsstream/src/main/php/org/bovigo/vfs/vfsStream.php:360
+/work/vendor/mikey179/vfsstream/src/main/php/org/bovigo/vfs/vfsStream.php:167
+/work/test/unit/Signer/Key/InMemoryTest.php:18
+ in /work/vendor/mikey179/vfsstream/src/main/php/org/bovigo/vfs/vfsStreamDirectory.php on line 16
+phpunit-exit: 255

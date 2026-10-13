@@ -1,0 +1,71 @@
+upgrade-check: jwt-4.1.4-php-7.4
+  php  tool.php.version  7.4.33 -> 8.3
+32 of 260 rules read a target key
+
+Will break (11)
+  1. [high, verified] PHP 8.0 gives + and - higher precedence than the concatenation operator
+     rule: php-8-0-concat-precedence-changed
+     boundary: tool.php.version 7.4.33 -> 8.3 (rule: was <8.0.0, now >=8.0.0)
+     mechanism: From PHP 8.0 the concatenation operator has lower precedence than addition, subtraction and bitshifts, so an unparenthesised sum in a concatenation is evaluated before the concatenation.
+     source: https://www.php.net/manual/en/migration80.incompatible.php
+  2. [high, verified] PHP 8.1 changes the default flags of htmlspecialchars() and related functions to ENT_QUOTES
+     rule: php-8-1-htmlspecialchars-ent-quotes-default
+     boundary: tool.php.version 7.4.33 -> 8.3 (rule: was <8.1.0, now >=8.1.0)
+     mechanism: PHP 8.1 changes the default flags of htmlspecialchars(), htmlentities() and related functions from ENT_COMPAT to ENT_QUOTES | ENT_SUBSTITUTE.
+     source: https://www.php.net/manual/en/migration81.incompatible.php
+  3. [high, verified] PHP 8 throws TypeError for arithmetic on non-numeric strings
+     rule: php-8-non-numeric-typeerror
+     boundary: tool.php.version 7.4.33 -> 8.3 (rule: was <8.0.0, now >=8.0.0)
+     mechanism: PHP 8 raises a TypeError for arithmetic and bitwise operations on strings that PHP 7 only warned about, and warns where PHP 7 raised a notice.
+     source: https://github.com/php/doc-en/blob/master/appendices/migration80/incompatible.xml
+  4. [high, inferred] PHP 8.0 removes create_function(), each() and __autoload()
+     rule: php-8-0-create-function-each-removed
+     boundary: tool.php.version 7.4.33 -> 8.3 (rule: was <8.0.0, now >=8.0.0)
+     mechanism: The PHP 8.0 page lists create_function() as removed (anonymous functions may be used instead), each() as removed (foreach or ArrayIterator should be used instead) and the __autoload() ability as removed (spl_autoload_register() should be used instead).
+     source: https://www.php.net/manual/en/migration80.incompatible.php
+  5. [high, inferred] PHP 8.0 changes the PDO default error mode from silent to exceptions
+     rule: php-8-0-pdo-error-mode-exceptions-default
+     boundary: tool.php.version 7.4.33 -> 8.3 (rule: was <8.0.0, now >=8.0.0)
+     mechanism: The PHP 8.0 page states that the default error handling mode for PDO has been changed from silent to exceptions.
+     source: https://www.php.net/manual/en/migration80.incompatible.php
+  6. [high, inferred] PHP 8.1 changes the mysqli default error mode from silent to exceptions
+     rule: php-8-1-mysqli-error-mode-exceptions-default
+     boundary: tool.php.version 7.4.33 -> 8.3 (rule: was <8.1.0, now >=8.1.0)
+     mechanism: The PHP 8.1 page states that the default mysqli error handling mode has been changed from silent to exceptions, and refers to the MySQLi reporting mode page for restoring the old behaviour.
+     source: https://www.php.net/manual/en/migration81.incompatible.php
+  7. [medium, verified] PHP 8.0 stops the @ operator from silencing fatal errors
+     rule: php-8-0-at-operator-no-longer-silences-fatal
+     boundary: tool.php.version 7.4.33 -> 8.3 (rule: was <8.0.0, now >=8.0.0)
+     mechanism: The PHP 8.0 page states that the @ operator no longer silences the listed fatal error levels, and that error handlers that expected error_reporting to be 0 under @ should use a mask check instead.
+     source: https://www.php.net/manual/en/migration80.incompatible.php
+  8. [medium, verified] PHP 8.1 deprecates passing null to non-nullable parameters of built-in functions
+     rule: php-8-1-null-to-internal-param-deprecated
+     boundary: tool.php.version 7.4.33 -> 8.3 (rule: was <8.1.0, now >=8.1.0)
+     mechanism: PHP 8.1 deprecates passing null to non-nullable parameters of built-in functions, to align them with user-defined functions where scalar types must be marked nullable explicitly.
+     source: https://www.php.net/manual/en/migration81.deprecated.php
+  9. [medium, verified] PHP 8.2 deprecates creating dynamic properties on classes that do not declare them
+     rule: php-8-2-dynamic-properties-deprecated
+     boundary: tool.php.version 7.4.33 -> 8.3 (rule: was <8.2.0, now >=8.2.0)
+     mechanism: PHP 8.2 deprecates creating dynamic properties unless the class uses the #[\AllowDynamicProperties] attribute.
+     source: https://www.php.net/manual/en/migration82.deprecated.php
+  10. [medium, verified] PHP 8 compares a number with a non-numeric string as strings
+     rule: php-8-string-number-comparison
+     boundary: tool.php.version 7.4.33 -> 8.3 (rule: was any, now differs on >=8.0.0)
+     mechanism: PHP 8 casts the number to a string and compares strings when the other operand is non-numeric, so loose comparisons that were true in PHP 7 are false.
+     source: https://github.com/php/doc-en/blob/master/appendices/migration80/incompatible.xml
+  11. [medium, inferred] PHP 8.0 removes the reversed implode($pieces, $glue) argument order
+     rule: php-8-0-implode-reversed-arguments-removed
+     boundary: tool.php.version 7.4.33 -> 8.3 (rule: was <8.0.0, now >=8.0.0)
+     mechanism: PHP 8.0 removes support for the reversed implode() parameter order, $pieces before $glue.
+     source: https://www.php.net/manual/en/migration80.incompatible.php
+
+May break (1)
+  1. [high, inferred] PHP 8.2 makes strtolower(), strtoupper() and related functions ignore the locale
+     rule: php-8-2-string-case-functions-ascii-only
+     boundary: tool.php.version 7.4.33 -> 8.3 (rule: was <8.2.0, now >=8.2.0)
+     needs: env.LC_CTYPE
+     mechanism: From PHP 8.2 strtolower(), strtoupper(), stristr(), stripos(), strripos(), lcfirst(), ucfirst(), ucwords() and str_ireplace() ignore the locale and convert ASCII case only, as if the locale were C.
+     source: https://www.php.net/manual/en/migration82.incompatible.php
+
+Unknown (0)
+  none

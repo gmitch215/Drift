@@ -1,0 +1,14 @@
+PHP 8.3.35 (cli) (built: Oct  6 2026 01:30:47) (NTS)
+Installing dependencies from lock file (including require-dev)
+Verifying lock file contents can be installed on current platform.
+Your lock file does not contain a compatible set of packages. Please run composer update.
+
+  Problem 1
+    - phpspec/prophecy is locked to version 1.12.2 and an update of this package was not requested.
+    - phpspec/prophecy 1.12.2 requires php ^7.2 || ~8.0, <8.1 -> your php version (8.3.35) does not satisfy that requirement.
+  Problem 2
+    - phpunit/phpunit is locked to version 9.5.0 and an update of this package was not requested.
+    - phpspec/prophecy 1.12.2 requires php ^7.2 || ~8.0, <8.1 -> your php version (8.3.35) does not satisfy that requirement.
+    - phpunit/phpunit 9.5.0 requires phpspec/prophecy ^1.12.1 -> satisfiable by phpspec/prophecy[1.12.2].
+
+composer-exit: 2
