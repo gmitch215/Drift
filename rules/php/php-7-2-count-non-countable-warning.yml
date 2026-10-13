@@ -1,0 +1,54 @@
+schema: 1
+id: php-7-2-count-non-countable-warning
+title: PHP 7.2 warns when count() or sizeof() receives a non-countable value
+applies:
+  - runtime
+difference: >-
+  the PHP version is below 7.2 on the passing side, where count() gives no warning for non-countable values,
+  and 7.2 or newer on the failing side; from PHP 8.0, invalid countable types passed to count() throw a
+  TypeError instead, a separate change in the 8.0 band
+symptoms:
+  - text: 'E_WARNING "count(): Parameter must be an array or an object that implements Countable" on PHP 7.2 and later'
+    basis: verified
+mechanism: >-
+  count() and sizeof() emit an E_WARNING for a non-countable value from PHP 7.2 on.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '<7.2.0'
+    - b: tool.php.version
+      ver: '>=7.2.0'
+severity: medium
+provenance:
+  - url: https://www.php.net/manual/en/migration72.incompatible.php
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Warn when counting non-countable types
+  - url: https://www.php.net/manual/en/migration80.incompatible.php
+    kind: vendor-doc
+    verified: '2026-10-13'
+fixtures:
+  positive:
+    - name: php 7.1.33 to php 7.2.34
+      a:
+        attrs:
+          tool.php.version: '7.1.33'
+      b:
+        attrs:
+          tool.php.version: '7.2.34'
+  negative:
+    - name: php 7.2.34 to php 7.1.33 (reverse direction)
+      a:
+        attrs:
+          tool.php.version: '7.2.34'
+      b:
+        attrs:
+          tool.php.version: '7.1.33'
+    - name: php 7.4.33 to php 8.4.26 (both sides on or after 7.2)
+      a:
+        attrs:
+          tool.php.version: '7.4.33'
+      b:
+        attrs:
+          tool.php.version: '8.4.26'
+status: active

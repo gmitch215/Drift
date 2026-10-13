@@ -1,0 +1,51 @@
+schema: 1
+id: php-7-3-autoloader-stops-after-exception
+title: PHP 7.3 stops the SPL autoloader chain after an autoloader throws
+applies:
+  - runtime
+difference: >-
+  side a is PHP below 7.3, where every registered autoloader runs and exceptions are chained; side b is PHP
+  7.3 or newer, where the chain stops at the first throw
+symptoms:
+  - text: a class that a later autoloader used to find now fails with the earlier autoloader's exception
+    basis: inferred
+mechanism: >-
+  If an SPL autoloader throws an exception, the autoloaders registered after it no longer run; before PHP 7.3
+  every autoloader ran and the exceptions were chained.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '<7.3.0'
+    - b: tool.php.version
+      ver: '>=7.3.0'
+severity: medium
+provenance:
+  - url: https://www.php.net/manual/en/migration73.incompatible.php
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Standard PHP Library (SPL)
+fixtures:
+  positive:
+    - name: php 7.2.34 to php 7.3.33
+      a:
+        attrs:
+          tool.php.version: '7.2.34'
+      b:
+        attrs:
+          tool.php.version: '7.3.33'
+  negative:
+    - name: php 7.3.33 to php 7.2.34 (reverse direction)
+      a:
+        attrs:
+          tool.php.version: '7.3.33'
+      b:
+        attrs:
+          tool.php.version: '7.2.34'
+    - name: php 7.3.33 to php 8.4.26 (both sides on or after 7.3)
+      a:
+        attrs:
+          tool.php.version: '7.3.33'
+      b:
+        attrs:
+          tool.php.version: '8.4.26'
+status: active

@@ -1,0 +1,52 @@
+schema: 1
+id: php-8-3-json-validate-added
+title: PHP 8.3 adds json_validate
+applies:
+  - runtime
+difference: >-
+  the PHP version is 8.3 or newer on the passing side and older than 8.3 on the failing side
+symptoms:
+  - text: "Call to undefined function json_validate()"
+    basis: inferred
+mechanism: PHP 8.3 adds the json_validate function, so a call to it fails on earlier PHP versions.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '>=8.3.0'
+    - b: tool.php.version
+      ver: '<8.3.0'
+    - b: project.php.calls.json_validate
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://www.php.net/manual/en/function.json-validate.php
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: "Version notice: PHP 8 >= 8.3.0"
+fixtures:
+  positive:
+    - name: php 7.4 target still calling json_validate (8.3.35 to 7.4.33)
+      a:
+        attrs:
+          tool.php.version: '8.3.35'
+      b:
+        attrs:
+          tool.php.version: '7.4.33'
+          project.php.calls.json_validate: 'true'
+  negative:
+    - name: target without the call
+      a:
+        attrs:
+          tool.php.version: '8.3.35'
+      b:
+        attrs:
+          tool.php.version: '7.4.33'
+    - name: target on a runtime that has the API
+      a:
+        attrs:
+          tool.php.version: '8.3.35'
+      b:
+        attrs:
+          tool.php.version: '8.3.35'
+          project.php.calls.json_validate: 'true'
+status: active

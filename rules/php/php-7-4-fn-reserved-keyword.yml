@@ -1,0 +1,50 @@
+schema: 1
+id: php-7-4-fn-reserved-keyword
+title: PHP 7.4 makes fn a reserved keyword for functions and classes
+applies:
+  - runtime
+difference: >-
+  side a is PHP below 7.4, where fn is an ordinary identifier; side b is PHP 7.4 or newer, where fn cannot be
+  a function or class name
+symptoms:
+  - text: a parse error on a function or class declared or called as fn; methods and class constants named fn still parse
+    basis: verified
+mechanism: >-
+  From PHP 7.4 fn is a reserved keyword and cannot be used as a function or class name, but it can still be used
+  as a method or class constant name.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '<7.4.0'
+    - b: tool.php.version
+      ver: '>=7.4.0'
+severity: medium
+provenance:
+  - url: https://www.php.net/manual/en/migration74.incompatible.php
+    kind: vendor-doc
+    verified: '2026-10-13'
+fixtures:
+  positive:
+    - name: php 7.3.33 to php 7.4.33
+      a:
+        attrs:
+          tool.php.version: '7.3.33'
+      b:
+        attrs:
+          tool.php.version: '7.4.33'
+  negative:
+    - name: php 7.4.33 to php 7.3.33 (reverse direction)
+      a:
+        attrs:
+          tool.php.version: '7.4.33'
+      b:
+        attrs:
+          tool.php.version: '7.3.33'
+    - name: php 7.4.33 to php 8.4.26 (both sides on or after 7.4)
+      a:
+        attrs:
+          tool.php.version: '7.4.33'
+      b:
+        attrs:
+          tool.php.version: '8.4.26'
+status: active

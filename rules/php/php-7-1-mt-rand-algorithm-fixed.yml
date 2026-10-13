@@ -1,0 +1,51 @@
+schema: 1
+id: php-7-1-mt-rand-algorithm-fixed
+title: PHP 7.1 makes the fixed mt_rand() algorithm the default; seeded sequences change
+applies:
+  - runtime
+difference: >-
+  the PHP version is below 7.1 on the passing side, with the old mt_rand(), and 7.1 or newer on the failing
+  side, with the fixed algorithm, for the same seed
+symptoms:
+  - text: a fixture or test that seeds mt_rand() with a fixed seed gets different numbers on the two sides
+    basis: inferred
+mechanism: >-
+  mt_rand() defaults to the fixed Mersenne Twister algorithm from PHP 7.1; code that relies on the old sequences
+  can pass MT_RAND_PHP as the second argument to mt_srand().
+detect:
+  all:
+    - a: tool.php.version
+      ver: '<7.1.0'
+    - b: tool.php.version
+      ver: '>=7.1.0'
+severity: medium
+provenance:
+  - url: https://www.php.net/manual/en/migration71.incompatible.php
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Fixes to mt_rand() algorithm
+fixtures:
+  positive:
+    - name: php 7.0.33 to php 7.1.33
+      a:
+        attrs:
+          tool.php.version: '7.0.33'
+      b:
+        attrs:
+          tool.php.version: '7.1.33'
+  negative:
+    - name: php 7.1.33 to php 7.0.33 (reverse direction)
+      a:
+        attrs:
+          tool.php.version: '7.1.33'
+      b:
+        attrs:
+          tool.php.version: '7.0.33'
+    - name: php 7.1.33 to php 8.4.26 (both sides on or after 7.1)
+      a:
+        attrs:
+          tool.php.version: '7.1.33'
+      b:
+        attrs:
+          tool.php.version: '8.4.26'
+status: active

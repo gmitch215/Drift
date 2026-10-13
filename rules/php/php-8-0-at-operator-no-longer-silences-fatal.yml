@@ -1,0 +1,50 @@
+schema: 1
+id: php-8-0-at-operator-no-longer-silences-fatal
+title: PHP 8.0 stops the @ operator from silencing fatal errors
+applies:
+  - runtime
+difference: >-
+  side a is PHP below 8.0, where @ suppresses fatal errors as well as warnings; side b is PHP 8.0 or newer,
+  where fatal errors still surface
+symptoms:
+  - text: fatal errors (E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR, E_PARSE) are no longer silenced by @ on PHP 8.0 and later
+    basis: verified
+mechanism: >-
+  The PHP 8.0 page states that the @ operator no longer silences the listed fatal error levels, and that error
+  handlers that expected error_reporting to be 0 under @ should use a mask check instead.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '<8.0.0'
+    - b: tool.php.version
+      ver: '>=8.0.0'
+severity: medium
+provenance:
+  - url: https://www.php.net/manual/en/migration80.incompatible.php
+    kind: vendor-doc
+    verified: '2026-10-13'
+fixtures:
+  positive:
+    - name: php 7.4.33 to php 8.4.26
+      a:
+        attrs:
+          tool.php.version: '7.4.33'
+      b:
+        attrs:
+          tool.php.version: '8.4.26'
+  negative:
+    - name: php 8.4.26 to php 7.4.33 (reverse direction)
+      a:
+        attrs:
+          tool.php.version: '8.4.26'
+      b:
+        attrs:
+          tool.php.version: '7.4.33'
+    - name: php 8.1.34 to php 8.4.26 (both sides on or after 8.0)
+      a:
+        attrs:
+          tool.php.version: '8.1.34'
+      b:
+        attrs:
+          tool.php.version: '8.4.26'
+status: active

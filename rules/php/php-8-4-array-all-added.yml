@@ -1,0 +1,52 @@
+schema: 1
+id: php-8-4-array-all-added
+title: PHP 8.4 adds array_all
+applies:
+  - runtime
+difference: >-
+  the PHP version is 8.4 or newer on the passing side and older than 8.4 on the failing side
+symptoms:
+  - text: "Call to undefined function array_all()"
+    basis: inferred
+mechanism: PHP 8.4 adds the array_all function, so a call to it fails on earlier PHP versions.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '>=8.4.0'
+    - b: tool.php.version
+      ver: '<8.4.0'
+    - b: project.php.calls.array_all
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://www.php.net/manual/en/function.array-all.php
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: "Version notice: PHP 8 >= 8.4.0"
+fixtures:
+  positive:
+    - name: "php 8.3.12 target using array_all (8.4.1 to 8.3.12)"
+      a:
+        attrs:
+          tool.php.version: '8.4.1'
+      b:
+        attrs:
+          tool.php.version: '8.3.12'
+          project.php.calls.array_all: 'true'
+  negative:
+    - name: target without the call
+      a:
+        attrs:
+          tool.php.version: '8.4.1'
+      b:
+        attrs:
+          tool.php.version: '8.3.12'
+    - name: target on a runtime that has the API
+      a:
+        attrs:
+          tool.php.version: '8.4.1'
+      b:
+        attrs:
+          tool.php.version: '8.4.1'
+          project.php.calls.array_all: 'true'
+status: active

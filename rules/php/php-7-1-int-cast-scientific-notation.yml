@@ -1,0 +1,51 @@
+schema: 1
+id: php-7-1-int-cast-scientific-notation
+title: PHP 7.1 makes integer conversion of numeric strings respect scientific notation
+applies:
+  - runtime
+difference: >-
+  the PHP version is below 7.1 on the passing side, where the conversion stops at the exponent marker, and
+  7.1 or newer on the failing side; the page gives no example input, so the converted values are not taken from it
+symptoms:
+  - text: a numeric string with an exponent such as "1e3" converts to a different integer than on PHP 7.0
+    basis: inferred
+mechanism: >-
+  PHP 7.1 makes integer operations and conversions on numerical strings respect scientific notation, including
+  the (int) cast, intval() in base 10, settype(), decbin(), decoct() and dechex().
+detect:
+  all:
+    - a: tool.php.version
+      ver: '<7.1.0'
+    - b: tool.php.version
+      ver: '>=7.1.0'
+severity: medium
+provenance:
+  - url: https://www.php.net/manual/en/migration71.incompatible.php
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Numerical string conversions
+fixtures:
+  positive:
+    - name: php 7.0.33 to php 7.4.33
+      a:
+        attrs:
+          tool.php.version: '7.0.33'
+      b:
+        attrs:
+          tool.php.version: '7.4.33'
+  negative:
+    - name: php 7.4.33 to php 7.0.33 (reverse direction)
+      a:
+        attrs:
+          tool.php.version: '7.4.33'
+      b:
+        attrs:
+          tool.php.version: '7.0.33'
+    - name: php 7.1.33 to php 8.4.26 (both sides on or after 7.1)
+      a:
+        attrs:
+          tool.php.version: '7.1.33'
+      b:
+        attrs:
+          tool.php.version: '8.4.26'
+status: active

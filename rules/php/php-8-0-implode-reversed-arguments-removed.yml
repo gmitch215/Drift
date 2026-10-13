@@ -1,0 +1,49 @@
+schema: 1
+id: php-8-0-implode-reversed-arguments-removed
+title: PHP 8.0 removes the reversed implode($pieces, $glue) argument order
+applies:
+  - runtime
+difference: >-
+  side a is PHP below 8.0, where implode(array, string) is accepted; side b is PHP 8.0 or newer, where it is
+  rejected; the page does not name the exception class, so the TypeError is inferred
+symptoms:
+  - text: a TypeError on the first implode() call written in the reversed order
+    basis: inferred
+mechanism: >-
+  PHP 8.0 removes support for the reversed implode() parameter order, $pieces before $glue.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '<8.0.0'
+    - b: tool.php.version
+      ver: '>=8.0.0'
+severity: medium
+provenance:
+  - url: https://www.php.net/manual/en/migration80.incompatible.php
+    kind: vendor-doc
+    verified: '2026-10-13'
+fixtures:
+  positive:
+    - name: php 7.4.33 to php 8.4.26
+      a:
+        attrs:
+          tool.php.version: '7.4.33'
+      b:
+        attrs:
+          tool.php.version: '8.4.26'
+  negative:
+    - name: php 8.4.26 to php 7.4.33 (reverse direction)
+      a:
+        attrs:
+          tool.php.version: '8.4.26'
+      b:
+        attrs:
+          tool.php.version: '7.4.33'
+    - name: php 8.1.34 to php 8.4.26 (both sides on or after 8.0)
+      a:
+        attrs:
+          tool.php.version: '8.1.34'
+      b:
+        attrs:
+          tool.php.version: '8.4.26'
+status: active

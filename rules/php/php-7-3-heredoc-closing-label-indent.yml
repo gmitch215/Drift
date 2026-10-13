@@ -1,0 +1,51 @@
+schema: 1
+id: php-7-3-heredoc-closing-label-indent
+title: PHP 7.3 reads an indented heredoc or nowdoc label in the body as the closing label
+applies:
+  - runtime
+difference: >-
+  side a is PHP below 7.3, where an indented label inside the body is ordinary text; side b is PHP 7.3 or
+  newer, where it closes the string
+symptoms:
+  - text: a syntax error at the following line, where the indented label inside the body closes the string early
+    basis: verified
+mechanism: >-
+  From PHP 7.3 an indented occurrence of the ending label closes a heredoc or nowdoc, so the following text
+  causes a syntax error; choosing an ending label that does not occur in the body avoids it.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '<7.3.0'
+    - b: tool.php.version
+      ver: '>=7.3.0'
+severity: medium
+provenance:
+  - url: https://www.php.net/manual/en/migration73.incompatible.php
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Heredoc/Nowdoc Ending Label Interpretation
+fixtures:
+  positive:
+    - name: php 7.2.34 to php 7.3.33
+      a:
+        attrs:
+          tool.php.version: '7.2.34'
+      b:
+        attrs:
+          tool.php.version: '7.3.33'
+  negative:
+    - name: php 7.3.33 to php 7.2.34 (reverse direction)
+      a:
+        attrs:
+          tool.php.version: '7.3.33'
+      b:
+        attrs:
+          tool.php.version: '7.2.34'
+    - name: php 7.3.33 to php 8.4.26 (both sides on or after 7.3)
+      a:
+        attrs:
+          tool.php.version: '7.3.33'
+      b:
+        attrs:
+          tool.php.version: '8.4.26'
+status: active

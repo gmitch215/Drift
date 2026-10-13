@@ -1,0 +1,52 @@
+schema: 1
+id: php-8-1-array-is-list-added
+title: PHP 8.1 adds array_is_list
+applies:
+  - runtime
+difference: >-
+  the PHP version is 8.1 or newer on the passing side and older than 8.1 on the failing side
+symptoms:
+  - text: "Call to undefined function array_is_list()"
+    basis: inferred
+mechanism: PHP 8.1 adds the array_is_list function, so a call to it fails on earlier PHP versions.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '>=8.1.0'
+    - b: tool.php.version
+      ver: '<8.1.0'
+    - b: project.php.calls.array_is_list
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://www.php.net/manual/en/function.array-is-list.php
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: "Version notice: PHP 8 >= 8.1.0"
+fixtures:
+  positive:
+    - name: php 7.4 target still calling array_is_list (8.1.27 to 7.4.33)
+      a:
+        attrs:
+          tool.php.version: '8.1.27'
+      b:
+        attrs:
+          tool.php.version: '7.4.33'
+          project.php.calls.array_is_list: 'true'
+  negative:
+    - name: target without the call
+      a:
+        attrs:
+          tool.php.version: '8.1.27'
+      b:
+        attrs:
+          tool.php.version: '7.4.33'
+    - name: target on a runtime that has the API
+      a:
+        attrs:
+          tool.php.version: '8.1.27'
+      b:
+        attrs:
+          tool.php.version: '8.1.27'
+          project.php.calls.array_is_list: 'true'
+status: active

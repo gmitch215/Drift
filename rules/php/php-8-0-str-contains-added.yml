@@ -1,0 +1,52 @@
+schema: 1
+id: php-8-0-str-contains-added
+title: PHP 8.0 adds str_contains
+applies:
+  - runtime
+difference: >-
+  the PHP version is 8.0 or newer on the passing side and older than 8.0 on the failing side
+symptoms:
+  - text: "Call to undefined function str_contains()"
+    basis: inferred
+mechanism: PHP 8.0 adds the str_contains function, so a call to it fails on earlier PHP versions.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '>=8.0.0'
+    - b: tool.php.version
+      ver: '<8.0.0'
+    - b: project.php.calls.str_contains
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/php/php-src/PHP-8.0/UPGRADING
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: "PHP-8.0 UPGRADING: New functions str_contains(), str_starts_with(), str_ends_with() (raw, line 974)"
+fixtures:
+  positive:
+    - name: "php 7.4.33 target using str_contains (8.3.12 to 7.4.33)"
+      a:
+        attrs:
+          tool.php.version: '8.3.12'
+      b:
+        attrs:
+          tool.php.version: '7.4.33'
+          project.php.calls.str_contains: 'true'
+  negative:
+    - name: target without the call
+      a:
+        attrs:
+          tool.php.version: '8.3.12'
+      b:
+        attrs:
+          tool.php.version: '7.4.33'
+    - name: target on a runtime that has the API
+      a:
+        attrs:
+          tool.php.version: '8.3.12'
+      b:
+        attrs:
+          tool.php.version: '8.3.12'
+          project.php.calls.str_contains: 'true'
+status: active

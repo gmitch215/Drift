@@ -1,0 +1,58 @@
+schema: 1
+id: php-7-2-mcrypt-removed
+title: PHP 7.2 removes the mcrypt extension; mcrypt_* calls fail when it is absent
+applies:
+  - runtime
+difference: >-
+  side a is PHP below 7.2 built with the mcrypt extension; side b is PHP 7.2 or newer, where the extension
+  does not exist; a version check alone does not show whether mcrypt was installed, so detect also reads the
+  loaded extension list
+symptoms:
+  - text: mcrypt_* calls fail as undefined functions on PHP 7.2 and later
+    basis: inferred
+mechanism: >-
+  The mcrypt extension was deprecated in PHP 7.1.0 and removed in PHP 7.2.0.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '<7.2.0'
+    - b: tool.php.version
+      ver: '>=7.2.0'
+    - a: tool.php.extensions
+      has: mcrypt
+severity: high
+provenance:
+  - url: https://www.php.net/manual/en/book.mcrypt.php
+    kind: vendor-doc
+    verified: '2026-10-13'
+fixtures:
+  positive:
+    - name: php 7.1.33 with mcrypt to php 7.4.33
+      a:
+        attrs:
+          tool.php.version: '7.1.33'
+          tool.php.extensions: mcrypt
+      b:
+        attrs:
+          tool.php.version: '7.4.33'
+          tool.php.extensions: ''
+  negative:
+    - name: php 7.4.33 to php 7.1.33 with mcrypt (reverse direction)
+      a:
+        attrs:
+          tool.php.version: '7.4.33'
+          tool.php.extensions: ''
+      b:
+        attrs:
+          tool.php.version: '7.1.33'
+          tool.php.extensions: mcrypt
+    - name: php 7.1.33 with mcrypt to php 7.1.33 with mcrypt (same band)
+      a:
+        attrs:
+          tool.php.version: '7.1.33'
+          tool.php.extensions: mcrypt
+      b:
+        attrs:
+          tool.php.version: '7.1.33'
+          tool.php.extensions: mcrypt
+status: pending-scanner
