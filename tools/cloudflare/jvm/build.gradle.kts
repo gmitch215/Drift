@@ -31,9 +31,9 @@ tasks.named<Sync>("syncProbes") {
     filesMatching("**/RegexProbes.kt") {
         filter { line ->
             when {
-                line.startsWith("\t\tline(\"matchAt-lookbehind\"") ->
-                    "\t\tthrow UnsupportedOperationException(\"$refusal\")"
-                line.startsWith("\t\tline(\"matchAt-caret\"") -> ""
+                line.startsWith("        line(\"matchAt-lookbehind\"") ->
+                    "        throw UnsupportedOperationException(\"$refusal\")"
+                line.startsWith("        line(\"matchAt-caret\"") -> ""
                 else -> line
             }
         }
