@@ -85,9 +85,18 @@ fun StudioApp(
     case: CaseView? = null,
     picker: CasePicker? = null,
     files: FilePicker? = null,
+    startOnAtlas: Boolean = false,
 ) {
     var opened by remember { mutableStateOf(case) }
-    var tab by remember { mutableStateOf(if (case != null) Tab.CASE else Tab.HOME) }
+    var tab by remember {
+        mutableStateOf(
+            when {
+                case != null -> Tab.CASE
+                startOnAtlas -> Tab.ATLAS
+                else -> Tab.HOME
+            },
+        )
+    }
     var problem by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(case) {
         if (case != null) {

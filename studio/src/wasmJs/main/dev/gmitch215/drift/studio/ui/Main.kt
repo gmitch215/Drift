@@ -10,6 +10,10 @@ import kotlin.time.TimeSource
 private external fun publishDevice(transcript: String, millis: Int)
 
 @OptIn(ExperimentalWasmJsInterop::class)
+@JsFun("() => globalThis.location.hash")
+private external fun locationHash(): String
+
+@OptIn(ExperimentalWasmJsInterop::class)
 @JsFun(
     "(accept, done) => { const input = document.createElement('input'); input.type = 'file'; " +
         "input.accept = accept; input.onchange = () => { const file = input.files[0]; " +
@@ -63,6 +67,7 @@ fun main() {
             },
             picker = browserPicker,
             files = browserFilePicker,
+            startOnAtlas = locationHash() == "#atlas",
         )
     }
 }

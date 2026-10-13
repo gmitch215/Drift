@@ -71,6 +71,19 @@ class AtlasScreenTest {
     }
 
     @Test
+    fun studioAppStartsOnTheAtlasAndMeasuresWhenAsked() = runComposeUiTest {
+        var calls = 0
+        val counted = { d: Dataset ->
+            calls++
+            fixture(d)
+        }
+        setContent { StudioApp(dataset, measure = counted, startOnAtlas = true) }
+        waitUntil { onAllNodesWithText("Measuring this device").fetchSemanticsNodes().isEmpty() }
+        onNodeWithTag("count").assertExists()
+        assertEquals(1, calls)
+    }
+
+    @Test
     fun versionSelectorNeverMergesVersions() = runComposeUiTest {
         show()
         val old = wasm(view("2.4.20"))
