@@ -311,7 +311,7 @@
             <div class="bar"><a class="brand" href="index.html" aria-current="page"><img src="drift_128.png" alt="" width="28" height="28">Drift</a>
 <a href="advanced-usage.html">Usage</a>
 <a href="technical-report.html">Report</a>
-<a href="atlas/">Atlas</a>
+<a href="atlas/#atlas">Atlas</a>
 <a href="engine/">Engine</a>
 <a href="https://github.com/gmitch215/Drift">GitHub</a></div>
         </nav>
@@ -329,7 +329,7 @@
 <li><a class="card" href="technical-report.html"><strong>Read</strong><span>The design, the evidence and the numbers.</span></a></li>
 </ol>
 <div class="links">
-<a class="card" href="atlas/"><strong>Atlas</strong><span>Kotlin behavior recorded per target, with Studio.</span></a>
+<a class="card" href="atlas/#atlas"><strong>Atlas</strong><span>Kotlin behavior recorded per target, with Studio.</span></a>
 <a class="card" href="engine/"><strong>Engine</strong><span>KDoc for the engine modules, from Dokka.</span></a>
 <a class="card" href="https://github.com/gmitch215/Drift"><strong>GitHub</strong><span>Source, releases and issues.</span></a>
 </div>
@@ -393,9 +393,9 @@ classification from primary sources: 10 are <code>documented</code> (a Kotlin pa
 <code>platform-defined</code> (a JDK or ECMAScript page does) and 25 are <code>unclassified</code>, with the search that
 found no explanation. A divergence is data, not a verdict that something is a bug. <code>drift atlas diff</code>
 lists what changed between two compiler versions.</p>
-<p>Studio opens on the Atlas. The matrix groups columns by target family and adds a column for the
-device it runs on, measured live. A predict-and-reveal mode asks for the output you expect on a
-target, then shows the recorded one.</p>
+<p>Studio's Atlas tab holds the matrix. It groups columns by target family and adds a column for the
+device it runs on, measured live when the tab opens. A predict-and-reveal mode asks for the output
+you expect on a target, then shows the recorded one.</p>
 <p><code>drift atlas record</code>, <code>build</code>, <code>compare</code> and <code>show</code> do the same work from the command line.
 <code>./gradlew atlasSite</code> builds the static Atlas site: Studio, a page per probe and the dataset as
 JSON. <code>./gradlew docsSite</code> assembles the documentation site around it: this README as the front
@@ -579,18 +579,20 @@ executables ran inside Debian containers. The Windows executable ran under Wine,
 <h3 id="studio-on-the-desktop">Studio on the Desktop</h3>
 <pre><code class="language-sh">./gradlew :studio:run
 </code></pre>
-<p>A window opens on the Atlas, with the Investigation view on the second tab.</p>
+<p>A window opens on the Home tab, with the Atlas, Investigation, Upgrade, Contract and Bisect views
+beside it.</p>
 <h3 id="studio-on-the-web">Studio on the Web</h3>
 <p><code>drift serve</code> serves the web build from a directory, read-only, on the loopback interface.
 <code>:cli:stageStudio</code> builds the Wasm distribution and copies it to <code>cli/build/serve/studio</code>.</p>
 <pre><code class="language-sh">./gradlew :cli:stageStudio
 drift serve --dir cli/build/serve/studio
 </code></pre>
-<p>Open <code>http://localhost:8080/</code>. The page title is &quot;Drift Studio&quot;. <code>--port 0</code> takes a free port,
-<code>--cert</code> and <code>--key</code> (or <code>--mkcert</code> with an existing mkcert CA) serve HTTPS on the JVM, macOS and
-Linux builds, and <code>--domain</code> adds names such as <code>drift.local</code>. Any static server works too: serve
-<code>studio/build/dist/wasmJs/productionExecutable</code> after <code>./gradlew :studio:wasmJsBrowserDistribution</code>.
-Nothing hosts the site until <code>docs.yml</code> has run.</p>
+<p>Open <code>http://localhost:8080/</code>, or <code>http://localhost:8080/#atlas</code> to start on the Atlas tab. The page
+title is &quot;Drift Studio&quot;. <code>--port 0</code> takes a free port, <code>--cert</code> and <code>--key</code> (or <code>--mkcert</code> with an
+existing mkcert CA) serve HTTPS on the JVM, macOS and Linux builds, and <code>--domain</code> adds names such
+as <code>drift.local</code>. Any static server works too: serve <code>studio/build/dist/wasmJs/productionExecutable</code>
+after <code>./gradlew :studio:wasmJsBrowserDistribution</code>. Nothing hosts the site until <code>docs.yml</code> has
+run.</p>
 <h3 id="android">Android</h3>
 <p>Android and iOS builds are off by default so that a fresh clone needs only a JDK. Pass
 <code>-Pdrift.mobile=true</code> to turn them on. The Android build is a debug APK for an emulator or a device
