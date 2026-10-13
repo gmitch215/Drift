@@ -1,0 +1,288 @@
+{
+	"candidates": [
+		{
+			"a": "TZ=UTC",
+			"b": "TZ=a non-UTC zone",
+			"causeKey": "env.TZ",
+			"confirmingUrl": "https://github.com/jerryscript-project/jerryscript/pull/2551",
+			"ecosystem": "other",
+			"failingSide": "b",
+			"id": "INC-01",
+			"pins": {
+				"change": "66a5bff4ce",
+				"merged": "2018-10-09",
+				"passingZone": "America/Los_Angeles is what the fix enforces"
+			},
+			"platform": "linux",
+			"status": "CONFIRMED",
+			"url": "https://github.com/jerryscript-project/jerryscript/pull/2551",
+			"urlSha256": "92bd8d5965f0a0bd591490fec290b0c2c30a0fa497a41f5167531c8892023dce"
+		},
+		{
+			"a": "22.04",
+			"b": "24.04",
+			"causeKey": "os.release.VERSION_ID",
+			"confirmingUrl": "https://github.com/actions/runner-images/issues/10781",
+			"ecosystem": "Python, runner image",
+			"failingSide": "b",
+			"id": "INC-02",
+			"pins": {
+				"aImage": "ubuntu:22.04",
+				"bImage": "ubuntu:24.04",
+				"marker": "EXTERNALLY-MANAGED",
+				"pythonA": "3.10",
+				"pythonB": "3.12",
+				"runnerImage": "20241006.1.0"
+			},
+			"platform": "linux",
+			"status": "CONFIRMED",
+			"url": "https://github.com/actions/runner-images/issues/10781",
+			"urlSha256": "4b34c2453837274d73fedf05fec8d8e0e284c2ffe8860f6a85ccd38679713f8e"
+		},
+		{
+			"a": "22.11.0",
+			"b": "22.12.0",
+			"causeKey": "tool.node.version",
+			"confirmingUrl": "https://github.com/nodejs/node/issues/56137",
+			"ecosystem": "Node",
+			"failingSide": "b",
+			"id": "INC-03",
+			"pins": {
+				"libuvChange": "nodejs/node#56224",
+				"linux": "consistent across both versions",
+				"os": "Windows 11 10.0.26100.0"
+			},
+			"platform": "windows",
+			"status": "CONFIRMED",
+			"url": "https://github.com/nodejs/node/issues/56137",
+			"urlSha256": "1767ce6f288902518188a9d5dbf7b3f561835af9aeb8a7f2771da8f6a3c281a3"
+		},
+		{
+			"a": "ubuntu-24.04 or upgraded skopeo",
+			"b": "ubuntu-22.04 with skopeo 1.4.1",
+			"causeKey": "NEEDS: tool.skopeo.version",
+			"confirmingUrl": "https://github.com/devcontainers/ci/issues/191",
+			"ecosystem": "Docker",
+			"failingSide": "b",
+			"id": "INC-04",
+			"pins": {
+				"skopeoA": null,
+				"skopeoB": "1.4.1"
+			},
+			"platform": "linux",
+			"status": "PARTIAL",
+			"url": "https://github.com/devcontainers/ci/issues/191",
+			"urlSha256": "aff8fa944844b127c9c421376d38efbeb9014f9a4d82f64f5fbb40be1fdee9fe"
+		},
+		{
+			"a": "22.04",
+			"b": "24.04",
+			"causeKey": "os.release.VERSION_ID",
+			"confirmingUrl": "https://github.com/actions/runner-images/issues/10636",
+			"ecosystem": "runner image",
+			"failingSide": "b",
+			"id": "INC-05",
+			"pins": {
+				"aImage": "ubuntu:22.04",
+				"bImage": "ubuntu:24.04",
+				"failingCommand": null
+			},
+			"platform": "linux",
+			"status": "PARTIAL",
+			"url": "https://github.com/actions/runner-images/issues/10636",
+			"urlSha256": "ddb61e2e34d761a53b7cea04086311f807c3ee54b81416d66c09152032d055de"
+		},
+		{
+			"a": "17",
+			"b": "21",
+			"causeKey": "tool.java.version",
+			"confirmingUrl": "https://github.com/flutter/flutter/issues/156304#issuecomment-2396493786",
+			"ecosystem": "JDK",
+			"failingSide": "b",
+			"id": "INC-06",
+			"pins": {
+				"aImage": null,
+				"androidSdk": null,
+				"bImage": null,
+				"flutter": null
+			},
+			"platform": "linux",
+			"status": "CONFIRMED",
+			"url": "https://github.com/flutter/flutter/issues/156304",
+			"urlSha256": "11b44cb5acd98dc670c2fb845c59e9cbdae6eea841028ada70b9768bb7dfd579"
+		},
+		{
+			"a": "16 (implied, not measured in the thread)",
+			"b": "17.0.0",
+			"causeKey": "tool.node.version",
+			"confirmingUrl": "https://github.com/webpack/webpack/issues/14532#issuecomment-947515866",
+			"ecosystem": "Node",
+			"failingSide": "b",
+			"id": "INC-07",
+			"pins": {
+				"aImage": "node:16 (patch chosen at reconstruction)",
+				"bImage": "node:17.0.0",
+				"webpack": "5.59.0"
+			},
+			"platform": "linux",
+			"status": "CONFIRMED",
+			"url": "https://github.com/webpack/webpack/issues/14532",
+			"urlSha256": "105d6ef89b7bed82106a802f52648be6bfe91eba92d975ed5486a9ed5857d655"
+		},
+		{
+			"a": "JVM default locale (not stated)",
+			"b": "user.language=tr, user.region=TR",
+			"causeKey": "NEEDS: jvm.user.language",
+			"confirmingUrl": "https://github.com/Shopkeepers/Shopkeepers/issues/886#issuecomment-2142992865",
+			"ecosystem": "JDK",
+			"failingSide": "b",
+			"id": "INC-08",
+			"pins": {
+				"shopkeepers": null,
+				"spigot": null
+			},
+			"platform": "linux",
+			"status": "CONFIRMED",
+			"url": "https://github.com/Shopkeepers/Shopkeepers/issues/886",
+			"urlSha256": "8d72a647b07b695b0d225f9c8a31e169f7ed3a93e0320a4e6b1f33529a738a4f"
+		},
+		{
+			"a": "20230612.1.0",
+			"b": "20230620.1.0",
+			"causeKey": "ci.runner.image.version",
+			"confirmingUrl": "https://github.com/actions/runner-images/issues/7782#issuecomment-1632665024",
+			"ecosystem": "runner image",
+			"failingSide": "b",
+			"id": "INC-09",
+			"pins": {
+				"dotnetSdkA": "6.0.408",
+				"dotnetSdkB": "6.0.411"
+			},
+			"platform": "windows",
+			"status": "CONFIRMED",
+			"url": "https://github.com/actions/runner-images/issues/7782",
+			"urlSha256": "79ba83bcd1300ac0305ea1ef693fcaf1d35bf10bc4615ea5fd6a5ef2e6125525"
+		},
+		{
+			"a": "ubuntu",
+			"b": "alpine",
+			"causeKey": "os.release.ID",
+			"confirmingUrl": "https://github.com/AdoptOpenJDK/openjdk-docker/issues/75#issuecomment-436618992",
+			"ecosystem": "JDK (Docker, musl)",
+			"failingSide": "b",
+			"id": "INC-10",
+			"pins": {
+				"aImage": "adoptopenjdk/openjdk11:jdk-11.0.2.9",
+				"arch": "x86_64",
+				"bImage": "adoptopenjdk/openjdk11:jdk-11.0.2.9-alpine"
+			},
+			"platform": "linux",
+			"status": "PARTIAL",
+			"url": "https://github.com/AdoptOpenJDK/openjdk-docker/issues/75",
+			"urlSha256": "23e5bafd24028be23a1835c6573e0ee2b93070297235a6e54ca3089962877ab4"
+		},
+		{
+			"a": "a JDK below 21 (not stated)",
+			"b": "21",
+			"causeKey": "tool.java.version",
+			"confirmingUrl": "https://github.com/projectlombok/lombok/issues/3393#issuecomment-1691067212",
+			"ecosystem": "JDK",
+			"failingSide": "b",
+			"id": "INC-11",
+			"pins": {
+				"aJdk": "17 chosen at reconstruction",
+				"bJdk": "21 (the thread used an early-access build)",
+				"lombok": "1.18.26"
+			},
+			"platform": "linux",
+			"status": "PARTIAL",
+			"url": "https://github.com/projectlombok/lombok/issues/3393",
+			"urlSha256": "5f833bd94ed4d638baa5f92ea51fe1690c873ed7b11af1b91cfe732aa52f3b36"
+		},
+		{
+			"a": "11",
+			"b": "12",
+			"causeKey": "os.release.VERSION_ID",
+			"confirmingUrl": "https://github.com/prisma/orm/issues/19729#issuecomment-1591270599",
+			"ecosystem": "Docker",
+			"failingSide": "b",
+			"id": "INC-12",
+			"pins": {
+				"aImage": "node:18.16.0-bullseye-slim",
+				"bImage": "node:18.16.0-bookworm-slim",
+				"prisma": "4.15.0"
+			},
+			"platform": "linux",
+			"status": "CONFIRMED",
+			"url": "https://github.com/prisma/orm/issues/19729",
+			"urlSha256": "b9bb951ce85c6dc0bef593107fb78ecaa4837db0e74756f1fdee783b0b8cde35"
+		},
+		{
+			"a": "3.20",
+			"b": "3.21",
+			"causeKey": "os.release.VERSION_ID",
+			"confirmingUrl": "https://github.com/prisma/orm/issues/25817#issuecomment-2530926082",
+			"ecosystem": "Docker",
+			"failingSide": "b",
+			"id": "INC-13",
+			"pins": {
+				"alpineA": "3.20",
+				"alpineB": "3.21",
+				"node": "22",
+				"prisma": null
+			},
+			"platform": "linux",
+			"status": "PARTIAL",
+			"url": "https://github.com/prisma/orm/issues/25817",
+			"urlSha256": "0c9784f69441428dccf34438cc4b2b9683b91cea9923a922e1b9a6ccfb790ef6"
+		},
+		{
+			"a": "gcc of Alpine 3.20 (not stated)",
+			"b": "gcc 14.2.0-r4 (Alpine 3.21)",
+			"causeKey": "tool.cc.version",
+			"confirmingUrl": "https://github.com/boazsegev/iodine/issues/156#issuecomment-2543063098",
+			"ecosystem": "glibc/musl",
+			"failingSide": "b",
+			"id": "INC-14",
+			"pins": {
+				"aImage": "ruby:3.3.6-alpine3.20",
+				"apk": "g++ make",
+				"bImage": "ruby:3.3.6-alpine3.21",
+				"iodine": "0.7.58"
+			},
+			"platform": "linux",
+			"status": "PARTIAL",
+			"url": "https://github.com/boazsegev/iodine/issues/156",
+			"urlSha256": "eae66fd4df8c26adcd379cee42b908c0f460a8d1d40c8fae20359bf385a73b31"
+		}
+	],
+	"case": "c",
+	"order": [
+		"INC-13",
+		"INC-07",
+		"INC-06",
+		"INC-03",
+		"INC-10",
+		"INC-02",
+		"INC-11",
+		"INC-09",
+		"INC-08",
+		"INC-01",
+		"INC-04",
+		"INC-12",
+		"INC-05",
+		"INC-14"
+	],
+	"orderSha256": "98254a96045bef5cb19d7be274ce826e2f04176c1ecda86bde7082cf496c6e6c",
+	"schema": 1,
+	"selectionRule": [
+		"every incident labelled CONFIRMED or PARTIAL in incidents.md is a candidate; none is dropped or added by the sealer",
+		"a candidate is identified by its issue or pull request URL",
+		"order is ascending SHA-256 of the UTF-8 URL, compared as lowercase hex",
+		"candidates run in that order; a candidate is never skipped, and one that cannot be built is recorded as not-reconstructible with the reason",
+		"a candidate is reconstructible when both sides build in Linux containers from pinned public images or package versions and the failing command exits nonzero on side b and zero on side a",
+		"the flagship is the first reconstructible candidate in the order, whatever verdict solve returns",
+		"no rule, weight or probe is changed after sealing, and results are published whatever they are"
+	],
+	"source": "the 14 labelled incidents of .claude/batch/research/incidents/incidents.md (survey P2-W3-B)"
+}
