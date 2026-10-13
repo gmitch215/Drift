@@ -375,7 +375,7 @@ capsule directory. <code>drift import</code> builds the same directory from a sa
 log. <code>drift diagnose --against BASELINE</code> compares a saved passing run with the current one, and
 <code>drift bisect plan</code> and <code>drift bisect apply</code> narrow a green and red pair one test at a time. None of
 them opens a network connection.</p>
-<p><code>drift capture --project</code> adds the dependency versions, imports and call sites of the working directory to a capsule. <code>drift upgrade-check --to php=8.3,drupal=11</code> lists what a move to other versions breaks, from one capsule and the rule catalog (296 rules). <code>drift triage</code> reads an issue body offline and says which environment facts and rules it names. <code>drift contract</code> writes what a program needs from an environment and checks other capsules against it. Studio has a screen for each of the last three.</p>
+<p><code>drift capture --project</code> adds the dependency versions, imports and call sites of the working directory to a capsule. <code>drift upgrade-check --to php=8.3,drupal=11</code> lists what a move to other versions breaks, from one capsule and the rule catalog (298 rules). <code>drift triage</code> reads an issue body offline and says which environment facts and rules it names. <code>drift contract</code> writes what a program needs from an environment and checks other capsules against it. Studio has a screen for each of the last three.</p>
 <p>The repository also holds a GitHub Action (<code>action.yml</code>) and a GitLab CI/CD component
 (<code>templates/drift.yml</code>) that run these steps in a pipeline; see
 <a href="advanced-usage.html#ci-integration">CI Integration</a>.</p>
@@ -790,8 +790,9 @@ top-1 (21 of 45, P = 0.018) and top-3 (29 of 45, P = 0.009), and a <code>plausib
 more often wrong than right (14 of 25).</li>
 <li><code>upgrade-check</code> was scored once, on a PHP 7.4 to 8.3 move of one library: 0 true positives and 12
 false positives, and what did break had no rule.</li>
-<li>The <code>triage</code> claim check flags none of 67 labelled issue threads, and its facts score a precision of
-0.78 on form-labelled issues of large trackers.</li>
+<li>The <code>triage</code> claim check is experimental: it flags none of 67 labelled issue threads and fires once in
+222,707 corpus issues, and that hit is a false positive. The facts it extracts score a precision of 0.78 on
+form-labelled issues of large trackers.</li>
 <li>The Lab confirms a cause only under a rule fixed before the first trial, and <code>verify</code> checks the
 arithmetic of a case, not that the experiment would repeat.</li>
 <li>Some Atlas probes depend on hardware and on the build host. NaN bit patterns and the last digits of

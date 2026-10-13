@@ -2084,7 +2084,7 @@ contract: 0 hold, 0 break, 1 unverifiable
   drupal   project.composer.drupal/core          10.3.6 -&gt; 11
   symfony  project.composer.symfony/http-kernel  v6.4.12 -&gt; 7.1
   php      tool.php.version                      8.1.34 -&gt; 8.3
-71 of 296 rules read a target key
+73 of 298 rules read a target key
 
 Will break (0)
   none
@@ -2144,12 +2144,12 @@ Unknown (0)
 </tr>
 </tbody>
 </table></div>
-<p>Only rules that read a target key on side <code>b</code> and give a different verdict for the targets than for the capsule alone are listed. The line <code>71 of 296 rules read a target key</code> counts the rules that read one before that filter. Probe results and run facts describe today's environment, so side <code>b</code> has none, and a rule that reads one is unknown.</p>
+<p>Only rules that read a target key on side <code>b</code> and give a different verdict for the targets than for the capsule alone are listed. The line <code>73 of 298 rules read a target key</code> counts the rules that read one before that filter. Probe results and run facts describe today's environment, so side <code>b</code> has none, and a rule that reads one is unknown.</p>
 <p><code>--json</code> prints the same findings. A finding holds <code>rule</code>, <code>title</code>, <code>severity</code>, <code>basis</code>, <code>status</code>, <code>mechanism</code>, <code>crossings</code> (<code>key</code>, <code>from</code>, <code>to</code>, <code>was</code>, <code>now</code>), <code>missing</code>, <code>evidence</code> and <code>sources</code>, under the keys <code>will-break</code>, <code>may-break</code>, <code>version-boundary</code> and <code>unknown</code>, next to <code>targets</code>, <code>rules</code> and <code>touched</code>:</p>
 <pre><code class="language-sh">drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=8.3,drupal=11,symfony=7.1 --json \
   | jq -c '{rules, touched, willBreak: [.&quot;will-break&quot;[] | {rule}], versionBoundary: [.&quot;version-boundary&quot;[] | {rule, crossings: [.crossings[] | {key, from, to}]}]}'
 </code></pre>
-<pre><code>{&quot;rules&quot;:296,&quot;touched&quot;:71,&quot;willBreak&quot;:[],&quot;versionBoundary&quot;:[{&quot;rule&quot;:&quot;php-8-2-dynamic-properties-deprecated&quot;,&quot;crossings&quot;:[{&quot;key&quot;:&quot;tool.php.version&quot;,&quot;from&quot;:&quot;8.1.34&quot;,&quot;to&quot;:&quot;8.3&quot;}]},{&quot;rule&quot;:&quot;drupal-10-to-11-symfony-6-2-to-7-1&quot;,&quot;crossings&quot;:[{&quot;key&quot;:&quot;project.composer.drupal/core&quot;,&quot;from&quot;:&quot;10.3.6&quot;,&quot;to&quot;:&quot;11&quot;},{&quot;key&quot;:&quot;project.composer.symfony/http-kernel&quot;,&quot;from&quot;:&quot;v6.4.12&quot;,&quot;to&quot;:&quot;7.1&quot;}]}]}
+<pre><code>{&quot;rules&quot;:298,&quot;touched&quot;:73,&quot;willBreak&quot;:[],&quot;versionBoundary&quot;:[{&quot;rule&quot;:&quot;php-8-2-dynamic-properties-deprecated&quot;,&quot;crossings&quot;:[{&quot;key&quot;:&quot;tool.php.version&quot;,&quot;from&quot;:&quot;8.1.34&quot;,&quot;to&quot;:&quot;8.3&quot;}]},{&quot;rule&quot;:&quot;drupal-10-to-11-symfony-6-2-to-7-1&quot;,&quot;crossings&quot;:[{&quot;key&quot;:&quot;project.composer.drupal/core&quot;,&quot;from&quot;:&quot;10.3.6&quot;,&quot;to&quot;:&quot;11&quot;},{&quot;key&quot;:&quot;project.composer.symfony/http-kernel&quot;,&quot;from&quot;:&quot;v6.4.12&quot;,&quot;to&quot;:&quot;7.1&quot;}]}]}
 </code></pre>
 <p>The targets can sit in a file instead. This file gives the same result:</p>
 <pre><code class="language-yaml">php: 8.3
@@ -2165,7 +2165,7 @@ symfony: '7.1'
 </code></pre>
 <pre><code>upgrade-check: drupal-10-site
   php  tool.php.version  8.1.34 -&gt; 7.4
-44 of 296 rules read a target key
+46 of 298 rules read a target key
 
 Will break (2)
   1. [high, inferred] Drupal 10 cannot run on PHP 8.0 or earlier; PHP 8.0 sites must move to 8.1 before upgrading core
@@ -2202,7 +2202,7 @@ Unknown (0)
 </code></pre>
 <pre><code>upgrade-check: red
   drupal  project.composer.drupal/core  unknown -&gt; 11
-21 of 296 rules read a target key
+21 of 298 rules read a target key
 
 Will break (0)
   none
@@ -2689,6 +2689,7 @@ Draft rule: none
 <p>Only a <code>match</code> has a tier: <code>known</code> when every symptom of the rule is verified and <code>plausible</code> otherwise, the ranker's own policy. The other grades lack the two-sided difference a tier describes, so none is shown. The confidence of a rule is the weakest fact it rests on, times 0.7 for a <code>symptom</code>. It is not the chance that the rule is the cause. Rules with status <code>pending-scanner</code> are matched too, since the reporter can state attributes no scanner emits yet.</p>
 <p>Symptom text comes from the rule's <code>symptoms</code>: quoted strings, <code>ERR_CODE</code> names and <code>...Error</code> names.</p>
 <h3 id="claims">Claims</h3>
+<p>The claim check is experimental. On 67 labelled maintainer-correction threads it flags none, and on the 222,707-issue corpus it fires once, on a sentence that is not a claim (details in <code>TECHNICAL_REPORT.md</code>). Treat a flagged sentence as a lead to read, not as a finding.</p>
 <p>A claim check flags a sentence that contradicts something Drift knows. Each claim names its source: a rule, or two columns of an Atlas probe. A test checks that every rule exists and that the two Atlas columns print different results.</p>
 <pre><code class="language-sh">drift triage fixtures/triage/c06-distutils-still-available.md
 </code></pre>
@@ -2753,7 +2754,7 @@ Draft rule: none
 </tr>
 </tbody>
 </table></div>
-<p>A claim fires on a sentence outside code blocks that has a phrase from each of its word groups and no negation. A claim that depends on the environment stays silent when the fact is missing. The confidence is 0.700, times the weakest fact the claim depends on.</p>
+<p>A claim fires on a sentence outside code blocks that has a phrase from each of its word groups and no negation, question mark or sign that the sentence is not an assertion (<code>deprecat</code>, <code>slated</code>, <code>instead</code>, <code>alternativ</code>, <code>would</code>, <code>please</code>, <code>overflow</code>, <code>non-</code>). A claim that depends on the environment stays silent when the fact is missing. The confidence is 0.700, times the weakest fact the claim depends on.</p>
 <h3 id="draft-rules">Draft Rules</h3>
 <p>A draft needs a symptom signature, one version key stated on both sides with the passing version below the failing one, and no rule that already holds on that key. Its detect tree is the version range each side stated plus the signature:</p>
 <pre><code class="language-sh">drift triage fixtures/triage/f11-node-typeerror.md --publish-threshold 0.5 --date 2026-10-13
@@ -2803,7 +2804,7 @@ drift upgrade-check capsule.json --to node=20 --learned .drift/learned
 <h3 id="redaction">Redaction</h3>
 <p>Secrets are masked before anything is stored or printed, with the same redactor as <code>capture</code>. Other users' home directories become <code>.../user</code>. An <code>@login</code> mention becomes <code>@</code> and a hash, <code>u</code> followed by ten hex digits of the SHA-256 of the lowercase login; <code>--author</code> is hashed the same way. A mention inside a code block stays, since it is usually an annotation. The result keeps the SHA-256 of the redacted text and the line and column of each value, never the text.</p>
 <h3 id="fixtures-and-scores">Fixtures and Scores</h3>
-<p><a href="https://github.com/gmitch215/Drift/tree/master/fixtures/triage"><code>fixtures/triage/</code></a> holds 66 issue bodies, each with an expectation file. The first 52 are strict forms (10), forms with blank issues (8), free text (12), sparse or wrong beginner reports (10) and mixed phrasing (12); the other 14 cover false positives of the key-value path and claim wording. The bodies are invented for this repository; none is copied from an issue. The expectation lists every fact the text states, the rules and claims it should trigger and whether a draft follows. <code>TriageTest</code> scores the extractor on them and prints the result:</p>
+<p><a href="https://github.com/gmitch215/Drift/tree/master/fixtures/triage"><code>fixtures/triage/</code></a> holds 70 issue bodies, each with an expectation file. The first 52 are strict forms (10), forms with blank issues (8), free text (12), sparse or wrong beginner reports (10) and mixed phrasing (12); the other 18 cover false positives of the key-value path and claim wording. The bodies are invented for this repository; none is copied from an issue. The expectation lists every fact the text states, the rules and claims it should trigger and whether a draft follows. <code>TriageTest</code> scores the extractor on them and prints the result:</p>
 <div class="table"><table>
 <thead>
 <tr>
@@ -2814,15 +2815,15 @@ drift upgrade-check capsule.json --to node=20 --learned .drift/learned
 <tbody>
 <tr>
 <td>facts extracted</td>
-<td>185</td>
+<td>189</td>
 </tr>
 <tr>
 <td>precision, recall</td>
-<td>0.989, 0.978 (183 true positives, 2 false positives, 4 false negatives)</td>
+<td>0.989, 0.979 (187 true positives, 2 false positives, 4 false negatives)</td>
 </tr>
 <tr>
 <td>Brier score</td>
-<td>0.0855</td>
+<td>0.0851</td>
 </tr>
 </tbody>
 </table></div>

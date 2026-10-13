@@ -378,7 +378,7 @@
 </tr>
 <tr>
 <td>Rules</td>
-<td>296 in 27 folders: 206 active and 90 <code>pending-scanner</code>; 903 fixtures (300 positive, 603 negative); 335 cited sources (208 distinct)</td>
+<td>298 in 27 folders: 207 active and 91 <code>pending-scanner</code>; 913 fixtures (303 positive, 610 negative); 338 cited sources (210 distinct)</td>
 <td><code>rules/**/*.yml</code></td>
 </tr>
 <tr>
@@ -457,8 +457,8 @@
 <td><code>fixtures/cases/d</code></td>
 </tr>
 <tr>
-<td>Triage on 66 fixture bodies</td>
-<td>precision 0.989, recall 0.978, Brier 0.0855; claim check: 0 of 67 labelled threads flagged</td>
+<td>Triage on 70 fixture bodies</td>
+<td>precision 0.989, recall 0.979, Brier 0.0851; claim check: 0 of 67 labelled threads flagged</td>
 <td><code>TriageTest</code>, <code>triage/claim-labels.yml</code></td>
 </tr>
 <tr>
@@ -578,7 +578,7 @@
 </tr>
 </tbody>
 </table></div>
-<p>The remaining directories are data and delivery, not modules: <code>rules</code> (296 YAML rule files in 27 folders), <code>triage</code> (the corpus manifest and the claim-check labels), <code>notices</code> (third-party notices that ship in every artifact), <code>atlas</code> (the hand-maintained classification of every Atlas probe), <code>fixtures</code> (recorded capsules, Atlas transcripts, solved cases, project trees, issue bodies and upgrade-check captures), <code>packaging</code> (templates for the Homebrew and Chocolatey packages), <code>assets</code> (the icon), and <code>install.sh</code> and <code>install.ps1</code> at the root. <code>.github/release</code> holds the scripts the release workflow runs. The version is <code>version=1.0.0</code> in <code>gradle.properties</code>; <code>core</code> embeds it for <code>--version</code>, the Studio and Android packages read it, and the Xcode project carries its own copy of the marketing version.</p>
+<p>The remaining directories are data and delivery, not modules: <code>rules</code> (298 YAML rule files in 27 folders), <code>triage</code> (the corpus manifest and the claim-check labels), <code>notices</code> (third-party notices that ship in every artifact), <code>atlas</code> (the hand-maintained classification of every Atlas probe), <code>fixtures</code> (recorded capsules, Atlas transcripts, solved cases, project trees, issue bodies and upgrade-check captures), <code>packaging</code> (templates for the Homebrew and Chocolatey packages), <code>assets</code> (the icon), and <code>install.sh</code> and <code>install.ps1</code> at the root. <code>.github/release</code> holds the scripts the release workflow runs. The version is <code>version=1.0.0</code> in <code>gradle.properties</code>; <code>core</code> embeds it for <code>--version</code>, the Studio and Android packages read it, and the Xcode project carries its own copy of the marketing version.</p>
 <p>Sources sit at <code>src/&lt;set&gt;/main</code> and <code>src/&lt;set&gt;/test</code>. The shared-code ratio counts non-comment lines under <code>src/common/main</code> against every other source set's <code>main</code>.</p>
 <div class="table"><table>
 <thead>
@@ -945,7 +945,7 @@
 <p>Each changed path maps to one of 14 dimensions by longest matching prefix: <code>os</code>, <code>kernel</code>, <code>cpu</code>, <code>cpu-limit</code>, <code>memory</code>, <code>runtime</code>, <code>compiler</code>, <code>build</code>, <code>userland</code>, <code>env</code>, <code>locale</code>, <code>limits</code>, <code>network</code> and <code>browser</code>. For example <code>tool.node.</code> is <code>runtime</code>, <code>tool.npm.</code> and <code>deps.</code> and <code>ci.</code> are <code>build</code>, <code>env.TZ</code> is <code>locale</code>, and <code>env.HTTPS_PROXY</code> is <code>network</code>. A path no prefix claims has no dimension; it is listed under <code>changes</code> and never ranked. <a href="advanced-usage.html#attribute-prefixes">ADVANCED_USAGE.md</a> holds the full prefix table. Probe ids map the same way, so a probe that differs in a dimension can support a candidate in that dimension.</p>
 <hr />
 <h2 id="rules-and-provenance">Rules and Provenance</h2>
-<p>A rule records a documented difference between two environments that can break software. The catalog has 296 rules in <code>rules/**/*.yml</code>, one folder per subject (27 folders), each with a mechanism, one or more symptoms, a matcher, fixtures and cited sources. 206 are <code>active</code>. The other 90 are <code>pending-scanner</code>: they read an attribute that no scanner emits yet (a database server version, the TLS versions a peer offers, a browser name, a source-level key), they are compiled and checked like the rest, and they never match a capture that lacks the attribute. <code>RuleCatalogTest</code> prints the keys they are waiting for.</p>
+<p>A rule records a documented difference between two environments that can break software. The catalog has 298 rules in <code>rules/**/*.yml</code>, one folder per subject (27 folders), each with a mechanism, one or more symptoms, a matcher, fixtures and cited sources. 207 are <code>active</code>. The other 91 are <code>pending-scanner</code>: they read an attribute that no scanner emits yet (a database server version, the TLS versions a peer offers, a browser name, a source-level key), they are compiled and checked like the rest, and they never match a capture that lacks the attribute. <code>RuleCatalogTest</code> prints the keys they are waiting for.</p>
 <p>A rule file has <code>schema: 1</code>, an <code>id</code> equal to the file name, a <code>title</code>, <code>applies</code> (dimension ids), <code>difference</code>, <code>symptoms</code>, <code>mechanism</code> (one sentence), <code>detect</code>, <code>severity</code> (<code>low</code>, <code>medium</code>, <code>high</code>), <code>provenance</code>, <code>fixtures</code> and <code>status</code> (<code>active</code> or <code>pending-scanner</code>). A symptom has a <code>basis</code>: <code>verified</code> when the cited source states the symptom, <code>inferred</code> when it only states the mechanism. The matcher is a small language over a passing side <code>a</code> and a failing side <code>b</code>: <code>eq</code>, <code>ne</code>, <code>in</code>, <code>has</code>, <code>starts</code>, <code>ver</code> (version ranges), <code>present</code>, <code>changed</code> (with a trailing <code>*</code>), and <code>all</code>, <code>any</code>, <code>not</code>, to a depth of 8. This is a rule from the catalog:</p>
 <pre><code class="language-yaml">id: node-localhost-ipv6-first
 applies:
@@ -962,7 +962,7 @@ detect:
 severity: medium
 </code></pre>
 <p>Rule files are YAML because people maintain them by hand. snakeyaml-engine 3.2 parses them at build time under the failsafe schema, so every scalar is a string (<code>1.20</code>, <code>no</code>, <code>0o17</code> and <code>~</code> stay strings), and <code>embedRules</code> writes the JSON that <code>core</code> reads. Common code never parses YAML. A stray <code>rules/**/*.json</code> fails the build, and the embedded JSON was byte-identical to what the earlier JSON catalog produced when the format changed (32 of 32 rules at that time).</p>
-<p>The checker, <code>Constraints.check</code>, runs in the <code>core</code> test suite, so on every build. It validates each rule (id shape, non-empty fields, one-sentence mechanism, dimension ids, provenance, fixtures), requires unique ids, requires every positive fixture to match and every negative fixture not to match, and lists every <code>pending-scanner</code> rule (90 today). A scan-side test (<code>RuleCatalogTest</code>) checks that every attribute path an active rule reads is one that capture or a scanner emits, and that a pending rule reads at least one that none emits.</p>
+<p>The checker, <code>Constraints.check</code>, runs in the <code>core</code> test suite, so on every build. It validates each rule (id shape, non-empty fields, one-sentence mechanism, dimension ids, provenance, fixtures), requires unique ids, requires every positive fixture to match and every negative fixture not to match, and lists every <code>pending-scanner</code> rule (91 today). A scan-side test (<code>RuleCatalogTest</code>) checks that every attribute path an active rule reads is one that capture or a scanner emits, and that a pending rule reads at least one that none emits.</p>
 <div class="table"><table>
 <thead>
 <tr>
@@ -973,31 +973,31 @@ severity: medium
 <tbody>
 <tr>
 <td>rules, active / pending-scanner</td>
-<td>296: 206 / 90</td>
+<td>298: 207 / 91</td>
 </tr>
 <tr>
 <td>severity high / medium / low</td>
-<td>84 / 165 / 47</td>
+<td>85 / 166 / 47</td>
 </tr>
 <tr>
 <td>fixtures, positive / negative</td>
-<td>300 / 603</td>
+<td>303 / 610</td>
 </tr>
 <tr>
 <td>cited sources</td>
-<td>335 entries, 208 distinct locations</td>
+<td>338 entries, 210 distinct locations</td>
 </tr>
 <tr>
 <td>source kinds: measurement / vendor-doc / release-note / spec</td>
-<td>14 / 137 / 143 / 41</td>
+<td>14 / 138 / 145 / 41</td>
 </tr>
 <tr>
 <td>symptoms, <code>verified</code> / <code>inferred</code></td>
-<td>84 / 232</td>
+<td>86 / 233</td>
 </tr>
 <tr>
 <td>rules with at least one <code>inferred</code> symptom</td>
-<td>229</td>
+<td>230</td>
 </tr>
 </tbody>
 </table></div>
@@ -1064,9 +1064,9 @@ severity: medium
 <td>6</td>
 <td>0</td>
 <td><code>php</code></td>
+<td>35</td>
 <td>33</td>
-<td>32</td>
-<td>1</td>
+<td>2</td>
 </tr>
 <tr>
 <td><code>docker</code></td>
@@ -1160,9 +1160,9 @@ severity: medium
 </tr>
 <tr>
 <td>total</td>
-<td>296</td>
-<td>206</td>
-<td>90</td>
+<td>298</td>
+<td>207</td>
+<td>91</td>
 <td></td>
 <td></td>
 <td></td>
@@ -1556,10 +1556,10 @@ verify: failed at manifest: results/0001.json was changed; expected 5f6997c647d8
 <h2 id="upgrade-check">Upgrade Check</h2>
 <p><code>drift upgrade-check [CAPSULE] --to php=8.3,drupal=11</code> asks what a move to other versions breaks, from one capsule and no second environment. It copies the capsule, sets the target keys on the copy, and evaluates every rule against that synthetic pair with the same engine that <code>diagnose</code> uses. A target name is one of 19 aliases for an attribute path (<code>agp</code>, <code>composer</code>, <code>docker</code>, <code>drupal</code>, <code>git</code>, <code>go</code>, <code>gradle</code>, <code>java</code>, <code>jdk</code>, <code>kotlin</code>, <code>node</code>, <code>npm</code>, <code>openssl</code>, <code>php</code>, <code>python</code>, <code>ruby</code>, <code>symfony</code>, <code>twig</code>, <code>tzdata</code>), or a dotted path. Without a capsule the command captures this machine with <code>--tools --project</code>.</p>
 <p>The result has four groups, taken from the three-valued verdicts of the matcher and not from a new score. <strong>Will break</strong> is a rule that matches on a fact beyond the target version keys, such as a package in the lockfile or a call in the source; the finding prints that fact on an <code>evidence:</code> line. <strong>Version boundary crossed</strong> is a rule that matches on the target versions alone: a documented change lies between the two versions, and nothing in the capsule shows that the project meets it. <strong>May break</strong> is a rule whose verdict is unknown because another key it reads is missing from the capsule or is one no scanner emits yet, and the output names the key (and says when the rule is <code>pending-scanner</code>). <strong>Unknown</strong> is a target whose current value the capsule lacks. A rule is listed only when its verdict for the target differs from its verdict for the capsule alone. The order inside a group is severity, verified symptoms before inferred ones, then rule id, and the JSON form is canonical, schema 2.</p>
-<p>On the real capture <code>fixtures/upgrade-check/drupal-10-php-8-1.json</code> (the Composer fixture inside <code>php:8.1-cli-bookworm</code>: PHP 8.1.34, Drupal 10.3.6, Symfony 6.4.12), <code>--to php=8.3,drupal=11,symfony=7.1</code> gives 0 will break, 7 may break, 2 version boundary and 0 unknown, and 71 of the 296 rules read a target key. The output is byte-identical on the JVM and macOS builds, and <code>UpgradeCheckTest</code> (19 tests) and <code>UpgradeCheckCommandTest</code> (9) run on all three Gradle targets.</p>
+<p>On the real capture <code>fixtures/upgrade-check/drupal-10-php-8-1.json</code> (the Composer fixture inside <code>php:8.1-cli-bookworm</code>: PHP 8.1.34, Drupal 10.3.6, Symfony 6.4.12), <code>--to php=8.3,drupal=11,symfony=7.1</code> gives 0 will break, 7 may break, 2 version boundary and 0 unknown, and 73 of the 298 rules read a target key. The output is byte-identical on the JVM and macOS builds, and <code>UpgradeCheckTest</code> (19 tests) and <code>UpgradeCheckCommandTest</code> (9) run on all three Gradle targets.</p>
 <p><strong>What it got wrong.</strong> The first version put every version-only match under Will break. Case D (below) ran it before a PHP 7.4 to 8.3 move: 11 will-break findings and 1 may-break, and none of them was a failure in the project's own test suite (0 true positives, 12 false positives). The suite passed on PHP 8.3. What did break the move was not predicted: a locked package with a PHP upper bound stopped the install, and a locked package that lacks a PHP 8.1 tentative return type died with a fatal error. No rule covers either. The group split and the evidence requirement are the response, and the same capture now gives 0 will break, 1 may break, 11 version boundary and 0 unknown. That is a change of wording, not a better prediction: the 11 are still not failures, and the frozen prediction in <code>fixtures/cases/d</code> is unchanged.</p>
 <p><strong>A second check.</strong> On the four migration scenarios of DriftBench, moving the green arm to the red arm's version put a will-break finding on the injected version key in 3 of 4 scenarios, and in 2 of 4 in the natural direction (the red arm to the new version). Both counts are weak: any finding on the version key counts, and at that time none named the injected API (0 of 4). Added-API rules (36, one per call such as <code>json_validate</code>, <code>Array.fromAsync</code> or <code>List.getFirst</code>) then raised the API-level hits to 4 of 4, but only in the direction where side b has the older runtime, which is the CI-older-than-local shape; an upgrade runs the other way, and those rules do not fire for it.</p>
-<p><strong>Limits.</strong> A quiet result does not show that a move is safe: the catalog holds documented changes, 90 of its 296 rules wait for a key no scanner emits, and a project that uses a removed API without a rule for it is invisible. The direction of a rule is the direction of its text (<code>a</code> is the passing side), and a rule written for a downgrade can match an upgrade only by accident. <code>--learned DIR</code> adds the rules published by <code>drift triage</code> (see Triage and the Corpus).</p>
+<p><strong>Limits.</strong> A quiet result does not show that a move is safe: the catalog holds documented changes, 91 of its 298 rules wait for a key no scanner emits, and a project that uses a removed API without a rule for it is invisible. The direction of a rule is the direction of its text (<code>a</code> is the passing side), and a rule written for a downgrade can match an upgrade only by accident. <code>--learned DIR</code> adds the rules published by <code>drift triage</code> (see Triage and the Corpus).</p>
 <hr />
 <h2 id="triage-and-the-corpus">Triage and the Corpus</h2>
 <p><code>drift triage ISSUE_FILE</code> reads the text of an issue offline, with no model, and says what it can about the reporter's environment: facts as Drift attribute keys, each with a confidence, the rules that apply, statements that contradict what Drift knows, and a draft rule when the report suggests one. The same text gives the same bytes on the JVM, Native and Wasm builds, since the arithmetic is integer and the scanning has no regular expressions. A fact has a side (<code>passing</code> or <code>failing</code>) taken from the verdict word nearest the value, a path that says how it was found, and a confidence. The paths start at <code>section</code> 0.950 (the first line under an issue-form heading), <code>tool-output</code> 0.900, <code>pattern</code> 0.700 (0.800 under an environment heading) and <code>key-value</code> 0.490, and the agreement of two spans raises a value while a conflict or a hedge lowers it. Rules that match are listed with the facts they read. A draft rule needs a symptom signature, one version key stated on both sides with the passing version below the failing one, and no rule that already holds on that key. It is published, not only drafted, when <code>--publish-threshold</code> is set, its confidence reaches it, <code>--date</code> names the day the report was read, and the rule passes the rule compiler and its own fixtures. Published drafts go into a learned-rule store (<code>--learned DIR</code>, validated by the rule compiler on every read, never a shipped id) that <code>diagnose</code>, <code>upgrade-check</code> and <code>triage</code> read. Secrets are masked first with the capture redactor, and an <code>@login</code> mention becomes a hash.</p>
@@ -1643,8 +1643,8 @@ verify: failed at manifest: results/0001.json was changed; expected 5f6997c647d8
 </table></div>
 <p>Recall is low by construction (15%): it counts form values found again outside their own sections. Reliability on the held-out half, in bins of confidence: 0.4 holds 165 facts at accuracy 0.412, 0.5 holds 177 at 0.661, 0.6 holds 47 at 0.936, 0.7 holds 528 at 0.799, 0.8 holds 51 at 0.941 and 0.9 holds 404 at 0.933, so the 0.5 and 0.6 bins are underconfident and the 0.9 bin slightly overconfident. A fact was found in 75% of the issues of large form-only repositories, 63% of large form repositories with blank issues allowed, 60% and 40% of large Markdown-template repositories (strict, blank), 36% and 49% of small form repositories and 21% of small repositories with no template. Small repositories are worse on every measure that has a number, and 9 scored small facts support no precision figure. The scored sample is large trackers, mostly PHP, Node, .NET and Python.</p>
 <p>Earlier in the work the <code>key-value</code> path read <code>PHP Fatal error: ... on line 23</code> as PHP version 23 (123 of its 142 held-out misses) and the claim check fired on any sentence that mentioned a library without a negation. The first is fixed: a version must sit next to the tool name or its label. Before that fix the held-out precision was 0.731 and the Brier score 0.1645 over 1,500 facts; after it, the table above. The fix changed the fact set, so the two figures are not a paired comparison.</p>
-<p><strong>Fixtures.</strong> <code>fixtures/triage</code> holds 66 invented issue bodies with expectation files (strict forms, forms with blank issues, free text, sparse or wrong beginner reports, mixed phrasing, 14 for false positives and claim wording). <code>TriageTest</code> scores the extractor on them: 185 facts, 183 true positives, 2 false positives, 4 false negatives, precision 0.989, recall 0.978, Brier 0.0855, and the test fails below 0.95, 0.93 or above 0.12. These bodies were written to exercise the extractor, so the scores are an upper bound for real issues. <code>drift triage calibrate --corpus FILE --out TABLE</code> repeats the dev-half recalibration on a corpus of the user's own issues (it reads the whole file into memory, and a <code>.json.zst</code> through the user's <code>zstd</code>), and <code>--confidence TABLE</code> applies it; it was tested on small inputs and not run on the real corpus.</p>
-<p><strong>The claim check is weak.</strong> It flags a sentence that contradicts something Drift knows: nine statements, each tied to a rule or to two Atlas columns that print different results (for example, that the Nashorn engine is available in JDK 21, which the rules say JEP 372 removed). It needs the facts and a sentence that affirms the claim inside one clause; questions and &quot;removed in&quot; sentences are rejected. A labelled set of 67 maintainer-correction threads from 13 repositories (<code>triage/claim-labels.yml</code>: 6 corrections, 55 not corrections, 6 unclear) was built to measure it, and the search heuristic that found the candidates has a precision of 6 of 61 (0.098; Wilson 0.05 to 0.20). The engine flags none of the 6 corrections. On the whole corpus it fires 6 times in 222,707 bodies (<code>distutils-available</code> 4, <code>hash-order-same</code> 1, <code>regex-same</code> 1), none of them in a labelled thread, and read by hand none is a clear true positive: the four <code>distutils</code> hits are deprecation and discussion text in the CPython tracker. The feature does not work as built on real reports. The claim-check set also holds too few corrections (6) for a recall figure.</p>
+<p><strong>Fixtures.</strong> <code>fixtures/triage</code> holds 70 invented issue bodies with expectation files (strict forms, forms with blank issues, free text, sparse or wrong beginner reports, mixed phrasing, 18 for false positives and claim wording). <code>TriageTest</code> scores the extractor on them: 189 facts, 187 true positives, 2 false positives, 4 false negatives, precision 0.989, recall 0.979, Brier 0.0851, and the test fails below 0.95, 0.93 or above 0.12. These bodies were written to exercise the extractor, so the scores are an upper bound for real issues. <code>drift triage calibrate --corpus FILE --out TABLE</code> repeats the dev-half recalibration on a corpus of the user's own issues (it reads the whole file into memory, and a <code>.json.zst</code> through the user's <code>zstd</code>), and <code>--confidence TABLE</code> applies it. On the real corpus (222,707 issues, 595 MB of JSON) the macOS executable took 7.5 minutes at a peak resident size of 6.09 GB; keeping only the form bodies instead of every parsed issue brought it to 6.0 minutes and 3.20 GB with an identical table (<code>pattern</code> 700 to 760, held-out Brier 0.1450 to 0.1408 over 1,434 facts). The remaining memory is the decompressed text itself.</p>
+<p><strong>The claim check is weak.</strong> It flags a sentence that contradicts something Drift knows: nine statements, each tied to a rule or to two Atlas columns that print different results (for example, that the Nashorn engine is available in JDK 21, which the rules say JEP 372 removed). It needs the facts and a sentence that affirms the claim inside one clause; questions and &quot;removed in&quot; sentences are rejected. A labelled set of 67 maintainer-correction threads from 13 repositories (<code>triage/claim-labels.yml</code>: 6 corrections, 55 not corrections, 6 unclear) was built to measure it, and the search heuristic that found the candidates has a precision of 6 of 61 (0.098; Wilson 0.05 to 0.20). The engine flags none of the 6 corrections. The 67 threads were split by <code>sha256(&quot;&lt;repo&gt;#&lt;issue&gt;&quot;)</code> (first four bytes, odd is held-out) before the second fix: 30 held-out (3 corrections, 23 not corrections, 4 unclear) and 37 dev. The engine flags 0 of the 30 held-out threads, so its precision there is undefined and its recall is 0 of 3 (Wilson 0 to 0.56). On the whole corpus the fix pass (assertion shape in the first pass; hedge, deprecation and imperative cues in the second) took it from 12 hits to 6 to 1 in 222,707 bodies; the one left is <code>distutils</code> in a parenthetical in a CPython issue and is not a claim. By the rule fixed for this check (held-out precision below 0.5 removes the feature from the headline claims), the claim check is documented as experimental in <code>README.md</code> and <code>ADVANCED_USAGE.md</code>. The claim list covers nine Kotlin, JDK and Python statements, none of which the 13 repositories of the labelled set discuss, so a larger set would need claims written for it. The claim-check set also holds too few corrections (6) for a recall figure.</p>
 <hr />
 <h2 id="studio-screens">Studio Screens</h2>
 <p>Studio is one Compose Multiplatform codebase for the desktop, the browser and the mobile builds. Its Home tab offers <code>Choose a Case File</code>, <code>Show a Sample</code>, <code>Open the Atlas</code>, and one entry each for the Upgrade, Contract and Bisect screens, each with a one-line description. A <code>.driftcase</code> opens from the file picker (desktop and web), from the launch argument, from a macOS open-file event, and from the operating system through a file association for <code>application/x-driftcase</code>; the Case tab shows the sentence summary and the verdict, and for a tampered archive it shows the check that failed. <code>drift open</code> starts Studio for a file, or writes <code>report.html</code> beside it when Studio is not installed. The Atlas and Investigation tabs described below remain. The Upgrade screen takes a capsule and <code>name=version</code> pairs and shows the groups of Upgrade Check as one sentence per group count, then each finding with its rule, boundary and source; the Contract screen takes a contract and a capsule and lists requirements that break, could not be checked and hold; the Bisect screen takes a passing and a failing capsule and shows the settings that differ, the first test in words and the <code>drift bisect</code> commands to run, and runs nothing itself. Summaries of a certificate and a ranking use fixed wording per verdict and tier (tested on all four archives in <code>fixtures/lab/cases</code>), technical output sits behind <code>Show Technical Details</code>, a term is glossed once where it first appears, and controls are at least 44 dp. The palette is a muted purple (accent text <code>#6b3fd4</code> on light and <code>#b99cff</code> on dark, flat, no gradients) shared with the documentation site template, defined once in <code>StudioTheme.kt</code>; <code>StudioThemeTest</code> asserts contrast of at least 4.59 to 1 for text and 3.41 to 1 for marks. The screens were checked at 390 px wide in the web build (<code>scrollWidth</code> equals <code>innerWidth</code> on the Upgrade and Bisect screens). Studio has 114 JVM tests and 69 browser tests. The Wasm build bundles JetBrains Mono (OFL) so that the monospace panels render the same everywhere. The wording rules follow brand-voice conventions; no measured effect on comprehension is claimed.</p>
@@ -2760,15 +2760,15 @@ Mechanism: unexplained (no rule or probe agreed)
 </tr>
 </tbody>
 </table></div>
-<p>The score is a loss for the catalog, and the table understates why. All 12 rules fire on the version crossing alone; none reads a source fact, and the capture had none of the APIs they name (<code>create_function</code>, <code>each</code>, <code>implode</code> with reversed arguments, mysqli, PDO). What actually broke the move was not predicted. <code>composer install</code> from the lock stopped on <code>phpspec/prophecy</code> 1.12.2, which caps PHP below 8.1. With the lock held, <code>mikey179/vfsstream</code> 1.6.8 stopped the run with a fatal error because <code>getIterator()</code> lacks the PHP 8.1 tentative return type. <code>composer update</code> hid that second break by moving 60 packages. No rule covers a locked package with a PHP upper bound or a tentative return type; the capture held both package versions. The scored run is therefore a result for &quot;PHP 8.3 with whatever Composer resolves&quot;, not for the dependency set of the pin, and a suite that passes there does not show that the old dependencies would.</p>
-<p>The group split that followed (see Upgrade Check) rerun on the same capture gives 0 will break, 1 may break and 11 version boundary, recorded in <code>fixtures/cases/d/post-fix.json</code>; it changes the wording of the 11 and not whether they were failures. Limits: one project, one outcome, so no precision or recall figure holds; the pass is the PHPUnit exit status of the default configuration, and the deprecation scan only covers what PHPUnit's handler sees; a deprecation that PHPUnit swallows would not count as a failure under the protocol; Docker Desktop on one Mac ran every stack (linux/arm64). Rules suggested by the result are in <code>fixtures/cases/d/follow-up-rules.md</code>; none was applied, and <code>rules/</code> did not change between the frozen prediction and the score. <code>VerifyTest</code> pins the selection hash, checks the order and the score against the prediction.</p>
+<p>The score is a loss for the catalog, and the table understates why. All 12 rules fire on the version crossing alone; none reads a source fact, and the capture had none of the APIs they name (<code>create_function</code>, <code>each</code>, <code>implode</code> with reversed arguments, mysqli, PDO). What actually broke the move was not predicted. <code>composer install</code> from the lock stopped on <code>phpspec/prophecy</code> 1.12.2, which caps PHP below 8.1. With the lock held, <code>mikey179/vfsstream</code> 1.6.8 stopped the run with a fatal error because <code>getIterator()</code> lacks the PHP 8.1 tentative return type. <code>composer update</code> hid that second break by moving 60 packages. No rule in the frozen catalog covered a locked package with a PHP upper bound or a tentative return type, although the capture held both package versions. The scored run is therefore a result for &quot;PHP 8.3 with whatever Composer resolves&quot;, not for the dependency set of the pin, and a suite that passes there does not show that the old dependencies would.</p>
+<p>The group split that followed (see Upgrade Check) rerun on the same capture gives 0 will break, 1 may break and 11 version boundary, recorded in <code>fixtures/cases/d/post-fix.json</code>; it changes the wording of the 11 and not whether they were failures. Limits: one project, one outcome, so no precision or recall figure holds; the pass is the PHPUnit exit status of the default configuration, and the deprecation scan only covers what PHPUnit's handler sees; a deprecation that PHPUnit swallows would not count as a failure under the protocol; Docker Desktop on one Mac ran every stack (linux/arm64). Rules suggested by the result are in <code>fixtures/cases/d/follow-up-rules.md</code>; none was applied, and <code>rules/</code> did not change between the frozen prediction and the score. <code>VerifyTest</code> pins the selection hash, checks the order and the score against the prediction. After the score, <code>php-8-1-vfsstream-below-1-6-10-tentative-return</code> was written from the vfsStream source at each tag (the attribute arrives in 1.6.10). A labelled rerun with it, <code>fixtures/cases/d/post-fix-p3-rules.json</code>, gives 1 will break (vfsStream), 2 may break and 11 version boundary. The rule came after the outcome, so the rerun reproduces the break rather than predicting it; the frozen score above is unchanged. The <code>phpspec/prophecy</code> upper bound still has no rule.</p>
 <h3 id="threats-to-validity">Threats to Validity</h3>
 <ul>
 <li>The benchmark is synthetic. The injected cause is ground truth because the scenario was built around it. Real failures have causes that nobody injected and that may lie outside any capsule.</li>
 <li>Intermittency is a hash gate on the fault, so no scenario contains a real race, and five scenarios carry capsule values that were written in and not measured.</li>
 <li>The 31 sealed scenarios were never run. Their validity is inferred from dev siblings.</li>
 <li>Weights are hand-set. The ranking weights, the planner's cost weights, its 25% unknown prior and the trial-plan thresholds are guesses with a written reason, and none was calibrated.</li>
-<li>Rule sources are cited and not reproduced. Rule fixtures are synthetic. 229 of 296 rules have a symptom that rests on the mechanism alone (232 of 316 symptoms are <code>inferred</code>), and 90 rules wait for an attribute no scanner emits.</li>
+<li>Rule sources are cited and not reproduced. Rule fixtures are synthetic. 230 of 298 rules have a symptom that rests on the mechanism alone (233 of 319 symptoms are <code>inferred</code>), and 91 rules wait for an attribute no scanner emits.</li>
 <li>Rule matches on real data are few. Seven dev scenarios and one real project (case D, where the 12 matched rules predicted breaks that did not happen) are the only matches, and the Drangler pair matches no rule. Real multi-rule captures were not tested.</li>
 <li>A probe links to a candidate through the attribute path it reads, a table that is a reading of the probe sources and not a measurement, and the link ignores the symptom. A differing probe supports a decoy that really changed as much as the cause.</li>
 <li><code>correlated</code> needs the history to carry step data. Without the run JSON joined to the logs, every green's steps are unknown, all five are excluded as <code>NO_STEP_EVIDENCE</code>, and all eight drangler candidates drop to <code>difference</code> (<code>withoutStepEvidenceInTheGreensTheDranglerFallsBackToDifferences</code>).</li>
@@ -2950,12 +2950,12 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
 </tr>
 <tr>
 <td>rules, status, fixtures, sources, severities</td>
-<td>296; 206 active and 90 pending-scanner; 903 (300/603); 335 entries, 208 distinct; 84/165/47</td>
+<td>298; 207 active and 91 pending-scanner; 913 (303/610); 338 entries, 210 distinct; 85/166/47</td>
 <td><code>find rules -name '*.yml' | wc -l</code>; <code>grep -rh '^status:' rules --include='*.yml' | sort | uniq -c</code>; <code>grep -rh '^severity:' rules --include='*.yml' | sort | uniq -c</code>; <code>- name:</code> under <code>fixtures:</code> and <code>kind:</code> under <code>provenance:</code> per file</td>
 </tr>
 <tr>
 <td>rule symptom basis</td>
-<td>84 verified, 232 inferred; 229 rules</td>
+<td>86 verified, 233 inferred; 230 rules</td>
 <td><code>grep -rh &quot;basis:&quot; rules --include=&quot;*.yml&quot;</code></td>
 </tr>
 <tr>
@@ -3215,17 +3215,17 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
 </tr>
 <tr>
 <td>triage, held-out</td>
-<td>1,376 facts, precision 0.783, Brier 0.1486; 6 claim hits in 222,707 bodies</td>
+<td>1,376 facts, precision 0.783, Brier 0.1486; 1 claim hit in 222,707 bodies</td>
 <td><code>./gradlew :tools:evalTriage -Pdrift.corpus=&lt;corpus.json.zst&gt;</code> (needs the corpus file)</td>
 </tr>
 <tr>
 <td>triage fixtures</td>
-<td>66 bodies, 185 facts, precision 0.989, recall 0.978, Brier 0.0855</td>
+<td>70 bodies, 189 facts, precision 0.989, recall 0.979, Brier 0.0851</td>
 <td><code>TriageTest</code></td>
 </tr>
 <tr>
 <td>upgrade-check</td>
-<td>0 / 7 / 2 / 0 on the Drupal capture, 71 of 296 rules; case D 0 / 1 / 11 / 0, 44 of 296</td>
+<td>0 / 7 / 2 / 0 on the Drupal capture, 73 of 298 rules; case D 1 / 2 / 11 / 0, 46 of 298</td>
 <td><code>drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=8.3,drupal=11,symfony=7.1</code>; <code>drift upgrade-check fixtures/cases/d/capture-php-7-4.json --to php=8.3</code></td>
 </tr>
 <tr>
