@@ -1,0 +1,8 @@
+ ❯  e2e  tests/e2e/preview.spec.ts (3 tests | 1 failed)
+     × left the source byte-identical
+ ❯  e2e  tests/e2e/to-worker.spec.ts (8 tests | 2 failed)
+     × the converted dump loads into a real Durable Object with the bytes intact
+     × what the migration REPORTED matches what actually moved
+ Test Files  2 failed (2)
+      Tests  3 failed | 8 passed (11)
+drift: exit 1 after 54658 ms; capsule in ../run-pp12

@@ -1,0 +1,5 @@
+ ❯ |e2e| tests/e2e/preview.spec.ts (3 tests | 1 failed) 47909ms
+     × left the source byte-identical 847ms
+ Test Files  1 failed | 8 passed | 1 skipped (10)
+      Tests  1 failed | 60 passed | 6 skipped (67)
+drift: exit 1 after 321091 ms; capsule in <scratchpad>/runs/mac1

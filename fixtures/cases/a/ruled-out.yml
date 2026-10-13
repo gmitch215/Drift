@@ -1,0 +1,34 @@
+schema: "1"
+scope: Docker E2E job of the red runs 36995781138, 37114464625 and 37195797966 (commit df6dce4)
+source: fixtures/drangler/logs
+ruled_out:
+  - id: kernel-killed-a-process
+    claim: the kernel killed or crashed a process during the job
+    evidence: the Dump Host State on Failure step greps the whole kernel log for oom, killed process, segfault, sigbus and trap; it prints nothing in all three runs
+    where: "36995781138.log from line 2689, 37114464625.log from line 2100, 37195797966.log from line 1968"
+    limit: a kernel log has no record of a process that exited on its own
+  - id: memory-exhaustion
+    claim: the runner ran out of memory
+    evidence: free -m after the failure shows 15989 MB total, about 14.5 GB available and no swap used, in all three runs
+    where: "36995781138.log line 2708, 37114464625.log line 2119, 37195797966.log line 1987"
+    limit: a snapshot taken after the failing step, so it says nothing about a peak during the step; the kernel log above covers the peak
+  - id: disk-exhaustion
+    claim: the runner ran out of disk
+    evidence: df -h shows 83 GB free of 145 GB on / and /tmp in all three runs
+    where: "36995781138.log line 2710, 37114464625.log line 2121, 37195797966.log line 1989"
+    limit: same snapshot caveat as memory
+  - id: dependency-install
+    claim: the install step failed or installed a different tree
+    evidence: bun install --frozen-lockfile succeeds with 137 packages in every red run, and the lockfile is frozen
+    where: "37195797966.log line 179"
+    limit: none beyond the lockfile; the lockfile itself changed between the green and red commits
+  - id: step-after-the-failure
+    claim: Dump Host State on Failure, added in the same window, caused the failure
+    evidence: it runs after the failing step, so it cannot precede the failure; the planner drops it for the same reason
+    where: "fixtures/drangler/runs/37195797966.json steps 8 and 11"
+    limit: none
+  - id: failing-tests-are-new
+    claim: the failing tests exist only on the later commit, so no environment is needed to explain them
+    evidence: the two to-worker tests that fail in every red run ran and passed in the green runs (4 of 5 for the first, 5 of 5 for the second); the two modify tests and the preview file exist only in the reds
+    where: "vacuous-green.sh over fixtures/drangler/logs"
+    limit: holds for the to-worker pair only; the modify and preview tests have no green run to compare with

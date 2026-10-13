@@ -1,0 +1,16 @@
+ ❯  e2e  tests/e2e/preview.spec.ts (3 tests | 1 failed)
+     × left the source byte-identical
+ ❯  e2e  tests/e2e/to-worker.spec.ts (8 tests | 2 failed)
+     × the converted dump loads into a real Durable Object with the bytes intact
+     × what the migration REPORTED matches what actually moved
+ ✓  e2e  tests/e2e/modify.spec.ts (8 tests)
+ ✓  e2e  tests/e2e/heal-real.spec.ts (4 tests)
+ ✓  e2e  tests/e2e/workspace-clone.spec.ts (10 tests | 1 skipped)
+ ✓  e2e  tests/e2e/survey.spec.ts (6 tests)
+ ✓  e2e  tests/e2e/detector.spec.ts (9 tests)
+ ✓  e2e  tests/e2e/to-vps.spec.ts (7 tests)
+ ✓  e2e  tests/e2e/heal.spec.ts (7 tests)
+ ↓  e2e  tests/e2e/doctor-source.spec.ts (5 tests | 5 skipped)
+ Test Files  2 failed | 7 passed | 1 skipped (10)
+      Tests  3 failed | 58 passed | 6 skipped (67)
+drift: exit 1 after 135212 ms; capsule in ../run-pp5

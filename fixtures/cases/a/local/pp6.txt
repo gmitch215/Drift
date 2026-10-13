@@ -1,0 +1,14 @@
+ ❯  e2e  tests/e2e/preview.spec.ts (3 tests | 1 failed)
+     × left the source byte-identical
+ ✓  e2e  tests/e2e/to-worker.spec.ts (8 tests)
+ ✓  e2e  tests/e2e/modify.spec.ts (8 tests)
+ ✓  e2e  tests/e2e/heal-real.spec.ts (4 tests)
+ ✓  e2e  tests/e2e/workspace-clone.spec.ts (10 tests | 1 skipped)
+ ✓  e2e  tests/e2e/survey.spec.ts (6 tests)
+ ✓  e2e  tests/e2e/to-vps.spec.ts (7 tests)
+ ✓  e2e  tests/e2e/detector.spec.ts (9 tests)
+ ✓  e2e  tests/e2e/heal.spec.ts (7 tests)
+ ↓  e2e  tests/e2e/doctor-source.spec.ts (5 tests | 5 skipped)
+ Test Files  1 failed | 8 passed | 1 skipped (10)
+      Tests  1 failed | 60 passed | 6 skipped (67)
+drift: exit 1 after 141998 ms; capsule in ../run-pp6

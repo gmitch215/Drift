@@ -1,0 +1,7 @@
+ ❯ |e2e| tests/e2e/modify.spec.ts (8 tests | 1 failed) 109244ms
+       × requires simple_oauth, uploads simple_oauth_21 and enables it 28720ms
+ ❯ |e2e| tests/e2e/preview.spec.ts (3 tests | 1 failed) 46334ms
+     × left the source byte-identical 829ms
+ Test Files  2 failed | 7 passed | 1 skipped (10)
+      Tests  2 failed | 59 passed | 6 skipped (67)
+drift: exit 1 after 266256 ms; capsule in <scratchpad>/runs/mac2

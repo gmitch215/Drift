@@ -1,0 +1,8 @@
+ ❯ |e2e| tests/e2e/detector.spec.ts (9 tests | 9 skipped)
+ ❯ |e2e| tests/e2e/preview.spec.ts (3 tests | 3 skipped)
+ ❯ |e2e| tests/e2e/to-worker.spec.ts (8 tests | 8 skipped)
+ ❯ |e2e| tests/e2e/to-vps.spec.ts (7 tests | 7 skipped)
+ ❯ |e2e| tests/e2e/survey.spec.ts (6 tests | 6 skipped)
+ Test Files  5 failed | 4 passed | 1 skipped (10)
+      Tests  28 passed | 39 skipped (67)
+drift: exit 1 after 209781 ms; capsule in ../run-mac1
