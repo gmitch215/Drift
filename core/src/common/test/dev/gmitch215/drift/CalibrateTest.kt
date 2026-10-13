@@ -62,6 +62,7 @@ class CalibrateTest {
         val result = Calibrate.run(corpus(50) { "It broke on node 20.1.1 after the upgrade" })
         assertEquals(0, result.before.facts)
         assertEquals("n/a", result.before.text)
+        assertEquals(50, result.issues)
         assertTrue(result.dev.isEmpty())
     }
 

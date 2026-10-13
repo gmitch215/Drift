@@ -123,7 +123,8 @@ class TriageCommand(private val host: Host, private val files: CaseFiles) :
         val from = corpus ?: throw UsageError("triage calibrate needs --corpus")
         val to = out ?: throw UsageError("triage calibrate needs --out")
         val text = if (from.endsWith(".zst")) decompress(from) else files.read(from)
-        val lines = (text ?: throw CliktError("cannot read corpus: $from")).lines()
+        val lines = (text ?: throw CliktError("cannot read corpus: $from")).lineSequence()
+            .asIterable()
         val result = try {
             Calibrate.run(lines, seed, minFacts)
         } catch (e: JsonException) {

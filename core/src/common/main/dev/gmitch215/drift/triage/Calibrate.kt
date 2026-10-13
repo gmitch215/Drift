@@ -134,8 +134,13 @@ object Calibrate {
      * [lines] is a corpus file as `buildCorpus` writes it: an opening line, one JSON issue per
      * line (after the first with a leading comma) and a closing `]`.
      */
-    fun run(lines: List<String>, seed: String = SEED, minFacts: Long = MIN_FACTS): Calibration {
-        val issues = lines.drop(1).takeWhile { !it.startsWith("]") }.map(::parse)
+    fun run(lines: Iterable<String>, seed: String = SEED, minFacts: Long = MIN_FACTS): Calibration {
+        var total = 0
+        val issues = lines.asSequence().drop(1).takeWhile { !it.startsWith("]") }
+            .map(::parse)
+            .onEach { total++ }
+            .filter { it.body.trimStart().startsWith("### ") }
+            .toList()
         val dev = mutableMapOf<Via, Tally>()
         for (issue in issues.filter { isDev(seed, it.repo, it.number) }) {
             for ((f, ok) in scored(issue, emptyMap()).orEmpty()) {
@@ -161,7 +166,7 @@ object Calibrate {
         return Calibration(
             bases,
             seed,
-            issues.size,
+            total,
             dev.mapValues { it.value.facts },
             BrierScore(before.facts, before.squares),
             BrierScore(after.facts, after.squares),
