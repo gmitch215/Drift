@@ -1,0 +1,61 @@
+schema: 1
+id: kotlinx-coroutines-1-11-unhandled-js-runtime
+title: kotlinx.coroutines 1.11.0 reports unhandled exceptions on JS and Wasm to the JS runtime
+applies:
+  - runtime
+difference: >-
+  side a is kotlinx.coroutines 1.10.x, where the library logs the exception; side b is 1.11.0 or later, where the exception is reported to the JS runtime
+symptoms:
+  - text: >-
+      an unhandled coroutine exception on JS or Wasm reaches the JS runtime instead of only being logged (the host effect is not stated)
+    basis: verified
+mechanism: >-
+  From kotlinx.coroutines 1.11.0 unhandled exceptions on JS and Wasm are reported to the JS runtime instead of only being logged.
+detect:
+  all:
+    - a: project.gradle.org.jetbrains.kotlinx:kotlinx-coroutines-core
+      ver: '<1.11.0'
+    - b: project.gradle.org.jetbrains.kotlinx:kotlinx-coroutines-core
+      ver: '>=1.11.0'
+    - any:
+        - b: project.gradle.kotlin.target.wasmJs
+          present: 'true'
+        - b: project.gradle.kotlin.target.js
+          present: 'true'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/Kotlin/kotlinx.coroutines/master/CHANGES.md
+    kind: release-note
+    verified: '2026-10-13'
+    section: Version 1.11.0
+fixtures:
+  positive:
+    - name: coroutines 1.10.2 to 1.11.0 on js
+      a:
+        attrs:
+          project.gradle.org.jetbrains.kotlinx:kotlinx-coroutines-core: '1.10.2'
+          project.gradle.kotlin.target.js: 'true'
+      b:
+        attrs:
+          project.gradle.org.jetbrains.kotlinx:kotlinx-coroutines-core: '1.11.0'
+          project.gradle.kotlin.target.js: 'true'
+  negative:
+    - name: coroutines 1.11.0 on jvm
+      a:
+        attrs:
+          project.gradle.org.jetbrains.kotlinx:kotlinx-coroutines-core: '1.10.2'
+          project.gradle.kotlin.target.jvm: 'true'
+      b:
+        attrs:
+          project.gradle.org.jetbrains.kotlinx:kotlinx-coroutines-core: '1.11.0'
+          project.gradle.kotlin.target.jvm: 'true'
+    - name: coroutines 1.11.0 on both sides
+      a:
+        attrs:
+          project.gradle.org.jetbrains.kotlinx:kotlinx-coroutines-core: '1.11.0'
+          project.gradle.kotlin.target.wasmJs: 'true'
+      b:
+        attrs:
+          project.gradle.org.jetbrains.kotlinx:kotlinx-coroutines-core: '1.11.0'
+          project.gradle.kotlin.target.wasmJs: 'true'
+status: active

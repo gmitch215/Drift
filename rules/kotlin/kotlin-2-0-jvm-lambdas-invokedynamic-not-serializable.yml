@@ -1,0 +1,58 @@
+schema: 1
+id: kotlin-2-0-jvm-lambdas-invokedynamic-not-serializable
+title: Kotlin 2.0 generates JVM lambdas with invokedynamic, so they are no longer serializable
+applies:
+  - runtime
+difference: >-
+  side a is Kotlin 1.9.x, where lambdas are class-based and serializable; side b is Kotlin 2.0.0 or later, where lambdas use invokedynamic and are not serializable
+symptoms:
+  - text: >-
+      serializing a lambda fails at run time with a not-serializable error (the exception type is inferred; the page says only that the lambda is no longer serializable)
+    basis: inferred
+mechanism: >-
+  Kotlin 2.0 makes invokedynamic the default for JVM lambda generation, and a lambda compiled that way is not serializable.
+detect:
+  all:
+    - a: project.gradle.kotlin.version
+      ver: '<2.0.0'
+    - b: project.gradle.kotlin.version
+      ver: '>=2.0.0'
+    - b: run:signature
+      has: 'NotSerializableException'
+severity: medium
+provenance:
+  - url: https://kotlinlang.org/docs/whatsnew20.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Generation of lambda functions using invokedynamic
+fixtures:
+  positive:
+    - name: kotlin 1.9.24 to kotlin 2.0.0 with a serialization failure
+      a:
+        attrs:
+          project.gradle.kotlin.version: '1.9.24'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.0.0'
+        run:
+          signature: 'java.io.NotSerializableException: Main$main$1'
+  negative:
+    - name: kotlin 2.0.0 on both sides with the failure
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.0.0'
+        run:
+          signature: 'java.io.NotSerializableException: Main$main$1'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.0.0'
+        run:
+          signature: 'java.io.NotSerializableException: Main$main$1'
+    - name: kotlin 2.0.0 with no failure
+      a:
+        attrs:
+          project.gradle.kotlin.version: '1.9.24'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.0.0'
+status: active

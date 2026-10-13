@@ -1,0 +1,58 @@
+schema: 1
+id: kotlin-2-0-expect-actual-abstract-override-required
+title: Kotlin 2.0 requires an expected class to override an inherited abstract member
+applies:
+  - compiler
+difference: >-
+  side a is Kotlin 1.9.x, where the expected class could inherit an abstract function without overriding it; side b is Kotlin 2.0.0 or later, where the build reports ABSTRACT_MEMBER_NOT_IMPLEMENTED
+symptoms:
+  - text: >-
+      compile error ABSTRACT_MEMBER_NOT_IMPLEMENTED for an expected class that inherits an abstract function it does not override
+    basis: verified
+mechanism: >-
+  Kotlin 2.0 compiles common and platform sources separately, so an expected class must explicitly override the abstract functions it inherits.
+detect:
+  all:
+    - a: project.gradle.kotlin.version
+      ver: '<2.0.0'
+    - b: project.gradle.kotlin.version
+      ver: '>=2.0.0'
+    - b: run:signature
+      has: 'ABSTRACT_MEMBER_NOT_IMPLEMENTED'
+severity: medium
+provenance:
+  - url: https://kotlinlang.org/docs/k2-compiler-migration-guide.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Stricter rules for abstract members in expected classes
+fixtures:
+  positive:
+    - name: kotlin 1.9.24 to kotlin 2.0.0 with the error in the build log
+      a:
+        attrs:
+          project.gradle.kotlin.version: '1.9.24'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.0.0'
+        run:
+          signature: 'e: ABSTRACT_MEMBER_NOT_IMPLEMENTED'
+  negative:
+    - name: kotlin 2.0.0 with a clean build log
+      a:
+        attrs:
+          project.gradle.kotlin.version: '1.9.24'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.0.0'
+        run:
+          signature: 'BUILD SUCCESSFUL'
+    - name: kotlin 1.9.24 on both sides with the error text
+      a:
+        attrs:
+          project.gradle.kotlin.version: '1.9.24'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '1.9.24'
+        run:
+          signature: 'e: ABSTRACT_MEMBER_NOT_IMPLEMENTED'
+status: active

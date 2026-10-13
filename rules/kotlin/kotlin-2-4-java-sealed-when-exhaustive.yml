@@ -1,0 +1,50 @@
+schema: 1
+id: kotlin-2-4-java-sealed-when-exhaustive
+title: Kotlin 2.4.0 requires exhaustive when over a non-abstract Java sealed class
+applies:
+  - compiler
+difference: >-
+  side a is Kotlin 2.3.x, where a non-exhaustive when reports a warning since 2.3.0; side b is Kotlin 2.4.0 or later, where it is an error unless it has an else branch or a branch for the sealed class itself
+symptoms:
+  - text: >-
+      a when expression that covers only the subclasses of a non-abstract Java sealed class fails to compile on Kotlin 2.4.0
+    basis: verified
+mechanism: >-
+  Kotlin 2.4.0 requires a when over a non-abstract Java sealed class to have an else branch or a branch that matches the sealed class itself.
+detect:
+  all:
+    - a: project.gradle.kotlin.version
+      ver: '<2.4.0'
+    - b: project.gradle.kotlin.version
+      ver: '>=2.4.0'
+severity: medium
+provenance:
+  - url: https://kotlinlang.org/docs/compatibility-guide-24.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Enforce exhaustiveness for when expressions with non-abstract Java sealed classes
+fixtures:
+  positive:
+    - name: kotlin 2.3.20 to kotlin 2.4.0
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.3.20'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.4.0'
+  negative:
+    - name: kotlin 2.4.0 on both sides
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.4.0'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.4.0'
+    - name: kotlin 2.2.20 to kotlin 2.3.0
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.2.20'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.3.0'
+status: active

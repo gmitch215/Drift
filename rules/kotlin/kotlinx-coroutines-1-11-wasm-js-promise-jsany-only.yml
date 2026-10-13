@@ -1,0 +1,61 @@
+schema: 1
+id: kotlinx-coroutines-1-11-wasm-js-promise-jsany-only
+title: kotlinx.coroutines 1.11.0 accepts only JsAny subtypes in Promise functions on Wasm and JS
+applies:
+  - runtime
+difference: >-
+  side a is kotlinx.coroutines 1.10.x on a Kotlin/Wasm or Kotlin/JS target; side b is 1.11.0 or later on the same target
+symptoms:
+  - text: >-
+      Promise-related functions on Wasm and JS accept only JsAny subtypes (the compile error text is not quoted)
+    basis: verified
+mechanism: >-
+  kotlinx.coroutines 1.11.0 restricts Promise-related functions on Wasm and JS to JsAny subtypes, which is a source-level break.
+detect:
+  all:
+    - a: project.gradle.org.jetbrains.kotlinx:kotlinx-coroutines-core
+      ver: '<1.11.0'
+    - b: project.gradle.org.jetbrains.kotlinx:kotlinx-coroutines-core
+      ver: '>=1.11.0'
+    - any:
+        - b: project.gradle.kotlin.target.wasmJs
+          present: 'true'
+        - b: project.gradle.kotlin.target.js
+          present: 'true'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/Kotlin/kotlinx.coroutines/master/CHANGES.md
+    kind: release-note
+    verified: '2026-10-13'
+    section: Version 1.11.0
+fixtures:
+  positive:
+    - name: coroutines 1.10.2 to 1.11.0 on wasmJs
+      a:
+        attrs:
+          project.gradle.org.jetbrains.kotlinx:kotlinx-coroutines-core: '1.10.2'
+          project.gradle.kotlin.target.wasmJs: 'true'
+      b:
+        attrs:
+          project.gradle.org.jetbrains.kotlinx:kotlinx-coroutines-core: '1.11.0'
+          project.gradle.kotlin.target.wasmJs: 'true'
+  negative:
+    - name: coroutines 1.11.0 on jvm
+      a:
+        attrs:
+          project.gradle.org.jetbrains.kotlinx:kotlinx-coroutines-core: '1.10.2'
+          project.gradle.kotlin.target.jvm: 'true'
+      b:
+        attrs:
+          project.gradle.org.jetbrains.kotlinx:kotlinx-coroutines-core: '1.11.0'
+          project.gradle.kotlin.target.jvm: 'true'
+    - name: coroutines 1.11.0 on both sides
+      a:
+        attrs:
+          project.gradle.org.jetbrains.kotlinx:kotlinx-coroutines-core: '1.11.0'
+          project.gradle.kotlin.target.wasmJs: 'true'
+      b:
+        attrs:
+          project.gradle.org.jetbrains.kotlinx:kotlinx-coroutines-core: '1.11.0'
+          project.gradle.kotlin.target.wasmJs: 'true'
+status: active

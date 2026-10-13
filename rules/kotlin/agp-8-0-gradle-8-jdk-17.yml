@@ -1,0 +1,58 @@
+schema: 1
+id: agp-8-0-gradle-8-jdk-17
+title: AGP 8.0.0 requires JDK 17 to run Gradle
+applies:
+  - build
+difference: >-
+  side a is AGP 7.x on a Gradle JDK below 17; side b is AGP 8.0.0 on the same JDK, which Gradle no longer accepts
+symptoms:
+  - text: >-
+      Gradle does not run on a JDK below 17 with AGP 8.0.0 (the failure text is not quoted)
+    basis: verified
+mechanism: >-
+  AGP 8.0.0 requires Gradle 8.0 or later and a JDK 17 or later to run Gradle.
+detect:
+  all:
+    - a: project.gradle.agp.version
+      ver: '<8.0.0'
+    - b: project.gradle.agp.version
+      ver: '>=8.0.0'
+    - b: project.gradle.jdk.version
+      ver: '<17'
+severity: high
+provenance:
+  - url: https://developer.android.com/build/releases/past-releases/agp-8-0-0-release-notes
+    kind: release-note
+    verified: '2026-10-13'
+    section: JDK 17 required to run AGP 8.0
+fixtures:
+  positive:
+    - name: agp 7.4.2 to agp 8.0.0 on jdk 11
+      a:
+        attrs:
+          project.gradle.agp.version: '7.4.2'
+          project.gradle.jdk.version: '11.0.23'
+      b:
+        attrs:
+          project.gradle.agp.version: '8.0.0'
+          project.gradle.jdk.version: '11.0.23'
+  negative:
+    - name: agp 8.0.0 on jdk 17.0.11+9
+      a:
+        attrs:
+          project.gradle.agp.version: '7.4.2'
+          project.gradle.jdk.version: '17.0.11+9'
+      b:
+        attrs:
+          project.gradle.agp.version: '8.0.0'
+          project.gradle.jdk.version: '17.0.11+9'
+    - name: agp 8.0.0 on both sides
+      a:
+        attrs:
+          project.gradle.agp.version: '8.0.0'
+          project.gradle.jdk.version: '11.0.23'
+      b:
+        attrs:
+          project.gradle.agp.version: '8.1.0'
+          project.gradle.jdk.version: '11.0.23'
+status: active

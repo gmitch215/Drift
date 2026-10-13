@@ -1,0 +1,54 @@
+schema: 1
+id: agp-9-kmp-android-same-subproject
+title: AGP 9.0 does not allow the Kotlin Multiplatform and Android plugins in one subproject
+applies:
+  - build
+difference: >-
+  side a is a subproject with the Kotlin Multiplatform plugin and an Android plugin on AGP 8.x, which works; side b is the same subproject on AGP 9.0 or later
+symptoms:
+  - text: >-
+      the Kotlin Multiplatform plugin in the same subproject as the Android library or application plugin is not compatible with the new DSL (the error text is not quoted)
+    basis: verified
+mechanism: >-
+  Applying org.jetbrains.kotlin.multiplatform in the same Gradle subproject as the Android library or application plugin is not compatible with the new DSL.
+detect:
+  all:
+    - b: project.gradle.agp.version
+      ver: '>=9.0.0'
+    - b: project.gradle.kmp-android-module
+      present: 'true'
+severity: high
+provenance:
+  - url: https://developer.android.com/build/releases/agp-9-0-0-release-notes
+    kind: release-note
+    verified: '2026-10-13'
+  - url: https://developer.android.com/build/migrate-to-built-in-kotlin
+    kind: vendor-doc
+    verified: '2026-10-13'
+fixtures:
+  positive:
+    - name: agp 9.0.0 with kmp and the application plugin
+      a:
+        attrs:
+          project.gradle.agp.version: '8.7.3'
+      b:
+        attrs:
+          project.gradle.agp.version: '9.0.0'
+          project.gradle.kmp-android-module: ':shared'
+  negative:
+    - name: agp 9.0.0 with kmp and android in separate modules
+      a:
+        attrs:
+          project.gradle.agp.version: '8.7.3'
+      b:
+        attrs:
+          project.gradle.agp.version: '9.0.0'
+    - name: agp 8.7.3 with kmp and the application plugin
+      a:
+        attrs:
+          project.gradle.agp.version: '8.7.3'
+      b:
+        attrs:
+          project.gradle.agp.version: '8.7.3'
+          project.gradle.kmp-android-module: ':shared'
+status: active

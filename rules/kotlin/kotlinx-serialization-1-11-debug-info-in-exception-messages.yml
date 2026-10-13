@@ -1,0 +1,50 @@
+schema: 1
+id: kotlinx-serialization-1-11-debug-info-in-exception-messages
+title: kotlinx.serialization 1.11.0 adds a flag that hides user input from exception messages
+applies:
+  - runtime
+difference: >-
+  side a is kotlinx.serialization before 1.11.0, which has no exceptionsWithDebugInfo property; side b is 1.11.0 or later, where the property exists and disabling it hides user input from exception messages
+symptoms:
+  - text: >-
+      user input can appear in exception messages, which may then be logged or returned to clients (inferred; the changelog does not name the logged path)
+    basis: inferred
+mechanism: >-
+  kotlinx.serialization 1.11.0 adds the JsonConfiguration property exceptionsWithDebugInfo, and disabling it hides user input from exception messages.
+detect:
+  all:
+    - a: project.gradle.org.jetbrains.kotlinx:kotlinx-serialization-json
+      ver: '<1.11.0'
+    - b: project.gradle.org.jetbrains.kotlinx:kotlinx-serialization-json
+      ver: '>=1.11.0'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/Kotlin/kotlinx.serialization/master/CHANGELOG.md
+    kind: release-note
+    verified: '2026-10-13'
+    section: Ability to hide user input from exception messages for security/privacy reasons
+fixtures:
+  positive:
+    - name: serialization 1.10.0 to 1.11.0
+      a:
+        attrs:
+          project.gradle.org.jetbrains.kotlinx:kotlinx-serialization-json: '1.10.0'
+      b:
+        attrs:
+          project.gradle.org.jetbrains.kotlinx:kotlinx-serialization-json: '1.11.0'
+  negative:
+    - name: serialization 1.11.0 on both sides
+      a:
+        attrs:
+          project.gradle.org.jetbrains.kotlinx:kotlinx-serialization-json: '1.11.0'
+      b:
+        attrs:
+          project.gradle.org.jetbrains.kotlinx:kotlinx-serialization-json: '1.11.0'
+    - name: serialization 1.10.0 to 1.10.1
+      a:
+        attrs:
+          project.gradle.org.jetbrains.kotlinx:kotlinx-serialization-json: '1.10.0'
+      b:
+        attrs:
+          project.gradle.org.jetbrains.kotlinx:kotlinx-serialization-json: '1.10.1'
+status: active

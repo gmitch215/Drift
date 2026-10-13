@@ -1,0 +1,50 @@
+schema: 1
+id: kotlin-2-4-always-false-is-check-error
+title: Kotlin 2.4.0 makes an always-false is check between incompatible types an error
+applies:
+  - compiler
+difference: >-
+  side a is Kotlin 2.0.x to 2.3.x, where the check reports a warning since 2.0.0; side b is Kotlin 2.4.0 or later, where it is an error
+symptoms:
+  - text: >-
+      an is check between definitely incompatible types is a compile error on Kotlin 2.4.0 (the message text is not quoted)
+    basis: verified
+mechanism: >-
+  Kotlin 2.4.0 raises the 2.0.0 warning for is checks between definitely incompatible types to an error.
+detect:
+  all:
+    - a: project.gradle.kotlin.version
+      ver: '<2.4.0'
+    - b: project.gradle.kotlin.version
+      ver: '>=2.4.0'
+severity: medium
+provenance:
+  - url: https://kotlinlang.org/docs/compatibility-guide-24.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Prohibit always-false is checks for definitely incompatible types
+fixtures:
+  positive:
+    - name: kotlin 2.3.20 to kotlin 2.4.0
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.3.20'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.4.0'
+  negative:
+    - name: kotlin 2.4.0 to kotlin 2.4.1
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.4.0'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.4.1'
+    - name: kotlin 2.0.21 to kotlin 2.3.20
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.0.21'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.3.20'
+status: active

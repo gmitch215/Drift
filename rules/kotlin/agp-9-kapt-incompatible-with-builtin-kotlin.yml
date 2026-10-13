@@ -1,0 +1,63 @@
+schema: 1
+id: agp-9-kapt-incompatible-with-builtin-kotlin
+title: AGP 9.0 with built-in Kotlin is incompatible with the kotlin-kapt plugin
+applies:
+  - build
+difference: >-
+  side a is AGP 8.x with kotlin-kapt applied; side b is AGP 9.0 or later with kotlin-kapt applied and built-in Kotlin not opted out
+symptoms:
+  - text: >-
+      the kotlin-kapt plugin is incompatible with built-in Kotlin (the failure text is not quoted)
+    basis: verified
+mechanism: >-
+  The kotlin-kapt plugin is incompatible with built-in Kotlin, and the page recommends KSP or the com.android.legacy-kapt plugin at the same version as AGP.
+detect:
+  all:
+    - a: project.gradle.agp.version
+      ver: '<9.0.0'
+    - b: project.gradle.agp.version
+      ver: '>=9.0.0'
+    - b: project.gradle.plugin.org.jetbrains.kotlin.kapt
+      present: 'true'
+    - any:
+        - b: project.gradle.properties.android.builtInKotlin
+          present: 'false'
+        - b: project.gradle.properties.android.builtInKotlin
+          eq: 'true'
+severity: high
+provenance:
+  - url: https://developer.android.com/build/migrate-to-built-in-kotlin
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Migrate the kotlin-kapt plugin if necessary
+fixtures:
+  positive:
+    - name: agp 8.7.3 to agp 9.0.0 with kotlin-kapt
+      a:
+        attrs:
+          project.gradle.agp.version: '8.7.3'
+          project.gradle.plugin.org.jetbrains.kotlin.kapt: 'true'
+      b:
+        attrs:
+          project.gradle.agp.version: '9.0.0'
+          project.gradle.plugin.org.jetbrains.kotlin.kapt: 'true'
+  negative:
+    - name: agp 9.0.0 without kotlin-kapt
+      a:
+        attrs:
+          project.gradle.agp.version: '8.7.3'
+          project.gradle.plugin.org.jetbrains.kotlin.kapt: 'true'
+      b:
+        attrs:
+          project.gradle.agp.version: '9.0.0'
+    - name: agp 9.0.0 with kotlin-kapt and built-in Kotlin opted out
+      a:
+        attrs:
+          project.gradle.agp.version: '8.7.3'
+          project.gradle.plugin.org.jetbrains.kotlin.kapt: 'true'
+      b:
+        attrs:
+          project.gradle.agp.version: '9.0.0'
+          project.gradle.plugin.org.jetbrains.kotlin.kapt: 'true'
+          project.gradle.properties.android.builtInKotlin: 'false'
+status: active

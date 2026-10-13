@@ -1,0 +1,66 @@
+schema: 1
+id: agp-9-builtin-kotlin-default
+title: AGP 9.0 enables built-in Kotlin, so applying org.jetbrains.kotlin.android fails the build
+applies:
+  - build
+difference: >-
+  side a is AGP 8.x with org.jetbrains.kotlin.android applied; side b is AGP 9.0 or later with that plugin still applied and built-in Kotlin not opted out
+symptoms:
+  - text: >-
+      error 'The org.jetbrains.kotlin.android plugin is no longer required for Kotlin support since AGP 9.0'
+    basis: verified
+mechanism: >-
+  AGP 9.0 enables built-in Kotlin by default, so the kotlin-android plugin is an error unless built-in Kotlin is opted out with android.builtInKotlin=false and android.newDsl=false.
+detect:
+  all:
+    - a: project.gradle.agp.version
+      ver: '<9.0.0'
+    - b: project.gradle.agp.version
+      ver: '>=9.0.0'
+    - b: project.gradle.plugin.org.jetbrains.kotlin.android
+      present: 'true'
+    - any:
+        - b: project.gradle.properties.android.builtInKotlin
+          present: 'false'
+        - b: project.gradle.properties.android.builtInKotlin
+          eq: 'true'
+severity: high
+provenance:
+  - url: https://developer.android.com/build/releases/agp-9-0-0-release-notes
+    kind: release-note
+    verified: '2026-10-13'
+    section: Built-in Kotlin
+  - url: https://developer.android.com/build/migrate-to-built-in-kotlin
+    kind: vendor-doc
+    verified: '2026-10-13'
+fixtures:
+  positive:
+    - name: agp 8.7.3 to agp 9.0.0 with kotlin-android applied
+      a:
+        attrs:
+          project.gradle.agp.version: '8.7.3'
+          project.gradle.plugin.org.jetbrains.kotlin.android: 'true'
+      b:
+        attrs:
+          project.gradle.agp.version: '9.0.0'
+          project.gradle.plugin.org.jetbrains.kotlin.android: 'true'
+  negative:
+    - name: agp 9.0.0 with built-in Kotlin opted out
+      a:
+        attrs:
+          project.gradle.agp.version: '8.7.3'
+          project.gradle.plugin.org.jetbrains.kotlin.android: 'true'
+      b:
+        attrs:
+          project.gradle.agp.version: '9.0.0'
+          project.gradle.plugin.org.jetbrains.kotlin.android: 'true'
+          project.gradle.properties.android.builtInKotlin: 'false'
+    - name: agp 9.0.0 without kotlin-android
+      a:
+        attrs:
+          project.gradle.agp.version: '8.7.3'
+          project.gradle.plugin.org.jetbrains.kotlin.android: 'true'
+      b:
+        attrs:
+          project.gradle.agp.version: '9.0.0'
+status: active

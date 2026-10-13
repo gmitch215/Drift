@@ -1,0 +1,50 @@
+schema: 1
+id: kotlin-2-0-open-property-init-error
+title: Kotlin 2.0 requires open val properties with a backing field to be initialized at declaration
+applies:
+  - compiler
+difference: >-
+  side a is Kotlin 1.9.x, where only open var had to be initialized right away; side b is Kotlin 2.0.0 or later, where an open val with a backing field must be initialized too
+symptoms:
+  - text: >-
+      compile error 'open val must have initializer' on Kotlin 2.0.0 when an init block assigns the open val
+    basis: verified
+mechanism: >-
+  From Kotlin 2.0 every open property with a backing field must be initialized immediately, which extends a rule that earlier applied only to open var.
+detect:
+  all:
+    - a: project.gradle.kotlin.version
+      ver: '<2.0.0'
+    - b: project.gradle.kotlin.version
+      ver: '>=2.0.0'
+severity: medium
+provenance:
+  - url: https://kotlinlang.org/docs/k2-compiler-migration-guide.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Immediate initialization of open properties with backing fields
+fixtures:
+  positive:
+    - name: kotlin 1.9.24 to kotlin 2.0.0
+      a:
+        attrs:
+          project.gradle.kotlin.version: '1.9.24'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.0.0'
+  negative:
+    - name: both sides on kotlin 2.0.x
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.0.0'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.0.21'
+    - name: both sides on kotlin 1.9.x
+      a:
+        attrs:
+          project.gradle.kotlin.version: '1.9.24'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '1.9.25'
+status: active

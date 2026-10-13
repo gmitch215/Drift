@@ -1,0 +1,58 @@
+schema: 1
+id: kotlin-2-4-k1-compiler-removed
+title: Kotlin 2.4.0 no longer supports language version 1.9 or the K1 compiler
+applies:
+  - compiler
+difference: >-
+  side a is Kotlin 2.3.x with language version 1.9, which reports a warning since 2.2.0; side b is Kotlin 2.4.0 or later with the same language version, which is no longer supported
+symptoms:
+  - text: >-
+      the compiler no longer supports -language-version=1.9 on Kotlin 2.4.0 (the error text is not quoted)
+    basis: verified
+mechanism: >-
+  Kotlin 2.4.0 drops -language-version=1.9 and the K1 compiler, so a project pinned to language version 1.9 must move to K2 semantics.
+detect:
+  all:
+    - a: project.gradle.kotlin.version
+      ver: '<2.4.0'
+    - b: project.gradle.kotlin.version
+      ver: '>=2.4.0'
+    - b: project.gradle.kotlin.language-version
+      eq: '1.9'
+severity: high
+provenance:
+  - url: https://kotlinlang.org/docs/compatibility-guide-24.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Drop support for -language-version=1.9 and the K1 compiler
+fixtures:
+  positive:
+    - name: kotlin 2.3.20 to kotlin 2.4.0 with language version 1.9
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.3.20'
+          project.gradle.kotlin.language-version: '1.9'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.4.0'
+          project.gradle.kotlin.language-version: '1.9'
+  negative:
+    - name: kotlin 2.4.0 with language version 2.0
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.3.20'
+          project.gradle.kotlin.language-version: '2.0'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.4.0'
+          project.gradle.kotlin.language-version: '2.0'
+    - name: kotlin 2.3.21 with language version 1.9 is still before 2.4
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.3.20'
+          project.gradle.kotlin.language-version: '1.9'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.3.21'
+          project.gradle.kotlin.language-version: '1.9'
+status: active

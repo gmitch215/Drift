@@ -1,0 +1,53 @@
+schema: 1
+id: kotlin-2-4-annotation-default-target-change
+title: Kotlin 2.4.0 changes the default use-site target of annotations
+applies:
+  - compiler
+difference: >-
+  side a is Kotlin 2.3.x, where an annotation without a use-site target lands on field when it applies; side b is Kotlin 2.4.0 or later, where it lands on param or property first
+symptoms:
+  - text: >-
+      an annotation written without a use-site target lands on param or property, so a processor that reads the field no longer sees it (inferred; the page names no framework)
+    basis: inferred
+mechanism: >-
+  Kotlin 2.4.0 chooses the param or property use-site target before field when none is written, and -Xannotation-default-target=first-only restores the old rule.
+detect:
+  all:
+    - a: project.gradle.kotlin.version
+      ver: '<2.4.0'
+    - b: project.gradle.kotlin.version
+      ver: '>=2.4.0'
+    - b: project.gradle.kotlin.annotation-default-target
+      present: 'false'
+severity: medium
+provenance:
+  - url: https://kotlinlang.org/docs/compatibility-guide-24.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Change default use-site target selection for annotations
+fixtures:
+  positive:
+    - name: kotlin 2.3.20 to kotlin 2.4.0 with the default flag
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.3.20'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.4.0'
+  negative:
+    - name: kotlin 2.4.0 with first-only restored
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.3.20'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.4.0'
+          project.gradle.kotlin.annotation-default-target: 'first-only'
+    - name: kotlin 2.4.0 on both sides
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.4.0'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.4.0'
+status: active

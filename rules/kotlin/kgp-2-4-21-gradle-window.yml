@@ -1,0 +1,57 @@
+schema: 1
+id: kgp-2-4-21-gradle-window
+title: KGP 2.4.20 and 2.4.21 are fully supported only up to Gradle 9.7.0
+applies:
+  - build
+difference: >-
+  side a is Gradle 7.6.3 through 9.7.0; side b is Gradle above 9.7.0, with KGP 2.4.20 or 2.4.21
+symptoms:
+  - text: >-
+      deprecation warnings, or new features that do not work, on Gradle above the fully supported maximum
+    basis: verified
+mechanism: >-
+  KGP 2.4.20 and 2.4.21 fully support Gradle 7.6.3 through 9.7.0 and AGP 8.5.2 through 9.3.1, and newer Gradle versions may show deprecation warnings.
+detect:
+  all:
+    - a: project.gradle.wrapper
+      ver: '>=7.6.3,<=9.7.0'
+    - b: project.gradle.wrapper
+      ver: '>9.7.0'
+    - b: project.gradle.kotlin.version
+      ver: '>=2.4.20,<=2.4.21'
+severity: medium
+provenance:
+  - url: https://kotlinlang.org/docs/gradle-configure-project.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+fixtures:
+  positive:
+    - name: gradle 9.6.0 to gradle 9.8.0 with kgp 2.4.20
+      a:
+        attrs:
+          project.gradle.wrapper: '9.6.0'
+          project.gradle.kotlin.version: '2.4.20'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.8.0'
+          project.gradle.kotlin.version: '2.4.20'
+  negative:
+    - name: gradle 9.6.0 to gradle 9.7.0 is inside the window
+      a:
+        attrs:
+          project.gradle.wrapper: '9.6.0'
+          project.gradle.kotlin.version: '2.4.20'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.7.0'
+          project.gradle.kotlin.version: '2.4.20'
+    - name: gradle 9.8.0 with kgp 2.4.10 is outside this KGP window
+      a:
+        attrs:
+          project.gradle.wrapper: '9.6.0'
+          project.gradle.kotlin.version: '2.4.10'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.8.0'
+          project.gradle.kotlin.version: '2.4.10'
+status: active

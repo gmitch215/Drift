@@ -1,0 +1,61 @@
+schema: 1
+id: kotlin-jvmtarget-null-defaults-to-1-8
+title: Without a jvmTarget or toolchain, the Kotlin compiler targets 1.8 while Gradle targets the JDK version
+applies:
+  - build
+difference: >-
+  side a is a build with an explicit jvmTarget or a Java toolchain, so the targets agree; side b is a build with neither on a Gradle JDK of 9 or later
+symptoms:
+  - text: >-
+      the published artifact declares JDK 17 compatibility while its bytecode target is 1.8 (the page calls the declaration wrong; the Gradle error text is not quoted)
+    basis: verified
+mechanism: >-
+  With no jvmTarget and no toolchain the Kotlin compiler uses 1.8 while targetCompatibility follows the Gradle JDK, so the two targets disagree.
+detect:
+  all:
+    - b: project.gradle.kotlin.jvm-target
+      present: 'false'
+    - b: project.gradle.kotlin.toolchain
+      present: 'false'
+    - b: project.gradle.jdk.version
+      ver: '>=9'
+severity: medium
+provenance:
+  - url: https://kotlinlang.org/docs/gradle-configure-project.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Check for JVM target compatibility of related compile tasks
+fixtures:
+  positive:
+    - name: no jvmTarget and no toolchain on jdk 17
+      a:
+        attrs:
+          project.gradle.kotlin.jvm-target: '17'
+      b:
+        attrs:
+          project.gradle.jdk.version: '17.0.11+9'
+  negative:
+    - name: explicit jvmTarget 17
+      a:
+        attrs:
+          project.gradle.kotlin.jvm-target: '17'
+      b:
+        attrs:
+          project.gradle.kotlin.jvm-target: '17'
+          project.gradle.jdk.version: '17.0.11+9'
+    - name: toolchain set
+      a:
+        attrs:
+          project.gradle.kotlin.jvm-target: '17'
+      b:
+        attrs:
+          project.gradle.kotlin.toolchain: '17'
+          project.gradle.jdk.version: '17.0.11+9'
+    - name: jdk 8 on the failing side
+      a:
+        attrs:
+          project.gradle.kotlin.jvm-target: '17'
+      b:
+        attrs:
+          project.gradle.jdk.version: '1.8.0_412'
+status: active
