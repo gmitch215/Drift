@@ -1,0 +1,117 @@
+schema: 1
+templates:
+  - id: migration-php-json-validate
+    title: A PHP project calls json_validate on the PHP 7.4 it still pins
+    dimension: runtime
+    instances: 1
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      php -r 'echo json_validate("[]") ? "ok\n" : "bad\n";'
+    signature: "Call to undefined function json_validate"
+    green:
+      image: "php:8.3-cli-bookworm"
+    red:
+      image: "php:7.4-cli-bullseye"
+    cause:
+      dimension: runtime
+      path: tool.php.version
+      attribute: php version
+      direction: lower
+    bundle:
+      - dimension: runtime
+        path: env.PHP_VERSION
+      - dimension: os
+        path: os.release.PRETTY_NAME
+
+  - id: migration-node-array-fromasync
+    title: An npm project calls Array.fromAsync on the Node 18 it still pins
+    dimension: runtime
+    instances: 1
+    runtime: node
+    program: |
+      if (process.env.BENCH_FLAKE !== '1') {
+        console.log('ok');
+        process.exit(0);
+      }
+      Array.fromAsync([1, 2]).then(() => console.log('ok'));
+    signature: "Array.fromAsync is not a function"
+    green:
+      image: "node:22.12.0-bookworm-slim"
+    red:
+      image: "node:18.16.0-bookworm-slim"
+    cause:
+      dimension: runtime
+      path: tool.node.version
+      attribute: node version
+      direction: lower
+    bundle:
+      - dimension: runtime
+        path: env.NODE_VERSION
+      - dimension: os
+        path: os.release.PRETTY_NAME
+
+  - id: migration-jdk-list-getfirst
+    title: A Gradle project calls List.getFirst on the JDK 17 it still pins
+    dimension: runtime
+    instances: 1
+    trials: 10
+    runtime: java
+    program: |
+      public class Prog {
+        public static void main(String[] args) throws Exception {
+          if (!"1".equals(System.getenv("BENCH_FLAKE"))) {
+            System.out.println("ok");
+            return;
+          }
+          System.out.println("ok " + java.util.List.class.getMethod("getFirst").getName());
+        }
+      }
+    signature: NoSuchMethodException
+    green:
+      image: "eclipse-temurin:21-jdk"
+    red:
+      image: "eclipse-temurin:17-jdk"
+    cause:
+      dimension: runtime
+      path: tool.java.version
+      attribute: java version
+      direction: lower
+    bundle:
+      - dimension: runtime
+        path: env.JAVA_VERSION
+      - dimension: os
+        path: os.release.PRETTY_NAME
+
+  - id: migration-python-copy
+    title: A uv project calls copy.replace on the Python 3.11 it still pins
+    dimension: runtime
+    instances: 1
+    gate: "500"
+    trials: "40"
+    runtime: python3
+    program: |
+      import copy
+      import os
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      print(copy.replace)
+      print("ok")
+    signature: "has no attribute 'replace'"
+    green:
+      image: "python:3.13-slim-bookworm"
+    red:
+      image: "python:3.11-slim-bookworm"
+    cause:
+      dimension: runtime
+      path: tool.python.version
+      attribute: python version
+      direction: lower
+    bundle:
+      - dimension: runtime
+        path: env.PYTHON_VERSION
+      - dimension: os
+        path: os.release.PRETTY_NAME
