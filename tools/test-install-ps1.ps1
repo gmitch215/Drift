@@ -1,5 +1,5 @@
 param(
-	[string]$Work = (Join-Path ([System.IO.Path]::GetTempPath()) 'drift-ps1-test')
+    [string]$Work = (Join-Path ([System.IO.Path]::GetTempPath()) 'drift-ps1-test')
 )
 
 $root = Split-Path -Parent $PSScriptRoot
@@ -14,43 +14,43 @@ $script:versionCode = 0
 function Get-DriftPlatform { $script:platform }
 
 function Invoke-Drift([string]$Exe, [string[]]$Arguments, [switch]$Quiet) {
-	$script:calls += , (@($Exe) + $Arguments)
-	if ($Arguments[0] -eq '--version') { return $script:versionCode }
-	return $script:exitCode
+    $script:calls += , (@($Exe) + $Arguments)
+    if ($Arguments[0] -eq '--version') { return $script:versionCode }
+    return $script:exitCode
 }
 
 function New-FileUrl([string]$Path) {
-	'file:///' + $Path.TrimStart('/').Replace('\', '/')
+    'file:///' + $Path.TrimStart('/').Replace('\', '/')
 }
 
 function Check([string]$Name, [bool]$Condition) {
-	if ($Condition) {
-		Write-Output "ok   $Name"
-	} else {
-		Write-Output "FAIL $Name"
-		$script:failed = 1
-	}
+    if ($Condition) {
+        Write-Output "ok   $Name"
+    } else {
+        Write-Output "FAIL $Name"
+        $script:failed = 1
+    }
 }
 
 function New-Release([string]$Dir, [string]$Version, [switch]$Corrupt, [string]$Sidecar) {
-	$stage = Join-Path $Work "stage-$Version"
-	New-Item -ItemType Directory -Force -Path $stage | Out-Null
-	Set-Content -LiteralPath (Join-Path $stage 'drift.exe') -Value 'fake executable'
-	$out = Join-Path $Dir "v$Version"
-	New-Item -ItemType Directory -Force -Path $out | Out-Null
-	$zip = Join-Path $out "drift-$Version-windows-x64.zip"
-	Compress-Archive -Path (Join-Path $stage 'drift.exe') -DestinationPath $zip -Force
-	$digest = (Get-FileHash -Algorithm SHA256 -LiteralPath $zip).Hash.ToLowerInvariant()
-	if ($Sidecar) { $digest = $Sidecar }
-	Set-Content -LiteralPath "$zip.sha256" -Value "$digest  drift-$Version-windows-x64.zip"
-	if ($Corrupt) { Add-Content -LiteralPath $zip -Value 'x' }
+    $stage = Join-Path $Work "stage-$Version"
+    New-Item -ItemType Directory -Force -Path $stage | Out-Null
+    Set-Content -LiteralPath (Join-Path $stage 'drift.exe') -Value 'fake executable'
+    $out = Join-Path $Dir "v$Version"
+    New-Item -ItemType Directory -Force -Path $out | Out-Null
+    $zip = Join-Path $out "drift-$Version-windows-x64.zip"
+    Compress-Archive -Path (Join-Path $stage 'drift.exe') -DestinationPath $zip -Force
+    $digest = (Get-FileHash -Algorithm SHA256 -LiteralPath $zip).Hash.ToLowerInvariant()
+    if ($Sidecar) { $digest = $Sidecar }
+    Set-Content -LiteralPath "$zip.sha256" -Value "$digest  drift-$Version-windows-x64.zip"
+    if ($Corrupt) { Add-Content -LiteralPath $zip -Value 'x' }
 }
 
 function Run-Install([string]$Base, [string]$Version, [hashtable]$Flags = @{}) {
-	$script:calls = @()
-	$env:DRIFT_INSTALL_BASE_URL = $Base
-	$env:DRIFT_VERSION = $Version
-	Install-Drift @Flags
+    $script:calls = @()
+    $env:DRIFT_INSTALL_BASE_URL = $Base
+    $env:DRIFT_VERSION = $Version
+    Install-Drift @Flags
 }
 
 Remove-Item -LiteralPath $Work -Recurse -Force -ErrorAction SilentlyContinue

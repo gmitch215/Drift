@@ -20,7 +20,7 @@ enum class EvidenceKind { ATTRIBUTE, PROBE, RULE, SPECTRUM }
 
 /** A fact a rule match touched: an attribute path, `probe:<id>` or `run:<field>`. */
 data class Evidence(val ref: String) {
-	fun toJson(): JsonObject = obj("ref" to JsonString(ref))
+    fun toJson(): JsonObject = obj("ref" to JsonString(ref))
 }
 
 /**
@@ -29,22 +29,22 @@ data class Evidence(val ref: String) {
  * [Weights] row it came from.
  */
 data class EvidenceItem(val kind: EvidenceKind, val ref: String, val weight: Long, val id: String) {
-	fun toJson(): JsonObject = obj(
-		"kind" to JsonString(kind.name.lowercase()),
-		"ref" to JsonString(ref),
-		"weight" to JsonInt(weight),
-		"id" to JsonString(id),
-	)
+    fun toJson(): JsonObject = obj(
+        "kind" to JsonString(kind.name.lowercase()),
+        "ref" to JsonString(ref),
+        "weight" to JsonInt(weight),
+        "id" to JsonString(id),
+    )
 }
 
 /** Ochiai counts and score (micro-units) of a candidate's red value over the included runs. */
 data class Spectrum(val ef: Int, val nf: Int, val ep: Int, val score: Long) {
-	fun toJson(): JsonObject = obj(
-		"ef" to JsonInt(ef.toLong()),
-		"nf" to JsonInt(nf.toLong()),
-		"ep" to JsonInt(ep.toLong()),
-		"score" to JsonInt(score),
-	)
+    fun toJson(): JsonObject = obj(
+        "ef" to JsonInt(ef.toLong()),
+        "nf" to JsonInt(nf.toLong()),
+        "ep" to JsonInt(ep.toLong()),
+        "score" to JsonInt(score),
+    )
 }
 
 /**
@@ -58,37 +58,37 @@ data class Spectrum(val ef: Int, val nf: Int, val ep: Int, val score: Long) {
  * candidate of the ranking rests on its attribute change alone.
  */
 data class Candidate(
-	val path: String,
-	val tier: Tier,
-	val score: Long,
-	val evidence: List<EvidenceItem>,
-	val matches: List<RuleMatch>,
-	val basis: Basis,
-	val spectrum: Spectrum?,
-	val coverage: Long?,
-	val bundle: String?,
-	val probability: Long? = null,
+    val path: String,
+    val tier: Tier,
+    val score: Long,
+    val evidence: List<EvidenceItem>,
+    val matches: List<RuleMatch>,
+    val basis: Basis,
+    val spectrum: Spectrum?,
+    val coverage: Long?,
+    val bundle: String?,
+    val probability: Long? = null,
 ) {
-	fun toJson(): JsonObject = obj(
-		"path" to JsonString(path),
-		"tier" to JsonString(tier.name.lowercase()),
-		"score" to JsonInt(score),
-		"evidence" to JsonArray(evidence.map { it.toJson() }),
-		"rules" to JsonArray(matches.map { it.toJson() }),
-		"basis" to JsonString(basis.id),
-		"spectrum" to (spectrum?.toJson() ?: JsonNull),
-		"coverage" to (coverage?.let { JsonInt(it) } ?: JsonNull),
-		"bundle" to jsonOrNull(bundle),
-		"probability" to (probability?.let { JsonInt(it) } ?: JsonNull),
-	)
+    fun toJson(): JsonObject = obj(
+        "path" to JsonString(path),
+        "tier" to JsonString(tier.name.lowercase()),
+        "score" to JsonInt(score),
+        "evidence" to JsonArray(evidence.map { it.toJson() }),
+        "rules" to JsonArray(matches.map { it.toJson() }),
+        "basis" to JsonString(basis.id),
+        "spectrum" to (spectrum?.toJson() ?: JsonNull),
+        "coverage" to (coverage?.let { JsonInt(it) } ?: JsonNull),
+        "bundle" to jsonOrNull(bundle),
+        "probability" to (probability?.let { JsonInt(it) } ?: JsonNull),
+    )
 }
 
 /** Candidates the data cannot separate: same tier, same support, same history counts. */
 data class Bundle(val id: String, val members: List<String>) {
-	fun toJson(): JsonObject = obj(
-		"id" to JsonString(id),
-		"members" to JsonArray(members.map(::JsonString)),
-	)
+    fun toJson(): JsonObject = obj(
+        "id" to JsonString(id),
+        "members" to JsonArray(members.map(::JsonString)),
+    )
 }
 
 /**
@@ -96,10 +96,10 @@ data class Bundle(val id: String, val members: List<String>) {
  * the [TransitionNote.steps] added or removed, which no capsule shows.
  */
 data class TransitionNote(val kind: TransitionKind, val steps: List<StepChange>) {
-	fun toJson(): JsonObject = obj(
-		"kind" to JsonString(kind.name.lowercase()),
-		"steps" to JsonArray(steps.map { it.toJson() }),
-	)
+    fun toJson(): JsonObject = obj(
+        "kind" to JsonString(kind.name.lowercase()),
+        "steps" to JsonArray(steps.map { it.toJson() }),
+    )
 }
 
 /**
@@ -110,23 +110,23 @@ data class TransitionNote(val kind: TransitionKind, val steps: List<StepChange>)
  * it is.
  */
 data class Ranking(
-	val candidates: List<Candidate>,
-	val bundles: List<Bundle>,
-	val unattached: List<RuleMatch>,
-	val excluded: List<Exclusion>,
-	val transition: TransitionNote?,
+    val candidates: List<Candidate>,
+    val bundles: List<Bundle>,
+    val unattached: List<RuleMatch>,
+    val excluded: List<Exclusion>,
+    val transition: TransitionNote?,
 ) {
-	fun toJson(): JsonObject = obj(
-		"weights" to Weights.toJson(),
-		"candidates" to JsonArray(candidates.map { it.toJson() }),
-		"bundles" to JsonArray(bundles.map { it.toJson() }),
-		"unattached" to JsonArray(unattached.map { it.toJson() }),
-		"excluded" to JsonArray(
-			excluded.map {
-				val reason = JsonString(it.reason.name.lowercase())
-				obj("run" to JsonString(it.runId), "reason" to reason)
-			},
-		),
-		"transition" to (transition?.toJson() ?: JsonNull),
-	)
+    fun toJson(): JsonObject = obj(
+        "weights" to Weights.toJson(),
+        "candidates" to JsonArray(candidates.map { it.toJson() }),
+        "bundles" to JsonArray(bundles.map { it.toJson() }),
+        "unattached" to JsonArray(unattached.map { it.toJson() }),
+        "excluded" to JsonArray(
+            excluded.map {
+                val reason = JsonString(it.reason.name.lowercase())
+                obj("run" to JsonString(it.runId), "reason" to reason)
+            },
+        ),
+        "transition" to (transition?.toJson() ?: JsonNull),
+    )
 }

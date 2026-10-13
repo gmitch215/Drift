@@ -12,35 +12,35 @@ enum class Classification { DOCUMENTED, PLATFORM_DEFINED, UNCLASSIFIED }
  * apart. Classification, references and issues live in `atlas/classification.yml`.
  */
 class KotlinProbe(
-	val id: String,
-	val question: String,
-	source: String,
-	body: ProbeContext.() -> Unit,
+    val id: String,
+    val question: String,
+    source: String,
+    body: ProbeContext.() -> Unit,
 ) {
-	val source: String = source.trimIndent()
-	val probe = Probe(id, Family.KOTLIN, body = body)
+    val source: String = source.trimIndent()
+    val probe = Probe(id, Family.KOTLIN, body = body)
 }
 
 internal fun ProbeContext.outcome(label: String, block: () -> Any?) {
-	line(
-		label,
-		try {
-		"ok:" + block()
-	} catch (e: Throwable) {
-		"err:" + e::class.simpleName
-	},
-	)
+    line(
+        label,
+        try {
+            "ok:" + block()
+        } catch (e: Throwable) {
+            "err:" + e::class.simpleName
+        },
+    )
 }
 
 internal fun ProbeContext.failure(label: String, block: () -> Any?) {
-	line(
-		label,
-		try {
-		"ok:" + block()
-	} catch (e: Throwable) {
-		"err:" + e::class.simpleName + ":" + e.message
-	},
-	)
+    line(
+        label,
+        try {
+            "ok:" + block()
+        } catch (e: Throwable) {
+            "err:" + e::class.simpleName + ":" + e.message
+        },
+    )
 }
 
 internal fun hex(code: Int): String = code.toString(16)

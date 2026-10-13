@@ -7,4 +7,4 @@ import platform.windows.GetModuleHandleW
 import platform.windows.GetProcAddress
 
 internal actual fun underWine() =
-	GetProcAddress(GetModuleHandleW("ntdll.dll"), "wine_get_version") != null
+    GetProcAddress(GetModuleHandleW("ntdll.dll"), "wine_get_version") != null

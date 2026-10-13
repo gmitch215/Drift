@@ -13,7 +13,7 @@ data class JsonString(val value: String) : JsonValue
 data class JsonArray(val items: List<JsonValue>) : JsonValue
 
 data class JsonObject(val fields: Map<String, JsonValue>) : JsonValue {
-	operator fun get(key: String): JsonValue? = fields[key]
+    operator fun get(key: String): JsonValue? = fields[key]
 }
 
 class JsonException(message: String) : Exception(message)

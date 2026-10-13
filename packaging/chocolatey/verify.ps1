@@ -1,7 +1,7 @@
 param(
-	[Parameter(Mandatory = $true)][string]$Root,
-	[Parameter(Mandatory = $true)][string]$Version,
-	[Parameter(Mandatory = $true)][string]$Sums
+    [Parameter(Mandatory = $true)][string]$Root,
+    [Parameter(Mandatory = $true)][string]$Version,
+    [Parameter(Mandatory = $true)][string]$Sums
 )
 
 $ErrorActionPreference = 'Stop'
@@ -11,49 +11,49 @@ $global:calls = @()
 $global:keys = @()
 
 function Install-ChocolateyZipPackage {
-	param($packageName, $unzipLocation, $url64bit, $checksum64, $checksumType64)
-	$global:calls += [pscustomobject]@{ Name = 'Install-ChocolateyZipPackage'; Args = $PSBoundParameters }
+    param($packageName, $unzipLocation, $url64bit, $checksum64, $checksumType64)
+    $global:calls += [pscustomobject]@{ Name = 'Install-ChocolateyZipPackage'; Args = $PSBoundParameters }
 }
 
 function Uninstall-ChocolateyZipPackage {
-	param($packageName, $zipFileName)
-	$global:calls += [pscustomobject]@{ Name = 'Uninstall-ChocolateyZipPackage'; Args = $PSBoundParameters }
+    param($packageName, $zipFileName)
+    $global:calls += [pscustomobject]@{ Name = 'Uninstall-ChocolateyZipPackage'; Args = $PSBoundParameters }
 }
 
 function Install-ChocolateyPackage {
-	param($packageName, $fileType, $url64bit, $checksum64, $checksumType64, $silentArgs, $validExitCodes, $softwareName)
-	$global:calls += [pscustomobject]@{ Name = 'Install-ChocolateyPackage'; Args = $PSBoundParameters }
+    param($packageName, $fileType, $url64bit, $checksum64, $checksumType64, $silentArgs, $validExitCodes, $softwareName)
+    $global:calls += [pscustomobject]@{ Name = 'Install-ChocolateyPackage'; Args = $PSBoundParameters }
 }
 
 function Uninstall-ChocolateyPackage {
-	param($packageName, $fileType, $silentArgs, $validExitCodes, $file)
-	$global:calls += [pscustomobject]@{ Name = 'Uninstall-ChocolateyPackage'; Args = $PSBoundParameters }
+    param($packageName, $fileType, $silentArgs, $validExitCodes, $file)
+    $global:calls += [pscustomobject]@{ Name = 'Uninstall-ChocolateyPackage'; Args = $PSBoundParameters }
 }
 
 function Get-UninstallRegistryKey {
-	param($softwareName)
-	$global:softwareName = $softwareName
-	$global:keys
+    param($softwareName)
+    $global:softwareName = $softwareName
+    $global:keys
 }
 
 function Assert-Equal($Actual, $Expected, $What) {
-	if ("$Actual" -ne "$Expected") {
-		throw "$What : expected '$Expected' but got '$Actual'"
-	}
+    if ("$Actual" -ne "$Expected") {
+        throw "$What : expected '$Expected' but got '$Actual'"
+    }
 }
 
 function Invoke-Script($Path) {
-	$global:calls = @()
-	& $Path
-	$global:calls
+    $global:calls = @()
+    & $Path
+    $global:calls
 }
 
 $digests = @{}
 foreach ($line in Get-Content -LiteralPath $Sums) {
-	if ($line.Trim()) {
-		$digest, $name = $line -split '  ', 2
-		$digests[$name] = $digest
-	}
+    if ($line.Trim()) {
+        $digest, $name = $line -split '  ', 2
+        $digests[$name] = $digest
+    }
 }
 
 $base = "https://github.com/gmitch215/Drift/releases/download/v$Version"
@@ -104,14 +104,14 @@ $none = Invoke-Script $uninstall 3> $null
 Assert-Equal @($none).Count 0 'studio uninstall with no registry key'
 
 $global:keys = @(
-	[pscustomobject]@{ PSChildName = $guid; DisplayName = 'Drift' },
-	[pscustomobject]@{ PSChildName = '{AAAAAAAA-2222-3333-4444-555555555555}'; DisplayName = 'Drift Chat' }
+    [pscustomobject]@{ PSChildName = $guid; DisplayName = 'Drift' },
+    [pscustomobject]@{ PSChildName = '{AAAAAAAA-2222-3333-4444-555555555555}'; DisplayName = 'Drift Chat' }
 )
 $threw = $false
 try {
-	Invoke-Script $uninstall | Out-Null
+    Invoke-Script $uninstall | Out-Null
 } catch {
-	$threw = $true
+    $threw = $true
 }
 Assert-Equal $threw $true 'studio uninstall with two registry keys'
 

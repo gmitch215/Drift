@@ -9,10 +9,10 @@ import dev.gmitch215.drift.scan.atlas.Dataset
 import dev.gmitch215.drift.scan.atlas.Transcripts
 
 object AtlasData {
-	val dataset: Dataset by lazy {
-		val names = AtlasFixtures.names.filter { it.endsWith(".txt") }.sorted()
-		Dataset.build(names.map { Transcripts.read(it, AtlasFixtures.text(it)) })
-	}
+    val dataset: Dataset by lazy {
+        val names = AtlasFixtures.names.filter { it.endsWith(".txt") }.sorted()
+        Dataset.build(names.map { Transcripts.read(it, AtlasFixtures.text(it)) })
+    }
 }
 
 /**
@@ -20,20 +20,20 @@ object AtlasData {
  * build`.
  */
 class Device(val label: String, val transcript: String, val comparison: Comparison) {
-	val version: String get() = comparison.device.version
-	val measured: Int get() = comparison.measured
+    val version: String get() = comparison.device.version
+    val measured: Int get() = comparison.measured
 }
 
 object Devices {
-	fun label(platform: String): String = when (platform) {
-		"jvm" -> "this JVM"
-		"wasm" -> "this browser (wasm)"
-		else -> "this device ($platform)"
-	}
+    fun label(platform: String): String = when (platform) {
+        "jvm" -> "this JVM"
+        "wasm" -> "this browser (wasm)"
+        else -> "this device ($platform)"
+    }
 
-	fun of(label: String, transcript: String, dataset: Dataset): Device =
-		Device(label, transcript, Comparison(dataset, Transcripts.read(label, transcript)))
+    fun of(label: String, transcript: String, dataset: Dataset): Device =
+        Device(label, transcript, Comparison(dataset, Transcripts.read(label, transcript)))
 
-	fun measure(dataset: Dataset, host: Host = systemHost()): Device =
-		of(label(host.platform), Atlas.record(host), dataset)
+    fun measure(dataset: Dataset, host: Host = systemHost()): Device =
+        of(label(host.platform), Atlas.record(host), dataset)
 }

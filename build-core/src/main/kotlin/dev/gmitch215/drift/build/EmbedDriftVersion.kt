@@ -8,23 +8,23 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
 abstract class EmbedDriftVersion : DefaultTask() {
-	@get:Input
-	abstract val version: Property<String>
+    @get:Input
+    abstract val version: Property<String>
 
-	@get:OutputDirectory
-	abstract val outputDir: DirectoryProperty
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
 
-	@TaskAction
-	fun embed() {
-		val out = outputDir.get().asFile.resolve("dev/gmitch215/drift/Version.kt")
-		out.parentFile.mkdirs()
-		out.writeText(
-			"""
-			|package dev.gmitch215.drift
-			|
-			|const val DRIFT_VERSION = "${version.get()}"
-			|
-			""".trimMargin(),
-		)
-	}
+    @TaskAction
+    fun embed() {
+        val out = outputDir.get().asFile.resolve("dev/gmitch215/drift/Version.kt")
+        out.parentFile.mkdirs()
+        out.writeText(
+            """
+            |package dev.gmitch215.drift
+            |
+            |const val DRIFT_VERSION = "${version.get()}"
+            |
+            """.trimMargin(),
+        )
+    }
 }

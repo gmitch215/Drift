@@ -19,22 +19,22 @@ grep -q 'a.zip: OK' "$work/ok.log"
 grep -q 'b.msi: OK' "$work/ok.log"
 
 if "$here/wait-assets.sh" owner/repo v1 "$work/missing" a.zip c.dmg 2> "$work/missing.err"; then
-	echo "a missing asset must fail" >&2
-	exit 1
+    echo "a missing asset must fail" >&2
+    exit 1
 fi
 grep -q 'c.dmg did not become downloadable' "$work/missing.err"
 
 printf 'tampered' > "$work/release/b.msi"
 if "$here/wait-assets.sh" owner/repo v1 "$work/bad" a.zip b.msi > "$work/bad.log" 2>&1; then
-	echo "a changed asset must fail" >&2
-	exit 1
+    echo "a changed asset must fail" >&2
+    exit 1
 fi
 grep -q 'b.msi: FAILED' "$work/bad.log"
 
 printf 'x' > "$work/release/d.zip"
 if "$here/wait-assets.sh" owner/repo v1 "$work/unlisted" d.zip 2> "$work/unlisted.err"; then
-	echo "an unlisted asset must fail" >&2
-	exit 1
+    echo "an unlisted asset must fail" >&2
+    exit 1
 fi
 grep -q 'd.zip is not listed in SHA256SUMS' "$work/unlisted.err"
 

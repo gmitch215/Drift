@@ -15,35 +15,35 @@ import dev.gmitch215.drift.json.require
 import dev.gmitch215.drift.json.string
 
 data class Capsule(
-	val label: String,
-	val attributes: List<Attribute>,
-	val probes: List<ProbeResult> = emptyList(),
+    val label: String,
+    val attributes: List<Attribute>,
+    val probes: List<ProbeResult> = emptyList(),
 ) {
-	fun toJson(): JsonObject = obj(
-		"schema" to JsonInt(SCHEMA),
-		"label" to JsonString(label),
-		"attributes" to JsonArray(attributes.sortedBy { it.path }.map { it.toJson() }),
-		"probes" to JsonArray(probes.sortedBy { it.id }.map { it.toJson() }),
-	)
+    fun toJson(): JsonObject = obj(
+        "schema" to JsonInt(SCHEMA),
+        "label" to JsonString(label),
+        "attributes" to JsonArray(attributes.sortedBy { it.path }.map { it.toJson() }),
+        "probes" to JsonArray(probes.sortedBy { it.id }.map { it.toJson() }),
+    )
 
-	fun canonical(): String = CanonicalJson.encode(toJson())
+    fun canonical(): String = CanonicalJson.encode(toJson())
 
-	fun hash(): String = Sha256.hex(canonical())
+    fun hash(): String = Sha256.hex(canonical())
 
-	companion object {
-		const val SCHEMA = 1L
+    companion object {
+        const val SCHEMA = 1L
 
-		fun fromJson(json: JsonValue): Capsule {
-			val o = json.obj()
-			val schema = o.require("schema").long()
-			if (schema != SCHEMA) throw JsonException("unsupported capsule schema $schema")
-			return Capsule(
-				label = o.require("label").string(),
-				attributes = o.require("attributes").array().map(Attribute::fromJson),
-				probes = o.require("probes").array().map(ProbeResult::fromJson),
-			)
-		}
+        fun fromJson(json: JsonValue): Capsule {
+            val o = json.obj()
+            val schema = o.require("schema").long()
+            if (schema != SCHEMA) throw JsonException("unsupported capsule schema $schema")
+            return Capsule(
+                label = o.require("label").string(),
+                attributes = o.require("attributes").array().map(Attribute::fromJson),
+                probes = o.require("probes").array().map(ProbeResult::fromJson),
+            )
+        }
 
-		fun parse(text: String): Capsule = fromJson(CanonicalJson.parse(text))
-	}
+        fun parse(text: String): Capsule = fromJson(CanonicalJson.parse(text))
+    }
 }

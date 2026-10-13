@@ -13,13 +13,13 @@ import platform.posix.fputs
 private const val RECORD_ENV = "DRIFT_RECORD"
 
 fun mainViewController() = run {
-	val host = systemHost()
-	host.env()[RECORD_ENV]?.let { path ->
-		val file = fopen(path, "w")
-		if (file != null) {
-			fputs(Atlas.record(host), file)
-			fclose(file)
-		}
-	}
-	ComposeUIViewController { StudioApp() }
+    val host = systemHost()
+    host.env()[RECORD_ENV]?.let { path ->
+        val file = fopen(path, "w")
+        if (file != null) {
+            fputs(Atlas.record(host), file)
+            fclose(file)
+        }
+    }
+    ComposeUIViewController { StudioApp() }
 }

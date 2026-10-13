@@ -10,27 +10,27 @@ import dev.gmitch215.drift.json.JsonString
  * canonical content (the record without its `prev` and `hash` fields).
  */
 object Chain {
-	val GENESIS = "0".repeat(64)
+    val GENESIS = "0".repeat(64)
 
-	fun link(prev: String, content: JsonObject): String =
-		Sha256.hex(prev + "\n" + CanonicalJson.encode(content))
+    fun link(prev: String, content: JsonObject): String =
+        Sha256.hex(prev + "\n" + CanonicalJson.encode(content))
 
-	fun content(record: JsonObject): JsonObject = JsonObject(record.fields - "prev" - "hash")
+    fun content(record: JsonObject): JsonObject = JsonObject(record.fields - "prev" - "hash")
 
-	/** Adds `prev` and `hash` to each record in order; returns the records and the head hash. */
-	fun seal(contents: List<JsonObject>): Pair<List<JsonObject>, String> {
-		var prev = GENESIS
-		val sealed = contents.map {
-			val hash = link(prev, it)
-			val record = JsonObject(
-				it.fields + mapOf(
-					"prev" to JsonString(prev),
-					"hash" to JsonString(hash),
-				),
-			)
-			prev = hash
-			record
-		}
-		return sealed to prev
-	}
+    /** Adds `prev` and `hash` to each record in order; returns the records and the head hash. */
+    fun seal(contents: List<JsonObject>): Pair<List<JsonObject>, String> {
+        var prev = GENESIS
+        val sealed = contents.map {
+            val hash = link(prev, it)
+            val record = JsonObject(
+                it.fields + mapOf(
+                    "prev" to JsonString(prev),
+                    "hash" to JsonString(hash),
+                ),
+            )
+            prev = hash
+            record
+        }
+        return sealed to prev
+    }
 }

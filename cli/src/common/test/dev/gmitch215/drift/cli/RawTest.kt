@@ -7,21 +7,21 @@ import com.github.ajalt.clikt.testing.CliktCommandTestResult
 import com.github.ajalt.clikt.testing.test as cliktTest
 
 internal class RawBuffer : RawOut {
-	val text = StringBuilder()
+    val text = StringBuilder()
 
-	override fun write(text: String) {
-		this.text.append(text)
-	}
+    override fun write(text: String) {
+        this.text.append(text)
+    }
 }
 
 /** Like Clikt's test, with the raw machine output appended to stdout. */
 internal fun CliktCommand.test(argv: String): CliktCommandTestResult {
-	val raw = RawBuffer()
-	val result = context { obj = raw }.cliktTest(argv)
-	return CliktCommandTestResult(
-		output = result.output + raw.text,
-		stdout = result.stdout + raw.text,
-		stderr = result.stderr,
-		statusCode = result.statusCode,
-	)
+    val raw = RawBuffer()
+    val result = context { obj = raw }.cliktTest(argv)
+    return CliktCommandTestResult(
+        output = result.output + raw.text,
+        stdout = result.stdout + raw.text,
+        stderr = result.stderr,
+        statusCode = result.statusCode,
+    )
 }

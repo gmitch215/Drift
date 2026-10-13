@@ -10,16 +10,16 @@ import dev.gmitch215.drift.case.CaseFiles
 import dev.gmitch215.drift.case.Detail
 
 class NextCommand(private val files: CaseFiles) : CliktCommand(name = "next") {
-	private val dir by argument("case-dir", help = "a case directory written by diagnose --case")
-	private val detail by option("--detail", help = "how much to print")
-		.choice("summary", "detail", "full").default("detail")
+    private val dir by argument("case-dir", help = "a case directory written by diagnose --case")
+    private val detail by option("--detail", help = "how much to print")
+        .choice("summary", "detail", "full").default("detail")
 
-	override fun help(context: Context) =
-		"Print the next proposed experiment of a case, and the manual ones with instructions"
+    override fun help(context: Context) =
+        "Print the next proposed experiment of a case, and the manual ones with instructions"
 
-	override fun run() {
-		val case = loadCase(files, dir)
-		case.requireIntact(dir)
-		echo(case.render(dir, Detail.parse(detail)!!, next = true), trailingNewline = false)
-	}
+    override fun run() {
+        val case = loadCase(files, dir)
+        case.requireIntact(dir)
+        echo(case.render(dir, Detail.parse(detail)!!, next = true), trailingNewline = false)
+    }
 }
