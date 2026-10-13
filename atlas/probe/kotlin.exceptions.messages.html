@@ -32,6 +32,7 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <a href="../../">Drift</a>
 <a href="../">Interactive Atlas</a>
 <a href="../probe/">All probes</a>
+<a href="../versions.html">Version changes</a>
 <a href="../data/dataset.json">dataset.json</a>
 <a href="../data/classification.json">classification.json</a>
 </nav>
@@ -84,31 +85,34 @@ failure(&quot;radix&quot;) { 255.toString(37) }
 failure(&quot;lateinit&quot;) { Holder().name }
 failure(&quot;iterator-end&quot;) { listOf(1).iterator().apply { next() }.next() }</code></pre>
 <h2>Results on Kotlin 2.4.20</h2>
-<p>5 different results; 20 of 41 lines differ.</p>
+<p>7 different results; 41 of 41 lines differ.</p>
 <table>
 <caption>Result per column, Kotlin 2.4.20</caption>
 <tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
-<tr class="differs"><th scope="row">android</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
-<tr><th scope="row">ios</th><td>B</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
-<tr><th scope="row">linux</th><td>B</td><td>ok</td><td><a href="../data/transcripts/linux.txt">file</a></td></tr>
-<tr><th scope="row">linux-arm64</th><td>B</td><td>ok</td><td><a href="../data/transcripts/linux-arm64.txt">file</a></td></tr>
-<tr><th scope="row">macos</th><td>B</td><td>ok</td><td><a href="../data/transcripts/macos.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm-21</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-21.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm-25</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-25.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm-17</th><td>D (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">wasm</th><td>E (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/wasm.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">wasm-chromium</th><td>E (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">wasm-firefox</th><td>E (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">wasm-webkit</th><td>E (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">android</th><td>A (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">cloudflare-jvm</th><td>B (differs from group C)</td><td>unavailable</td><td><a href="../data/transcripts/cloudflare-jvm.txt">file</a></td></tr>
+<tr><th scope="row">cloudflare-wasm</th><td>C</td><td>ok</td><td><a href="../data/transcripts/cloudflare-wasm.txt">file</a></td></tr>
+<tr><th scope="row">wasm</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm.txt">file</a></td></tr>
+<tr><th scope="row">wasm-chromium</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
+<tr><th scope="row">wasm-firefox</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
+<tr><th scope="row">wasm-webkit</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">ios</th><td>D (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">linux</th><td>D (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/linux.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">linux-arm64</th><td>D (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/linux-arm64.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">macos</th><td>D (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/macos.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">js-ir</th><td>E (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/js-ir.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm</th><td>F (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-21</th><td>F (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm-21.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-25</th><td>F (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm-25.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-17</th><td>G (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
 </table>
 <h3>Group A: android</h3>
 <pre><mark>toInt = err:NumberFormatException:For input string: &quot;x&quot;</mark>
 <mark>toInt-empty = err:NumberFormatException:For input string: &quot;&quot;</mark>
 <mark>toLong = err:NumberFormatException:For input string: &quot;9999999999999999999&quot;</mark>
 <mark>toDouble = err:NumberFormatException:For input string: &quot;x&quot;</mark>
-toUInt = err:NumberFormatException:Invalid number format: '-1'
-toUByte = err:NumberFormatException:Invalid number format: '256'
+<mark>toUInt = err:NumberFormatException:Invalid number format: '-1'</mark>
+<mark>toUByte = err:NumberFormatException:Invalid number format: '256'</mark>
 <mark>int-div-zero = err:ArithmeticException:divide by zero</mark>
 <mark>long-div-zero = err:ArithmeticException:divide by zero</mark>
 <mark>int-mod-zero = err:ArithmeticException:divide by zero</mark>
@@ -122,161 +126,37 @@ toUByte = err:NumberFormatException:Invalid number format: '256'
 <mark>removeAt = err:IndexOutOfBoundsException:Index 1 out of bounds for length 1</mark>
 <mark>negative-array = err:NegativeArraySizeException:-1</mark>
 <mark>negative-list = err:IllegalArgumentException:Illegal Capacity: -1</mark>
-first-empty = err:NoSuchElementException:List is empty.
-last-empty = err:NoSuchElementException:List is empty.
-single-many = err:IllegalArgumentException:List has more than one element.
+<mark>first-empty = err:NoSuchElementException:List is empty.</mark>
+<mark>last-empty = err:NoSuchElementException:List is empty.</mark>
+<mark>single-many = err:IllegalArgumentException:List has more than one element.</mark>
 <mark>removeFirst-empty = err:NoSuchElementException:null</mark>
-require = err:IllegalArgumentException:Failed requirement.
-require-message = err:IllegalArgumentException:custom
-check = err:IllegalStateException:Check failed.
-error = err:IllegalStateException:boom
-checkNotNull = err:IllegalStateException:Required value was null.
-not-null-assert = err:NullPointerException:null
-todo = err:NotImplementedError:An operation is not implemented.
-todo-message = err:NotImplementedError:An operation is not implemented: later
+<mark>require = err:IllegalArgumentException:Failed requirement.</mark>
+<mark>require-message = err:IllegalArgumentException:custom</mark>
+<mark>check = err:IllegalStateException:Check failed.</mark>
+<mark>error = err:IllegalStateException:boom</mark>
+<mark>checkNotNull = err:IllegalStateException:Required value was null.</mark>
+<mark>not-null-assert = err:NullPointerException:null</mark>
+<mark>todo = err:NotImplementedError:An operation is not implemented.</mark>
+<mark>todo-message = err:NotImplementedError:An operation is not implemented: later</mark>
 <mark>cast = err:ClassCastException:java.lang.Integer cannot be cast to java.lang.String</mark>
 <mark>null-cast = err:NullPointerException:null cannot be cast to non-null type kotlin.String</mark>
-getValue = err:NoSuchElementException:Key 1 is missing in the map.
-repeat-negative = err:IllegalArgumentException:Count 'n' must be non-negative, but was -1.
-chunked-zero = err:IllegalArgumentException:size 0 must be greater than zero.
-step-zero = err:IllegalArgumentException:Step must be positive, was: 0.
-random-empty = err:IllegalArgumentException:Random range is empty: [5, 5).
-radix = err:IllegalArgumentException:radix 37 was not in valid range 2..36
-lateinit = err:UninitializedPropertyAccessException:lateinit property name has not been initialized
-iterator-end = err:NoSuchElementException:null</pre>
-<h3>Group B: ios, linux, linux-arm64, macos</h3>
-<pre><mark>toInt = err:NumberFormatException:null</mark>
-<mark>toInt-empty = err:NumberFormatException:null</mark>
-<mark>toLong = err:NumberFormatException:null</mark>
-<mark>toDouble = err:NumberFormatException:null</mark>
-toUInt = err:NumberFormatException:Invalid number format: '-1'
-toUByte = err:NumberFormatException:Invalid number format: '256'
-<mark>int-div-zero = err:ArithmeticException:null</mark>
-<mark>long-div-zero = err:ArithmeticException:null</mark>
-<mark>int-mod-zero = err:ArithmeticException:null</mark>
-<mark>floorDiv-zero = err:ArithmeticException:null</mark>
-<mark>list-index = err:IndexOutOfBoundsException:index: 3, size: 1</mark>
-<mark>array-index = err:ArrayIndexOutOfBoundsException:null</mark>
-<mark>string-index = err:ArrayIndexOutOfBoundsException:null</mark>
-<mark>substring = err:ArrayIndexOutOfBoundsException:null</mark>
-<mark>substring-range = err:ArrayIndexOutOfBoundsException:null</mark>
-<mark>subList = err:IndexOutOfBoundsException:fromIndex: 1, toIndex: 5, size: 2</mark>
-<mark>removeAt = err:IndexOutOfBoundsException:index: 1, size: 1</mark>
-<mark>negative-array = err:IllegalArgumentException:null</mark>
-<mark>negative-list = err:IllegalArgumentException:capacity must be non-negative.</mark>
-first-empty = err:NoSuchElementException:List is empty.
-last-empty = err:NoSuchElementException:List is empty.
-single-many = err:IllegalArgumentException:List has more than one element.
-<mark>removeFirst-empty = err:NoSuchElementException:List is empty.</mark>
-require = err:IllegalArgumentException:Failed requirement.
-require-message = err:IllegalArgumentException:custom
-check = err:IllegalStateException:Check failed.
-error = err:IllegalStateException:boom
-checkNotNull = err:IllegalStateException:Required value was null.
-not-null-assert = err:NullPointerException:null
-todo = err:NotImplementedError:An operation is not implemented.
-todo-message = err:NotImplementedError:An operation is not implemented: later
-<mark>cast = err:ClassCastException:class kotlin.Int cannot be cast to class kotlin.String</mark>
-<mark>null-cast = err:NullPointerException:null</mark>
-getValue = err:NoSuchElementException:Key 1 is missing in the map.
-repeat-negative = err:IllegalArgumentException:Count 'n' must be non-negative, but was -1.
-chunked-zero = err:IllegalArgumentException:size 0 must be greater than zero.
-step-zero = err:IllegalArgumentException:Step must be positive, was: 0.
-random-empty = err:IllegalArgumentException:Random range is empty: [5, 5).
-radix = err:IllegalArgumentException:radix 37 was not in valid range 2..36
-lateinit = err:UninitializedPropertyAccessException:lateinit property name has not been initialized
-iterator-end = err:NoSuchElementException:null</pre>
-<h3>Group C: jvm, jvm-21, jvm-25</h3>
-<pre><mark>toInt = err:NumberFormatException:For input string: &quot;x&quot;</mark>
-<mark>toInt-empty = err:NumberFormatException:For input string: &quot;&quot;</mark>
-<mark>toLong = err:NumberFormatException:For input string: &quot;9999999999999999999&quot;</mark>
-<mark>toDouble = err:NumberFormatException:For input string: &quot;x&quot;</mark>
-toUInt = err:NumberFormatException:Invalid number format: '-1'
-toUByte = err:NumberFormatException:Invalid number format: '256'
-<mark>int-div-zero = err:ArithmeticException:/ by zero</mark>
-<mark>long-div-zero = err:ArithmeticException:/ by zero</mark>
-<mark>int-mod-zero = err:ArithmeticException:/ by zero</mark>
-<mark>floorDiv-zero = err:ArithmeticException:/ by zero</mark>
-<mark>list-index = err:IndexOutOfBoundsException:Index: 3, Size: 1</mark>
-<mark>array-index = err:ArrayIndexOutOfBoundsException:Index 5 out of bounds for length 1</mark>
-<mark>string-index = err:StringIndexOutOfBoundsException:Index 10 out of bounds for length 3</mark>
-<mark>substring = err:StringIndexOutOfBoundsException:Range [5, 3) out of bounds for length 3</mark>
-<mark>substring-range = err:StringIndexOutOfBoundsException:Range [2, 1) out of bounds for length 3</mark>
-<mark>subList = err:IndexOutOfBoundsException:toIndex = 5</mark>
-<mark>removeAt = err:IndexOutOfBoundsException:Index 1 out of bounds for length 1</mark>
-<mark>negative-array = err:NegativeArraySizeException:-1</mark>
-<mark>negative-list = err:IllegalArgumentException:Illegal Capacity: -1</mark>
-first-empty = err:NoSuchElementException:List is empty.
-last-empty = err:NoSuchElementException:List is empty.
-single-many = err:IllegalArgumentException:List has more than one element.
-<mark>removeFirst-empty = err:NoSuchElementException:null</mark>
-require = err:IllegalArgumentException:Failed requirement.
-require-message = err:IllegalArgumentException:custom
-check = err:IllegalStateException:Check failed.
-error = err:IllegalStateException:boom
-checkNotNull = err:IllegalStateException:Required value was null.
-not-null-assert = err:NullPointerException:null
-todo = err:NotImplementedError:An operation is not implemented.
-todo-message = err:NotImplementedError:An operation is not implemented: later
-<mark>cast = err:ClassCastException:class java.lang.Integer cannot be cast to class java.lang.String (java.lang.Integer and java.lang.String are in module java.base of loader 'bootstrap')</mark>
-<mark>null-cast = err:NullPointerException:null cannot be cast to non-null type kotlin.String</mark>
-getValue = err:NoSuchElementException:Key 1 is missing in the map.
-repeat-negative = err:IllegalArgumentException:Count 'n' must be non-negative, but was -1.
-chunked-zero = err:IllegalArgumentException:size 0 must be greater than zero.
-step-zero = err:IllegalArgumentException:Step must be positive, was: 0.
-random-empty = err:IllegalArgumentException:Random range is empty: [5, 5).
-radix = err:IllegalArgumentException:radix 37 was not in valid range 2..36
-lateinit = err:UninitializedPropertyAccessException:lateinit property name has not been initialized
-iterator-end = err:NoSuchElementException:null</pre>
-<h3>Group D: jvm-17</h3>
-<pre><mark>toInt = err:NumberFormatException:For input string: &quot;x&quot;</mark>
-<mark>toInt-empty = err:NumberFormatException:For input string: &quot;&quot;</mark>
-<mark>toLong = err:NumberFormatException:For input string: &quot;9999999999999999999&quot;</mark>
-<mark>toDouble = err:NumberFormatException:For input string: &quot;x&quot;</mark>
-toUInt = err:NumberFormatException:Invalid number format: '-1'
-toUByte = err:NumberFormatException:Invalid number format: '256'
-<mark>int-div-zero = err:ArithmeticException:/ by zero</mark>
-<mark>long-div-zero = err:ArithmeticException:/ by zero</mark>
-<mark>int-mod-zero = err:ArithmeticException:/ by zero</mark>
-<mark>floorDiv-zero = err:ArithmeticException:/ by zero</mark>
-<mark>list-index = err:IndexOutOfBoundsException:Index: 3, Size: 1</mark>
-<mark>array-index = err:ArrayIndexOutOfBoundsException:Index 5 out of bounds for length 1</mark>
-<mark>string-index = err:StringIndexOutOfBoundsException:String index out of range: 10</mark>
-<mark>substring = err:StringIndexOutOfBoundsException:begin 5, end 3, length 3</mark>
-<mark>substring-range = err:StringIndexOutOfBoundsException:begin 2, end 1, length 3</mark>
-<mark>subList = err:IndexOutOfBoundsException:toIndex = 5</mark>
-<mark>removeAt = err:IndexOutOfBoundsException:Index 1 out of bounds for length 1</mark>
-<mark>negative-array = err:NegativeArraySizeException:-1</mark>
-<mark>negative-list = err:IllegalArgumentException:Illegal Capacity: -1</mark>
-first-empty = err:NoSuchElementException:List is empty.
-last-empty = err:NoSuchElementException:List is empty.
-single-many = err:IllegalArgumentException:List has more than one element.
-<mark>removeFirst-empty = err:NoSuchMethodError:'java.lang.Object java.util.List.removeFirst()'</mark>
-require = err:IllegalArgumentException:Failed requirement.
-require-message = err:IllegalArgumentException:custom
-check = err:IllegalStateException:Check failed.
-error = err:IllegalStateException:boom
-checkNotNull = err:IllegalStateException:Required value was null.
-not-null-assert = err:NullPointerException:null
-todo = err:NotImplementedError:An operation is not implemented.
-todo-message = err:NotImplementedError:An operation is not implemented: later
-<mark>cast = err:ClassCastException:class java.lang.Integer cannot be cast to class java.lang.String (java.lang.Integer and java.lang.String are in module java.base of loader 'bootstrap')</mark>
-<mark>null-cast = err:NullPointerException:null cannot be cast to non-null type kotlin.String</mark>
-getValue = err:NoSuchElementException:Key 1 is missing in the map.
-repeat-negative = err:IllegalArgumentException:Count 'n' must be non-negative, but was -1.
-chunked-zero = err:IllegalArgumentException:size 0 must be greater than zero.
-step-zero = err:IllegalArgumentException:Step must be positive, was: 0.
-random-empty = err:IllegalArgumentException:Random range is empty: [5, 5).
-radix = err:IllegalArgumentException:radix 37 was not in valid range 2..36
-lateinit = err:UninitializedPropertyAccessException:lateinit property name has not been initialized
-iterator-end = err:NoSuchElementException:null</pre>
-<h3>Group E: wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
+<mark>getValue = err:NoSuchElementException:Key 1 is missing in the map.</mark>
+<mark>repeat-negative = err:IllegalArgumentException:Count 'n' must be non-negative, but was -1.</mark>
+<mark>chunked-zero = err:IllegalArgumentException:size 0 must be greater than zero.</mark>
+<mark>step-zero = err:IllegalArgumentException:Step must be positive, was: 0.</mark>
+<mark>random-empty = err:IllegalArgumentException:Random range is empty: [5, 5).</mark>
+<mark>radix = err:IllegalArgumentException:radix 37 was not in valid range 2..36</mark>
+<mark>lateinit = err:UninitializedPropertyAccessException:lateinit property name has not been initialized</mark>
+<mark>iterator-end = err:NoSuchElementException:null</mark></pre>
+<h3>Group B: cloudflare-jvm</h3>
+<pre><mark>refused: the compiled module traps on integer division and a trap aborts the request (RuntimeError: divide by zero)</mark></pre>
+<h3>Group C: cloudflare-wasm, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
 <pre><mark>toInt = err:NumberFormatException:Invalid number format: 'x'</mark>
 <mark>toInt-empty = err:NumberFormatException:Invalid number format: ''</mark>
 <mark>toLong = err:NumberFormatException:Invalid number format: '9999999999999999999'</mark>
 <mark>toDouble = err:NumberFormatException:Invalid number format: 'x'</mark>
-toUInt = err:NumberFormatException:Invalid number format: '-1'
-toUByte = err:NumberFormatException:Invalid number format: '256'
+<mark>toUInt = err:NumberFormatException:Invalid number format: '-1'</mark>
+<mark>toUByte = err:NumberFormatException:Invalid number format: '256'</mark>
 <mark>int-div-zero = err:ArithmeticException:Division by zero</mark>
 <mark>long-div-zero = err:ArithmeticException:Division by zero</mark>
 <mark>int-mod-zero = err:ArithmeticException:Division by zero</mark>
@@ -290,28 +170,196 @@ toUByte = err:NumberFormatException:Invalid number format: '256'
 <mark>removeAt = err:IndexOutOfBoundsException:index: 1, size: 1</mark>
 <mark>negative-array = err:IllegalArgumentException:Negative array size</mark>
 <mark>negative-list = err:IllegalArgumentException:capacity must be non-negative.</mark>
-first-empty = err:NoSuchElementException:List is empty.
-last-empty = err:NoSuchElementException:List is empty.
-single-many = err:IllegalArgumentException:List has more than one element.
+<mark>first-empty = err:NoSuchElementException:List is empty.</mark>
+<mark>last-empty = err:NoSuchElementException:List is empty.</mark>
+<mark>single-many = err:IllegalArgumentException:List has more than one element.</mark>
 <mark>removeFirst-empty = err:NoSuchElementException:List is empty.</mark>
-require = err:IllegalArgumentException:Failed requirement.
-require-message = err:IllegalArgumentException:custom
-check = err:IllegalStateException:Check failed.
-error = err:IllegalStateException:boom
-checkNotNull = err:IllegalStateException:Required value was null.
-not-null-assert = err:NullPointerException:null
-todo = err:NotImplementedError:An operation is not implemented.
-todo-message = err:NotImplementedError:An operation is not implemented: later
+<mark>require = err:IllegalArgumentException:Failed requirement.</mark>
+<mark>require-message = err:IllegalArgumentException:custom</mark>
+<mark>check = err:IllegalStateException:Check failed.</mark>
+<mark>error = err:IllegalStateException:boom</mark>
+<mark>checkNotNull = err:IllegalStateException:Required value was null.</mark>
+<mark>not-null-assert = err:NullPointerException:null</mark>
+<mark>todo = err:NotImplementedError:An operation is not implemented.</mark>
+<mark>todo-message = err:NotImplementedError:An operation is not implemented: later</mark>
 <mark>cast = err:ClassCastException:Cannot cast instance of kotlin.Int to kotlin.String: incompatible types</mark>
 <mark>null-cast = err:ClassCastException:Cannot cast null to kotlin.String: target type is non-nullable</mark>
-getValue = err:NoSuchElementException:Key 1 is missing in the map.
-repeat-negative = err:IllegalArgumentException:Count 'n' must be non-negative, but was -1.
-chunked-zero = err:IllegalArgumentException:size 0 must be greater than zero.
-step-zero = err:IllegalArgumentException:Step must be positive, was: 0.
-random-empty = err:IllegalArgumentException:Random range is empty: [5, 5).
-radix = err:IllegalArgumentException:radix 37 was not in valid range 2..36
-lateinit = err:UninitializedPropertyAccessException:lateinit property name has not been initialized
-iterator-end = err:NoSuchElementException:null</pre>
+<mark>getValue = err:NoSuchElementException:Key 1 is missing in the map.</mark>
+<mark>repeat-negative = err:IllegalArgumentException:Count 'n' must be non-negative, but was -1.</mark>
+<mark>chunked-zero = err:IllegalArgumentException:size 0 must be greater than zero.</mark>
+<mark>step-zero = err:IllegalArgumentException:Step must be positive, was: 0.</mark>
+<mark>random-empty = err:IllegalArgumentException:Random range is empty: [5, 5).</mark>
+<mark>radix = err:IllegalArgumentException:radix 37 was not in valid range 2..36</mark>
+<mark>lateinit = err:UninitializedPropertyAccessException:lateinit property name has not been initialized</mark>
+<mark>iterator-end = err:NoSuchElementException:null</mark></pre>
+<h3>Group D: ios, linux, linux-arm64, macos</h3>
+<pre><mark>toInt = err:NumberFormatException:null</mark>
+<mark>toInt-empty = err:NumberFormatException:null</mark>
+<mark>toLong = err:NumberFormatException:null</mark>
+<mark>toDouble = err:NumberFormatException:null</mark>
+<mark>toUInt = err:NumberFormatException:Invalid number format: '-1'</mark>
+<mark>toUByte = err:NumberFormatException:Invalid number format: '256'</mark>
+<mark>int-div-zero = err:ArithmeticException:null</mark>
+<mark>long-div-zero = err:ArithmeticException:null</mark>
+<mark>int-mod-zero = err:ArithmeticException:null</mark>
+<mark>floorDiv-zero = err:ArithmeticException:null</mark>
+<mark>list-index = err:IndexOutOfBoundsException:index: 3, size: 1</mark>
+<mark>array-index = err:ArrayIndexOutOfBoundsException:null</mark>
+<mark>string-index = err:ArrayIndexOutOfBoundsException:null</mark>
+<mark>substring = err:ArrayIndexOutOfBoundsException:null</mark>
+<mark>substring-range = err:ArrayIndexOutOfBoundsException:null</mark>
+<mark>subList = err:IndexOutOfBoundsException:fromIndex: 1, toIndex: 5, size: 2</mark>
+<mark>removeAt = err:IndexOutOfBoundsException:index: 1, size: 1</mark>
+<mark>negative-array = err:IllegalArgumentException:null</mark>
+<mark>negative-list = err:IllegalArgumentException:capacity must be non-negative.</mark>
+<mark>first-empty = err:NoSuchElementException:List is empty.</mark>
+<mark>last-empty = err:NoSuchElementException:List is empty.</mark>
+<mark>single-many = err:IllegalArgumentException:List has more than one element.</mark>
+<mark>removeFirst-empty = err:NoSuchElementException:List is empty.</mark>
+<mark>require = err:IllegalArgumentException:Failed requirement.</mark>
+<mark>require-message = err:IllegalArgumentException:custom</mark>
+<mark>check = err:IllegalStateException:Check failed.</mark>
+<mark>error = err:IllegalStateException:boom</mark>
+<mark>checkNotNull = err:IllegalStateException:Required value was null.</mark>
+<mark>not-null-assert = err:NullPointerException:null</mark>
+<mark>todo = err:NotImplementedError:An operation is not implemented.</mark>
+<mark>todo-message = err:NotImplementedError:An operation is not implemented: later</mark>
+<mark>cast = err:ClassCastException:class kotlin.Int cannot be cast to class kotlin.String</mark>
+<mark>null-cast = err:NullPointerException:null</mark>
+<mark>getValue = err:NoSuchElementException:Key 1 is missing in the map.</mark>
+<mark>repeat-negative = err:IllegalArgumentException:Count 'n' must be non-negative, but was -1.</mark>
+<mark>chunked-zero = err:IllegalArgumentException:size 0 must be greater than zero.</mark>
+<mark>step-zero = err:IllegalArgumentException:Step must be positive, was: 0.</mark>
+<mark>random-empty = err:IllegalArgumentException:Random range is empty: [5, 5).</mark>
+<mark>radix = err:IllegalArgumentException:radix 37 was not in valid range 2..36</mark>
+<mark>lateinit = err:UninitializedPropertyAccessException:lateinit property name has not been initialized</mark>
+<mark>iterator-end = err:NoSuchElementException:null</mark></pre>
+<h3>Group E: js-ir</h3>
+<pre><mark>toInt = err:NumberFormatException:Invalid number format: 'x'</mark>
+<mark>toInt-empty = err:NumberFormatException:Invalid number format: ''</mark>
+<mark>toLong = err:NumberFormatException:Invalid number format: '9999999999999999999'</mark>
+<mark>toDouble = err:NumberFormatException:Invalid number format: 'x'</mark>
+<mark>toUInt = err:NumberFormatException:Invalid number format: '-1'</mark>
+<mark>toUByte = err:NumberFormatException:Invalid number format: '256'</mark>
+<mark>int-div-zero = ok:0</mark>
+<mark>long-div-zero = err:Exception:division by zero</mark>
+<mark>int-mod-zero = ok:0</mark>
+<mark>floorDiv-zero = ok:0</mark>
+<mark>list-index = err:IndexOutOfBoundsException:index: 3, size: 1</mark>
+<mark>array-index = ok:null</mark>
+<mark>string-index = ok:\u0000</mark>
+<mark>substring = ok:</mark>
+<mark>substring-range = ok:b</mark>
+<mark>subList = err:IndexOutOfBoundsException:fromIndex: 1, toIndex: 5, size: 2</mark>
+<mark>removeAt = err:IndexOutOfBoundsException:index: 1, size: 1</mark>
+<mark>negative-array = err:null:Invalid typed array length: -1</mark>
+<mark>negative-list = err:IllegalArgumentException:Negative initial capacity: -1</mark>
+<mark>first-empty = err:NoSuchElementException:List is empty.</mark>
+<mark>last-empty = err:NoSuchElementException:List is empty.</mark>
+<mark>single-many = err:IllegalArgumentException:List has more than one element.</mark>
+<mark>removeFirst-empty = err:NoSuchElementException:List is empty.</mark>
+<mark>require = err:IllegalArgumentException:Failed requirement.</mark>
+<mark>require-message = err:IllegalArgumentException:custom</mark>
+<mark>check = err:IllegalStateException:Check failed.</mark>
+<mark>error = err:IllegalStateException:boom</mark>
+<mark>checkNotNull = err:IllegalStateException:Required value was null.</mark>
+<mark>not-null-assert = err:NullPointerException:undefined</mark>
+<mark>todo = err:NotImplementedError:An operation is not implemented.</mark>
+<mark>todo-message = err:NotImplementedError:An operation is not implemented: later</mark>
+<mark>cast = err:ClassCastException:undefined</mark>
+<mark>null-cast = err:ClassCastException:undefined</mark>
+<mark>getValue = err:NoSuchElementException:Key 1 is missing in the map.</mark>
+<mark>repeat-negative = err:IllegalArgumentException:Count 'n' must be non-negative, but was -1.</mark>
+<mark>chunked-zero = err:IllegalArgumentException:size 0 must be greater than zero.</mark>
+<mark>step-zero = err:IllegalArgumentException:Step must be positive, was: 0.</mark>
+<mark>random-empty = err:IllegalArgumentException:Random range is empty: [5, 5).</mark>
+<mark>radix = err:IllegalArgumentException:radix 37 was not in valid range 2..36</mark>
+<mark>lateinit = err:UninitializedPropertyAccessException:lateinit property name has not been initialized</mark>
+<mark>iterator-end = err:NoSuchElementException:undefined</mark></pre>
+<h3>Group F: jvm, jvm-21, jvm-25</h3>
+<pre><mark>toInt = err:NumberFormatException:For input string: &quot;x&quot;</mark>
+<mark>toInt-empty = err:NumberFormatException:For input string: &quot;&quot;</mark>
+<mark>toLong = err:NumberFormatException:For input string: &quot;9999999999999999999&quot;</mark>
+<mark>toDouble = err:NumberFormatException:For input string: &quot;x&quot;</mark>
+<mark>toUInt = err:NumberFormatException:Invalid number format: '-1'</mark>
+<mark>toUByte = err:NumberFormatException:Invalid number format: '256'</mark>
+<mark>int-div-zero = err:ArithmeticException:/ by zero</mark>
+<mark>long-div-zero = err:ArithmeticException:/ by zero</mark>
+<mark>int-mod-zero = err:ArithmeticException:/ by zero</mark>
+<mark>floorDiv-zero = err:ArithmeticException:/ by zero</mark>
+<mark>list-index = err:IndexOutOfBoundsException:Index: 3, Size: 1</mark>
+<mark>array-index = err:ArrayIndexOutOfBoundsException:Index 5 out of bounds for length 1</mark>
+<mark>string-index = err:StringIndexOutOfBoundsException:Index 10 out of bounds for length 3</mark>
+<mark>substring = err:StringIndexOutOfBoundsException:Range [5, 3) out of bounds for length 3</mark>
+<mark>substring-range = err:StringIndexOutOfBoundsException:Range [2, 1) out of bounds for length 3</mark>
+<mark>subList = err:IndexOutOfBoundsException:toIndex = 5</mark>
+<mark>removeAt = err:IndexOutOfBoundsException:Index 1 out of bounds for length 1</mark>
+<mark>negative-array = err:NegativeArraySizeException:-1</mark>
+<mark>negative-list = err:IllegalArgumentException:Illegal Capacity: -1</mark>
+<mark>first-empty = err:NoSuchElementException:List is empty.</mark>
+<mark>last-empty = err:NoSuchElementException:List is empty.</mark>
+<mark>single-many = err:IllegalArgumentException:List has more than one element.</mark>
+<mark>removeFirst-empty = err:NoSuchElementException:null</mark>
+<mark>require = err:IllegalArgumentException:Failed requirement.</mark>
+<mark>require-message = err:IllegalArgumentException:custom</mark>
+<mark>check = err:IllegalStateException:Check failed.</mark>
+<mark>error = err:IllegalStateException:boom</mark>
+<mark>checkNotNull = err:IllegalStateException:Required value was null.</mark>
+<mark>not-null-assert = err:NullPointerException:null</mark>
+<mark>todo = err:NotImplementedError:An operation is not implemented.</mark>
+<mark>todo-message = err:NotImplementedError:An operation is not implemented: later</mark>
+<mark>cast = err:ClassCastException:class java.lang.Integer cannot be cast to class java.lang.String (java.lang.Integer and java.lang.String are in module java.base of loader 'bootstrap')</mark>
+<mark>null-cast = err:NullPointerException:null cannot be cast to non-null type kotlin.String</mark>
+<mark>getValue = err:NoSuchElementException:Key 1 is missing in the map.</mark>
+<mark>repeat-negative = err:IllegalArgumentException:Count 'n' must be non-negative, but was -1.</mark>
+<mark>chunked-zero = err:IllegalArgumentException:size 0 must be greater than zero.</mark>
+<mark>step-zero = err:IllegalArgumentException:Step must be positive, was: 0.</mark>
+<mark>random-empty = err:IllegalArgumentException:Random range is empty: [5, 5).</mark>
+<mark>radix = err:IllegalArgumentException:radix 37 was not in valid range 2..36</mark>
+<mark>lateinit = err:UninitializedPropertyAccessException:lateinit property name has not been initialized</mark>
+<mark>iterator-end = err:NoSuchElementException:null</mark></pre>
+<h3>Group G: jvm-17</h3>
+<pre><mark>toInt = err:NumberFormatException:For input string: &quot;x&quot;</mark>
+<mark>toInt-empty = err:NumberFormatException:For input string: &quot;&quot;</mark>
+<mark>toLong = err:NumberFormatException:For input string: &quot;9999999999999999999&quot;</mark>
+<mark>toDouble = err:NumberFormatException:For input string: &quot;x&quot;</mark>
+<mark>toUInt = err:NumberFormatException:Invalid number format: '-1'</mark>
+<mark>toUByte = err:NumberFormatException:Invalid number format: '256'</mark>
+<mark>int-div-zero = err:ArithmeticException:/ by zero</mark>
+<mark>long-div-zero = err:ArithmeticException:/ by zero</mark>
+<mark>int-mod-zero = err:ArithmeticException:/ by zero</mark>
+<mark>floorDiv-zero = err:ArithmeticException:/ by zero</mark>
+<mark>list-index = err:IndexOutOfBoundsException:Index: 3, Size: 1</mark>
+<mark>array-index = err:ArrayIndexOutOfBoundsException:Index 5 out of bounds for length 1</mark>
+<mark>string-index = err:StringIndexOutOfBoundsException:String index out of range: 10</mark>
+<mark>substring = err:StringIndexOutOfBoundsException:begin 5, end 3, length 3</mark>
+<mark>substring-range = err:StringIndexOutOfBoundsException:begin 2, end 1, length 3</mark>
+<mark>subList = err:IndexOutOfBoundsException:toIndex = 5</mark>
+<mark>removeAt = err:IndexOutOfBoundsException:Index 1 out of bounds for length 1</mark>
+<mark>negative-array = err:NegativeArraySizeException:-1</mark>
+<mark>negative-list = err:IllegalArgumentException:Illegal Capacity: -1</mark>
+<mark>first-empty = err:NoSuchElementException:List is empty.</mark>
+<mark>last-empty = err:NoSuchElementException:List is empty.</mark>
+<mark>single-many = err:IllegalArgumentException:List has more than one element.</mark>
+<mark>removeFirst-empty = err:NoSuchMethodError:'java.lang.Object java.util.List.removeFirst()'</mark>
+<mark>require = err:IllegalArgumentException:Failed requirement.</mark>
+<mark>require-message = err:IllegalArgumentException:custom</mark>
+<mark>check = err:IllegalStateException:Check failed.</mark>
+<mark>error = err:IllegalStateException:boom</mark>
+<mark>checkNotNull = err:IllegalStateException:Required value was null.</mark>
+<mark>not-null-assert = err:NullPointerException:null</mark>
+<mark>todo = err:NotImplementedError:An operation is not implemented.</mark>
+<mark>todo-message = err:NotImplementedError:An operation is not implemented: later</mark>
+<mark>cast = err:ClassCastException:class java.lang.Integer cannot be cast to class java.lang.String (java.lang.Integer and java.lang.String are in module java.base of loader 'bootstrap')</mark>
+<mark>null-cast = err:NullPointerException:null cannot be cast to non-null type kotlin.String</mark>
+<mark>getValue = err:NoSuchElementException:Key 1 is missing in the map.</mark>
+<mark>repeat-negative = err:IllegalArgumentException:Count 'n' must be non-negative, but was -1.</mark>
+<mark>chunked-zero = err:IllegalArgumentException:size 0 must be greater than zero.</mark>
+<mark>step-zero = err:IllegalArgumentException:Step must be positive, was: 0.</mark>
+<mark>random-empty = err:IllegalArgumentException:Random range is empty: [5, 5).</mark>
+<mark>radix = err:IllegalArgumentException:radix 37 was not in valid range 2..36</mark>
+<mark>lateinit = err:UninitializedPropertyAccessException:lateinit property name has not been initialized</mark>
+<mark>iterator-end = err:NoSuchElementException:null</mark></pre>
 <h2>Results on Kotlin 2.5.0-Beta1</h2>
 <p>4 different results; 20 of 41 lines differ.</p>
 <table>
@@ -495,7 +543,7 @@ iterator-end = err:NoSuchElementException:null</pre>
 <p>unclassified, basis inferred; causes: JDK version, unexplained.</p>
 <p>No explanation was found in the sources searched.</p>
 <h3>Notes</h3>
-<p>No page read gives message text, so no line has a documented expectation. Class differences: Native string-index, substring and substring-range throw ArrayIndexOutOfBoundsException(null); Wasm throws IndexOutOfBoundsException; null-cast is ClassCastException on Wasm and NullPointerException elsewhere (KT-88829 Open is the generic-cast sibling, not this exact line). jvm-17 differs from jvm-21 in string-index, substring (message text) and removeFirst-empty (harness artefact: compiled on JDK 21, run on 17); no JDK release note for 18, 19, 20, 21 mentions the message change (searched). Android prints ART texts (length=3; index=10).</p>
+<p>No page read gives message text, so no line has a documented expectation. Class differences: Native string-index, substring and substring-range throw ArrayIndexOutOfBoundsException(null); Wasm throws IndexOutOfBoundsException; null-cast is ClassCastException on Wasm and NullPointerException elsewhere (KT-88829 Open is the generic-cast sibling, not this exact line). jvm-17 differs from jvm-21 in string-index, substring (message text) and removeFirst-empty (harness artefact: compiled on JDK 21, run on 17); no JDK release note for 18, 19, 20, 21 mentions the message change (searched). Android prints ART texts (length=3; index=10). cloudflare-wasm prints what wasm prints; cloudflare-jvm records the probe as unavailable (refused, the compiled module traps on integer division and a trap aborts the request (RuntimeError: divide by zero)).</p>
 <p class="muted">Read on 2026-10-07.</p>
 <h2>Issues</h2>
 <table>
@@ -518,7 +566,7 @@ Question: Which exception class and message does each common failure produce?
 
 Classification now: unclassified (was unclassified); cause letters: e g; basis: inferred.
 
-Measured: Kotlin 2.4.20 on 16 columns (android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, jvm 21 arm64 in a container, linux x64, linux arm64 and linux-ubuntu Native, mingw Native under wine); Kotlin 2.5.0-Beta1 on jvm, macos, wasm, android and ios. Single run per cell; no spread measured.
+Measured: Kotlin 2.4.20 on 17 columns (js-ir on Node 26.8.2 arm64, android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, jvm 21 arm64 in a container, linux x64, linux arm64 and linux-ubuntu Native, mingw Native under wine); Kotlin 2.5.0-Beta1 on jvm, macos, wasm, android and ios. Single run per cell; no spread measured.
 
 Helpers (not shown below): `line(label, v)` prints `label = v`; `outcome(label) { }` prints `ok:&lt;value&gt;` or `err:&lt;ExceptionClass&gt;`; `failure(label) { }` prints `err:&lt;Class&gt;:&lt;message&gt;`; `bits(d)` prints `d.toRawBits()` as unsigned hex.
 
@@ -563,21 +611,25 @@ Results at 2.4.20, one row per distinct output (columns that agree share a row):
   - `err:ArithmeticException:null`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
   - `err:ArithmeticException:/ by zero`: jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
   - `err:ArithmeticException:Division by zero`: wasm+3browsers
+  - `ok:0`: js-ir
 - `long-div-zero`
   - `err:ArithmeticException:divide by zero`: android
   - `err:ArithmeticException:null`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
   - `err:ArithmeticException:/ by zero`: jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
   - `err:ArithmeticException:Division by zero`: wasm+3browsers
+  - `err:Exception:division by zero`: js-ir
 - `int-mod-zero`
   - `err:ArithmeticException:divide by zero`: android
   - `err:ArithmeticException:null`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
   - `err:ArithmeticException:/ by zero`: jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
   - `err:ArithmeticException:Division by zero`: wasm+3browsers
+  - `ok:0`: js-ir
 - `floorDiv-zero`
   - `err:ArithmeticException:divide by zero`: android
   - `err:ArithmeticException:null`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
   - `err:ArithmeticException:/ by zero`: jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
   - `err:ArithmeticException:Division by zero`: wasm+3browsers
+  - `ok:0`: js-ir
 - `list-index`
   - `err:IndexOutOfBoundsException:Index: 3, Size: 1`: android, jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
   - `err:IndexOutOfBoundsException:index: 3, size: 1`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine, wasm+3browsers
@@ -586,18 +638,21 @@ Results at 2.4.20, one row per distinct output (columns that agree share a row):
   - `err:ArrayIndexOutOfBoundsException:null`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
   - `err:ArrayIndexOutOfBoundsException:Index 5 out of bounds for length 1`: jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
   - `err:IndexOutOfBoundsException:null`: wasm+3browsers
+  - `ok:null`: js-ir
 - `string-index`
   - `err:StringIndexOutOfBoundsException:length=3; index=10`: android
   - `err:ArrayIndexOutOfBoundsException:null`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
   - `err:StringIndexOutOfBoundsException:Index 10 out of bounds for length 3`: jvm+jvm-21+jvm-21-arm64+jvm-25
   - `err:IndexOutOfBoundsException:null`: wasm+3browsers
   - `err:StringIndexOutOfBoundsException:String index out of range: 10`: jvm-17
+  - `ok:\u0000`: js-ir
 - `substring`
   - `err:StringIndexOutOfBoundsException:length=3; index=5`: android
   - `err:ArrayIndexOutOfBoundsException:null`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
   - `err:StringIndexOutOfBoundsException:Range [5, 3) out of bounds for length 3`: jvm+jvm-21+jvm-21-arm64+jvm-25
   - `err:IndexOutOfBoundsException:startIndex: 5 &gt; endIndex: 3`: wasm+3browsers
   - `err:StringIndexOutOfBoundsException:begin 5, end 3, length 3`: jvm-17
+  - `ok:`: js-ir
 - also differing, not expanded: `substring-range`, `subList`, `removeAt`, `negative-array`, `negative-list`, `removeFirst-empty`, `cast`, `null-cast`
 
 On 2.5.0-Beta1 the cells group as: jvm; macos+ios; wasm; android.
@@ -607,6 +662,183 @@ Existing tracker issues (read through the YouTrack REST API on 2026-10-07; nothi
 What is known: No page read gives message text, so no line has a documented expectation. Class differences: Native string-index, substring and substring-range throw ArrayIndexOutOfBoundsException(null); Wasm throws IndexOutOfBoundsException; null-cast is ClassCastException on Wasm and NullPointerException elsewhere (KT-88829 Open is the generic-cast sibling, not this exact line). jvm-17 differs from jvm-21 in string-index, substring (message text) and removeFirst-empty (harness artefact: compiled on JDK 21, run on 17); no JDK release note for 18, 19, 20, 21 mentions the message change (searched). Android prints ART texts (length=3; index=10).
 
 What is NOT known: the intended behavior where no page read states one; whether the divergent column is a defect or by design; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device of the same target differs (one device per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies; the ladder agent re-compiled the displayed text and matched 37 of 38 probes on JVM and macOS Native).
+
+## Cloudflare columns
+
+Recorded 2026-10-12 on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local, macOS arm64), one run per cell. cloudflare-wasm is the Kotlin/Wasm probe module with a hand-written Worker entry; cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 plugin (TeaVM), so its Java classes are not a JDK. These rows are not part of the results above.
+
+Rows for the differing lines of this draft:
+
+- `toInt`
+  - `err:NumberFormatException:For input string: &quot;x&quot;`: android+jvm-17+jvm-21+jvm-25+jvm
+  - `(absent)`: cloudflare-jvm
+  - `err:NumberFormatException:Invalid number format: 'x'`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NumberFormatException:null`: ios+linux-arm64+linux+macos
+- `toInt-empty`
+  - `err:NumberFormatException:For input string: &quot;&quot;`: android+jvm-17+jvm-21+jvm-25+jvm
+  - `(absent)`: cloudflare-jvm
+  - `err:NumberFormatException:Invalid number format: ''`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NumberFormatException:null`: ios+linux-arm64+linux+macos
+- `toLong`
+  - `err:NumberFormatException:For input string: &quot;9999999999999999999&quot;`: android+jvm-17+jvm-21+jvm-25+jvm
+  - `(absent)`: cloudflare-jvm
+  - `err:NumberFormatException:Invalid number format: '9999999999999999999'`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NumberFormatException:null`: ios+linux-arm64+linux+macos
+- `toDouble`
+  - `err:NumberFormatException:For input string: &quot;x&quot;`: android+jvm-17+jvm-21+jvm-25+jvm
+  - `(absent)`: cloudflare-jvm
+  - `err:NumberFormatException:Invalid number format: 'x'`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NumberFormatException:null`: ios+linux-arm64+linux+macos
+- `toUInt`
+  - `err:NumberFormatException:Invalid number format: '-1'`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `toUByte`
+  - `err:NumberFormatException:Invalid number format: '256'`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `int-div-zero`
+  - `err:ArithmeticException:divide by zero`: android
+  - `(absent)`: cloudflare-jvm
+  - `err:ArithmeticException:Division by zero`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:ArithmeticException:null`: ios+linux-arm64+linux+macos
+  - `err:ArithmeticException:/ by zero`: jvm-17+jvm-21+jvm-25+jvm
+- `long-div-zero`
+  - `err:ArithmeticException:divide by zero`: android
+  - `(absent)`: cloudflare-jvm
+  - `err:ArithmeticException:Division by zero`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:ArithmeticException:null`: ios+linux-arm64+linux+macos
+  - `err:ArithmeticException:/ by zero`: jvm-17+jvm-21+jvm-25+jvm
+- `int-mod-zero`
+  - `err:ArithmeticException:divide by zero`: android
+  - `(absent)`: cloudflare-jvm
+  - `err:ArithmeticException:Division by zero`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:ArithmeticException:null`: ios+linux-arm64+linux+macos
+  - `err:ArithmeticException:/ by zero`: jvm-17+jvm-21+jvm-25+jvm
+- `floorDiv-zero`
+  - `err:ArithmeticException:divide by zero`: android
+  - `(absent)`: cloudflare-jvm
+  - `err:ArithmeticException:Division by zero`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:ArithmeticException:null`: ios+linux-arm64+linux+macos
+  - `err:ArithmeticException:/ by zero`: jvm-17+jvm-21+jvm-25+jvm
+- `list-index`
+  - `err:IndexOutOfBoundsException:Index: 3, Size: 1`: android+jvm-17+jvm-21+jvm-25+jvm
+  - `(absent)`: cloudflare-jvm
+  - `err:IndexOutOfBoundsException:index: 3, size: 1`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `array-index`
+  - `err:ArrayIndexOutOfBoundsException:length=1; index=5`: android
+  - `(absent)`: cloudflare-jvm
+  - `err:IndexOutOfBoundsException:null`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:ArrayIndexOutOfBoundsException:null`: ios+linux-arm64+linux+macos
+  - `err:ArrayIndexOutOfBoundsException:Index 5 out of bounds for length 1`: jvm-17+jvm-21+jvm-25+jvm
+- `string-index`
+  - `err:StringIndexOutOfBoundsException:length=3; index=10`: android
+  - `(absent)`: cloudflare-jvm
+  - `err:IndexOutOfBoundsException:null`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:ArrayIndexOutOfBoundsException:null`: ios+linux-arm64+linux+macos
+  - `err:StringIndexOutOfBoundsException:String index out of range: 10`: jvm-17
+  - `err:StringIndexOutOfBoundsException:Index 10 out of bounds for length 3`: jvm-21+jvm-25+jvm
+- `substring`
+  - `err:StringIndexOutOfBoundsException:length=3; index=5`: android
+  - `(absent)`: cloudflare-jvm
+  - `err:IndexOutOfBoundsException:startIndex: 5 &gt; endIndex: 3`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:ArrayIndexOutOfBoundsException:null`: ios+linux-arm64+linux+macos
+  - `err:StringIndexOutOfBoundsException:begin 5, end 3, length 3`: jvm-17
+  - `err:StringIndexOutOfBoundsException:Range [5, 3) out of bounds for length 3`: jvm-21+jvm-25+jvm
+- `substring-range`
+  - `err:StringIndexOutOfBoundsException:begin 2, end 1, length 3`: android+jvm-17
+  - `(absent)`: cloudflare-jvm
+  - `err:IndexOutOfBoundsException:startIndex: 2 &gt; endIndex: 1`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:ArrayIndexOutOfBoundsException:null`: ios+linux-arm64+linux+macos
+  - `err:StringIndexOutOfBoundsException:Range [2, 1) out of bounds for length 3`: jvm-21+jvm-25+jvm
+- `subList`
+  - `err:IndexOutOfBoundsException:toIndex = 5`: android+jvm-17+jvm-21+jvm-25+jvm
+  - `(absent)`: cloudflare-jvm
+  - `err:IndexOutOfBoundsException:fromIndex: 1, toIndex: 5, size: 2`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `removeAt`
+  - `err:IndexOutOfBoundsException:Index 1 out of bounds for length 1`: android+jvm-17+jvm-21+jvm-25+jvm
+  - `(absent)`: cloudflare-jvm
+  - `err:IndexOutOfBoundsException:index: 1, size: 1`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `negative-array`
+  - `err:NegativeArraySizeException:-1`: android+jvm-17+jvm-21+jvm-25+jvm
+  - `(absent)`: cloudflare-jvm
+  - `err:IllegalArgumentException:Negative array size`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:IllegalArgumentException:null`: ios+linux-arm64+linux+macos
+- `negative-list`
+  - `err:IllegalArgumentException:Illegal Capacity: -1`: android+jvm-17+jvm-21+jvm-25+jvm
+  - `(absent)`: cloudflare-jvm
+  - `err:IllegalArgumentException:capacity must be non-negative.`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `first-empty`
+  - `err:NoSuchElementException:List is empty.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `last-empty`
+  - `err:NoSuchElementException:List is empty.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `single-many`
+  - `err:IllegalArgumentException:List has more than one element.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `removeFirst-empty`
+  - `err:NoSuchElementException:null`: android+jvm-21+jvm-25+jvm
+  - `(absent)`: cloudflare-jvm
+  - `err:NoSuchElementException:List is empty.`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NoSuchMethodError:'java.lang.Object java.util.List.removeFirst()'`: jvm-17
+- `require`
+  - `err:IllegalArgumentException:Failed requirement.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `require-message`
+  - `err:IllegalArgumentException:custom`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `check`
+  - `err:IllegalStateException:Check failed.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `error`
+  - `err:IllegalStateException:boom`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `checkNotNull`
+  - `err:IllegalStateException:Required value was null.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `not-null-assert`
+  - `err:NullPointerException:null`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `todo`
+  - `err:NotImplementedError:An operation is not implemented.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `todo-message`
+  - `err:NotImplementedError:An operation is not implemented: later`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `cast`
+  - `err:ClassCastException:java.lang.Integer cannot be cast to java.lang.String`: android
+  - `(absent)`: cloudflare-jvm
+  - `err:ClassCastException:Cannot cast instance of kotlin.Int to kotlin.String: incompatible types`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:ClassCastException:class kotlin.Int cannot be cast to class kotlin.String`: ios+linux-arm64+linux+macos
+  - `err:ClassCastException:class java.lang.Integer cannot be cast to class java.lang.String (java.lang.Integer and java.lang.String are in module java.base of loader 'bootstrap')`: jvm-17+jvm-21+jvm-25+jvm
+- `null-cast`
+  - `err:NullPointerException:null cannot be cast to non-null type kotlin.String`: android+jvm-17+jvm-21+jvm-25+jvm
+  - `(absent)`: cloudflare-jvm
+  - `err:ClassCastException:Cannot cast null to kotlin.String: target type is non-nullable`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NullPointerException:null`: ios+linux-arm64+linux+macos
+- `getValue`
+  - `err:NoSuchElementException:Key 1 is missing in the map.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `repeat-negative`
+  - `err:IllegalArgumentException:Count 'n' must be non-negative, but was -1.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `chunked-zero`
+  - `err:IllegalArgumentException:size 0 must be greater than zero.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `step-zero`
+  - `err:IllegalArgumentException:Step must be positive, was: 0.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `random-empty`
+  - `err:IllegalArgumentException:Random range is empty: [5, 5).`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `radix`
+  - `err:IllegalArgumentException:radix 37 was not in valid range 2..36`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `lateinit`
+  - `err:UninitializedPropertyAccessException:lateinit property name has not been initialized`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `iterator-end`
+  - `err:NoSuchElementException:null`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
 </pre>
 </div>
 <h2>Kotlin versions measured</h2>
@@ -614,7 +846,10 @@ What is NOT known: the intended behavior where no page read states one; whether 
 <h2>How it was measured</h2>
 <ul>
 <li><strong>android</strong>: The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</li>
+<li><strong>cloudflare-jvm</strong>: The probes compiled as Kotlin/JVM 2.4.20 classes and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM), run on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). The Java classes are TeaVM's class library, not a JDK. Four probes are recorded as unavailable: two are skipped because integer division traps in the compiled module and a trap aborts the request, one fails with a NullPointerException, and one is refused at build time because java.util.regex.Matcher.useAnchoringBounds is missing; tools/cloudflare has the details. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bits of 0/0-raw and sqrt-neg-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
+<li><strong>cloudflare-wasm</strong>: The Kotlin/Wasm (wasmJs) probe module on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). A 14-line JavaScript entry replaces Kotlin's loader, which does not run on workerd. Built and recorded by tools/cloudflare and drift probe cloudflare. Byte-identical to the wasm column apart from the target line. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bit of 0/0-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
 <li><strong>ios</strong>: The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</li>
+<li><strong>js-ir</strong>: Kotlin/JS IR on Node 26.8.2, macOS, Apple Silicon (arm64). The standalone Kotlin 2.4.20 compiler builds each probe from the displayed source through tools/ladder; Node runs it. Same transcript as fixtures/atlas-ladder/2.4.20/js-ir.txt.</li>
 <li><strong>jvm</strong>: The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
 <li><strong>jvm-17</strong>: The CLI JVM classes (jvmTarget 17) on Temurin 17.0.20.1, x86-64 Linux container, recorded with --target jvm-17.</li>
 <li><strong>jvm-21</strong>: The same classes on Temurin 21.0.12.1, x86-64 Linux container. Differs from the jvm column in hardware only.</li>

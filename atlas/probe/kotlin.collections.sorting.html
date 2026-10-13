@@ -32,6 +32,7 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <a href="../../">Drift</a>
 <a href="../">Interactive Atlas</a>
 <a href="../probe/">All probes</a>
+<a href="../versions.html">Version changes</a>
 <a href="../data/dataset.json">dataset.json</a>
 <a href="../data/classification.json">classification.json</a>
 </nav>
@@ -64,7 +65,7 @@ outcome(&quot;broken-40&quot;) {
     (0 until 40).toList().sortedWith { a, b -&gt; if (a == b) 0 else 1 }.take(6)
 }</code></pre>
 <h2>Results on Kotlin 2.4.20</h2>
-<p>2 different results; 4 of 15 lines differ.</p>
+<p>3 different results; 7 of 15 lines differ.</p>
 <table>
 <caption>Result per column, Kotlin 2.4.20</caption>
 <tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
@@ -73,6 +74,8 @@ outcome(&quot;broken-40&quot;) {
 <tr class="differs"><th scope="row">jvm-17</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
 <tr class="differs"><th scope="row">jvm-21</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-21.txt">file</a></td></tr>
 <tr class="differs"><th scope="row">jvm-25</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-25.txt">file</a></td></tr>
+<tr><th scope="row">cloudflare-jvm</th><td>B</td><td>ok</td><td><a href="../data/transcripts/cloudflare-jvm.txt">file</a></td></tr>
+<tr><th scope="row">cloudflare-wasm</th><td>B</td><td>ok</td><td><a href="../data/transcripts/cloudflare-wasm.txt">file</a></td></tr>
 <tr><th scope="row">ios</th><td>B</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
 <tr><th scope="row">linux</th><td>B</td><td>ok</td><td><a href="../data/transcripts/linux.txt">file</a></td></tr>
 <tr><th scope="row">linux-arm64</th><td>B</td><td>ok</td><td><a href="../data/transcripts/linux-arm64.txt">file</a></td></tr>
@@ -81,12 +84,13 @@ outcome(&quot;broken-40&quot;) {
 <tr><th scope="row">wasm-chromium</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
 <tr><th scope="row">wasm-firefox</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
 <tr><th scope="row">wasm-webkit</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">js-ir</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/js-ir.txt">file</a></td></tr>
 </table>
 <h3>Group A: android, jvm, jvm-17, jvm-21, jvm-25</h3>
-<pre>doubles = [-Infinity, -0.0, 0.0, 1.0, 3.0, NaN]
+<pre><mark>doubles = [-Infinity, -0.0, 0.0, 1.0, 3.0, NaN]</mark>
 max-nan = NaN
-max-zeros = 0.0
-min-zeros = -0.0
+<mark>max-zeros = 0.0</mark>
+<mark>min-zeros = -0.0</mark>
 stable-4 = [(a, 2), (d, 4), (bb, 1), (cc, 3)]
 stable-40 = true
 min-by-ties = bb
@@ -98,11 +102,11 @@ descending = [3, 2, 1]
 <mark>always-negative = ok:[6, 7, 0, 4, 5, 2, 1, 3]</mark>
 <mark>parity = ok:[7, 5, 1, 3, 2, 4, 0, 6]</mark>
 <mark>broken-40 = ok:[0, 1, 2, 3, 4, 5]</mark></pre>
-<h3>Group B: ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
-<pre>doubles = [-Infinity, -0.0, 0.0, 1.0, 3.0, NaN]
+<h3>Group B: cloudflare-jvm, cloudflare-wasm, ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
+<pre><mark>doubles = [-Infinity, -0.0, 0.0, 1.0, 3.0, NaN]</mark>
 max-nan = NaN
-max-zeros = 0.0
-min-zeros = -0.0
+<mark>max-zeros = 0.0</mark>
+<mark>min-zeros = -0.0</mark>
 stable-4 = [(a, 2), (d, 4), (bb, 1), (cc, 3)]
 stable-40 = true
 min-by-ties = bb
@@ -114,6 +118,22 @@ descending = [3, 2, 1]
 <mark>always-negative = ok:[3, 1, 2, 5, 4, 0, 7, 6]</mark>
 <mark>parity = ok:[3, 1, 5, 7, 6, 0, 4, 2]</mark>
 <mark>broken-40 = ok:[39, 38, 37, 36, 35, 34]</mark></pre>
+<h3>Group C: js-ir</h3>
+<pre><mark>doubles = [-Infinity, 0, 0, 1, 3, NaN]</mark>
+max-nan = NaN
+<mark>max-zeros = 0</mark>
+<mark>min-zeros = 0</mark>
+stable-4 = [(a, 2), (d, 4), (bb, 1), (cc, 3)]
+stable-40 = true
+min-by-ties = bb
+max-by-ties = bb
+nulls-first = [null, 1, 3]
+strings = [A, B, a, b]
+descending = [3, 2, 1]
+<mark>always-positive = ok:[3, 1, 2, 5, 4, 0, 7, 6]</mark>
+<mark>always-negative = ok:[6, 7, 0, 4, 5, 2, 1, 3]</mark>
+<mark>parity = ok:[7, 5, 1, 3, 2, 4, 0, 6]</mark>
+<mark>broken-40 = ok:[0, 1, 2, 3, 4, 5]</mark></pre>
 <h2>Results on Kotlin 2.5.0-Beta1</h2>
 <p>2 different results; 4 of 15 lines differ.</p>
 <table>
@@ -164,14 +184,17 @@ descending = [3, 2, 1]
 <blockquote><p>(optional) if the comparator is found to violate the Comparator contract</p>
 <footer><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html">https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html</a></footer></blockquote>
 <h3>Notes</h3>
-<p>Only the four lines with a broken comparator differ (always-positive, always-negative, parity, broken-40); stability and total-order lines are identical. The JDK Comparator Javadoc says the implementor must keep signum(compare(x, y)) == -signum(compare(y, x)); all four comparators break it. No FULL page says the result for a contract-violating comparator is undefined, so &quot;documented&quot; rests on the precondition being broken (inference). No YouTrack match for this behavior.</p>
+<p>Only the four lines with a broken comparator differ, and the zero lines on js-ir (it prints 0 for -0.0; see kotlin.double.equality-order) (always-positive, always-negative, parity, broken-40); stability and total-order lines are identical. The JDK Comparator Javadoc says the implementor must keep signum(compare(x, y)) == -signum(compare(y, x)); all four comparators break it. No FULL page says the result for a contract-violating comparator is undefined, so &quot;documented&quot; rests on the precondition being broken (inference). No YouTrack match for this behavior. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what ios, linux, linux-arm64, macos and 4 more print.</p>
 <p class="muted">Read on 2026-10-07.</p>
 <h2>Kotlin versions measured</h2>
 <p>2.4.20, 2.5.0-Beta1</p>
 <h2>How it was measured</h2>
 <ul>
 <li><strong>android</strong>: The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</li>
+<li><strong>cloudflare-jvm</strong>: The probes compiled as Kotlin/JVM 2.4.20 classes and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM), run on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). The Java classes are TeaVM's class library, not a JDK. Four probes are recorded as unavailable: two are skipped because integer division traps in the compiled module and a trap aborts the request, one fails with a NullPointerException, and one is refused at build time because java.util.regex.Matcher.useAnchoringBounds is missing; tools/cloudflare has the details. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bits of 0/0-raw and sqrt-neg-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
+<li><strong>cloudflare-wasm</strong>: The Kotlin/Wasm (wasmJs) probe module on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). A 14-line JavaScript entry replaces Kotlin's loader, which does not run on workerd. Built and recorded by tools/cloudflare and drift probe cloudflare. Byte-identical to the wasm column apart from the target line. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bit of 0/0-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
 <li><strong>ios</strong>: The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</li>
+<li><strong>js-ir</strong>: Kotlin/JS IR on Node 26.8.2, macOS, Apple Silicon (arm64). The standalone Kotlin 2.4.20 compiler builds each probe from the displayed source through tools/ladder; Node runs it. Same transcript as fixtures/atlas-ladder/2.4.20/js-ir.txt.</li>
 <li><strong>jvm</strong>: The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
 <li><strong>jvm-17</strong>: The CLI JVM classes (jvmTarget 17) on Temurin 17.0.20.1, x86-64 Linux container, recorded with --target jvm-17.</li>
 <li><strong>jvm-21</strong>: The same classes on Temurin 21.0.12.1, x86-64 Linux container. Differs from the jvm column in hardware only.</li>

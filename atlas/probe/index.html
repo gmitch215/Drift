@@ -32,19 +32,20 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <a href="../../">Drift</a>
 <a href="../">Interactive Atlas</a>
 <a href="../probe/">All probes</a>
+<a href="../versions.html">Version changes</a>
 <a href="../data/dataset.json">dataset.json</a>
 <a href="../data/classification.json">classification.json</a>
 </nav>
 </header>
 <main id="main">
 <h1>Drift Atlas probes</h1>
-<p>38 Kotlin probes, 18 measured columns, 23 probes that differ between targets on at least one Kotlin version (2.4.20, 2.5.0-Beta1). Classifications and issue states were read on 2026-10-07.</p>
+<p>38 Kotlin probes, 21 measured columns, 32 probes that differ between targets on at least one Kotlin version (2.4.20, 2.5.0-Beta1). Classifications and issue states were read on 2026-10-07.</p>
 <table>
 <caption>Classification counts</caption>
 <tr><th scope="col">Classification</th><th scope="col">Probes</th><th scope="col">Differing</th></tr>
-<tr><th scope="row">documented</th><td>18</td><td>6</td></tr>
-<tr><th scope="row">platform-defined</th><td>4</td><td>4</td></tr>
-<tr><th scope="row">unclassified</th><td>16</td><td>13</td></tr>
+<tr><th scope="row">documented</th><td>10</td><td>4</td></tr>
+<tr><th scope="row">platform-defined</th><td>3</td><td>3</td></tr>
+<tr><th scope="row">unclassified</th><td>25</td><td>25</td></tr>
 </table>
 <h2>Probes</h2>
 <table>
@@ -52,41 +53,41 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <tr><th scope="col">Probe</th><th scope="col">Classification</th><th scope="col">Differs on Kotlin</th><th scope="col">Issues</th></tr>
 <tr><th scope="row"><a href="kotlin.char.bmp-case-mapping.html">kotlin.char.bmp-case-mapping</a></th><td>platform-defined</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-58195</td></tr>
 <tr><th scope="row"><a href="kotlin.char.bmp-categories.html">kotlin.char.bmp-categories</a></th><td>platform-defined</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-58195</td></tr>
-<tr><th scope="row"><a href="kotlin.char.case-special.html">kotlin.char.case-special</a></th><td>documented</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.char.case-special.html">kotlin.char.case-special</a></th><td>unclassified</td><td>2.4.20</td><td></td></tr>
 <tr><th scope="row"><a href="kotlin.char.whitespace-set.html">kotlin.char.whitespace-set</a></th><td>documented</td><td>identical</td><td></td></tr>
-<tr><th scope="row"><a href="kotlin.collections.equality-hashing.html">kotlin.collections.equality-hashing</a></th><td>documented</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.collections.equality-hashing.html">kotlin.collections.equality-hashing</a></th><td>documented</td><td>2.4.20</td><td></td></tr>
 <tr><th scope="row"><a href="kotlin.collections.hash-order.html">kotlin.collections.hash-order</a></th><td>documented</td><td>2.4.20, 2.5.0-Beta1</td><td></td></tr>
 <tr><th scope="row"><a href="kotlin.collections.iterator-modification.html">kotlin.collections.iterator-modification</a></th><td>platform-defined</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-88775, KT-89031</td></tr>
 <tr><th scope="row"><a href="kotlin.collections.sorting.html">kotlin.collections.sorting</a></th><td>documented</td><td>2.4.20, 2.5.0-Beta1</td><td></td></tr>
 <tr><th scope="row"><a href="kotlin.collections.tostring-forms.html">kotlin.collections.tostring-forms</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-88414, KT-69456, KT-78708</td></tr>
-<tr><th scope="row"><a href="kotlin.double.equality-order.html">kotlin.double.equality-order</a></th><td>documented</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.double.equality-order.html">kotlin.double.equality-order</a></th><td>unclassified</td><td>2.4.20</td><td></td></tr>
 <tr><th scope="row"><a href="kotlin.double.extremes.html">kotlin.double.extremes</a></th><td>unclassified</td><td>2.4.20</td><td>KT-88414, KT-88035, KT-88036</td></tr>
 <tr><th scope="row"><a href="kotlin.double.nan-bits.html">kotlin.double.nan-bits</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-53258</td></tr>
 <tr><th scope="row"><a href="kotlin.double.parse.html">kotlin.double.parse</a></th><td>unclassified</td><td>2.4.20</td><td>KT-88414</td></tr>
 <tr><th scope="row"><a href="kotlin.double.shortest-digits.html">kotlin.double.shortest-digits</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-88414</td></tr>
 <tr><th scope="row"><a href="kotlin.double.tostring-boundaries.html">kotlin.double.tostring-boundaries</a></th><td>unclassified</td><td>2.4.20</td><td>KT-88414</td></tr>
 <tr><th scope="row"><a href="kotlin.exceptions.messages.html">kotlin.exceptions.messages</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-88829</td></tr>
-<tr><th scope="row"><a href="kotlin.exceptions.tostring-cause.html">kotlin.exceptions.tostring-cause</a></th><td>documented</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-78708</td></tr>
+<tr><th scope="row"><a href="kotlin.exceptions.tostring-cause.html">kotlin.exceptions.tostring-cause</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-78708</td></tr>
 <tr><th scope="row"><a href="kotlin.float.tostring.html">kotlin.float.tostring</a></th><td>unclassified</td><td>2.4.20</td><td>KT-88414</td></tr>
-<tr><th scope="row"><a href="kotlin.int.division-modulo.html">kotlin.int.division-modulo</a></th><td>documented</td><td>identical</td><td></td></tr>
-<tr><th scope="row"><a href="kotlin.int.overflow.html">kotlin.int.overflow</a></th><td>documented</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.int.division-modulo.html">kotlin.int.division-modulo</a></th><td>unclassified</td><td>2.4.20</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.int.overflow.html">kotlin.int.overflow</a></th><td>unclassified</td><td>2.4.20</td><td></td></tr>
 <tr><th scope="row"><a href="kotlin.int.radix.html">kotlin.int.radix</a></th><td>documented</td><td>identical</td><td></td></tr>
 <tr><th scope="row"><a href="kotlin.long.bit-ops.html">kotlin.long.bit-ops</a></th><td>documented</td><td>identical</td><td></td></tr>
 <tr><th scope="row"><a href="kotlin.math.pow-special-cases.html">kotlin.math.pow-special-cases</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-89072, KT-88414</td></tr>
 <tr><th scope="row"><a href="kotlin.math.rounding.html">kotlin.math.rounding</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-89074</td></tr>
-<tr><th scope="row"><a href="kotlin.math.transcendental-bits.html">kotlin.math.transcendental-bits</a></th><td>platform-defined</td><td>2.4.20, 2.5.0-Beta1</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.math.transcendental-bits.html">kotlin.math.transcendental-bits</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td></td></tr>
 <tr><th scope="row"><a href="kotlin.numbers.float-conversions.html">kotlin.numbers.float-conversions</a></th><td>unclassified</td><td>2.4.20</td><td>KT-88414</td></tr>
-<tr><th scope="row"><a href="kotlin.numbers.type-checks.html">kotlin.numbers.type-checks</a></th><td>unclassified</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.numbers.type-checks.html">kotlin.numbers.type-checks</a></th><td>unclassified</td><td>2.4.20</td><td></td></tr>
 <tr><th scope="row"><a href="kotlin.random.seeded.html">kotlin.random.seeded</a></th><td>documented</td><td>identical</td><td></td></tr>
-<tr><th scope="row"><a href="kotlin.regex.anchors-lines.html">kotlin.regex.anchors-lines</a></th><td>unclassified</td><td>identical</td><td></td></tr>
-<tr><th scope="row"><a href="kotlin.regex.groups-replace.html">kotlin.regex.groups-replace</a></th><td>documented</td><td>identical</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.regex.anchors-lines.html">kotlin.regex.anchors-lines</a></th><td>unclassified</td><td>2.4.20</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.regex.groups-replace.html">kotlin.regex.groups-replace</a></th><td>unclassified</td><td>2.4.20</td><td></td></tr>
 <tr><th scope="row"><a href="kotlin.regex.syntax-support.html">kotlin.regex.syntax-support</a></th><td>documented</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-49557, KT-71003</td></tr>
 <tr><th scope="row"><a href="kotlin.regex.unicode-matching.html">kotlin.regex.unicode-matching</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-51859, KT-58195, KT-53212, KT-58678</td></tr>
-<tr><th scope="row"><a href="kotlin.string.compare-order.html">kotlin.string.compare-order</a></th><td>documented</td><td>2.4.20, 2.5.0-Beta1</td><td></td></tr>
-<tr><th scope="row"><a href="kotlin.string.hashcode.html">kotlin.string.hashcode</a></th><td>unclassified</td><td>identical</td><td>KT-44746, KT-61028</td></tr>
+<tr><th scope="row"><a href="kotlin.string.compare-order.html">kotlin.string.compare-order</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.string.hashcode.html">kotlin.string.hashcode</a></th><td>unclassified</td><td>2.4.20</td><td>KT-44746, KT-61028</td></tr>
 <tr><th scope="row"><a href="kotlin.string.padding.html">kotlin.string.padding</a></th><td>documented</td><td>identical</td><td></td></tr>
 <tr><th scope="row"><a href="kotlin.string.split-replace-lines.html">kotlin.string.split-replace-lines</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td>KT-63088, KT-50777</td></tr>
-<tr><th scope="row"><a href="kotlin.string.supplementary.html">kotlin.string.supplementary</a></th><td>documented</td><td>2.4.20, 2.5.0-Beta1</td><td></td></tr>
+<tr><th scope="row"><a href="kotlin.string.supplementary.html">kotlin.string.supplementary</a></th><td>unclassified</td><td>2.4.20, 2.5.0-Beta1</td><td></td></tr>
 <tr><th scope="row"><a href="kotlin.time.duration-format.html">kotlin.time.duration-format</a></th><td>documented</td><td>identical</td><td></td></tr>
 </table>
 <h2>Columns</h2>
@@ -95,8 +96,11 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <tr><th scope="col">Column</th><th scope="col">Kotlin</th><th scope="col">Transcript</th><th scope="col">How</th></tr>
 <tr><th scope="row">android</th><td>2.4.20</td><td><a href="../data/transcripts/android.txt">transcript</a></td><td>The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</td></tr>
 <tr><th scope="row">android</th><td>2.5.0-Beta1</td><td><a href="../data/transcripts/2.5.0-beta1/android.txt">transcript</a></td><td>The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</td></tr>
+<tr><th scope="row">cloudflare-jvm</th><td>2.4.20</td><td><a href="../data/transcripts/cloudflare-jvm.txt">transcript</a></td><td>The probes compiled as Kotlin/JVM 2.4.20 classes and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM), run on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). The Java classes are TeaVM's class library, not a JDK. Four probes are recorded as unavailable: two are skipped because integer division traps in the compiled module and a trap aborts the request, one fails with a NullPointerException, and one is refused at build time because java.util.regex.Matcher.useAnchoringBounds is missing; tools/cloudflare has the details. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bits of 0/0-raw and sqrt-neg-raw (fff8000000000000 deployed, 7ff8000000000000 here).</td></tr>
+<tr><th scope="row">cloudflare-wasm</th><td>2.4.20</td><td><a href="../data/transcripts/cloudflare-wasm.txt">transcript</a></td><td>The Kotlin/Wasm (wasmJs) probe module on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). A 14-line JavaScript entry replaces Kotlin's loader, which does not run on workerd. Built and recorded by tools/cloudflare and drift probe cloudflare. Byte-identical to the wasm column apart from the target line. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bit of 0/0-raw (fff8000000000000 deployed, 7ff8000000000000 here).</td></tr>
 <tr><th scope="row">ios</th><td>2.4.20</td><td><a href="../data/transcripts/ios.txt">transcript</a></td><td>The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</td></tr>
 <tr><th scope="row">ios</th><td>2.5.0-Beta1</td><td><a href="../data/transcripts/2.5.0-beta1/ios.txt">transcript</a></td><td>The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</td></tr>
+<tr><th scope="row">js-ir</th><td>2.4.20</td><td><a href="../data/transcripts/js-ir.txt">transcript</a></td><td>Kotlin/JS IR on Node 26.8.2, macOS, Apple Silicon (arm64). The standalone Kotlin 2.4.20 compiler builds each probe from the displayed source through tools/ladder; Node runs it. Same transcript as fixtures/atlas-ladder/2.4.20/js-ir.txt.</td></tr>
 <tr><th scope="row">jvm</th><td>2.4.20</td><td><a href="../data/transcripts/jvm.txt">transcript</a></td><td>The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</td></tr>
 <tr><th scope="row">jvm</th><td>2.5.0-Beta1</td><td><a href="../data/transcripts/2.5.0-beta1/jvm.txt">transcript</a></td><td>The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</td></tr>
 <tr><th scope="row">jvm-17</th><td>2.4.20</td><td><a href="../data/transcripts/jvm-17.txt">transcript</a></td><td>The CLI JVM classes (jvmTarget 17) on Temurin 17.0.20.1, x86-64 Linux container, recorded with --target jvm-17.</td></tr>

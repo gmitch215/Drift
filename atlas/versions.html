@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Version changes | Drift Atlas</title>
+<style>
+:root{color-scheme:light dark;--fg:#1a1a1a;--bg:#fff;--muted:#555;--line:#c8c8c8;
+--mark:#ffe58a;--code:#f3f3f3;--link:#0b57d0}
+@media (prefers-color-scheme:dark){:root{--fg:#ececec;--bg:#161616;--muted:#a8a8a8;
+--line:#444;--mark:#6b5300;--code:#222;--link:#8ab4f8}}
+body{margin:0;font:16px/1.5 system-ui,sans-serif;color:var(--fg);background:var(--bg)}
+header,main,footer{max-width:72rem;margin:0 auto;padding:.75rem 1rem}
+a{color:var(--link)}
+.skip{position:absolute;left:-999px}.skip:focus{left:1rem;top:.5rem}
+nav a{margin-right:1rem}
+pre,code{font:14px/1.4 ui-monospace,monospace;background:var(--code)}
+pre{padding:.5rem;overflow-x:auto;white-space:pre}
+table{border-collapse:collapse;display:block;overflow-x:auto;max-width:100%}
+th,td{border:1px solid var(--line);padding:.25rem .5rem;text-align:left;vertical-align:top}
+tr.differs{background:var(--mark)}
+mark{background:var(--mark);color:inherit}
+blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
+.draft{border:2px solid var(--fg);padding:.5rem}
+.muted{color:var(--muted)}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+<nav aria-label="Atlas">
+<a href="./../">Drift</a>
+<a href="./">Interactive Atlas</a>
+<a href="./probe/">All probes</a>
+<a href="./versions.html">Version changes</a>
+<a href="./data/dataset.json">dataset.json</a>
+<a href="./data/classification.json">classification.json</a>
+</nav>
+</header>
+<main id="main">
+<h1>Version changes</h1>
+<p>38 Kotlin probes on 74 columns (1.3.72, 1.4.32, 1.5.32, 1.6.21, 1.7.22, 1.8.22, 1.9.25, 2.0.21, 2.1.21, 2.2.21, 2.3.21, 2.4.0, 2.4.20, 2.4.21, 2.5.0-Beta1). For each target, every probe whose transcript differs from the previous version measured on that target is listed with the differing lines. A probe that fails to compile is recorded as unavailable, so an API that appears in a later version shows as a change. Compilers older than the committed columns are standalone builds of the displayed probe source.</p>
+<p>The same data is in <a href="data/ladder.json">data/ladder.json</a>; <code>drift atlas diff ladder.json --from X --to Y [--target T]</code> compares any two versions.</p>
+<ul>
+<li><a href="#android">android</a></li>
+<li><a href="#cloudflare-jvm">cloudflare-jvm</a></li>
+<li><a href="#cloudflare-wasm">cloudflare-wasm</a></li>
+<li><a href="#ios">ios</a></li>
+<li><a href="#js-ir">js-ir</a></li>
+<li><a href="#js-legacy">js-legacy</a></li>
+<li><a href="#jvm">jvm</a></li>
+<li><a href="#jvm-17">jvm-17</a></li>
+<li><a href="#jvm-21">jvm-21</a></li>
+<li><a href="#jvm-25">jvm-25</a></li>
+<li><a href="#linux">linux</a></li>
+<li><a href="#linux-arm64">linux-arm64</a></li>
+<li><a href="#macos">macos</a></li>
+<li><a href="#wasm">wasm</a></li>
+<li><a href="#wasm-chromium">wasm-chromium</a></li>
+<li><a href="#wasm-firefox">wasm-firefox</a></li>
+<li><a href="#wasm-webkit">wasm-webkit</a></li>
+</ul>
+<h2 id="android">android</h2>
+<table>
+<caption>Probes that change, android</caption>
+<tr><th scope="col">From</th><th scope="col">To</th><th scope="col">Changed</th><th scope="col">Became available</th><th scope="col">Became unavailable</th></tr>
+<tr><td>2.4.20</td><td>2.5.0-Beta1</td><td>0</td><td>0</td><td>0</td></tr>
+</table>
+<h2 id="cloudflare-jvm">cloudflare-jvm</h2>
+<p>Measured on 2.4.20 only.</p>
+<h2 id="cloudflare-wasm">cloudflare-wasm</h2>
+<p>Measured on 2.4.20 only.</p>
+<h2 id="ios">ios</h2>
+<table>
+<caption>Probes that change, ios</caption>
+<tr><th scope="col">From</th><th scope="col">To</th><th scope="col">Changed</th><th scope="col">Became available</th><th scope="col">Became unavailable</th></tr>
+<tr><td>2.4.20</td><td><a href="#ios-2.4.20-2.5.0-Beta1">2.5.0-Beta1</a></td><td>1</td><td>0</td><td>0</td></tr>
+</table>
+<h3 id="ios-2.4.20-2.5.0-Beta1">ios: 2.4.20 to 2.5.0-Beta1</h3>
+<ul>
+<li><a href="probe/kotlin.numbers.float-conversions.html">kotlin.numbers.float-conversions</a>: changed<pre>line 13 (2.4.20): ulong-max-double = 1.844674407370955E19
+line 13 (2.5.0-Beta1): ulong-max-double = 1.8446744073709552E19</pre></li>
+</ul>
+<h2 id="js-ir">js-ir</h2>
+<table>
+<caption>Probes that change, js-ir</caption>
+<tr><th scope="col">From</th><th scope="col">To</th><th scope="col">Changed</th><th scope="col">Became available</th><th scope="col">Became unavailable</th></tr>
+<tr><td>1.4.32</td><td><a href="#js-ir-1.4.32-1.5.32">1.5.32</a></td><td>16</td><td>6</td><td>1</td></tr>
+<tr><td>1.5.32</td><td><a href="#js-ir-1.5.32-1.6.21">1.6.21</a></td><td>10</td><td>2</td><td>0</td></tr>
+<tr><td>1.6.21</td><td><a href="#js-ir-1.6.21-1.7.22">1.7.22</a></td><td>5</td><td>3</td><td>0</td></tr>
+<tr><td>1.7.22</td><td><a href="#js-ir-1.7.22-1.8.22">1.8.22</a></td><td>2</td><td>1</td><td>0</td></tr>
+<tr><td>1.8.22</td><td><a href="#js-ir-1.8.22-1.9.25">1.9.25</a></td><td>7</td><td>1</td><td>0</td></tr>
+<tr><td>1.9.25</td><td><a href="#js-ir-1.9.25-2.0.21">2.0.21</a></td><td>2</td><td>0</td><td>0</td></tr>
+<tr><td>2.0.21</td><td>2.1.21</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>2.1.21</td><td><a href="#js-ir-2.1.21-2.2.21">2.2.21</a></td><td>1</td><td>0</td><td>0</td></tr>
+<tr><td>2.2.21</td><td>2.3.21</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>2.3.21</td><td>2.4.0</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>2.4.0</td><td>2.4.20</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>2.4.20</td><td>2.4.21</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>2.4.21</td><td><a href="#js-ir-2.4.21-2.5.0-Beta1">2.5.0-Beta1</a></td><td>1</td><td>0</td><td>0</td></tr>
+</table>
+<h3 id="js-ir-1.4.32-1.5.32">js-ir: 1.4.32 to 1.5.32</h3>
+<ul>
+<li><a href="probe/kotlin.char.bmp-case-mapping.html">kotlin.char.bmp-case-mapping</a>: became available</li>
+<li><a href="probe/kotlin.char.bmp-categories.html">kotlin.char.bmp-categories</a>: changed<pre>line 1 (1.4.32): does not compile: unresolved reference: CharCategory
+line 1 (1.5.32): does not compile: unresolved reference: entries</pre></li>
+<li><a href="probe/kotlin.char.case-special.html">kotlin.char.case-special</a>: became available</li>
+<li><a href="probe/kotlin.char.whitespace-set.html">kotlin.char.whitespace-set</a>: became available</li>
+<li><a href="probe/kotlin.collections.sorting.html">kotlin.collections.sorting</a>: became unavailable</li>
+<li><a href="probe/kotlin.double.nan-bits.html">kotlin.double.nan-bits</a>: changed<pre>line 3 (1.4.32): neg-nan-raw = 7ff8000000000000
+line 3 (1.5.32): neg-nan-raw = fff8000000000000</pre></li>
+<li><a href="probe/kotlin.exceptions.messages.html">kotlin.exceptions.messages</a>: became available</li>
+<li><a href="probe/kotlin.float.tostring.html">kotlin.float.tostring</a>: changed<pre>line 11 (1.4.32): 0.1+0.2 = 0.3000000029802322
+line 11 (1.5.32): 0.1+0.2 = 0.30000000000000004
+line 13 (1.4.32): widen-sum = 0.3000000029802322
+line 13 (1.5.32): widen-sum = 0.30000000000000004</pre></li>
+<li><a href="probe/kotlin.int.division-modulo.html">kotlin.int.division-modulo</a>: became available</li>
+<li><a href="probe/kotlin.int.radix.html">kotlin.int.radix</a>: changed<pre>line 20 (1.4.32): arabic-digit = null
+line 20 (1.5.32): arabic-digit = 3
+line 21 (1.4.32): fullwidth-digit = null
+line 21 (1.5.32): fullwidth-digit = 3</pre></li>
+<li><a href="probe/kotlin.regex.anchors-lines.html">kotlin.regex.anchors-lines</a>: changed<pre>line 1 (1.4.32): does not compile: unresolved reference: matchAt
+line 1 (1.5.32): does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.regex.syntax-support.html">kotlin.regex.syntax-support</a>: changed<pre>line 13 (1.4.32): unicode-letter = ok:false
+line 13 (1.5.32): unicode-letter = ok:true
+line 14 (1.4.32): unicode-upper = ok:false
+line 14 (1.5.32): unicode-upper = ok:true
+line 15 (1.4.32): is-alphabetic = ok:false
+line 15 (1.5.32): is-alphabetic = err:null
+line 16 (1.4.32): java-lowercase = ok:false
+line 16 (1.5.32): java-lowercase = err:null
+line 17 (1.4.32): block-greek = ok:false
+line 17 (1.5.32): block-greek = err:null
+line 18 (1.4.32): posix-alpha = ok:false
+line 18 (1.5.32): posix-alpha = ok:true
+line 19 (1.4.32): posix-bracket = ok:false
+line 19 (1.5.32): posix-bracket = err:null
+line 20 (1.4.32): horizontal-space = ok:false
+line 20 (1.5.32): horizontal-space = err:null
+line 21 (1.4.32): linebreak = ok:false
+line 21 (1.5.32): linebreak = err:null
+line 22 (1.4.32): grapheme = ok:false
+line 22 (1.5.32): grapheme = err:null
+line 23 (1.4.32): quote = ok:false
+line 23 (1.5.32): quote = err:null
+line 24 (1.4.32): literal-close-brace = ok:true
+line 24 (1.5.32): literal-close-brace = err:null
+line 25 (1.4.32): literal-open-brace = ok:true
+line 25 (1.5.32): literal-open-brace = err:null
+line 26 (1.4.32): literal-close-bracket = ok:true
+line 26 (1.5.32): literal-close-bracket = err:null
+line 27 (1.4.32): class-intersection = ok:false
+line 27 (1.5.32): class-intersection = err:null
+line 29 (1.4.32): hex-braces = ok:false
+line 29 (1.5.32): hex-braces = err:null
+line 31 (1.4.32): end-z = ok:false
+line 31 (1.5.32): end-z = err:null
+line 32 (1.4.32): end-Z = ok:false
+line 32 (1.5.32): end-Z = err:null
+line 34 (1.4.32): lone-quantifier-range = ok:true
+line 34 (1.5.32): lone-quantifier-range = err:null</pre></li>
+<li><a href="probe/kotlin.regex.unicode-matching.html">kotlin.regex.unicode-matching</a>: changed<pre>line 15 (1.4.32): dot-emoji = ok:false
+line 15 (1.5.32): dot-emoji = ok:true
+line 16 (1.4.32): two-dots-emoji = ok:true
+line 16 (1.5.32): two-dots-emoji = ok:false
+line 17 (1.4.32): letter-deseret = ok:false
+line 17 (1.5.32): letter-deseret = ok:true
+line 18 (1.4.32): upper-deseret = ok:false
+line 18 (1.5.32): upper-deseret = ok:true
+line 22 (1.4.32): ic-kelvin = ok:false
+line 22 (1.5.32): ic-kelvin = ok:true
+line 27 (1.4.32): ic-deseret = ok:false
+line 27 (1.5.32): ic-deseret = ok:true</pre></li>
+<li><a href="probe/kotlin.string.compare-order.html">kotlin.string.compare-order</a>: changed<pre>line 7 (1.4.32): sharp-s-vs-SS = false
+line 7 (1.5.32): sharp-s-vs-SS = true
+line 9 (1.4.32): dotless-i-vs-I = false
+line 9 (1.5.32): dotless-i-vs-I = true
+line 12 (1.4.32): final-sigma = false
+line 12 (1.5.32): final-sigma = true</pre></li>
+<li><a href="probe/kotlin.string.supplementary.html">kotlin.string.supplementary</a>: became available</li>
+<li><a href="probe/kotlin.time.duration-format.html">kotlin.time.duration-format</a>: changed<pre>line 1 (1.4.32): does not compile: unresolved reference: days
+line 1 (1.5.32): does not compile: unresolved reference: minutes</pre></li>
+</ul>
+<h3 id="js-ir-1.5.32-1.6.21">js-ir: 1.5.32 to 1.6.21</h3>
+<ul>
+<li><a href="probe/kotlin.collections.sorting.html">kotlin.collections.sorting</a>: changed<pre>line 1 (1.5.32): does not compile: using 'max(): Double?' is an error. Use maxOrNull instead.
+line 1 (1.6.21): does not compile: unresolved reference: max</pre></li>
+<li><a href="probe/kotlin.exceptions.messages.html">kotlin.exceptions.messages</a>: changed<pre>line 12 (1.5.32): array-index = ok:undefined
+line 12 (1.6.21): array-index = ok:null</pre></li>
+<li><a href="probe/kotlin.exceptions.tostring-cause.html">kotlin.exceptions.tostring-cause</a>: changed<pre>line 1 (1.5.32): toString = ProbeException: m
+line 1 (1.6.21): toString = probe16$1$ProbeException: m
+line 5 (1.5.32): bare-message = undefined
+line 5 (1.6.21): bare-message = null
+line 6 (1.5.32): cause-null = undefined
+line 6 (1.6.21): cause-null = null
+line 13 (1.5.32): stack-first-line = ProbeException: m
+line 13 (1.6.21): stack-first-line = probe16$1$ProbeException: m</pre></li>
+<li><a href="probe/kotlin.int.overflow.html">kotlin.int.overflow</a>: changed<pre>line 6 (1.5.32): long-min/-1 = -9223372036854776000
+line 6 (1.6.21): long-min/-1 = -9223372036854775808
+line 9 (1.5.32): long-max+1 = -9223372036854776000
+line 9 (1.6.21): long-max+1 = -9223372036854775808
+line 17 (1.5.32): long-ushr = 9223372036854776000
+line 17 (1.6.21): long-ushr = 9223372036854775804</pre></li>
+<li><a href="probe/kotlin.int.radix.html">kotlin.int.radix</a>: changed<pre>line 27 (1.5.32): long-min = -9223372036854776000
+line 27 (1.6.21): long-min = -9223372036854775808</pre></li>
+<li><a href="probe/kotlin.long.bit-ops.html">kotlin.long.bit-ops</a>: became available</li>
+<li><a href="probe/kotlin.numbers.float-conversions.html">kotlin.numbers.float-conversions</a>: changed<pre>line 4 (1.5.32): 1e20-long = 9223372036854776000
+line 4 (1.6.21): 1e20-long = 9223372036854775807
+line 11 (1.5.32): long-max-roundtrip = 9223372036854776000
+line 11 (1.6.21): long-max-roundtrip = 9223372036854775807</pre></li>
+<li><a href="probe/kotlin.random.seeded.html">kotlin.random.seeded</a>: changed<pre>line 4 (1.5.32): long = -6040149782845276000
+line 4 (1.6.21): long = -6040149782845276193</pre></li>
+<li><a href="probe/kotlin.string.compare-order.html">kotlin.string.compare-order</a>: changed<pre>line 7 (1.5.32): sharp-s-vs-SS = true
+line 7 (1.6.21): sharp-s-vs-SS = false
+line 8 (1.5.32): dotted-I-vs-i = false
+line 8 (1.6.21): dotted-I-vs-i = true
+line 15 (1.5.32): compare-ignore-case-sharp-s = 1
+line 15 (1.6.21): compare-ignore-case-sharp-s = 108
+line 16 (1.5.32): compare-ignore-case-upper-lower = -1
+line 16 (1.6.21): compare-ignore-case-upper-lower = -6</pre></li>
+<li><a href="probe/kotlin.time.duration-format.html">kotlin.time.duration-format</a>: became available</li>
+</ul>
+<h3 id="js-ir-1.6.21-1.7.22">js-ir: 1.6.21 to 1.7.22</h3>
+<ul>
+<li><a href="probe/kotlin.collections.sorting.html">kotlin.collections.sorting</a>: became available</li>
+<li><a href="probe/kotlin.exceptions.messages.html">kotlin.exceptions.messages</a>: changed<pre>line 9 (1.6.21): int-mod-zero = ok:NaN
+line 9 (1.7.22): int-mod-zero = ok:0</pre></li>
+<li><a href="probe/kotlin.math.transcendental-bits.html">kotlin.math.transcendental-bits</a>: changed<pre>line 1 (1.6.21): does not compile: unresolved reference: cbrt
+line 1 (1.7.22): does not compile: this declaration needs opt-in. Its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.regex.anchors-lines.html">kotlin.regex.anchors-lines</a>: became available</li>
+<li><a href="probe/kotlin.regex.groups-replace.html">kotlin.regex.groups-replace</a>: became available</li>
+</ul>
+<h3 id="js-ir-1.7.22-1.8.22">js-ir: 1.7.22 to 1.8.22</h3>
+<ul>
+<li><a href="probe/kotlin.char.bmp-categories.html">kotlin.char.bmp-categories</a>: changed<pre>line 1 (1.7.22): does not compile: unresolved reference: entries
+line 1 (1.8.22): does not compile: this declaration needs opt-in. Its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.math.transcendental-bits.html">kotlin.math.transcendental-bits</a>: became available</li>
+</ul>
+<h3 id="js-ir-1.8.22-1.9.25">js-ir: 1.8.22 to 1.9.25</h3>
+<ul>
+<li><a href="probe/kotlin.char.bmp-categories.html">kotlin.char.bmp-categories</a>: became available</li>
+<li><a href="probe/kotlin.collections.hash-order.html">kotlin.collections.hash-order</a>: changed<pre>line 1 (1.8.22): ints = [3, 8, 17, 42, 100, 1000, -5]
+line 1 (1.9.25): ints = [100, 3, 17, 42, 8, 1000, -5]
+line 2 (1.8.22): strings = [fig, kiwi, pear, apple, banana]
+line 2 (1.9.25): strings = [pear, apple, fig, banana, kiwi]
+line 3 (1.8.22): chars = [B, a, m, z]
+line 3 (1.9.25): chars = [z, a, m, B]
+line 4 (1.8.22): longs = [-1, 3, 100, 5000000000]
+line 4 (1.9.25): longs = [5000000000, 3, -1, 100]
+line 5 (1.8.22): doubles = [100, 0.1, 1.5, -2]
+line 5 (1.9.25): doubles = [1.5, 0.1, -2, 100]
+line 7 (1.8.22): map-keys = [a, b, m, z]
+line 7 (1.9.25): map-keys = [z, a, m, b]
+line 8 (1.8.22): map-string = {1=a, 2=b, 3=c}
+line 8 (1.9.25): map-string = {3=c, 1=a, 2=b}</pre></li>
+<li><a href="probe/kotlin.collections.iterator-modification.html">kotlin.collections.iterator-modification</a>: changed<pre>line 5 (1.8.22): map-put = ok:{1=1, 2=2, 11=0, 12=0}
+line 5 (1.9.25): map-put = err:ConcurrentModificationException
+line 6 (1.8.22): hashmap-remove-other = err:null
+line 6 (1.9.25): hashmap-remove-other = err:ConcurrentModificationException
+line 7 (1.8.22): set-add = ok:[1, 2, 11, 12]
+line 7 (1.9.25): set-add = err:ConcurrentModificationException</pre></li>
+<li><a href="probe/kotlin.double.shortest-digits.html">kotlin.double.shortest-digits</a>: changed<pre>line 10 (1.8.22): 0.1f = 0.10000000149011612
+line 10 (1.9.25): 0.1f = 0.1</pre></li>
+<li><a href="probe/kotlin.exceptions.messages.html">kotlin.exceptions.messages</a>: changed<pre>line 19 (1.8.22): negative-list = ok:[]
+line 19 (1.9.25): negative-list = err:IllegalArgumentException:Negative initial capacity: -1</pre></li>
+<li><a href="probe/kotlin.float.tostring.html">kotlin.float.tostring</a>: changed<pre>line 12 (1.8.22): widen-0.1 = 0.10000000149011612
+line 12 (1.9.25): widen-0.1 = 0.1</pre></li>
+<li><a href="probe/kotlin.string.hashcode.html">kotlin.string.hashcode</a>: changed<pre>line 18 (1.8.22): boolean = 1
+line 18 (1.9.25): boolean = 1231</pre></li>
+</ul>
+<h3 id="js-ir-1.9.25-2.0.21">js-ir: 1.9.25 to 2.0.21</h3>
+<ul>
+<li><a href="probe/kotlin.collections.tostring-forms.html">kotlin.collections.tostring-forms</a>: changed<pre>line 1 (1.9.25): does not compile: unsupported [This reflection API is not supported yet in JavaScript]
+line 1 (2.0.21): does not compile: unsupported [This reflection API is not supported yet in JavaScript].</pre></li>
+<li><a href="probe/kotlin.exceptions.tostring-cause.html">kotlin.exceptions.tostring-cause</a>: changed<pre>line 1 (1.9.25): toString = probe16$1$ProbeException: m
+line 1 (2.0.21): toString = probe16$ProbeException: m
+line 13 (1.9.25): stack-first-line = probe16$1$ProbeException: m
+line 13 (2.0.21): stack-first-line = probe16$ProbeException: m</pre></li>
+</ul>
+<h3 id="js-ir-2.1.21-2.2.21">js-ir: 2.1.21 to 2.2.21</h3>
+<ul>
+<li><a href="probe/kotlin.collections.tostring-forms.html">kotlin.collections.tostring-forms</a>: changed<pre>line 1 (2.1.21): does not compile: unsupported [This reflection API is not supported yet in JavaScript].
+line 1 (2.2.21): does not compile: this reflection API is not supported in Kotlin/JS.</pre></li>
+</ul>
+<h3 id="js-ir-2.4.21-2.5.0-Beta1">js-ir: 2.4.21 to 2.5.0-Beta1</h3>
+<ul>
+<li><a href="probe/kotlin.exceptions.messages.html">kotlin.exceptions.messages</a>: changed<pre>line 8 (2.4.21): long-div-zero = err:Exception:division by zero
+line 8 (2.5.0-Beta1): long-div-zero = err:ArithmeticException:/ by zero</pre></li>
+</ul>
+<h2 id="js-legacy">js-legacy</h2>
+<table>
+<caption>Probes that change, js-legacy</caption>
+<tr><th scope="col">From</th><th scope="col">To</th><th scope="col">Changed</th><th scope="col">Became available</th><th scope="col">Became unavailable</th></tr>
+<tr><td>1.3.72</td><td><a href="#js-legacy-1.3.72-1.4.32">1.4.32</a></td><td>14</td><td>9</td><td>0</td></tr>
+<tr><td>1.4.32</td><td><a href="#js-legacy-1.4.32-1.5.32">1.5.32</a></td><td>14</td><td>6</td><td>1</td></tr>
+<tr><td>1.5.32</td><td><a href="#js-legacy-1.5.32-1.6.21">1.6.21</a></td><td>4</td><td>2</td><td>0</td></tr>
+<tr><td>1.6.21</td><td><a href="#js-legacy-1.6.21-1.7.22">1.7.22</a></td><td>5</td><td>3</td><td>0</td></tr>
+<tr><td>1.7.22</td><td><a href="#js-legacy-1.7.22-1.8.22">1.8.22</a></td><td>2</td><td>1</td><td>0</td></tr>
+</table>
+<h3 id="js-legacy-1.3.72-1.4.32">js-legacy: 1.3.72 to 1.4.32</h3>
+<ul>
+<li><a href="probe/kotlin.char.bmp-case-mapping.html">kotlin.char.bmp-case-mapping</a>: changed<pre>line 1 (1.3.72): does not compile: cannot access '&lt;init&gt;': it is private in 'Char'
+line 1 (1.4.32): does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.char.case-special.html">kotlin.char.case-special</a>: changed<pre>line 1 (1.3.72): does not compile: unresolved reference: uppercase
+line 1 (1.4.32): does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.char.whitespace-set.html">kotlin.char.whitespace-set</a>: changed<pre>line 1 (1.3.72): does not compile: cannot access '&lt;init&gt;': it is private in 'Char'
+line 1 (1.4.32): does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.collections.sorting.html">kotlin.collections.sorting</a>: became available</li>
+<li><a href="probe/kotlin.double.parse.html">kotlin.double.parse</a>: became available</li>
+<li><a href="probe/kotlin.double.shortest-digits.html">kotlin.double.shortest-digits</a>: became available</li>
+<li><a href="probe/kotlin.double.tostring-boundaries.html">kotlin.double.tostring-boundaries</a>: became available</li>
+<li><a href="probe/kotlin.exceptions.tostring-cause.html">kotlin.exceptions.tostring-cause</a>: became available</li>
+<li><a href="probe/kotlin.float.tostring.html">kotlin.float.tostring</a>: became available</li>
+<li><a href="probe/kotlin.int.division-modulo.html">kotlin.int.division-modulo</a>: changed<pre>line 1 (1.3.72): does not compile: using 'mod(Int): Int' is an error. Use rem(other) instead
+line 1 (1.4.32): does not compile: unresolved reference: mod</pre></li>
+<li><a href="probe/kotlin.int.radix.html">kotlin.int.radix</a>: became available</li>
+<li><a href="probe/kotlin.math.rounding.html">kotlin.math.rounding</a>: became available</li>
+<li><a href="probe/kotlin.random.seeded.html">kotlin.random.seeded</a>: became available</li>
+<li><a href="probe/kotlin.string.supplementary.html">kotlin.string.supplementary</a>: changed<pre>line 1 (1.3.72): does not compile: unresolved reference: uppercase
+line 1 (1.4.32): does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+</ul>
+<h3 id="js-legacy-1.4.32-1.5.32">js-legacy: 1.4.32 to 1.5.32</h3>
+<ul>
+<li><a href="probe/kotlin.char.bmp-case-mapping.html">kotlin.char.bmp-case-mapping</a>: became available</li>
+<li><a href="probe/kotlin.char.bmp-categories.html">kotlin.char.bmp-categories</a>: changed<pre>line 1 (1.4.32): does not compile: unresolved reference: CharCategory
+line 1 (1.5.32): does not compile: unresolved reference: entries</pre></li>
+<li><a href="probe/kotlin.char.case-special.html">kotlin.char.case-special</a>: became available</li>
+<li><a href="probe/kotlin.char.whitespace-set.html">kotlin.char.whitespace-set</a>: became available</li>
+<li><a href="probe/kotlin.collections.sorting.html">kotlin.collections.sorting</a>: became unavailable</li>
+<li><a href="probe/kotlin.exceptions.messages.html">kotlin.exceptions.messages</a>: became available</li>
+<li><a href="probe/kotlin.int.division-modulo.html">kotlin.int.division-modulo</a>: became available</li>
+<li><a href="probe/kotlin.int.radix.html">kotlin.int.radix</a>: changed<pre>line 20 (1.4.32): arabic-digit = null
+line 20 (1.5.32): arabic-digit = 3
+line 21 (1.4.32): fullwidth-digit = null
+line 21 (1.5.32): fullwidth-digit = 3</pre></li>
+<li><a href="probe/kotlin.regex.anchors-lines.html">kotlin.regex.anchors-lines</a>: changed<pre>line 1 (1.4.32): does not compile: unresolved reference: matchAt
+line 1 (1.5.32): does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.regex.syntax-support.html">kotlin.regex.syntax-support</a>: changed<pre>line 13 (1.4.32): unicode-letter = ok:false
+line 13 (1.5.32): unicode-letter = ok:true
+line 14 (1.4.32): unicode-upper = ok:false
+line 14 (1.5.32): unicode-upper = ok:true
+line 15 (1.4.32): is-alphabetic = ok:false
+line 15 (1.5.32): is-alphabetic = err:null
+line 16 (1.4.32): java-lowercase = ok:false
+line 16 (1.5.32): java-lowercase = err:null
+line 17 (1.4.32): block-greek = ok:false
+line 17 (1.5.32): block-greek = err:null
+line 18 (1.4.32): posix-alpha = ok:false
+line 18 (1.5.32): posix-alpha = ok:true
+line 19 (1.4.32): posix-bracket = ok:false
+line 19 (1.5.32): posix-bracket = err:null
+line 20 (1.4.32): horizontal-space = ok:false
+line 20 (1.5.32): horizontal-space = err:null
+line 21 (1.4.32): linebreak = ok:false
+line 21 (1.5.32): linebreak = err:null
+line 22 (1.4.32): grapheme = ok:false
+line 22 (1.5.32): grapheme = err:null
+line 23 (1.4.32): quote = ok:false
+line 23 (1.5.32): quote = err:null
+line 24 (1.4.32): literal-close-brace = ok:true
+line 24 (1.5.32): literal-close-brace = err:null
+line 25 (1.4.32): literal-open-brace = ok:true
+line 25 (1.5.32): literal-open-brace = err:null
+line 26 (1.4.32): literal-close-bracket = ok:true
+line 26 (1.5.32): literal-close-bracket = err:null
+line 27 (1.4.32): class-intersection = ok:false
+line 27 (1.5.32): class-intersection = err:null
+line 29 (1.4.32): hex-braces = ok:false
+line 29 (1.5.32): hex-braces = err:null
+line 31 (1.4.32): end-z = ok:false
+line 31 (1.5.32): end-z = err:null
+line 32 (1.4.32): end-Z = ok:false
+line 32 (1.5.32): end-Z = err:null
+line 34 (1.4.32): lone-quantifier-range = ok:true
+line 34 (1.5.32): lone-quantifier-range = err:null</pre></li>
+<li><a href="probe/kotlin.regex.unicode-matching.html">kotlin.regex.unicode-matching</a>: changed<pre>line 15 (1.4.32): dot-emoji = ok:false
+line 15 (1.5.32): dot-emoji = ok:true
+line 16 (1.4.32): two-dots-emoji = ok:true
+line 16 (1.5.32): two-dots-emoji = ok:false
+line 17 (1.4.32): letter-deseret = ok:false
+line 17 (1.5.32): letter-deseret = ok:true
+line 18 (1.4.32): upper-deseret = ok:false
+line 18 (1.5.32): upper-deseret = ok:true
+line 22 (1.4.32): ic-kelvin = ok:false
+line 22 (1.5.32): ic-kelvin = ok:true
+line 27 (1.4.32): ic-deseret = ok:false
+line 27 (1.5.32): ic-deseret = ok:true</pre></li>
+<li><a href="probe/kotlin.string.compare-order.html">kotlin.string.compare-order</a>: changed<pre>line 7 (1.4.32): sharp-s-vs-SS = false
+line 7 (1.5.32): sharp-s-vs-SS = true
+line 9 (1.4.32): dotless-i-vs-I = false
+line 9 (1.5.32): dotless-i-vs-I = true
+line 12 (1.4.32): final-sigma = false
+line 12 (1.5.32): final-sigma = true</pre></li>
+<li><a href="probe/kotlin.string.supplementary.html">kotlin.string.supplementary</a>: became available</li>
+<li><a href="probe/kotlin.time.duration-format.html">kotlin.time.duration-format</a>: changed<pre>line 1 (1.4.32): does not compile: unresolved reference: days
+line 1 (1.5.32): does not compile: unresolved reference: minutes</pre></li>
+</ul>
+<h3 id="js-legacy-1.5.32-1.6.21">js-legacy: 1.5.32 to 1.6.21</h3>
+<ul>
+<li><a href="probe/kotlin.collections.sorting.html">kotlin.collections.sorting</a>: changed<pre>line 1 (1.5.32): does not compile: using 'max(): Double?' is an error. Use maxOrNull instead.
+line 1 (1.6.21): does not compile: unresolved reference: max</pre></li>
+<li><a href="probe/kotlin.long.bit-ops.html">kotlin.long.bit-ops</a>: became available</li>
+<li><a href="probe/kotlin.string.compare-order.html">kotlin.string.compare-order</a>: changed<pre>line 7 (1.5.32): sharp-s-vs-SS = true
+line 7 (1.6.21): sharp-s-vs-SS = false
+line 8 (1.5.32): dotted-I-vs-i = false
+line 8 (1.6.21): dotted-I-vs-i = true</pre></li>
+<li><a href="probe/kotlin.time.duration-format.html">kotlin.time.duration-format</a>: became available</li>
+</ul>
+<h3 id="js-legacy-1.6.21-1.7.22">js-legacy: 1.6.21 to 1.7.22</h3>
+<ul>
+<li><a href="probe/kotlin.collections.sorting.html">kotlin.collections.sorting</a>: became available</li>
+<li><a href="probe/kotlin.exceptions.messages.html">kotlin.exceptions.messages</a>: changed<pre>line 9 (1.6.21): int-mod-zero = ok:NaN
+line 9 (1.7.22): int-mod-zero = ok:0</pre></li>
+<li><a href="probe/kotlin.math.transcendental-bits.html">kotlin.math.transcendental-bits</a>: changed<pre>line 1 (1.6.21): does not compile: unresolved reference: cbrt
+line 1 (1.7.22): does not compile: this declaration needs opt-in. Its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.regex.anchors-lines.html">kotlin.regex.anchors-lines</a>: became available</li>
+<li><a href="probe/kotlin.regex.groups-replace.html">kotlin.regex.groups-replace</a>: became available</li>
+</ul>
+<h3 id="js-legacy-1.7.22-1.8.22">js-legacy: 1.7.22 to 1.8.22</h3>
+<ul>
+<li><a href="probe/kotlin.char.bmp-categories.html">kotlin.char.bmp-categories</a>: changed<pre>line 1 (1.7.22): does not compile: unresolved reference: entries
+line 1 (1.8.22): does not compile: this declaration needs opt-in. Its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.math.transcendental-bits.html">kotlin.math.transcendental-bits</a>: became available</li>
+</ul>
+<h2 id="jvm">jvm</h2>
+<table>
+<caption>Probes that change, jvm</caption>
+<tr><th scope="col">From</th><th scope="col">To</th><th scope="col">Changed</th><th scope="col">Became available</th><th scope="col">Became unavailable</th></tr>
+<tr><td>1.3.72</td><td><a href="#jvm-1.3.72-1.4.32">1.4.32</a></td><td>14</td><td>9</td><td>0</td></tr>
+<tr><td>1.4.32</td><td><a href="#jvm-1.4.32-1.5.32">1.5.32</a></td><td>9</td><td>6</td><td>1</td></tr>
+<tr><td>1.5.32</td><td><a href="#jvm-1.5.32-1.6.21">1.6.21</a></td><td>3</td><td>2</td><td>0</td></tr>
+<tr><td>1.6.21</td><td><a href="#jvm-1.6.21-1.7.22">1.7.22</a></td><td>3</td><td>2</td><td>0</td></tr>
+<tr><td>1.7.22</td><td><a href="#jvm-1.7.22-1.8.22">1.8.22</a></td><td>3</td><td>2</td><td>0</td></tr>
+<tr><td>1.8.22</td><td><a href="#jvm-1.8.22-1.9.25">1.9.25</a></td><td>1</td><td>1</td><td>0</td></tr>
+<tr><td>1.9.25</td><td>2.0.21</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>2.0.21</td><td>2.1.21</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>2.1.21</td><td>2.2.21</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>2.2.21</td><td>2.3.21</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>2.3.21</td><td>2.4.0</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>2.4.0</td><td><a href="#jvm-2.4.0-2.4.20">2.4.20</a></td><td>1</td><td>0</td><td>0</td></tr>
+<tr><td>2.4.20</td><td><a href="#jvm-2.4.20-2.4.21">2.4.21</a></td><td>1</td><td>0</td><td>0</td></tr>
+<tr><td>2.4.21</td><td><a href="#jvm-2.4.21-2.5.0-Beta1">2.5.0-Beta1</a></td><td>1</td><td>0</td><td>0</td></tr>
+</table>
+<h3 id="jvm-1.3.72-1.4.32">jvm: 1.3.72 to 1.4.32</h3>
+<ul>
+<li><a href="probe/kotlin.char.bmp-case-mapping.html">kotlin.char.bmp-case-mapping</a>: changed<pre>line 1 (1.3.72): does not compile: cannot access '&lt;init&gt;': it is private in 'Char'
+line 1 (1.4.32): does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.char.case-special.html">kotlin.char.case-special</a>: changed<pre>line 1 (1.3.72): does not compile: unresolved reference: uppercase
+line 1 (1.4.32): does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.char.whitespace-set.html">kotlin.char.whitespace-set</a>: changed<pre>line 1 (1.3.72): does not compile: cannot access '&lt;init&gt;': it is private in 'Char'
+line 1 (1.4.32): does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.collections.sorting.html">kotlin.collections.sorting</a>: became available</li>
+<li><a href="probe/kotlin.double.parse.html">kotlin.double.parse</a>: became available</li>
+<li><a href="probe/kotlin.double.shortest-digits.html">kotlin.double.shortest-digits</a>: became available</li>
+<li><a href="probe/kotlin.double.tostring-boundaries.html">kotlin.double.tostring-boundaries</a>: became available</li>
+<li><a href="probe/kotlin.exceptions.tostring-cause.html">kotlin.exceptions.tostring-cause</a>: became available</li>
+<li><a href="probe/kotlin.float.tostring.html">kotlin.float.tostring</a>: became available</li>
+<li><a href="probe/kotlin.int.division-modulo.html">kotlin.int.division-modulo</a>: changed<pre>line 1 (1.3.72): does not compile: using 'mod(Int): Int' is an error. Use rem(other) instead
+line 1 (1.4.32): does not compile: unresolved reference: mod</pre></li>
+<li><a href="probe/kotlin.int.radix.html">kotlin.int.radix</a>: became available</li>
+<li><a href="probe/kotlin.math.rounding.html">kotlin.math.rounding</a>: became available</li>
+<li><a href="probe/kotlin.random.seeded.html">kotlin.random.seeded</a>: became available</li>
+<li><a href="probe/kotlin.string.supplementary.html">kotlin.string.supplementary</a>: changed<pre>line 1 (1.3.72): does not compile: unresolved reference: uppercase
+line 1 (1.4.32): does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+</ul>
+<h3 id="jvm-1.4.32-1.5.32">jvm: 1.4.32 to 1.5.32</h3>
+<ul>
+<li><a href="probe/kotlin.char.bmp-case-mapping.html">kotlin.char.bmp-case-mapping</a>: became available</li>
+<li><a href="probe/kotlin.char.case-special.html">kotlin.char.case-special</a>: became available</li>
+<li><a href="probe/kotlin.char.whitespace-set.html">kotlin.char.whitespace-set</a>: became available</li>
+<li><a href="probe/kotlin.collections.sorting.html">kotlin.collections.sorting</a>: became unavailable</li>
+<li><a href="probe/kotlin.exceptions.messages.html">kotlin.exceptions.messages</a>: became available</li>
+<li><a href="probe/kotlin.int.division-modulo.html">kotlin.int.division-modulo</a>: became available</li>
+<li><a href="probe/kotlin.regex.anchors-lines.html">kotlin.regex.anchors-lines</a>: changed<pre>line 1 (1.4.32): does not compile: unresolved reference: matchAt
+line 1 (1.5.32): does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.string.supplementary.html">kotlin.string.supplementary</a>: became available</li>
+<li><a href="probe/kotlin.time.duration-format.html">kotlin.time.duration-format</a>: changed<pre>line 1 (1.4.32): does not compile: unresolved reference: days
+line 1 (1.5.32): does not compile: unresolved reference: minutes</pre></li>
+</ul>
+<h3 id="jvm-1.5.32-1.6.21">jvm: 1.5.32 to 1.6.21</h3>
+<ul>
+<li><a href="probe/kotlin.collections.sorting.html">kotlin.collections.sorting</a>: changed<pre>line 1 (1.5.32): does not compile: using 'max(): Double?' is an error. Use maxOrNull instead.
+line 1 (1.6.21): does not compile: unresolved reference: max</pre></li>
+<li><a href="probe/kotlin.long.bit-ops.html">kotlin.long.bit-ops</a>: became available</li>
+<li><a href="probe/kotlin.time.duration-format.html">kotlin.time.duration-format</a>: became available</li>
+</ul>
+<h3 id="jvm-1.6.21-1.7.22">jvm: 1.6.21 to 1.7.22</h3>
+<ul>
+<li><a href="probe/kotlin.collections.sorting.html">kotlin.collections.sorting</a>: became available</li>
+<li><a href="probe/kotlin.math.transcendental-bits.html">kotlin.math.transcendental-bits</a>: changed<pre>line 1 (1.6.21): does not compile: unresolved reference: cbrt
+line 1 (1.7.22): does not compile: this declaration needs opt-in. Its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.regex.anchors-lines.html">kotlin.regex.anchors-lines</a>: became available</li>
+</ul>
+<h3 id="jvm-1.7.22-1.8.22">jvm: 1.7.22 to 1.8.22</h3>
+<ul>
+<li><a href="probe/kotlin.char.bmp-categories.html">kotlin.char.bmp-categories</a>: changed<pre>line 1 (1.7.22): does not compile: unresolved reference: entries
+line 1 (1.8.22): does not compile: this declaration needs opt-in. Its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.math.transcendental-bits.html">kotlin.math.transcendental-bits</a>: became available</li>
+<li><a href="probe/kotlin.regex.groups-replace.html">kotlin.regex.groups-replace</a>: became available</li>
+</ul>
+<h3 id="jvm-1.8.22-1.9.25">jvm: 1.8.22 to 1.9.25</h3>
+<ul>
+<li><a href="probe/kotlin.char.bmp-categories.html">kotlin.char.bmp-categories</a>: became available</li>
+</ul>
+<h3 id="jvm-2.4.0-2.4.20">jvm: 2.4.0 to 2.4.20</h3>
+<ul>
+<li><a href="probe/kotlin.exceptions.tostring-cause.html">kotlin.exceptions.tostring-cause</a>: changed<pre>line 1 (2.4.0): toString = ladder.P_16Kt$probe16$1$ProbeException: m
+line 1 (2.4.20): toString = dev.gmitch215.drift.scan.probe.kotlin.ProbeException: m
+line 13 (2.4.0): stack-first-line = ladder.P_16Kt$probe16$1$ProbeException: m
+line 13 (2.4.20): stack-first-line = dev.gmitch215.drift.scan.probe.kotlin.ProbeException: m</pre></li>
+</ul>
+<h3 id="jvm-2.4.20-2.4.21">jvm: 2.4.20 to 2.4.21</h3>
+<ul>
+<li><a href="probe/kotlin.exceptions.tostring-cause.html">kotlin.exceptions.tostring-cause</a>: changed<pre>line 1 (2.4.20): toString = dev.gmitch215.drift.scan.probe.kotlin.ProbeException: m
+line 1 (2.4.21): toString = ladder.P_16Kt$probe16$1$ProbeException: m
+line 13 (2.4.20): stack-first-line = dev.gmitch215.drift.scan.probe.kotlin.ProbeException: m
+line 13 (2.4.21): stack-first-line = ladder.P_16Kt$probe16$1$ProbeException: m</pre></li>
+</ul>
+<h3 id="jvm-2.4.21-2.5.0-Beta1">jvm: 2.4.21 to 2.5.0-Beta1</h3>
+<ul>
+<li><a href="probe/kotlin.exceptions.tostring-cause.html">kotlin.exceptions.tostring-cause</a>: changed<pre>line 1 (2.4.21): toString = ladder.P_16Kt$probe16$1$ProbeException: m
+line 1 (2.5.0-Beta1): toString = dev.gmitch215.drift.scan.probe.kotlin.ProbeException: m
+line 13 (2.4.21): stack-first-line = ladder.P_16Kt$probe16$1$ProbeException: m
+line 13 (2.5.0-Beta1): stack-first-line = dev.gmitch215.drift.scan.probe.kotlin.ProbeException: m</pre></li>
+</ul>
+<h2 id="jvm-17">jvm-17</h2>
+<p>Measured on 2.4.20 only.</p>
+<h2 id="jvm-21">jvm-21</h2>
+<p>Measured on 2.4.20 only.</p>
+<h2 id="jvm-25">jvm-25</h2>
+<p>Measured on 2.4.20 only.</p>
+<h2 id="linux">linux</h2>
+<table>
+<caption>Probes that change, linux</caption>
+<tr><th scope="col">From</th><th scope="col">To</th><th scope="col">Changed</th><th scope="col">Became available</th><th scope="col">Became unavailable</th></tr>
+<tr><td>1.3.72</td><td><a href="#linux-1.3.72-1.4.32">1.4.32</a></td><td>15</td><td>8</td><td>0</td></tr>
+<tr><td>1.4.32</td><td><a href="#linux-1.4.32-1.5.32">1.5.32</a></td><td>13</td><td>7</td><td>1</td></tr>
+<tr><td>1.5.32</td><td><a href="#linux-1.5.32-1.6.21">1.6.21</a></td><td>4</td><td>2</td><td>0</td></tr>
+<tr><td>1.6.21</td><td><a href="#linux-1.6.21-1.7.22">1.7.22</a></td><td>6</td><td>3</td><td>0</td></tr>
+<tr><td>1.7.22</td><td><a href="#linux-1.7.22-1.8.22">1.8.22</a></td><td>3</td><td>1</td><td>0</td></tr>
+<tr><td>1.8.22</td><td><a href="#linux-1.8.22-1.9.25">1.9.25</a></td><td>6</td><td>2</td><td>0</td></tr>
+<tr><td>1.9.25</td><td>2.0.21</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>2.0.21</td><td><a href="#linux-2.0.21-2.1.21">2.1.21</a></td><td>1</td><td>1</td><td>0</td></tr>
+<tr><td>2.1.21</td><td>2.2.21</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>2.2.21</td><td>2.3.21</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>2.3.21</td><td><a href="#linux-2.3.21-2.4.20">2.4.20</a></td><td>2</td><td>0</td><td>0</td></tr>
+</table>
+<h3 id="linux-1.3.72-1.4.32">linux: 1.3.72 to 1.4.32</h3>
+<ul>
+<li><a href="probe/kotlin.char.bmp-case-mapping.html">kotlin.char.bmp-case-mapping</a>: changed<pre>line 1 (1.3.72): does not compile: cannot access '&lt;init&gt;': it is private in 'Char'
+line 1 (1.4.32): does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.char.case-special.html">kotlin.char.case-special</a>: changed<pre>line 1 (1.3.72): does not compile: unresolved reference: uppercase
+line 1 (1.4.32): does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.char.whitespace-set.html">kotlin.char.whitespace-set</a>: changed<pre>line 1 (1.3.72): does not compile: cannot access '&lt;init&gt;': it is private in 'Char'
+line 1 (1.4.32): does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.collections.sorting.html">kotlin.collections.sorting</a>: became available</li>
+<li><a href="probe/kotlin.double.nan-bits.html">kotlin.double.nan-bits</a>: changed<pre>line 3 (1.3.72): neg-nan-raw = 7ff8000000000000
+line 3 (1.4.32): neg-nan-raw = fff8000000000000</pre></li>
+<li><a href="probe/kotlin.double.parse.html">kotlin.double.parse</a>: changed<pre>line 1 (1.3.72): does not compile: the feature &quot;trailing commas&quot; is only available since language version 1.4
+line 1 (1.4.32): failed ArrayIndexOutOfBoundsException: null</pre></li>
+<li><a href="probe/kotlin.double.shortest-digits.html">kotlin.double.shortest-digits</a>: became available</li>
+<li><a href="probe/kotlin.double.tostring-boundaries.html">kotlin.double.tostring-boundaries</a>: became available</li>
+<li><a href="probe/kotlin.exceptions.tostring-cause.html">kotlin.exceptions.tostring-cause</a>: became available</li>
+<li><a href="probe/kotlin.float.tostring.html">kotlin.float.tostring</a>: became available</li>
+<li><a href="probe/kotlin.int.radix.html">kotlin.int.radix</a>: became available</li>
+<li><a href="probe/kotlin.math.rounding.html">kotlin.math.rounding</a>: became available</li>
+<li><a href="probe/kotlin.random.seeded.html">kotlin.random.seeded</a>: became available</li>
+<li><a href="probe/kotlin.string.compare-order.html">kotlin.string.compare-order</a>: changed<pre>line 1 (1.3.72): a-vs-B = 2031616
+line 1 (1.4.32): a-vs-B = 31
+line 6 (1.3.72): composed-vs-decomposed-order = 8650752
+line 6 (1.4.32): composed-vs-decomposed-order = 132</pre></li>
+<li><a href="probe/kotlin.string.supplementary.html">kotlin.string.supplementary</a>: changed<pre>line 1 (1.3.72): does not compile: unresolved reference: uppercase
+line 1 (1.4.32): does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+</ul>
+<h3 id="linux-1.4.32-1.5.32">linux: 1.4.32 to 1.5.32</h3>
+<ul>
+<li><a href="probe/kotlin.char.bmp-case-mapping.html">kotlin.char.bmp-case-mapping</a>: became available</li>
+<li><a href="probe/kotlin.char.case-special.html">kotlin.char.case-special</a>: became available</li>
+<li><a href="probe/kotlin.char.whitespace-set.html">kotlin.char.whitespace-set</a>: became available</li>
+<li><a href="probe/kotlin.collections.equality-hashing.html">kotlin.collections.equality-hashing</a>: changed<pre>line 15 (1.4.32): entry-hash = 608572940
+line 15 (1.5.32): entry-hash = 29</pre></li>
+<li><a href="probe/kotlin.collections.sorting.html">kotlin.collections.sorting</a>: became unavailable</li>
+<li><a href="probe/kotlin.exceptions.messages.html">kotlin.exceptions.messages</a>: became available</li>
+<li><a href="probe/kotlin.int.division-modulo.html">kotlin.int.division-modulo</a>: became available</li>
+<li><a href="probe/kotlin.int.overflow.html">kotlin.int.overflow</a>: became available</li>
+<li><a href="probe/kotlin.regex.anchors-lines.html">kotlin.regex.anchors-lines</a>: changed<pre>line 1 (1.4.32): does not compile: unresolved reference: matchAt
+line 1 (1.5.32): does not compile: this declaration is experimental and its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.string.compare-order.html">kotlin.string.compare-order</a>: changed<pre>line 9 (1.4.32): dotless-i-vs-I = false
+line 9 (1.5.32): dotless-i-vs-I = true
+line 12 (1.4.32): final-sigma = false
+line 12 (1.5.32): final-sigma = true
+line 13 (1.4.32): char-ignore-case = false
+line 13 (1.5.32): char-ignore-case = true
+line 14 (1.4.32): compare-ignore-case-sigma = -1
+line 14 (1.5.32): compare-ignore-case-sigma = 0</pre></li>
+<li><a href="probe/kotlin.string.hashcode.html">kotlin.string.hashcode</a>: changed<pre>line 1 (1.4.32): hello = 604317365
+line 1 (1.5.32): hello = 99162322
+line 2 (1.4.32): empty = 797982799
+line 2 (1.5.32): empty = 0
+line 3 (1.4.32): unicode = 1813156024
+line 3 (1.5.32): unicode = 27236
+line 4 (1.4.32): long = 1004188686
+line 4 (1.5.32): long = -206135704
+line 7 (1.4.32): map = 358261897
+line 7 (1.5.32): map = 192
+line 10 (1.4.32): pair = -1000452547
+line 10 (1.5.32): pair = 151
+line 12 (1.4.32): data-class = -1000452547
+line 12 (1.5.32): data-class = 151</pre></li>
+<li><a href="probe/kotlin.string.supplementary.html">kotlin.string.supplementary</a>: became available</li>
+<li><a href="probe/kotlin.time.duration-format.html">kotlin.time.duration-format</a>: changed<pre>line 1 (1.4.32): does not compile: unresolved reference: days
+line 1 (1.5.32): does not compile: unresolved reference: minutes</pre></li>
+</ul>
+<h3 id="linux-1.5.32-1.6.21">linux: 1.5.32 to 1.6.21</h3>
+<ul>
+<li><a href="probe/kotlin.collections.sorting.html">kotlin.collections.sorting</a>: changed<pre>line 1 (1.5.32): does not compile: using 'max(): Double?' is an error. Use maxOrNull instead.
+line 1 (1.6.21): does not compile: unresolved reference: max</pre></li>
+<li><a href="probe/kotlin.long.bit-ops.html">kotlin.long.bit-ops</a>: became available</li>
+<li><a href="probe/kotlin.string.supplementary.html">kotlin.string.supplementary</a>: changed<pre>line 12 (1.5.32): compare-emoji-vs-ffff = -12724007
+line 12 (1.6.21): compare-emoji-vs-ffff = -1
+line 13 (1.5.32): compare-emoji-vs-e000 = 3995640
+line 13 (1.6.21): compare-emoji-vs-e000 = -1</pre></li>
+<li><a href="probe/kotlin.time.duration-format.html">kotlin.time.duration-format</a>: became available</li>
+</ul>
+<h3 id="linux-1.6.21-1.7.22">linux: 1.6.21 to 1.7.22</h3>
+<ul>
+<li><a href="probe/kotlin.collections.sorting.html">kotlin.collections.sorting</a>: became available</li>
+<li><a href="probe/kotlin.exceptions.messages.html">kotlin.exceptions.messages</a>: changed<pre>line 32 (1.6.21): cast = err:ClassCastException:kotlin.Int cannot be cast to kotlin.String
+line 32 (1.7.22): cast = err:ClassCastException:class kotlin.Int cannot be cast to class kotlin.String</pre></li>
+<li><a href="probe/kotlin.math.transcendental-bits.html">kotlin.math.transcendental-bits</a>: changed<pre>line 1 (1.6.21): does not compile: unresolved reference: cbrt
+line 1 (1.7.22): does not compile: this declaration needs opt-in. Its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.regex.anchors-lines.html">kotlin.regex.anchors-lines</a>: became available</li>
+<li><a href="probe/kotlin.regex.groups-replace.html">kotlin.regex.groups-replace</a>: became available</li>
+<li><a href="probe/kotlin.regex.syntax-support.html">kotlin.regex.syntax-support</a>: changed<pre>line 8 (1.6.21): named-backref = err:PatternSyntaxException
+line 8 (1.7.22): named-backref = ok:true
+line 12 (1.6.21): comment-group = ok:true
+line 12 (1.7.22): comment-group = err:PatternSyntaxException
+line 20 (1.6.21): horizontal-space = err:PatternSyntaxException
+line 20 (1.7.22): horizontal-space = ok:true
+line 21 (1.6.21): linebreak = err:PatternSyntaxException
+line 21 (1.7.22): linebreak = ok:true</pre></li>
+</ul>
+<h3 id="linux-1.7.22-1.8.22">linux: 1.7.22 to 1.8.22</h3>
+<ul>
+<li><a href="probe/kotlin.char.bmp-categories.html">kotlin.char.bmp-categories</a>: changed<pre>line 1 (1.7.22): does not compile: unresolved reference: entries
+line 1 (1.8.22): does not compile: this declaration needs opt-in. Its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.double.nan-bits.html">kotlin.double.nan-bits</a>: changed<pre>line 5 (1.7.22): inf-minus-inf-raw = fff8000000000000
+line 5 (1.8.22): inf-minus-inf-raw = 7ff8000000000000</pre></li>
+<li><a href="probe/kotlin.math.transcendental-bits.html">kotlin.math.transcendental-bits</a>: became available</li>
+</ul>
+<h3 id="linux-1.8.22-1.9.25">linux: 1.8.22 to 1.9.25</h3>
+<ul>
+<li><a href="probe/kotlin.char.bmp-categories.html">kotlin.char.bmp-categories</a>: became available</li>
+<li><a href="probe/kotlin.collections.iterator-modification.html">kotlin.collections.iterator-modification</a>: became available</li>
+<li><a href="probe/kotlin.collections.tostring-forms.html">kotlin.collections.tostring-forms</a>: changed<pre>line 32 (1.8.22): kclass-list = null
+line 32 (1.9.25): kclass-list = ArrayList</pre></li>
+<li><a href="probe/kotlin.double.nan-bits.html">kotlin.double.nan-bits</a>: changed<pre>line 3 (1.8.22): neg-nan-raw = fff8000000000000
+line 3 (1.9.25): neg-nan-raw = 7ff8000000000000</pre></li>
+<li><a href="probe/kotlin.exceptions.messages.html">kotlin.exceptions.messages</a>: changed<pre>line 11 (1.8.22): list-index = err:ArrayIndexOutOfBoundsException:null
+line 11 (1.9.25): list-index = err:IndexOutOfBoundsException:index: 3, size: 1</pre></li>
+<li><a href="probe/kotlin.string.hashcode.html">kotlin.string.hashcode</a>: changed<pre>line 18 (1.8.22): boolean = 1
+line 18 (1.9.25): boolean = 1231</pre></li>
+</ul>
+<h3 id="linux-2.0.21-2.1.21">linux: 2.0.21 to 2.1.21</h3>
+<ul>
+<li><a href="probe/kotlin.double.parse.html">kotlin.double.parse</a>: became available</li>
+</ul>
+<h3 id="linux-2.3.21-2.4.20">linux: 2.3.21 to 2.4.20</h3>
+<ul>
+<li><a href="probe/kotlin.exceptions.tostring-cause.html">kotlin.exceptions.tostring-cause</a>: changed<pre>line 1 (2.3.21): toString = ProbeException: m
+line 1 (2.4.20): toString = dev.gmitch215.drift.scan.probe.kotlin.ProbeException: m
+line 13 (2.3.21): stack-first-line = ProbeException: m
+line 13 (2.4.20): stack-first-line = dev.gmitch215.drift.scan.probe.kotlin.ProbeException: m</pre></li>
+<li><a href="probe/kotlin.math.transcendental-bits.html">kotlin.math.transcendental-bits</a>: changed<pre>line 3 (2.3.21): tan1 = 3ff8eb245cbee3a6
+line 3 (2.4.20): tan1 = 3ff8eb245cbee3a5
+line 10 (2.3.21): asin-half = 3fe0c152382d7366
+line 10 (2.4.20): asin-half = 3fe0c152382d7365
+line 11 (2.3.21): acos-half = 3ff0c152382d7366
+line 11 (2.4.20): acos-half = 3ff0c152382d7365</pre></li>
+</ul>
+<h2 id="linux-arm64">linux-arm64</h2>
+<p>Measured on 2.4.20 only.</p>
+<h2 id="macos">macos</h2>
+<table>
+<caption>Probes that change, macos</caption>
+<tr><th scope="col">From</th><th scope="col">To</th><th scope="col">Changed</th><th scope="col">Became available</th><th scope="col">Became unavailable</th></tr>
+<tr><td>1.6.21</td><td><a href="#macos-1.6.21-1.7.22">1.7.22</a></td><td>6</td><td>3</td><td>0</td></tr>
+<tr><td>1.7.22</td><td><a href="#macos-1.7.22-1.8.22">1.8.22</a></td><td>2</td><td>1</td><td>0</td></tr>
+<tr><td>1.8.22</td><td><a href="#macos-1.8.22-1.9.25">1.9.25</a></td><td>6</td><td>2</td><td>0</td></tr>
+<tr><td>1.9.25</td><td>2.0.21</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>2.0.21</td><td><a href="#macos-2.0.21-2.1.21">2.1.21</a></td><td>1</td><td>1</td><td>0</td></tr>
+<tr><td>2.1.21</td><td>2.2.21</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>2.2.21</td><td>2.3.21</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>2.3.21</td><td>2.4.0</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>2.4.0</td><td><a href="#macos-2.4.0-2.4.20">2.4.20</a></td><td>1</td><td>0</td><td>0</td></tr>
+<tr><td>2.4.20</td><td><a href="#macos-2.4.20-2.4.21">2.4.21</a></td><td>1</td><td>0</td><td>0</td></tr>
+<tr><td>2.4.21</td><td><a href="#macos-2.4.21-2.5.0-Beta1">2.5.0-Beta1</a></td><td>2</td><td>0</td><td>0</td></tr>
+</table>
+<h3 id="macos-1.6.21-1.7.22">macos: 1.6.21 to 1.7.22</h3>
+<ul>
+<li><a href="probe/kotlin.collections.sorting.html">kotlin.collections.sorting</a>: became available</li>
+<li><a href="probe/kotlin.exceptions.messages.html">kotlin.exceptions.messages</a>: changed<pre>line 32 (1.6.21): cast = err:ClassCastException:kotlin.Int cannot be cast to kotlin.String
+line 32 (1.7.22): cast = err:ClassCastException:class kotlin.Int cannot be cast to class kotlin.String</pre></li>
+<li><a href="probe/kotlin.math.transcendental-bits.html">kotlin.math.transcendental-bits</a>: changed<pre>line 1 (1.6.21): does not compile: unresolved reference: cbrt
+line 1 (1.7.22): does not compile: this declaration needs opt-in. Its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.regex.anchors-lines.html">kotlin.regex.anchors-lines</a>: became available</li>
+<li><a href="probe/kotlin.regex.groups-replace.html">kotlin.regex.groups-replace</a>: became available</li>
+<li><a href="probe/kotlin.regex.syntax-support.html">kotlin.regex.syntax-support</a>: changed<pre>line 8 (1.6.21): named-backref = err:PatternSyntaxException
+line 8 (1.7.22): named-backref = ok:true
+line 12 (1.6.21): comment-group = ok:true
+line 12 (1.7.22): comment-group = err:PatternSyntaxException
+line 20 (1.6.21): horizontal-space = err:PatternSyntaxException
+line 20 (1.7.22): horizontal-space = ok:true
+line 21 (1.6.21): linebreak = err:PatternSyntaxException
+line 21 (1.7.22): linebreak = ok:true</pre></li>
+</ul>
+<h3 id="macos-1.7.22-1.8.22">macos: 1.7.22 to 1.8.22</h3>
+<ul>
+<li><a href="probe/kotlin.char.bmp-categories.html">kotlin.char.bmp-categories</a>: changed<pre>line 1 (1.7.22): does not compile: unresolved reference: entries
+line 1 (1.8.22): does not compile: this declaration needs opt-in. Its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'</pre></li>
+<li><a href="probe/kotlin.math.transcendental-bits.html">kotlin.math.transcendental-bits</a>: became available</li>
+</ul>
+<h3 id="macos-1.8.22-1.9.25">macos: 1.8.22 to 1.9.25</h3>
+<ul>
+<li><a href="probe/kotlin.char.bmp-categories.html">kotlin.char.bmp-categories</a>: became available</li>
+<li><a href="probe/kotlin.collections.iterator-modification.html">kotlin.collections.iterator-modification</a>: became available</li>
+<li><a href="probe/kotlin.collections.tostring-forms.html">kotlin.collections.tostring-forms</a>: changed<pre>line 32 (1.8.22): kclass-list = null
+line 32 (1.9.25): kclass-list = ArrayList</pre></li>
+<li><a href="probe/kotlin.double.nan-bits.html">kotlin.double.nan-bits</a>: changed<pre>line 3 (1.8.22): neg-nan-raw = fff8000000000000
+line 3 (1.9.25): neg-nan-raw = 7ff8000000000000</pre></li>
+<li><a href="probe/kotlin.exceptions.messages.html">kotlin.exceptions.messages</a>: changed<pre>line 11 (1.8.22): list-index = err:ArrayIndexOutOfBoundsException:null
+line 11 (1.9.25): list-index = err:IndexOutOfBoundsException:index: 3, size: 1</pre></li>
+<li><a href="probe/kotlin.string.hashcode.html">kotlin.string.hashcode</a>: changed<pre>line 18 (1.8.22): boolean = 1
+line 18 (1.9.25): boolean = 1231</pre></li>
+</ul>
+<h3 id="macos-2.0.21-2.1.21">macos: 2.0.21 to 2.1.21</h3>
+<ul>
+<li><a href="probe/kotlin.double.parse.html">kotlin.double.parse</a>: became available</li>
+</ul>
+<h3 id="macos-2.4.0-2.4.20">macos: 2.4.0 to 2.4.20</h3>
+<ul>
+<li><a href="probe/kotlin.exceptions.tostring-cause.html">kotlin.exceptions.tostring-cause</a>: changed<pre>line 1 (2.4.0): toString = ProbeException: m
+line 1 (2.4.20): toString = dev.gmitch215.drift.scan.probe.kotlin.ProbeException: m
+line 13 (2.4.0): stack-first-line = ProbeException: m
+line 13 (2.4.20): stack-first-line = dev.gmitch215.drift.scan.probe.kotlin.ProbeException: m</pre></li>
+</ul>
+<h3 id="macos-2.4.20-2.4.21">macos: 2.4.20 to 2.4.21</h3>
+<ul>
+<li><a href="probe/kotlin.exceptions.tostring-cause.html">kotlin.exceptions.tostring-cause</a>: changed<pre>line 1 (2.4.20): toString = dev.gmitch215.drift.scan.probe.kotlin.ProbeException: m
+line 1 (2.4.21): toString = ProbeException: m
+line 13 (2.4.20): stack-first-line = dev.gmitch215.drift.scan.probe.kotlin.ProbeException: m
+line 13 (2.4.21): stack-first-line = ProbeException: m</pre></li>
+</ul>
+<h3 id="macos-2.4.21-2.5.0-Beta1">macos: 2.4.21 to 2.5.0-Beta1</h3>
+<ul>
+<li><a href="probe/kotlin.exceptions.tostring-cause.html">kotlin.exceptions.tostring-cause</a>: changed<pre>line 1 (2.4.21): toString = ProbeException: m
+line 1 (2.5.0-Beta1): toString = dev.gmitch215.drift.scan.probe.kotlin.ProbeException: m
+line 13 (2.4.21): stack-first-line = ProbeException: m
+line 13 (2.5.0-Beta1): stack-first-line = dev.gmitch215.drift.scan.probe.kotlin.ProbeException: m</pre></li>
+<li><a href="probe/kotlin.numbers.float-conversions.html">kotlin.numbers.float-conversions</a>: changed<pre>line 13 (2.4.21): ulong-max-double = 1.844674407370955E19
+line 13 (2.5.0-Beta1): ulong-max-double = 1.8446744073709552E19</pre></li>
+</ul>
+<h2 id="wasm">wasm</h2>
+<table>
+<caption>Probes that change, wasm</caption>
+<tr><th scope="col">From</th><th scope="col">To</th><th scope="col">Changed</th><th scope="col">Became available</th><th scope="col">Became unavailable</th></tr>
+<tr><td>2.4.20</td><td><a href="#wasm-2.4.20-2.5.0-Beta1">2.5.0-Beta1</a></td><td>10</td><td>0</td><td>0</td></tr>
+</table>
+<h3 id="wasm-2.4.20-2.5.0-Beta1">wasm: 2.4.20 to 2.5.0-Beta1</h3>
+<ul>
+<li><a href="probe/kotlin.collections.tostring-forms.html">kotlin.collections.tostring-forms</a>: changed<pre>line 1 (2.4.20): list-doubles = [1.0, 2.5, 10000000000.0]
+line 1 (2.5.0-Beta1): list-doubles = [1.0, 2.5, 1.0E10]</pre></li>
+<li><a href="probe/kotlin.double.extremes.html">kotlin.double.extremes</a>: changed<pre>line 1 (2.4.20): min-value = 5e-324
+line 1 (2.5.0-Beta1): min-value = 4.9E-324
+line 2 (2.4.20): max-value = 1.7976931348623157e+308
+line 2 (2.5.0-Beta1): max-value = 1.7976931348623157E308
+line 10 (2.4.20): min-normal = 2.2250738585072014e-308
+line 10 (2.5.0-Beta1): min-normal = 2.2250738585072014E-308
+line 11 (2.4.20): 2^53+1 = 9007199254740992.0
+line 11 (2.5.0-Beta1): 2^53+1 = 9.007199254740992E15</pre></li>
+<li><a href="probe/kotlin.double.parse.html">kotlin.double.parse</a>: changed<pre>line 8 (2.4.20): '0x1p3' = null
+line 8 (2.5.0-Beta1): '0x1p3' = 8.0
+line 9 (2.4.20): '1d' = null
+line 9 (2.5.0-Beta1): '1d' = 1.0
+line 10 (2.4.20): '1f' = null
+line 10 (2.5.0-Beta1): '1f' = 1.0</pre></li>
+<li><a href="probe/kotlin.double.shortest-digits.html">kotlin.double.shortest-digits</a>: changed<pre>line 1 (2.4.20): 2e23 = 1.9999999999999998e+23
+line 1 (2.5.0-Beta1): 2e23 = 2.0E23
+line 2 (2.4.20): 1e23 = 9.999999999999999e+22
+line 2 (2.5.0-Beta1): 1e23 = 1.0E23
+line 3 (2.4.20): 8.41e21 = 8.409999999999999e+21
+line 3 (2.5.0-Beta1): 8.41e21 = 8.41E21
+line 4 (2.4.20): 5e-324 = 5e-324
+line 4 (2.5.0-Beta1): 5e-324 = 4.9E-324
+line 9 (2.4.20): 1e16/3 = 3333333333333333.5
+line 9 (2.5.0-Beta1): 1e16/3 = 3.3333333333333335E15</pre></li>
+<li><a href="probe/kotlin.double.tostring-boundaries.html">kotlin.double.tostring-boundaries</a>: changed<pre>line 1 (2.4.20): 1e-4 = 0.0001
+line 1 (2.5.0-Beta1): 1e-4 = 1.0E-4
+line 3 (2.4.20): 9.999e-4 = 0.0009999
+line 3 (2.5.0-Beta1): 9.999e-4 = 9.999E-4
+line 5 (2.4.20): 1e7 = 10000000.0
+line 5 (2.5.0-Beta1): 1e7 = 1.0E7
+line 6 (2.4.20): 12345678 = 12345678.0
+line 6 (2.5.0-Beta1): 12345678 = 1.2345678E7
+line 7 (2.4.20): 1e21 = 1e+21
+line 7 (2.5.0-Beta1): 1e21 = 1.0E21
+line 8 (2.4.20): 1e22 = 1e+22
+line 8 (2.5.0-Beta1): 1e22 = 1.0E22
+line 9 (2.4.20): 1e-7 = 1e-7
+line 9 (2.5.0-Beta1): 1e-7 = 1.0E-7</pre></li>
+<li><a href="probe/kotlin.exceptions.messages.html">kotlin.exceptions.messages</a>: changed<pre>line 4 (2.4.20): toDouble = err:NumberFormatException:Invalid number format: 'x'
+line 4 (2.5.0-Beta1): toDouble = err:NumberFormatException:null</pre></li>
+<li><a href="probe/kotlin.float.tostring.html">kotlin.float.tostring</a>: changed<pre>line 2 (2.4.20): 1e7 = 10000000.0
+line 2 (2.5.0-Beta1): 1e7 = 1.0E7
+line 3 (2.4.20): 1e10 = 10000000000.0
+line 3 (2.5.0-Beta1): 1e10 = 1.0E10
+line 4 (2.4.20): 16777217 = 16777216.0
+line 4 (2.5.0-Beta1): 16777217 = 1.6777216E7
+line 5 (2.4.20): min = 1e-45
+line 5 (2.5.0-Beta1): min = 1.4E-45
+line 6 (2.4.20): max = 3.4028235e+38
+line 6 (2.5.0-Beta1): max = 3.4028235E38
+line 9 (2.4.20): 1e-4 = 0.0001
+line 9 (2.5.0-Beta1): 1e-4 = 1.0E-4</pre></li>
+<li><a href="probe/kotlin.math.pow-special-cases.html">kotlin.math.pow-special-cases</a>: changed<pre>line 12 (2.4.20): 2^-1074 = 5e-324
+line 12 (2.5.0-Beta1): 2^-1074 = 4.9E-324</pre></li>
+<li><a href="probe/kotlin.math.rounding.html">kotlin.math.rounding</a>: changed<pre>line 9 (2.4.20): 4503599627370497 = round=4503599627370497.0 int=2147483647 long=4503599627370498
+line 9 (2.5.0-Beta1): 4503599627370497 = round=4.503599627370497E15 int=2147483647 long=4503599627370498</pre></li>
+<li><a href="probe/kotlin.numbers.float-conversions.html">kotlin.numbers.float-conversions</a>: changed<pre>line 9 (2.4.20): long-max-double = 9223372036854776000.0
+line 9 (2.5.0-Beta1): long-max-double = 9.223372036854776E18
+line 10 (2.4.20): long-max-float = 9223372000000000000.0
+line 10 (2.5.0-Beta1): long-max-float = 9.223372E18
+line 12 (2.4.20): int-max-float = 2147483600.0
+line 12 (2.5.0-Beta1): int-max-float = 2.1474836E9
+line 13 (2.4.20): ulong-max-double = 18446744073709552000.0
+line 13 (2.5.0-Beta1): ulong-max-double = 1.8446744073709552E19</pre></li>
+</ul>
+<h2 id="wasm-chromium">wasm-chromium</h2>
+<p>Measured on 2.4.20 only.</p>
+<h2 id="wasm-firefox">wasm-firefox</h2>
+<p>Measured on 2.4.20 only.</p>
+<h2 id="wasm-webkit">wasm-webkit</h2>
+<p>Measured on 2.4.20 only.</p>
+</main>
+<footer class="muted">
+<p>Results are recorded measurements for the listed Kotlin versions. A difference between
+targets is a result, not a diagnosis.</p>
+</footer>
+</body>
+</html>

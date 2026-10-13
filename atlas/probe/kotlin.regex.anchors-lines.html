@@ -32,6 +32,7 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <a href="../../">Drift</a>
 <a href="../">Interactive Atlas</a>
 <a href="../probe/">All probes</a>
+<a href="../versions.html">Version changes</a>
 <a href="../data/dataset.json">dataset.json</a>
 <a href="../data/classification.json">classification.json</a>
 </nav>
@@ -39,7 +40,7 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <main id="main">
 <h1>kotlin.regex.anchors-lines</h1>
 <p>How do ^, $ and line terminators behave, including from a start index?</p>
-<p><strong>unclassified</strong> (basis: inferred); identical on every column</p>
+<p><strong>unclassified</strong> (basis: inferred); differs between targets</p>
 <h2>Source</h2>
 <pre><code>fun count(pattern: String, input: String, vararg options: RegexOption) =
     Regex(pattern, options.toSet()).findAll(input).count()
@@ -61,11 +62,12 @@ line(&quot;lookbehind-from-index&quot;, Regex(&quot;(?&lt;=a)b&quot;).find(&quot
 line(&quot;matchAt-lookbehind&quot;, Regex(&quot;(?&lt;=a)b&quot;).matchAt(&quot;ab&quot;, 1)?.value)
 line(&quot;matchAt-caret&quot;, Regex(&quot;^b&quot;).matchAt(&quot;ab&quot;, 1)?.value)</code></pre>
 <h2>Results on Kotlin 2.4.20</h2>
-<p>Identical on every column.</p>
+<p>3 different results; 17 of 17 lines differ.</p>
 <table>
 <caption>Result per column, Kotlin 2.4.20</caption>
 <tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
 <tr><th scope="row">android</th><td>A</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
+<tr><th scope="row">cloudflare-wasm</th><td>A</td><td>ok</td><td><a href="../data/transcripts/cloudflare-wasm.txt">file</a></td></tr>
 <tr><th scope="row">ios</th><td>A</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
 <tr><th scope="row">jvm</th><td>A</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
 <tr><th scope="row">jvm-17</th><td>A</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
@@ -78,25 +80,47 @@ line(&quot;matchAt-caret&quot;, Regex(&quot;^b&quot;).matchAt(&quot;ab&quot;, 1)
 <tr><th scope="row">wasm-chromium</th><td>A</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
 <tr><th scope="row">wasm-firefox</th><td>A</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
 <tr><th scope="row">wasm-webkit</th><td>A</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">cloudflare-jvm</th><td>B (differs from group A)</td><td>unavailable</td><td><a href="../data/transcripts/cloudflare-jvm.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">js-ir</th><td>C (differs from group A)</td><td>ok</td><td><a href="../data/transcripts/js-ir.txt">file</a></td></tr>
 </table>
-<h3>Group A: android, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
-<pre>dollar-before-lf = true
-dollar-before-crlf = true
-dollar-before-cr = true
-dollar-before-nel = true
-caret-count-multiline = 2
-dollar-count-multiline = 3
-dollar-count-plain = 2
-crlf-multiline = 1
-cr-multiline = 1
-nel-multiline = 1
-ls-multiline = 1
-dot-star-lines = [a, , b, ]
-word-boundaries = 4
-caret-from-index = false
-lookbehind-from-index = b
-matchAt-lookbehind = b
-matchAt-caret = null</pre>
+<h3>Group A: android, cloudflare-wasm, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
+<pre><mark>dollar-before-lf = true</mark>
+<mark>dollar-before-crlf = true</mark>
+<mark>dollar-before-cr = true</mark>
+<mark>dollar-before-nel = true</mark>
+<mark>caret-count-multiline = 2</mark>
+<mark>dollar-count-multiline = 3</mark>
+<mark>dollar-count-plain = 2</mark>
+<mark>crlf-multiline = 1</mark>
+<mark>cr-multiline = 1</mark>
+<mark>nel-multiline = 1</mark>
+<mark>ls-multiline = 1</mark>
+<mark>dot-star-lines = [a, , b, ]</mark>
+<mark>word-boundaries = 4</mark>
+<mark>caret-from-index = false</mark>
+<mark>lookbehind-from-index = b</mark>
+<mark>matchAt-lookbehind = b</mark>
+<mark>matchAt-caret = null</mark></pre>
+<h3>Group B: cloudflare-jvm</h3>
+<pre><mark>failed UnsupportedOperationException: refused by TeaVM: java.util.regex.Matcher.useAnchoringBounds is not in its class library</mark></pre>
+<h3>Group C: js-ir</h3>
+<pre><mark>dollar-before-lf = false</mark>
+<mark>dollar-before-crlf = false</mark>
+<mark>dollar-before-cr = false</mark>
+<mark>dollar-before-nel = false</mark>
+<mark>caret-count-multiline = 3</mark>
+<mark>dollar-count-multiline = 3</mark>
+<mark>dollar-count-plain = 1</mark>
+<mark>crlf-multiline = 1</mark>
+<mark>cr-multiline = 1</mark>
+<mark>nel-multiline = 0</mark>
+<mark>ls-multiline = 1</mark>
+<mark>dot-star-lines = [a, , b, ]</mark>
+<mark>word-boundaries = 4</mark>
+<mark>caret-from-index = false</mark>
+<mark>lookbehind-from-index = b</mark>
+<mark>matchAt-lookbehind = b</mark>
+<mark>matchAt-caret = null</mark></pre>
 <h2>Results on Kotlin 2.5.0-Beta1</h2>
 <p>Identical on every column.</p>
 <table>
@@ -130,16 +154,129 @@ matchAt-caret = null</pre>
 <p>unclassified, basis inferred.</p>
 <p>No explanation was found in the sources searched.</p>
 <h3>Notes</h3>
-<p>Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Not researched: nothing to explain.</p>
+<p>cloudflare-jvm records the probe as unavailable: the build refuses java.util.regex.Matcher.useAnchoringBounds, which Regex.matchAt calls, so the matchAt lines are replaced by a thrown UnsupportedOperationException in the Worker's copy of the source and the whole probe fails. Every other column is identical. No page or tracker issue was read for it. cloudflare-wasm prints what wasm prints.</p>
 <p class="muted">Read on 2026-10-07.</p>
 <h2>What was searched</h2>
-<p>Not searched: no column differs, so there is no divergence to explain.</p>
+<p>Not searched: the only column that differs is cloudflare-jvm, and no page or tracker issue was read for it.</p>
+<h2>Repro draft</h2>
+<div class="draft">
+<p><strong>Draft for human review; not filed.</strong></p>
+<pre>Draft for human review. Not filed.
+
+# kotlin.regex.anchors-lines
+
+This text was written by an agent from measured transcripts and pages it read. A person must rerun the probe, read the pages named below and rewrite it in their own words before anything is posted; the Kotlin maintainers do not want generated reports. The columns cloudflare-wasm and cloudflare-jvm named below are measured transcripts in fixtures/atlas; the tools/cloudflare build in this repository produces them.
+
+Question: How do ^, $ and line terminators behave, including from a start index?
+
+Classification now: unclassified (was unclassified); cause letters: none; basis: inferred.
+
+Measured: Kotlin 2.4.20 on 16 columns of fixtures/atlas (js-ir on Node 26.8.2 arm64, android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, linux x64, linux arm64, and cloudflare-wasm and cloudflare-jvm on workerd 1.20261001.1 under wrangler 4.146.0 on macOS arm64). cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM), so its Java classes are not a JDK. Single run per cell; no spread measured.
+
+Helpers (not shown below): `line(label, v)` prints `label = v`; `outcome(label) { }` prints `ok:&lt;value&gt;` or `err:&lt;ExceptionClass&gt;`; `failure(label) { }` prints `err:&lt;Class&gt;:&lt;message&gt;`; `bits(d)` prints `d.toRawBits()` as unsigned hex.
+
+Code for the differing lines (from the displayed probe source):
+
+```kotlin
+line(&quot;dollar-before-lf&quot;, Regex(&quot;^a$&quot;).containsMatchIn(&quot;a\n&quot;))
+line(&quot;dollar-before-crlf&quot;, Regex(&quot;^a$&quot;).containsMatchIn(&quot;a\r\n&quot;))
+line(&quot;dollar-before-cr&quot;, Regex(&quot;^a$&quot;).containsMatchIn(&quot;a\r&quot;))
+line(&quot;dollar-before-nel&quot;, Regex(&quot;^a$&quot;).containsMatchIn(&quot;a\u0085&quot;))
+line(&quot;caret-count-multiline&quot;, count(&quot;^&quot;, &quot;a\nb\n&quot;, RegexOption.MULTILINE))
+line(&quot;dollar-count-multiline&quot;, count(&quot;$&quot;, &quot;a\nb\n&quot;, RegexOption.MULTILINE))
+line(&quot;dollar-count-plain&quot;, count(&quot;$&quot;, &quot;a\n&quot;))
+line(&quot;crlf-multiline&quot;, count(&quot;^b$&quot;, &quot;a\r\nb\r\nc&quot;, RegexOption.MULTILINE))
+line(&quot;cr-multiline&quot;, count(&quot;^b$&quot;, &quot;a\rb&quot;, RegexOption.MULTILINE))
+line(&quot;nel-multiline&quot;, count(&quot;^b$&quot;, &quot;a\u0085b&quot;, RegexOption.MULTILINE))
+line(&quot;ls-multiline&quot;, count(&quot;^b$&quot;, &quot;a\u2028b&quot;, RegexOption.MULTILINE))
+line(&quot;dot-star-lines&quot;, Regex(&quot;.*&quot;).findAll(&quot;a\nb&quot;).map { it.value }.toList())
+line(&quot;word-boundaries&quot;, count(&quot;\\b&quot;, &quot;ab cd&quot;))
+line(&quot;caret-from-index&quot;, Regex(&quot;^b&quot;).find(&quot;ab&quot;, 1) != null)
+line(&quot;lookbehind-from-index&quot;, Regex(&quot;(?&lt;=a)b&quot;).find(&quot;ab&quot;, 1)?.value)
+line(&quot;matchAt-lookbehind&quot;, Regex(&quot;(?&lt;=a)b&quot;).matchAt(&quot;ab&quot;, 1)?.value)
+line(&quot;matchAt-caret&quot;, Regex(&quot;^b&quot;).matchAt(&quot;ab&quot;, 1)?.value)
+```
+
+Results at 2.4.20, one row per distinct output (columns that agree share a row):
+
+- `dollar-before-lf`
+  - `true`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+  - `false`: js-ir
+- `dollar-before-crlf`
+  - `true`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+  - `false`: js-ir
+- `dollar-before-cr`
+  - `true`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+  - `false`: js-ir
+- `dollar-before-nel`
+  - `true`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+  - `false`: js-ir
+- `caret-count-multiline`
+  - `2`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+  - `3`: js-ir
+- `dollar-count-multiline`
+  - `3`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `dollar-count-plain`
+  - `2`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+  - `1`: js-ir
+- `crlf-multiline`
+  - `1`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `cr-multiline`
+  - `1`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `nel-multiline`
+  - `1`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+  - `0`: js-ir
+- `ls-multiline`
+  - `1`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `dot-star-lines`
+  - `[a, , b, ]`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `word-boundaries`
+  - `4`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `caret-from-index`
+  - `false`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `lookbehind-from-index`
+  - `b`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `matchAt-lookbehind`
+  - `b`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+- `matchAt-caret`
+  - `null`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: cloudflare-jvm
+
+Docs read (FULL text):
+
+
+Existing tracker issues: none read. No tracker was queried for the cloudflare columns.
+
+What is known: cloudflare-jvm records the probe as unavailable: the build refuses java.util.regex.Matcher.useAnchoringBounds, which Regex.matchAt calls, so the matchAt lines are replaced by a thrown UnsupportedOperationException in the Worker's copy of the source and the whole probe fails. Every other column is identical. No page or tracker issue was read for it. cloudflare-wasm prints what wasm prints.
+
+What is NOT known: why the cloudflare-jvm output differs (TeaVM's class library, the bytebox build or the Worker runtime were not examined line by line); whether it is a defect or by design; whether a different bytebox or TeaVM release changes the result; whether a different workerd release differs (one runtime version per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies).
+</pre>
+</div>
 <h2>Kotlin versions measured</h2>
 <p>2.4.20, 2.5.0-Beta1</p>
 <h2>How it was measured</h2>
 <ul>
 <li><strong>android</strong>: The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</li>
+<li><strong>cloudflare-jvm</strong>: The probes compiled as Kotlin/JVM 2.4.20 classes and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM), run on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). The Java classes are TeaVM's class library, not a JDK. Four probes are recorded as unavailable: two are skipped because integer division traps in the compiled module and a trap aborts the request, one fails with a NullPointerException, and one is refused at build time because java.util.regex.Matcher.useAnchoringBounds is missing; tools/cloudflare has the details. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bits of 0/0-raw and sqrt-neg-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
+<li><strong>cloudflare-wasm</strong>: The Kotlin/Wasm (wasmJs) probe module on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). A 14-line JavaScript entry replaces Kotlin's loader, which does not run on workerd. Built and recorded by tools/cloudflare and drift probe cloudflare. Byte-identical to the wasm column apart from the target line. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bit of 0/0-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
 <li><strong>ios</strong>: The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</li>
+<li><strong>js-ir</strong>: Kotlin/JS IR on Node 26.8.2, macOS, Apple Silicon (arm64). The standalone Kotlin 2.4.20 compiler builds each probe from the displayed source through tools/ladder; Node runs it. Same transcript as fixtures/atlas-ladder/2.4.20/js-ir.txt.</li>
 <li><strong>jvm</strong>: The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
 <li><strong>jvm-17</strong>: The CLI JVM classes (jvmTarget 17) on Temurin 17.0.20.1, x86-64 Linux container, recorded with --target jvm-17.</li>
 <li><strong>jvm-21</strong>: The same classes on Temurin 21.0.12.1, x86-64 Linux container. Differs from the jvm column in hardware only.</li>

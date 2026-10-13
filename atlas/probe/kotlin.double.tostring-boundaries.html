@@ -32,6 +32,7 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <a href="../../">Drift</a>
 <a href="../">Interactive Atlas</a>
 <a href="../probe/">All probes</a>
+<a href="../versions.html">Version changes</a>
 <a href="../data/dataset.json">dataset.json</a>
 <a href="../data/classification.json">classification.json</a>
 </nav>
@@ -47,11 +48,12 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
     &quot;1e-7&quot; to 1e-7, &quot;100&quot; to 100.0, &quot;0.5&quot; to 0.5,
 )) line(name, d)</code></pre>
 <h2>Results on Kotlin 2.4.20</h2>
-<p>2 different results; 7 of 11 lines differ.</p>
+<p>3 different results; 9 of 11 lines differ.</p>
 <table>
 <caption>Result per column, Kotlin 2.4.20</caption>
 <tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
 <tr><th scope="row">android</th><td>A</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
+<tr><th scope="row">cloudflare-jvm</th><td>A</td><td>ok</td><td><a href="../data/transcripts/cloudflare-jvm.txt">file</a></td></tr>
 <tr><th scope="row">ios</th><td>A</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
 <tr><th scope="row">jvm</th><td>A</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
 <tr><th scope="row">jvm-17</th><td>A</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
@@ -60,34 +62,48 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <tr><th scope="row">linux</th><td>A</td><td>ok</td><td><a href="../data/transcripts/linux.txt">file</a></td></tr>
 <tr><th scope="row">linux-arm64</th><td>A</td><td>ok</td><td><a href="../data/transcripts/linux-arm64.txt">file</a></td></tr>
 <tr><th scope="row">macos</th><td>A</td><td>ok</td><td><a href="../data/transcripts/macos.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">cloudflare-wasm</th><td>B (differs from group A)</td><td>ok</td><td><a href="../data/transcripts/cloudflare-wasm.txt">file</a></td></tr>
 <tr class="differs"><th scope="row">wasm</th><td>B (differs from group A)</td><td>ok</td><td><a href="../data/transcripts/wasm.txt">file</a></td></tr>
 <tr class="differs"><th scope="row">wasm-chromium</th><td>B (differs from group A)</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
 <tr class="differs"><th scope="row">wasm-firefox</th><td>B (differs from group A)</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
 <tr class="differs"><th scope="row">wasm-webkit</th><td>B (differs from group A)</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">js-ir</th><td>C (differs from group A)</td><td>ok</td><td><a href="../data/transcripts/js-ir.txt">file</a></td></tr>
 </table>
-<h3>Group A: android, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos</h3>
+<h3>Group A: android, cloudflare-jvm, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos</h3>
 <pre><mark>1e-4 = 1.0E-4</mark>
 1e-3 = 0.001
 <mark>9.999e-4 = 9.999E-4</mark>
-9999999 = 9999999.0
+<mark>9999999 = 9999999.0</mark>
 <mark>1e7 = 1.0E7</mark>
 <mark>12345678 = 1.2345678E7</mark>
 <mark>1e21 = 1.0E21</mark>
 <mark>1e22 = 1.0E22</mark>
 <mark>1e-7 = 1.0E-7</mark>
-100 = 100.0
+<mark>100 = 100.0</mark>
 0.5 = 0.5</pre>
-<h3>Group B: wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
+<h3>Group B: cloudflare-wasm, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
 <pre><mark>1e-4 = 0.0001</mark>
 1e-3 = 0.001
 <mark>9.999e-4 = 0.0009999</mark>
-9999999 = 9999999.0
+<mark>9999999 = 9999999.0</mark>
 <mark>1e7 = 10000000.0</mark>
 <mark>12345678 = 12345678.0</mark>
 <mark>1e21 = 1e+21</mark>
 <mark>1e22 = 1e+22</mark>
 <mark>1e-7 = 1e-7</mark>
-100 = 100.0
+<mark>100 = 100.0</mark>
+0.5 = 0.5</pre>
+<h3>Group C: js-ir</h3>
+<pre><mark>1e-4 = 0.0001</mark>
+1e-3 = 0.001
+<mark>9.999e-4 = 0.0009999</mark>
+<mark>9999999 = 9999999</mark>
+<mark>1e7 = 10000000</mark>
+<mark>12345678 = 12345678</mark>
+<mark>1e21 = 1e+21</mark>
+<mark>1e22 = 1e+22</mark>
+<mark>1e-7 = 1e-7</mark>
+<mark>100 = 100</mark>
 0.5 = 0.5</pre>
 <h2>Results on Kotlin 2.5.0-Beta1</h2>
 <p>Identical on every column.</p>
@@ -118,7 +134,7 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <blockquote><p>This decimal is (almost always) the shortest one that rounds to m according to the round to nearest rounding policy</p>
 <footer><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Double.html">https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Double.html</a></footer></blockquote>
 <h3>Notes</h3>
-<p>Wasm family only; 7 lines; equal on 2.5.0-Beta1.</p>
+<p>Wasm family only; 7 lines; equal on 2.5.0-Beta1. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, ios, jvm, jvm-17 and 5 more print.</p>
 <p class="muted">Read on 2026-10-07.</p>
 <h2>Issues</h2>
 <table>
@@ -141,7 +157,7 @@ Question: Which of these Doubles print in plain form and which in E notation?
 
 Classification now: unclassified (was unclassified); cause letters: c; basis: verified.
 
-Measured: Kotlin 2.4.20 on 16 columns (android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, jvm 21 arm64 in a container, linux x64, linux arm64 and linux-ubuntu Native, mingw Native under wine); Kotlin 2.5.0-Beta1 on jvm, macos, wasm, android and ios. Single run per cell; no spread measured.
+Measured: Kotlin 2.4.20 on 17 columns (js-ir on Node 26.8.2 arm64, android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, jvm 21 arm64 in a container, linux x64, linux arm64 and linux-ubuntu Native, mingw Native under wine); Kotlin 2.5.0-Beta1 on jvm, macos, wasm, android and ios. Single run per cell; no spread measured.
 
 Helpers (not shown below): `line(label, v)` prints `label = v`; `outcome(label) { }` prints `ok:&lt;value&gt;` or `err:&lt;ExceptionClass&gt;`; `failure(label) { }` prints `err:&lt;Class&gt;:&lt;message&gt;`; `bits(d)` prints `d.toRawBits()` as unsigned hex.
 
@@ -149,9 +165,9 @@ Code for the differing lines (from the displayed probe source):
 
 ```kotlin
 for ((name, d) in listOf(
-	&quot;1e-4&quot; to 1e-4, &quot;1e-3&quot; to 1e-3, &quot;9.999e-4&quot; to 9.999e-4, &quot;9999999&quot; to 9999999.0,
-	&quot;1e7&quot; to 1e7, &quot;12345678&quot; to 12345678.0, &quot;1e21&quot; to 1e21, &quot;1e22&quot; to 1e22,
-	&quot;1e-7&quot; to 1e-7, &quot;100&quot; to 100.0, &quot;0.5&quot; to 0.5,
+    &quot;1e-4&quot; to 1e-4, &quot;1e-3&quot; to 1e-3, &quot;9.999e-4&quot; to 9.999e-4, &quot;9999999&quot; to 9999999.0,
+    &quot;1e7&quot; to 1e7, &quot;12345678&quot; to 12345678.0, &quot;1e21&quot; to 1e21, &quot;1e22&quot; to 1e22,
+    &quot;1e-7&quot; to 1e-7, &quot;100&quot; to 100.0, &quot;0.5&quot; to 0.5,
 )) line(name, d)
 ```
 
@@ -166,9 +182,11 @@ Results at 2.4.20, one row per distinct output (columns that agree share a row):
 - `1e7`
   - `1.0E7`: android+ios+jvm+macos+jvm-17+jvm-21+jvm-21-arm64+jvm-25+linux+linux-arm64+linux-ubuntu+mingw-wine
   - `10000000.0`: wasm+3browsers
+  - `10000000`: js-ir
 - `12345678`
   - `1.2345678E7`: android+ios+jvm+macos+jvm-17+jvm-21+jvm-21-arm64+jvm-25+linux+linux-arm64+linux-ubuntu+mingw-wine
   - `12345678.0`: wasm+3browsers
+  - `12345678`: js-ir
 - `1e21`
   - `1.0E21`: android+ios+jvm+macos+jvm-17+jvm-21+jvm-21-arm64+jvm-25+linux+linux-arm64+linux-ubuntu+mingw-wine
   - `1e+21`: wasm+3browsers
@@ -189,6 +207,34 @@ Existing tracker issues (read through the YouTrack REST API on 2026-10-07; nothi
 What is known: Wasm family only; 7 lines; equal on 2.5.0-Beta1.
 
 What is NOT known: the intended behavior where no page read states one; whether the divergent column is a defect or by design; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device of the same target differs (one device per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies; the ladder agent re-compiled the displayed text and matched 37 of 38 probes on JVM and macOS Native).
+
+## Cloudflare columns
+
+Recorded 2026-10-12 on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local, macOS arm64), one run per cell. cloudflare-wasm is the Kotlin/Wasm probe module with a hand-written Worker entry; cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 plugin (TeaVM), so its Java classes are not a JDK. These rows are not part of the results above.
+
+Rows for the differing lines of this draft:
+
+- `1e-4`
+  - `1.0E-4`: android+cloudflare-jvm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos
+  - `0.0001`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `9.999e-4`
+  - `9.999E-4`: android+cloudflare-jvm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos
+  - `0.0009999`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `1e7`
+  - `1.0E7`: android+cloudflare-jvm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos
+  - `10000000.0`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `12345678`
+  - `1.2345678E7`: android+cloudflare-jvm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos
+  - `12345678.0`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `1e21`
+  - `1.0E21`: android+cloudflare-jvm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos
+  - `1e+21`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `1e22`
+  - `1.0E22`: android+cloudflare-jvm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos
+  - `1e+22`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `1e-7`
+  - `1.0E-7`: android+cloudflare-jvm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos
+  - `1e-7`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
 </pre>
 </div>
 <h2>Kotlin versions measured</h2>
@@ -196,7 +242,10 @@ What is NOT known: the intended behavior where no page read states one; whether 
 <h2>How it was measured</h2>
 <ul>
 <li><strong>android</strong>: The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</li>
+<li><strong>cloudflare-jvm</strong>: The probes compiled as Kotlin/JVM 2.4.20 classes and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM), run on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). The Java classes are TeaVM's class library, not a JDK. Four probes are recorded as unavailable: two are skipped because integer division traps in the compiled module and a trap aborts the request, one fails with a NullPointerException, and one is refused at build time because java.util.regex.Matcher.useAnchoringBounds is missing; tools/cloudflare has the details. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bits of 0/0-raw and sqrt-neg-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
+<li><strong>cloudflare-wasm</strong>: The Kotlin/Wasm (wasmJs) probe module on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). A 14-line JavaScript entry replaces Kotlin's loader, which does not run on workerd. Built and recorded by tools/cloudflare and drift probe cloudflare. Byte-identical to the wasm column apart from the target line. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bit of 0/0-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
 <li><strong>ios</strong>: The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</li>
+<li><strong>js-ir</strong>: Kotlin/JS IR on Node 26.8.2, macOS, Apple Silicon (arm64). The standalone Kotlin 2.4.20 compiler builds each probe from the displayed source through tools/ladder; Node runs it. Same transcript as fixtures/atlas-ladder/2.4.20/js-ir.txt.</li>
 <li><strong>jvm</strong>: The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
 <li><strong>jvm-17</strong>: The CLI JVM classes (jvmTarget 17) on Temurin 17.0.20.1, x86-64 Linux container, recorded with --target jvm-17.</li>
 <li><strong>jvm-21</strong>: The same classes on Temurin 21.0.12.1, x86-64 Linux container. Differs from the jvm column in hardware only.</li>

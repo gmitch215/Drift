@@ -32,6 +32,7 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <a href="../../">Drift</a>
 <a href="../">Interactive Atlas</a>
 <a href="../probe/">All probes</a>
+<a href="../versions.html">Version changes</a>
 <a href="../data/dataset.json">dataset.json</a>
 <a href="../data/classification.json">classification.json</a>
 </nav>
@@ -39,7 +40,7 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <main id="main">
 <h1>kotlin.string.compare-order</h1>
 <p>In which order do strings compare, sort and match ignoring case?</p>
-<p><strong>documented</strong> (basis: verified); differs between targets</p>
+<p><strong>unclassified</strong> (basis: verified); differs between targets</p>
 <h2>Source</h2>
 <pre><code>line(&quot;a-vs-B&quot;, &quot;a&quot;.compareTo(&quot;B&quot;))
 line(&quot;a-vs-B-ignore-case&quot;, &quot;a&quot;.compareTo(&quot;B&quot;, ignoreCase = true))
@@ -62,25 +63,28 @@ line(&quot;maxOf-strings&quot;, maxOf(&quot;a&quot;, &quot;B&quot;))
 line(&quot;nbsp-vs-space&quot;, &quot;\u00a0&quot; == &quot; &quot;)
 line(&quot;regionMatches&quot;, &quot;xAbC&quot;.regionMatches(1, &quot;aBc&quot;, 0, 3, ignoreCase = true))</code></pre>
 <h2>Results on Kotlin 2.4.20</h2>
-<p>2 different results; 2 of 19 lines differ.</p>
+<p>3 different results; 5 of 19 lines differ.</p>
 <table>
 <caption>Result per column, Kotlin 2.4.20</caption>
 <tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
-<tr class="differs"><th scope="row">android</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm-17</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm-21</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-21.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm-25</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-25.txt">file</a></td></tr>
-<tr><th scope="row">ios</th><td>B</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
-<tr><th scope="row">linux</th><td>B</td><td>ok</td><td><a href="../data/transcripts/linux.txt">file</a></td></tr>
-<tr><th scope="row">linux-arm64</th><td>B</td><td>ok</td><td><a href="../data/transcripts/linux-arm64.txt">file</a></td></tr>
-<tr><th scope="row">macos</th><td>B</td><td>ok</td><td><a href="../data/transcripts/macos.txt">file</a></td></tr>
-<tr><th scope="row">wasm</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm.txt">file</a></td></tr>
-<tr><th scope="row">wasm-chromium</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
-<tr><th scope="row">wasm-firefox</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
-<tr><th scope="row">wasm-webkit</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">android</th><td>A (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">js-ir</th><td>A (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/js-ir.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm</th><td>A (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-17</th><td>A (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-21</th><td>A (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm-21.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-25</th><td>A (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm-25.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">cloudflare-jvm</th><td>B (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/cloudflare-jvm.txt">file</a></td></tr>
+<tr><th scope="row">cloudflare-wasm</th><td>C</td><td>ok</td><td><a href="../data/transcripts/cloudflare-wasm.txt">file</a></td></tr>
+<tr><th scope="row">ios</th><td>C</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
+<tr><th scope="row">linux</th><td>C</td><td>ok</td><td><a href="../data/transcripts/linux.txt">file</a></td></tr>
+<tr><th scope="row">linux-arm64</th><td>C</td><td>ok</td><td><a href="../data/transcripts/linux-arm64.txt">file</a></td></tr>
+<tr><th scope="row">macos</th><td>C</td><td>ok</td><td><a href="../data/transcripts/macos.txt">file</a></td></tr>
+<tr><th scope="row">wasm</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm.txt">file</a></td></tr>
+<tr><th scope="row">wasm-chromium</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
+<tr><th scope="row">wasm-firefox</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
+<tr><th scope="row">wasm-webkit</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
 </table>
-<h3>Group A: android, jvm, jvm-17, jvm-21, jvm-25</h3>
+<h3>Group A: android, js-ir, jvm, jvm-17, jvm-21, jvm-25</h3>
 <pre>a-vs-B = 31
 a-vs-B-ignore-case = -1
 sorted = [ , 10, 9, B, Z, _, a, b, \u00e4]
@@ -89,18 +93,18 @@ composed-vs-decomposed = false
 composed-vs-decomposed-order = 132
 sharp-s-vs-SS = false
 dotted-I-vs-i = true
-dotless-i-vs-I = true
+<mark>dotless-i-vs-I = true</mark>
 kelvin-vs-k = true
 dz-forms = true
-final-sigma = true
+<mark>final-sigma = true</mark>
 char-ignore-case = true
-compare-ignore-case-sigma = 0
+<mark>compare-ignore-case-sigma = 0</mark>
 <mark>compare-ignore-case-sharp-s = 108</mark>
 <mark>compare-ignore-case-upper-lower = -6</mark>
 maxOf-strings = a
 nbsp-vs-space = false
 regionMatches = true</pre>
-<h3>Group B: ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
+<h3>Group B: cloudflare-jvm</h3>
 <pre>a-vs-B = 31
 a-vs-B-ignore-case = -1
 sorted = [ , 10, 9, B, Z, _, a, b, \u00e4]
@@ -109,12 +113,32 @@ composed-vs-decomposed = false
 composed-vs-decomposed-order = 132
 sharp-s-vs-SS = false
 dotted-I-vs-i = true
-dotless-i-vs-I = true
+<mark>dotless-i-vs-I = false</mark>
 kelvin-vs-k = true
 dz-forms = true
-final-sigma = true
+<mark>final-sigma = false</mark>
 char-ignore-case = true
-compare-ignore-case-sigma = 0
+<mark>compare-ignore-case-sigma = -1</mark>
+<mark>compare-ignore-case-sharp-s = 108</mark>
+<mark>compare-ignore-case-upper-lower = -6</mark>
+maxOf-strings = a
+nbsp-vs-space = false
+regionMatches = true</pre>
+<h3>Group C: cloudflare-wasm, ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
+<pre>a-vs-B = 31
+a-vs-B-ignore-case = -1
+sorted = [ , 10, 9, B, Z, _, a, b, \u00e4]
+sorted-ignore-case = [a, A, b, B]
+composed-vs-decomposed = false
+composed-vs-decomposed-order = 132
+sharp-s-vs-SS = false
+dotted-I-vs-i = true
+<mark>dotless-i-vs-I = true</mark>
+kelvin-vs-k = true
+dz-forms = true
+<mark>final-sigma = true</mark>
+char-ignore-case = true
+<mark>compare-ignore-case-sigma = 0</mark>
 <mark>compare-ignore-case-sharp-s = 1</mark>
 <mark>compare-ignore-case-upper-lower = -1</mark>
 maxOf-strings = a
@@ -172,20 +196,83 @@ maxOf-strings = a
 nbsp-vs-space = false
 regionMatches = true</pre>
 <h2>Classification</h2>
-<p>documented, basis verified; causes: documented difference.</p>
+<p>unclassified, basis verified; causes: documented difference.</p>
+<p>Downgraded from documented; the reason is in the notes.</p>
+<p>No explanation was found in the sources searched.</p>
 <blockquote><p>Returns zero if this object is equal to the specified other object, a negative number if it's less than other</p>
 <footer><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/compare-to.html">https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/compare-to.html</a></footer></blockquote>
 <blockquote><p>If ignoreCase is true, the result of Char.uppercaseChar().lowercaseChar() on each character is compared.</p>
 <footer><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/compare-to.html">https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/compare-to.html</a></footer></blockquote>
 <h3>Notes</h3>
-<p>Magnitude only (108, -6 on JVM family and Android; 1, -1 elsewhere); the sign is identical. The KDoc promises only the sign class.</p>
+<p>Downgraded from documented: cloudflare-jvm differs in value, not only in magnitude: dotless-i-vs-I and final-sigma print false where every other column prints true, and compare-ignore-case-sigma is -1 where the others print 0. The ignoreCase page read says Char.uppercaseChar().lowercaseChar() is compared, which the other columns follow. cloudflare-wasm prints what wasm prints.</p>
 <p class="muted">Read on 2026-10-07.</p>
+<h2>What was searched</h2>
+<p>Not searched beyond the pages quoted above: the cloudflare-jvm lines were compared with the quoted pages only, and no tracker (Kotlin, TeaVM or bytebox) was queried for them.</p>
+<h2>Repro draft</h2>
+<div class="draft">
+<p><strong>Draft for human review; not filed.</strong></p>
+<pre>Draft for human review. Not filed.
+
+# kotlin.string.compare-order
+
+This text was written by an agent from measured transcripts and pages it read. A person must rerun the probe, read the pages named below and rewrite it in their own words before anything is posted; the Kotlin maintainers do not want generated reports. The columns cloudflare-wasm and cloudflare-jvm named below are measured transcripts in fixtures/atlas; the tools/cloudflare build in this repository produces them.
+
+Question: In which order do strings compare, sort and match ignoring case?
+
+Classification now: unclassified (was documented); cause letters: a; basis: verified.
+
+Measured: Kotlin 2.4.20 on 15 columns of fixtures/atlas (android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, linux x64, linux arm64, and cloudflare-wasm and cloudflare-jvm on workerd 1.20261001.1 under wrangler 4.146.0 on macOS arm64). cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM), so its Java classes are not a JDK. Single run per cell; no spread measured.
+
+Helpers (not shown below): `line(label, v)` prints `label = v`; `outcome(label) { }` prints `ok:&lt;value&gt;` or `err:&lt;ExceptionClass&gt;`; `failure(label) { }` prints `err:&lt;Class&gt;:&lt;message&gt;`; `bits(d)` prints `d.toRawBits()` as unsigned hex.
+
+Code for the differing lines (from the displayed probe source):
+
+```kotlin
+line(&quot;dotless-i-vs-I&quot;, &quot;ı&quot;.equals(&quot;I&quot;, ignoreCase = true))
+line(&quot;final-sigma&quot;, &quot;ς&quot;.equals(&quot;Σ&quot;, ignoreCase = true))
+line(&quot;compare-ignore-case-sigma&quot;, &quot;ς&quot;.compareTo(&quot;σ&quot;, ignoreCase = true))
+line(&quot;compare-ignore-case-sharp-s&quot;, &quot;ß&quot;.compareTo(&quot;ss&quot;, ignoreCase = true))
+line(&quot;compare-ignore-case-upper-lower&quot;, &quot;[&quot;.compareTo(&quot;a&quot;, ignoreCase = true))
+```
+
+Results at 2.4.20, one row per distinct output (columns that agree share a row):
+
+- `dotless-i-vs-I`
+  - `true`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `false`: cloudflare-jvm
+- `final-sigma`
+  - `true`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `false`: cloudflare-jvm
+- `compare-ignore-case-sigma`
+  - `0`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `-1`: cloudflare-jvm
+- `compare-ignore-case-sharp-s`
+  - `108`: android+cloudflare-jvm+jvm-17+jvm-21+jvm-25+jvm
+  - `1`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `compare-ignore-case-upper-lower`
+  - `-6`: android+cloudflare-jvm+jvm-17+jvm-21+jvm-25+jvm
+  - `-1`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+
+Docs read (FULL text):
+- https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/compare-to.html : &quot;Returns zero if this object is equal to the specified other object, a negative number if it's less than other&quot;
+- https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/compare-to.html : &quot;If ignoreCase is true, the result of Char.uppercaseChar().lowercaseChar() on each character is compared.&quot;
+
+Existing tracker issues: none read. No tracker was queried for the cloudflare columns.
+
+What is known: Downgraded from documented: cloudflare-jvm differs in value, not only in magnitude: dotless-i-vs-I and final-sigma print false where every other column prints true, and compare-ignore-case-sigma is -1 where the others print 0. The ignoreCase page read says Char.uppercaseChar().lowercaseChar() is compared, which the other columns follow. cloudflare-wasm prints what wasm prints.
+
+What is NOT known: why the cloudflare-jvm output differs (TeaVM's class library, the bytebox build or the Worker runtime were not examined line by line); whether it is a defect or by design; whether a different bytebox or TeaVM release changes the result; whether a different workerd release differs (one runtime version per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies).
+</pre>
+</div>
 <h2>Kotlin versions measured</h2>
 <p>2.4.20, 2.5.0-Beta1</p>
 <h2>How it was measured</h2>
 <ul>
 <li><strong>android</strong>: The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</li>
+<li><strong>cloudflare-jvm</strong>: The probes compiled as Kotlin/JVM 2.4.20 classes and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM), run on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). The Java classes are TeaVM's class library, not a JDK. Four probes are recorded as unavailable: two are skipped because integer division traps in the compiled module and a trap aborts the request, one fails with a NullPointerException, and one is refused at build time because java.util.regex.Matcher.useAnchoringBounds is missing; tools/cloudflare has the details. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bits of 0/0-raw and sqrt-neg-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
+<li><strong>cloudflare-wasm</strong>: The Kotlin/Wasm (wasmJs) probe module on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). A 14-line JavaScript entry replaces Kotlin's loader, which does not run on workerd. Built and recorded by tools/cloudflare and drift probe cloudflare. Byte-identical to the wasm column apart from the target line. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bit of 0/0-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
 <li><strong>ios</strong>: The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</li>
+<li><strong>js-ir</strong>: Kotlin/JS IR on Node 26.8.2, macOS, Apple Silicon (arm64). The standalone Kotlin 2.4.20 compiler builds each probe from the displayed source through tools/ladder; Node runs it. Same transcript as fixtures/atlas-ladder/2.4.20/js-ir.txt.</li>
 <li><strong>jvm</strong>: The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
 <li><strong>jvm-17</strong>: The CLI JVM classes (jvmTarget 17) on Temurin 17.0.20.1, x86-64 Linux container, recorded with --target jvm-17.</li>
 <li><strong>jvm-21</strong>: The same classes on Temurin 21.0.12.1, x86-64 Linux container. Differs from the jvm column in hardware only.</li>

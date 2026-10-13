@@ -32,6 +32,7 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <a href="../../">Drift</a>
 <a href="../">Interactive Atlas</a>
 <a href="../probe/">All probes</a>
+<a href="../versions.html">Version changes</a>
 <a href="../data/dataset.json">dataset.json</a>
 <a href="../data/classification.json">classification.json</a>
 </nav>
@@ -63,26 +64,29 @@ line(&quot;int-pow-nan&quot;, nan.pow(0))
 line(&quot;inf^0&quot;, inf.pow(0.0))
 line(&quot;inf^-1&quot;, inf.pow(-1.0))</code></pre>
 <h2>Results on Kotlin 2.4.20</h2>
-<p>5 different results; 5 of 19 lines differ.</p>
+<p>6 different results; 11 of 19 lines differ.</p>
 <table>
 <caption>Result per column, Kotlin 2.4.20</caption>
 <tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
-<tr class="differs"><th scope="row">android</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
-<tr><th scope="row">ios</th><td>B</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
-<tr><th scope="row">linux</th><td>B</td><td>ok</td><td><a href="../data/transcripts/linux.txt">file</a></td></tr>
-<tr><th scope="row">linux-arm64</th><td>B</td><td>ok</td><td><a href="../data/transcripts/linux-arm64.txt">file</a></td></tr>
-<tr><th scope="row">macos</th><td>B</td><td>ok</td><td><a href="../data/transcripts/macos.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm-17</th><td>D (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm-21</th><td>D (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-21.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm-25</th><td>D (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-25.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">wasm</th><td>E (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/wasm.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">wasm-chromium</th><td>E (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">wasm-firefox</th><td>E (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">wasm-webkit</th><td>E (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">android</th><td>A (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">cloudflare-jvm</th><td>B (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/cloudflare-jvm.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-17</th><td>B (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-21</th><td>B (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm-21.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-25</th><td>B (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm-25.txt">file</a></td></tr>
+<tr><th scope="row">cloudflare-wasm</th><td>C</td><td>ok</td><td><a href="../data/transcripts/cloudflare-wasm.txt">file</a></td></tr>
+<tr><th scope="row">wasm</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm.txt">file</a></td></tr>
+<tr><th scope="row">wasm-chromium</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
+<tr><th scope="row">wasm-firefox</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
+<tr><th scope="row">wasm-webkit</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">ios</th><td>D (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">linux</th><td>D (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/linux.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">linux-arm64</th><td>D (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/linux-arm64.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">macos</th><td>D (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/macos.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">js-ir</th><td>E (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/js-ir.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm</th><td>F (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
 </table>
 <h3>Group A: android</h3>
-<pre>nan^0 = 1.0
+<pre><mark>nan^0 = 1.0</mark>
 <mark>1^nan = 1.0</mark>
 <mark>1^inf = 1.0</mark>
 <mark>-1^inf = 1.0</mark>
@@ -92,17 +96,57 @@ line(&quot;inf^-1&quot;, inf.pow(-1.0))</code></pre>
 -0^-2 = Infinity
 -8^third = NaN
 2^1024 = Infinity
-2^-1075 = 0.0
+<mark>2^-1075 = 0.0</mark>
 <mark>2^-1074 = 4.9E-324</mark>
 <mark>10^-5 = 3ee4f8b588e368f1</mark>
 2^half = 3ff6a09e667f3bcd
-2^int-10 = 1024.0
+<mark>2^int-10 = 1024.0</mark>
 1.1^int-100 = 40caea4e6126bb95
-int-pow-nan = 1.0
-inf^0 = 1.0
-inf^-1 = 0.0</pre>
-<h3>Group B: ios, linux, linux-arm64, macos</h3>
-<pre>nan^0 = 1.0
+<mark>int-pow-nan = 1.0</mark>
+<mark>inf^0 = 1.0</mark>
+<mark>inf^-1 = 0.0</mark></pre>
+<h3>Group B: cloudflare-jvm, jvm-17, jvm-21, jvm-25</h3>
+<pre><mark>nan^0 = 1.0</mark>
+<mark>1^nan = NaN</mark>
+<mark>1^inf = NaN</mark>
+<mark>-1^inf = NaN</mark>
+2^nan = NaN
+0^-1 = Infinity
+-0^-1 = -Infinity
+-0^-2 = Infinity
+-8^third = NaN
+2^1024 = Infinity
+<mark>2^-1075 = 0.0</mark>
+<mark>2^-1074 = 4.9E-324</mark>
+<mark>10^-5 = 3ee4f8b588e368f1</mark>
+2^half = 3ff6a09e667f3bcd
+<mark>2^int-10 = 1024.0</mark>
+1.1^int-100 = 40caea4e6126bb95
+<mark>int-pow-nan = 1.0</mark>
+<mark>inf^0 = 1.0</mark>
+<mark>inf^-1 = 0.0</mark></pre>
+<h3>Group C: cloudflare-wasm, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
+<pre><mark>nan^0 = 1.0</mark>
+<mark>1^nan = NaN</mark>
+<mark>1^inf = NaN</mark>
+<mark>-1^inf = NaN</mark>
+2^nan = NaN
+0^-1 = Infinity
+-0^-1 = -Infinity
+-0^-2 = Infinity
+-8^third = NaN
+2^1024 = Infinity
+<mark>2^-1075 = 0.0</mark>
+<mark>2^-1074 = 5e-324</mark>
+<mark>10^-5 = 3ee4f8b588e368f0</mark>
+2^half = 3ff6a09e667f3bcd
+<mark>2^int-10 = 1024.0</mark>
+1.1^int-100 = 40caea4e6126bb95
+<mark>int-pow-nan = 1.0</mark>
+<mark>inf^0 = 1.0</mark>
+<mark>inf^-1 = 0.0</mark></pre>
+<h3>Group D: ios, linux, linux-arm64, macos</h3>
+<pre><mark>nan^0 = 1.0</mark>
 <mark>1^nan = 1.0</mark>
 <mark>1^inf = NaN</mark>
 <mark>-1^inf = NaN</mark>
@@ -112,17 +156,17 @@ inf^-1 = 0.0</pre>
 -0^-2 = Infinity
 -8^third = NaN
 2^1024 = Infinity
-2^-1075 = 0.0
+<mark>2^-1075 = 0.0</mark>
 <mark>2^-1074 = 4.9E-324</mark>
 <mark>10^-5 = 3ee4f8b588e368f1</mark>
 2^half = 3ff6a09e667f3bcd
-2^int-10 = 1024.0
+<mark>2^int-10 = 1024.0</mark>
 1.1^int-100 = 40caea4e6126bb95
-int-pow-nan = 1.0
-inf^0 = 1.0
-inf^-1 = 0.0</pre>
-<h3>Group C: jvm</h3>
-<pre>nan^0 = 1.0
+<mark>int-pow-nan = 1.0</mark>
+<mark>inf^0 = 1.0</mark>
+<mark>inf^-1 = 0.0</mark></pre>
+<h3>Group E: js-ir</h3>
+<pre><mark>nan^0 = 1</mark>
 <mark>1^nan = NaN</mark>
 <mark>1^inf = NaN</mark>
 <mark>-1^inf = NaN</mark>
@@ -132,55 +176,35 @@ inf^-1 = 0.0</pre>
 -0^-2 = Infinity
 -8^third = NaN
 2^1024 = Infinity
-2^-1075 = 0.0
-<mark>2^-1074 = 4.9E-324</mark>
-<mark>10^-5 = 3ee4f8b588e368f0</mark>
-2^half = 3ff6a09e667f3bcd
-2^int-10 = 1024.0
-1.1^int-100 = 40caea4e6126bb95
-int-pow-nan = 1.0
-inf^0 = 1.0
-inf^-1 = 0.0</pre>
-<h3>Group D: jvm-17, jvm-21, jvm-25</h3>
-<pre>nan^0 = 1.0
-<mark>1^nan = NaN</mark>
-<mark>1^inf = NaN</mark>
-<mark>-1^inf = NaN</mark>
-2^nan = NaN
-0^-1 = Infinity
--0^-1 = -Infinity
--0^-2 = Infinity
--8^third = NaN
-2^1024 = Infinity
-2^-1075 = 0.0
-<mark>2^-1074 = 4.9E-324</mark>
-<mark>10^-5 = 3ee4f8b588e368f1</mark>
-2^half = 3ff6a09e667f3bcd
-2^int-10 = 1024.0
-1.1^int-100 = 40caea4e6126bb95
-int-pow-nan = 1.0
-inf^0 = 1.0
-inf^-1 = 0.0</pre>
-<h3>Group E: wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
-<pre>nan^0 = 1.0
-<mark>1^nan = NaN</mark>
-<mark>1^inf = NaN</mark>
-<mark>-1^inf = NaN</mark>
-2^nan = NaN
-0^-1 = Infinity
--0^-1 = -Infinity
--0^-2 = Infinity
--8^third = NaN
-2^1024 = Infinity
-2^-1075 = 0.0
+<mark>2^-1075 = 0</mark>
 <mark>2^-1074 = 5e-324</mark>
+<mark>10^-5 = 3ee4f8b588e368f1</mark>
+2^half = 3ff6a09e667f3bcd
+<mark>2^int-10 = 1024</mark>
+1.1^int-100 = 40caea4e6126bb95
+<mark>int-pow-nan = 1</mark>
+<mark>inf^0 = 1</mark>
+<mark>inf^-1 = 0</mark></pre>
+<h3>Group F: jvm</h3>
+<pre><mark>nan^0 = 1.0</mark>
+<mark>1^nan = NaN</mark>
+<mark>1^inf = NaN</mark>
+<mark>-1^inf = NaN</mark>
+2^nan = NaN
+0^-1 = Infinity
+-0^-1 = -Infinity
+-0^-2 = Infinity
+-8^third = NaN
+2^1024 = Infinity
+<mark>2^-1075 = 0.0</mark>
+<mark>2^-1074 = 4.9E-324</mark>
 <mark>10^-5 = 3ee4f8b588e368f0</mark>
 2^half = 3ff6a09e667f3bcd
-2^int-10 = 1024.0
+<mark>2^int-10 = 1024.0</mark>
 1.1^int-100 = 40caea4e6126bb95
-int-pow-nan = 1.0
-inf^0 = 1.0
-inf^-1 = 0.0</pre>
+<mark>int-pow-nan = 1.0</mark>
+<mark>inf^0 = 1.0</mark>
+<mark>inf^-1 = 0.0</mark></pre>
 <h2>Results on Kotlin 2.5.0-Beta1</h2>
 <p>3 different results; 4 of 19 lines differ.</p>
 <table>
@@ -265,7 +289,7 @@ inf^-1 = 0.0</pre>
 <blockquote><p>all implementations of the equivalent functions of class Math are not defined to return the bit-for-bit same results</p>
 <footer><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Math.html">https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Math.html</a></footer></blockquote>
 <h3>Notes</h3>
-<p>Downgraded from documented: the Kotlin KDoc states b.pow(NaN) is NaN, so Native violates a documented contract (open defect, not a documented difference). The Android column is also off the Kotlin contract, but its own Math.pow page documents the 1.0 results (verified).</p>
+<p>Downgraded from documented: the Kotlin KDoc states b.pow(NaN) is NaN, so Native violates a documented contract (open defect, not a documented difference). The Android column is also off the Kotlin contract, but its own Math.pow page documents the 1.0 results (verified). cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what jvm-17, jvm-21, jvm-25 print.</p>
 <p class="muted">Read on 2026-10-07.</p>
 <h2>Issues</h2>
 <table>
@@ -336,6 +360,28 @@ Existing tracker issues (read through the YouTrack REST API on 2026-10-07; nothi
 What is known: Downgraded from documented: the Kotlin KDoc states b.pow(NaN) is NaN, so Native violates a documented contract (open defect, not a documented difference). The Android column is also off the Kotlin contract, but its own Math.pow page documents the 1.0 results (verified).
 
 What is NOT known: the intended behavior where no page read states one; whether the divergent column is a defect or by design; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device of the same target differs (one device per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies; the ladder agent re-compiled the displayed text and matched 37 of 38 probes on JVM and macOS Native).
+
+## Cloudflare columns
+
+Recorded 2026-10-12 on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local, macOS arm64), one run per cell. cloudflare-wasm is the Kotlin/Wasm probe module with a hand-written Worker entry; cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 plugin (TeaVM), so its Java classes are not a JDK. These rows are not part of the results above.
+
+Rows for the differing lines of this draft:
+
+- `1^nan`
+  - `1.0`: android+ios+linux-arm64+linux+macos
+  - `NaN`: cloudflare-jvm+cloudflare-wasm+jvm-17+jvm-21+jvm-25+jvm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `1^inf`
+  - `1.0`: android
+  - `NaN`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `-1^inf`
+  - `1.0`: android
+  - `NaN`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `2^-1074`
+  - `4.9E-324`: android+cloudflare-jvm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos
+  - `5e-324`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `10^-5`
+  - `3ee4f8b588e368f1`: android+cloudflare-jvm+ios+jvm-17+jvm-21+jvm-25+linux-arm64+linux+macos
+  - `3ee4f8b588e368f0`: cloudflare-wasm+jvm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
 </pre>
 </div>
 <h2>Kotlin versions measured</h2>
@@ -343,7 +389,10 @@ What is NOT known: the intended behavior where no page read states one; whether 
 <h2>How it was measured</h2>
 <ul>
 <li><strong>android</strong>: The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</li>
+<li><strong>cloudflare-jvm</strong>: The probes compiled as Kotlin/JVM 2.4.20 classes and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM), run on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). The Java classes are TeaVM's class library, not a JDK. Four probes are recorded as unavailable: two are skipped because integer division traps in the compiled module and a trap aborts the request, one fails with a NullPointerException, and one is refused at build time because java.util.regex.Matcher.useAnchoringBounds is missing; tools/cloudflare has the details. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bits of 0/0-raw and sqrt-neg-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
+<li><strong>cloudflare-wasm</strong>: The Kotlin/Wasm (wasmJs) probe module on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). A 14-line JavaScript entry replaces Kotlin's loader, which does not run on workerd. Built and recorded by tools/cloudflare and drift probe cloudflare. Byte-identical to the wasm column apart from the target line. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bit of 0/0-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
 <li><strong>ios</strong>: The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</li>
+<li><strong>js-ir</strong>: Kotlin/JS IR on Node 26.8.2, macOS, Apple Silicon (arm64). The standalone Kotlin 2.4.20 compiler builds each probe from the displayed source through tools/ladder; Node runs it. Same transcript as fixtures/atlas-ladder/2.4.20/js-ir.txt.</li>
 <li><strong>jvm</strong>: The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
 <li><strong>jvm-17</strong>: The CLI JVM classes (jvmTarget 17) on Temurin 17.0.20.1, x86-64 Linux container, recorded with --target jvm-17.</li>
 <li><strong>jvm-21</strong>: The same classes on Temurin 21.0.12.1, x86-64 Linux container. Differs from the jvm column in hardware only.</li>

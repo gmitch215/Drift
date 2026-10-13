@@ -1,328 +1,339 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Drift</title>
-		<meta name="description" content="Why it passes here and fails there" />
-		<link rel="icon" href="drift.ico" sizes="any" />
-		<link rel="icon" href="drift_128.png" type="image/png" sizes="128x128" />
-		<link rel="apple-touch-icon" href="drift.png" />
-		<meta property="og:title" content="Drift" />
-		<meta property="og:description" content="Why it passes here and fails there" />
-		<meta property="og:image" content="https://drift.gmitch215.dev/drift.png" />
-		<style>
-			:root {
-				color-scheme: light dark;
-				--fg: #1d1a26;
-				--muted: #5b556b;
-				--bg: #fcfbfe;
-				--card: #ffffff;
-				--line: #e4def0;
-				--accent: #6b3fd4;
-				--accent-strong: #8a63f0;
-				--pink: #b0399a;
-				--pink-soft: #c768bd;
-				--coral: #e4707a;
-				--code-bg: #f4f0fb;
-				--code-fg: #96307f;
-				--tint: #efe8fb;
-				--gradient: linear-gradient(90deg, #7a4fe0 0%, #a548c6 60%, #bd3a93 100%);
-				--glow: color-mix(in oklab, #8a63f0 16%, transparent);
-				--glow-pink: color-mix(in oklab, #c768bd 11%, transparent);
-				--glow-coral: color-mix(in oklab, #e4707a 7%, transparent);
-			}
-			@media (prefers-color-scheme: dark) {
-				:root {
-					--fg: #ece9f3;
-					--muted: #a69fb8;
-					--bg: #110e17;
-					--card: #191521;
-					--line: #2b2438;
-					--accent: #b99cff;
-					--accent-strong: #9d7bf5;
-					--pink: #e58fd8;
-					--pink-soft: #c872bd;
-					--coral: #f08a92;
-					--code-bg: #1f1a2a;
-					--code-fg: #f0a6e4;
-					--tint: #2a2140;
-					--gradient: linear-gradient(90deg, #b99cff 0%, #d595ee 60%, #f09ad0 100%);
-					--glow: color-mix(in oklab, #9d7bf5 22%, transparent);
-					--glow-pink: color-mix(in oklab, #c872bd 14%, transparent);
-					--glow-coral: color-mix(in oklab, #f08a92 7%, transparent);
-				}
-			}
-			* {
-				box-sizing: border-box;
-			}
-			body {
-				margin: 0;
-				padding: 0 1rem 5rem;
-				background:
-					radial-gradient(60rem 30rem at 30% -10rem, var(--glow), transparent 70%),
-					radial-gradient(40rem 24rem at 95% 0, var(--glow-pink), transparent 70%),
-					radial-gradient(30rem 16rem at 100% 8rem, var(--glow-coral), transparent 70%),
-					var(--bg);
-				color: var(--fg);
-				font:
-					16px/1.7 ui-sans-serif,
-					system-ui,
-					-apple-system,
-					'Segoe UI',
-					Roboto,
-					sans-serif;
-				overflow-wrap: break-word;
-			}
-			main,
-			nav .bar,
-			footer {
-				max-width: 52rem;
-				margin: 0 auto;
-			}
-			nav {
-				margin: 0 -1rem 2.5rem;
-				padding: 0.75rem 1rem;
-				border-bottom: 1px solid var(--line);
-			}
-			nav .bar {
-				display: flex;
-				flex-wrap: wrap;
-				align-items: center;
-				gap: 0.25rem 1rem;
-			}
-			nav a {
-				color: var(--muted);
-				font-size: 0.925rem;
-				text-decoration: none;
-			}
-			nav a:hover,
-			nav a[aria-current] {
-				color: var(--accent);
-			}
-			nav a[aria-current] {
-				text-decoration: underline;
-				text-decoration-color: var(--pink-soft);
-				text-decoration-thickness: 2px;
-				text-underline-offset: 0.5em;
-			}
-			nav a.brand {
-				display: flex;
-				align-items: center;
-				gap: 0.5rem;
-				margin-right: auto;
-				color: var(--fg);
-				font-size: 1.05rem;
-				font-weight: 700;
-				letter-spacing: -0.01em;
-			}
-			nav a.brand[aria-current] {
-				color: var(--fg);
-				text-decoration: none;
-			}
-			nav a.brand img {
-				width: 1.75rem;
-				height: 1.75rem;
-			}
-			h1 {
-				margin: 0 0 1rem;
-				font-size: 2.25rem;
-				line-height: 1.2;
-				letter-spacing: -0.03em;
-			}
-			.hero {
-				margin: 0 0 2rem;
-			}
-			.hero img {
-				display: block;
-				margin: 0 0 1rem;
-			}
-			.hero h1 {
-				width: fit-content;
-				margin: 0 0 0.25rem;
-				color: var(--accent);
-				font-size: 3rem;
-			}
-			@supports (background-clip: text) or (-webkit-background-clip: text) {
-				.hero h1 {
-					background: var(--gradient);
-					-webkit-background-clip: text;
-					background-clip: text;
-					-webkit-text-fill-color: transparent;
-					color: transparent;
-				}
-			}
-			.hero .lead {
-				margin: 0;
-				color: var(--muted);
-				font-size: 1.2rem;
-			}
-			.links {
-				display: grid;
-				gap: 0.85rem;
-				grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-				margin: 0 0 3rem;
-			}
-			a.card {
-				display: block;
-				padding: 1rem 1.25rem;
-				border: 1px solid var(--line);
-				border-radius: 0.8rem;
-				background: var(--card);
-				color: inherit;
-				text-decoration: none;
-				transition:
-					border-color 0.15s,
-					box-shadow 0.15s;
-			}
-			a.card:hover {
-				border-color: var(--accent-strong);
-				box-shadow: 0 0 36px -10px var(--accent-strong);
-			}
-			a.card strong {
-				color: var(--accent);
-			}
-			a.card strong {
-				display: block;
-				font-size: 1.02rem;
-			}
-			a.card span {
-				color: var(--muted);
-				font-size: 0.875rem;
-				line-height: 1.5;
-			}
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Drift</title>
+        <meta name="description" content="Why it passes here and fails there" />
+        <link rel="icon" href="drift.ico" sizes="any" />
+        <link rel="icon" href="drift_128.png" type="image/png" sizes="128x128" />
+        <link rel="apple-touch-icon" href="drift.png" />
+        <meta property="og:title" content="Drift" />
+        <meta property="og:description" content="Why it passes here and fails there" />
+        <meta property="og:image" content="https://drift.gmitch215.dev/drift.png" />
+        <style>
+            :root {
+                color-scheme: light dark;
+                --canvas: #fcfbfe;
+                --surface: #ffffff;
+                --line: #e4def0;
+                                --fg: #1d1a26;
+                --muted: #5b556b;
+                --accent: #8a63f0;
+                --accent-text: #6b3fd4;
+                --tint: #efe8fb;
+                --radius: 6px;
+                --u: 4px;
+            }
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --canvas: #110e17;
+                    --surface: #191521;
+                    --line: #2b2438;
+                    --fg: #ece9f3;
+                    --muted: #a69fb8;
+                    --accent: #9d7bf5;
+                    --accent-text: #b99cff;
+                    --tint: #2a2140;
+                }
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                padding: 0 calc(var(--u) * 4) calc(var(--u) * 20);
+                background: var(--canvas);
+                color: var(--fg);
+                font:
+                    16px/1.65 ui-sans-serif,
+                    system-ui,
+                    -apple-system,
+                    'Segoe UI',
+                    Roboto,
+                    sans-serif;
+                overflow-wrap: break-word;
+            }
+            main,
+            nav .bar,
+            footer {
+                max-width: 52rem;
+                margin: 0 auto;
+            }
+            a:focus-visible {
+                outline: 2px solid var(--accent-text);
+                outline-offset: 2px;
+                border-radius: var(--radius);
+            }
+            nav {
+                margin: 0 calc(var(--u) * -4) calc(var(--u) * 8);
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border-bottom: 1px solid var(--line);
+                background: var(--surface);
+            }
+            nav .bar {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: var(--u) calc(var(--u) * 4);
+            }
+            nav a {
+                color: var(--muted);
+                font-size: 14px;
+                text-decoration: none;
+            }
+            nav a:hover,
+            nav a[aria-current] {
+                color: var(--accent-text);
+            }
+            nav a[aria-current] {
+                text-decoration: underline;
+                text-decoration-color: var(--accent);
+                text-decoration-thickness: 2px;
+                text-underline-offset: 0.5em;
+            }
+            nav a.brand {
+                display: flex;
+                align-items: center;
+                gap: calc(var(--u) * 2);
+                margin-right: auto;
+                color: var(--fg);
+                font-size: 16px;
+                font-weight: 600;
+            }
+            nav a.brand[aria-current] {
+                color: var(--fg);
+                text-decoration: none;
+            }
+            nav a.brand img {
+                width: 28px;
+                height: 28px;
+            }
+            h1 {
+                margin: 0 0 calc(var(--u) * 4);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .hero {
+                margin: 0 0 calc(var(--u) * 8);
+            }
+            .hero img {
+                display: block;
+                margin: 0 0 calc(var(--u) * 4);
+            }
+            .hero h1 {
+                margin: 0 0 var(--u);
+                font-size: 32px;
+                line-height: 40px;
+            }
+            .hero .lead {
+                margin: 0;
+                color: var(--muted);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .steps,
+            .links {
+                display: grid;
+                gap: calc(var(--u) * 3);
+                grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+                margin: 0 0 calc(var(--u) * 4);
+                padding: 0;
+                list-style: none;
+            }
+            .steps {
+                counter-reset: step;
+            }
+            .links {
+                margin-bottom: calc(var(--u) * 12);
+            }
+            .steps li {
+                display: flex;
+                counter-increment: step;
+            }
+            a.card {
+                display: block;
+                flex: 1;
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: var(--surface);
+                color: inherit;
+                text-decoration: none;
+            }
+            a.card:hover {
+                border-color: var(--accent);
+            }
+            a.card strong {
+                display: block;
+                color: var(--accent-text);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .steps a.card strong::before {
+                content: counter(step) '. ';
+            }
+            a.card span {
+                color: var(--muted);
+                font-size: 14px;
+                line-height: 22px;
+            }
 
-			.readme h2 {
-				margin: 3rem 0 1rem;
-				padding-bottom: 0.4rem;
-				border-bottom: 2px solid transparent;
-				border-image: linear-gradient(90deg, var(--accent-strong), var(--pink-soft) 40%, var(--line)) 1;
-				font-size: 1.55rem;
-				letter-spacing: -0.01em;
-			}
-			.readme h3 {
-				margin: 2rem 0 0.75rem;
-				padding-left: 0.6rem;
-				border-left: 3px solid var(--pink-soft);
-				font-size: 1.2rem;
-			}
-			.readme h4 {
-				margin: 1.5rem 0 0.5rem;
-			}
-			.readme a {
-				color: var(--accent);
-				text-underline-offset: 0.2em;
-			}
-			.readme hr {
-				margin: 3rem 0;
-				border: 0;
-				border-top: 1px solid var(--line);
-			}
-			.readme blockquote {
-				margin: 1.5rem 0;
-				padding: 0.25rem 0 0.25rem 1.25rem;
-				border-left: 3px solid var(--pink-soft);
-				color: var(--muted);
-			}
-			.readme ul,
-			.readme ol {
-				padding-left: 1.4rem;
-			}
-			.readme li {
-				margin: 0.35rem 0;
-			}
-			.readme li::marker {
-				color: var(--pink-soft);
-			}
-			.readme code {
-				font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-			}
-			.readme :not(pre) > code {
-				padding: 0.15em 0.4em;
-				border-radius: 0.35rem;
-				background: var(--code-bg);
-				color: var(--code-fg);
-				font-size: 0.85em;
-				overflow-wrap: anywhere;
-			}
-			.readme pre {
-				margin: 1.25rem 0;
-				padding: 1rem 1.25rem;
-				border: 1px solid var(--line);
-				border-radius: 0.8rem;
-				overflow-x: auto;
-				background: var(--code-bg);
-				font-size: 0.85rem;
-				line-height: 1.6;
-			}
-			.readme pre code {
-				display: block;
-			}
-			.readme .table {
-				overflow-x: auto;
-				margin: 1.25rem 0;
-				border: 1px solid var(--line);
-				border-radius: 0.8rem;
-			}
-			.readme table {
-				width: 100%;
-				border-collapse: collapse;
-				font-size: 0.925rem;
-			}
-			.readme th,
-			.readme td {
-				padding: 0.55rem 0.9rem;
-				border-bottom: 1px solid var(--line);
-				text-align: left;
-				vertical-align: top;
-			}
-			.readme th {
-				background: var(--tint);
-				border-bottom-color: var(--accent-strong);
-				font-weight: 600;
-			}
-			.readme tbody tr:last-child td {
-				border-bottom: 0;
-			}
-			.readme img {
-				max-width: 100%;
-			}
+            .readme h2 {
+                margin: calc(var(--u) * 12) 0 calc(var(--u) * 3);
+                padding-bottom: calc(var(--u) * 2);
+                border-bottom: 1px solid var(--line);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .readme h3 {
+                margin: calc(var(--u) * 8) 0 calc(var(--u) * 2);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .readme h4 {
+                margin: calc(var(--u) * 6) 0 calc(var(--u) * 2);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .readme a {
+                color: var(--accent-text);
+                text-underline-offset: 0.2em;
+            }
+            .readme hr {
+                margin: calc(var(--u) * 12) 0;
+                border: 0;
+                border-top: 1px solid var(--line);
+            }
+            .readme blockquote {
+                margin: calc(var(--u) * 6) 0;
+                padding: var(--u) 0 var(--u) calc(var(--u) * 4);
+                border-left: 3px solid var(--accent);
+                color: var(--muted);
+            }
+            .readme ul,
+            .readme ol {
+                padding-left: calc(var(--u) * 6);
+            }
+            .readme li {
+                margin: calc(var(--u) * 1.5) 0;
+            }
+            .readme code {
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            }
+            .readme :not(pre) > code {
+                padding: 0.15em 0.4em;
+                border-radius: var(--radius);
+                background: var(--tint);
+                color: var(--accent-text);
+                font-size: 13px;
+                overflow-wrap: anywhere;
+            }
+            .readme pre {
+                margin: calc(var(--u) * 5) 0;
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                overflow-x: auto;
+                background: var(--surface);
+                font-size: 13px;
+                line-height: 20px;
+            }
+            .readme pre code {
+                display: block;
+            }
+            .readme .table {
+                overflow-x: auto;
+                margin: calc(var(--u) * 5) 0;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+            }
+            .readme table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 14px;
+                line-height: 22px;
+            }
+            .readme th,
+            .readme td {
+                padding: calc(var(--u) * 2) calc(var(--u) * 3);
+                border-bottom: 1px solid var(--line);
+                text-align: left;
+                vertical-align: top;
+            }
+            .readme th {
+                background: var(--tint);
+                font-weight: 600;
+            }
+            .readme tbody tr:last-child td {
+                border-bottom: 0;
+            }
+            .readme img {
+                max-width: 100%;
+            }
 
-			footer {
-				margin-top: 4rem;
-				padding-top: 1.5rem;
-				border-top: 1px solid var(--line);
-				color: var(--muted);
-				font-size: 0.9rem;
-			}
-			footer a {
-				color: inherit;
-			}
-		</style>
-	</head>
-	<body>
-		<nav>
-			<div class="bar"><a class="brand" href="index.html" aria-current="page"><img src="drift_128.png" alt="" width="28" height="28">Drift</a>
+            .pager {
+                display: flex;
+                flex-wrap: wrap;
+                gap: calc(var(--u) * 3);
+                margin: calc(var(--u) * 12) 0 0;
+            }
+            .pager a.card {
+                min-width: 13rem;
+            }
+            .pager a.next {
+                margin-left: auto;
+                text-align: right;
+            }
+            .pager a.card span {
+                display: block;
+                font-size: 12px;
+                line-height: 18px;
+            }
+            .pager a.card strong {
+                font-size: 16px;
+            }
+
+            footer {
+                margin-top: calc(var(--u) * 16);
+                padding-top: calc(var(--u) * 6);
+                border-top: 1px solid var(--line);
+                color: var(--muted);
+                font-size: 14px;
+            }
+            footer a {
+                color: inherit;
+            }
+        </style>
+    </head>
+    <body>
+        <nav>
+            <div class="bar"><a class="brand" href="index.html" aria-current="page"><img src="drift_128.png" alt="" width="28" height="28">Drift</a>
 <a href="advanced-usage.html">Usage</a>
 <a href="technical-report.html">Report</a>
 <a href="atlas/">Atlas</a>
 <a href="engine/">Engine</a>
 <a href="https://github.com/gmitch215/Drift">GitHub</a></div>
-		</nav>
-		<main>
-			<div class="hero">
+        </nav>
+        <main>
+            <div class="hero">
 <img src="drift.png" alt="" width="96" height="96">
 <h1>Drift</h1>
 <p class="lead">Why it passes here and fails there</p>
 </div>
+<ol class="steps">
+<li><a class="card" href="index.html#what-it-does"><strong>Learn</strong><span>What Drift records, ranks and proves.</span></a></li>
+<li><a class="card" href="index.html#install-and-run"><strong>Install</strong><span>A release archive, a package or source.</span></a></li>
+<li><a class="card" href="index.html#try-it"><strong>Diagnose</strong><span>Run a first diagnosis on a recorded failure.</span></a></li>
+<li><a class="card" href="advanced-usage.html"><strong>Use</strong><span>Every command and flag, with real output.</span></a></li>
+<li><a class="card" href="technical-report.html"><strong>Read</strong><span>The design, the evidence and the numbers.</span></a></li>
+</ol>
 <div class="links">
-<a class="card" href="advanced-usage.html"><strong>Usage</strong><span>Every command and flag, with real output.</span></a>
-<a class="card" href="technical-report.html"><strong>Report</strong><span>The design, the evidence and the numbers.</span></a>
 <a class="card" href="atlas/"><strong>Atlas</strong><span>Kotlin behavior recorded per target, with Studio.</span></a>
 <a class="card" href="engine/"><strong>Engine</strong><span>KDoc for the engine modules, from Dokka.</span></a>
 <a class="card" href="https://github.com/gmitch215/Drift"><strong>GitHub</strong><span>Source, releases and issues.</span></a>
 </div>
-			<div class="readme"><p>Drift diagnoses a program that passes in one environment and fails in another. It records each
+            <div class="readme"><p>Drift diagnoses a program that passes in one environment and fails in another. It records each
 environment, ranks what differs between a passing run and a failing one, proposes the
 experiment that would remove the most uncertainty, runs it, and writes a certificate that a second
 command can verify. It is written in Kotlin Multiplatform and runs as a command line tool, a desktop
@@ -359,17 +370,29 @@ every count, p-value and verdict from the archive alone. It does not re-run an e
 </ol>
 <p><code>drift reproduce</code> writes a <code>Dockerfile</code> and a run script that mirror a capsule as far as a container
 can. The full command reference is in <a href="advanced-usage.html">ADVANCED_USAGE.md</a>.</p>
+<p>In CI, <code>drift run -- COMMAND</code> runs a command and keeps its environment, exit code and log tail as a
+capsule directory. <code>drift import</code> builds the same directory from a saved GitHub Actions or GitLab CI
+log. <code>drift diagnose --against BASELINE</code> compares a saved passing run with the current one, and
+<code>drift bisect plan</code> and <code>drift bisect apply</code> narrow a green and red pair one test at a time. None of
+them opens a network connection.</p>
+<p><code>drift capture --project</code> adds the dependency versions, imports and call sites of the working directory to a capsule. <code>drift upgrade-check --to php=8.3,drupal=11</code> lists what a move to other versions breaks, from one capsule and the rule catalog (296 rules). <code>drift triage</code> reads an issue body offline and says which environment facts and rules it names. <code>drift contract</code> writes what a program needs from an environment and checks other capsules against it. Studio has a screen for each of the last three.</p>
+<p>The repository also holds a GitHub Action (<code>action.yml</code>) and a GitLab CI/CD component
+(<code>templates/drift.yml</code>) that run these steps in a pipeline; see
+<a href="advanced-usage.html#ci-integration">CI Integration</a>.</p>
 <hr />
 <h2 id="the-kotlin-portability-atlas">The Kotlin Portability Atlas</h2>
 <p>Kotlin code that compiles everywhere does not always print the same thing everywhere. The Atlas holds
 38 probes of Kotlin behavior. Each probe is a small program with a recorded output per target.
-Thirteen columns are recorded on Kotlin 2.4.20: the JVM on JDK 17, 21 and 25, Linux x64 and arm64
-and macOS native, Wasm on Node, Chromium, Firefox and WebKit, Android and the iOS simulator. Five more
-(JVM, macOS native, Wasm, Android and iOS) are recorded on Kotlin 2.5.0-Beta1.</p>
-<p>23 probes differ between targets on 2.4.20, and 18 on 2.5.0-Beta1. Every probe carries a
-classification from primary sources: 18 are <code>documented</code> (a Kotlin page states the behavior), 4 are
-<code>platform-defined</code> (a JDK or ECMAScript page does) and 16 are <code>unclassified</code>, with the search that
-found no explanation. A divergence is data, not a verdict that something is a bug.</p>
+Sixteen columns are recorded on Kotlin 2.4.20: the JVM on JDK 17, 21 and 25, Linux x64 and arm64
+and macOS native, Wasm on Node, Chromium, Firefox and WebKit, Kotlin/JS IR on Node, Android, the iOS
+simulator and two Cloudflare Workers runtimes. Five more (JVM, macOS native, Wasm, Android and iOS)
+are recorded on Kotlin 2.5.0-Beta1, and a ladder of 14 compiler versions from 1.3.72 to 2.4.21
+covers the JVM, macOS, Linux and Kotlin/JS targets that have a standalone compiler.</p>
+<p>32 probes differ between targets on 2.4.20, and 18 on 2.5.0-Beta1. Every probe carries a
+classification from primary sources: 10 are <code>documented</code> (a Kotlin page states the behavior), 3 are
+<code>platform-defined</code> (a JDK or ECMAScript page does) and 25 are <code>unclassified</code>, with the search that
+found no explanation. A divergence is data, not a verdict that something is a bug. <code>drift atlas diff</code>
+lists what changed between two compiler versions.</p>
 <p>Studio opens on the Atlas. The matrix groups columns by target family and adds a column for the
 device it runs on, measured live. A predict-and-reveal mode asks for the output you expect on a
 target, then shows the recorded one.</p>
@@ -519,6 +542,11 @@ toolchain if one is missing. A cold build downloads toolchains and dependencies 
 <td><code>./gradlew :cli:stageStudio</code>, then <code>drift serve</code></td>
 </tr>
 <tr>
+<td>Wasm tests on Node</td>
+<td>JDK 21 (Gradle fetches Node.js)</td>
+<td><code>./gradlew :core:wasmJsNodeTest</code></td>
+</tr>
+<tr>
 <td>Studio on Android</td>
 <td>Android SDK with platform 37</td>
 <td>see <a href="#android">Android</a></td>
@@ -534,6 +562,8 @@ toolchain if one is missing. A cold build downloads toolchains and dependencies 
 macOS, <code>:studio:packageDeb :studio:packageRpm :studio:packageAppImage</code> on Linux and
 <code>:studio:packageMsi :studio:packageExe</code> on Windows (WiX Toolset). <code>drift solve</code> also needs Docker.
 Everything else runs without it.</p>
+<p>The wasmJs target builds Studio for the browser (see Studio on the Web; <code>./gradlew :studio:wasmJsBrowserDistribution</code> builds the bundle without staging it) and runs the common <code>core</code>
+tests under Node.</p>
 <h3 id="command-line">Command Line</h3>
 <p>Executables land in <code>cli/build/bin/&lt;target&gt;/releaseExecutable/</code>. The macOS executable is <code>drift.kexe</code>
 and the Windows one is <code>drift.exe</code>.</p>
@@ -545,6 +575,7 @@ drift --version
 <p>On the JVM, <code>./gradlew :cli:jvmRun --args=--version</code> prints <code>drift version 1.0.0 (jvm)</code>, and any other
 command goes in <code>--args</code>. The macOS executable and the JVM build were run. The Linux arm64 and x64
 executables ran inside Debian containers. The Windows executable ran under Wine, not on Windows.</p>
+<p>The default path runs offline: <code>drift capture</code> and <code>drift diagnose</code> complete under <code>docker run --network none</code>.</p>
 <h3 id="studio-on-the-desktop">Studio on the Desktop</h3>
 <pre><code class="language-sh">./gradlew :studio:run
 </code></pre>
@@ -601,7 +632,7 @@ to failing. <code>--detail</code> prints text instead of JSON, at three levels (
 R=fixtures/drangler/capsules/36995781138.json
 drift diagnose --detail summary $G $R
 </code></pre>
-<pre><code>8 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
+<pre><code>9 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
 so the data does not name one cause.
 </code></pre>
 <p>Use <code>--detail detail</code> for the ranked candidates, the bundle and the proposed next experiment.</p>
@@ -624,7 +655,7 @@ same command installs, and <code>drift uninstall</code> removes what the receipt
 <pre><code>dry run: nothing is changed
 scope: user
 create directory /path/to/scratch-bin
-write /path/to/scratch-bin/drift (mode 0755, 6742776 bytes)
+write /path/to/scratch-bin/drift (mode 0755, 9866776 bytes)
 create directory ~/.config
 create directory ~/.config/drift
 PATH is not modified
@@ -680,11 +711,11 @@ for the same target and Kotlin version.</p>
 </tr>
 <tr>
 <td><code>cli</code></td>
-<td>The <code>drift</code> command, including <code>install</code>, <code>uninstall</code> and <code>serve</code>.</td>
+<td>The <code>drift</code> command and its 21 subcommands, including <code>upgrade-check</code>, <code>triage</code>, <code>contract</code>, <code>install</code>, <code>uninstall</code> and <code>serve</code>.</td>
 </tr>
 <tr>
 <td><code>studio</code></td>
-<td>The Compose Multiplatform app: Atlas and Investigation views for desktop, web, Android and iOS, and the installer packaging.</td>
+<td>The Compose Multiplatform app for desktop, web, Android and iOS: Home, Case, Atlas, Investigation, Upgrade, Contract and Bisect screens, and the installer packaging.</td>
 </tr>
 <tr>
 <td><code>bench</code></td>
@@ -692,7 +723,7 @@ for the same target and Kotlin version.</p>
 </tr>
 <tr>
 <td><code>tools</code></td>
-<td>Fixture freezing, Atlas ladder tooling and the installer test scripts.</td>
+<td>Fixture freezing, Atlas ladder tooling, the triage corpus builder and scorer, the performance rig and the installer test scripts.</td>
 </tr>
 <tr>
 <td><code>androidApp</code>, <code>iosApp</code></td>
@@ -715,8 +746,12 @@ for the same target and Kotlin version.</p>
 <td>Hand-written rule files in YAML. The build generates the JSON that <code>core</code> reads.</td>
 </tr>
 <tr>
+<td><code>triage</code></td>
+<td>The manifest of the issue corpus that <code>drift triage</code> is measured on, and the claim-check labels.</td>
+</tr>
+<tr>
 <td><code>fixtures</code></td>
-<td>Recorded capsules, Atlas transcripts and solved cases.</td>
+<td>Recorded capsules, Atlas transcripts, solved cases, flagship cases, project trees, issue bodies and upgrade-check captures.</td>
 </tr>
 <tr>
 <td><code>install.sh</code>, <code>install.ps1</code></td>
@@ -730,15 +765,15 @@ for the same target and Kotlin version.</p>
 <code>host</code> holds every <code>expect</code> and <code>actual</code> pair. <code>./gradlew sharedRatio</code> prints common and platform
 lines per module and fails the build if a floor or budget is broken:</p>
 <pre><code>module     common  platform  shared
-host          176       388   31.2%
-core         9712         0  100.0%
-scan         3542         0  100.0%
-cli          2576      1549   62.4%
-studio        822        67   92.5%
+host          344       622   35.6%
+core        13526         0  100.0%
+scan         4920         0  100.0%
+cli          3605      1555   69.9%
+studio       2950       155   95.0%
 bench        1996       466   81.1%
-total       18824      2470   88.4%
+total       27341      2798   90.7%
 </code></pre>
-<p>The platform lines of <code>cli</code> are the file, process and socket code behind <code>install</code> and <code>serve</code>. The
+<p><code>host</code> is about a third common code and its platform lines are the process runners (POSIX, Windows and JVM) and the file and environment access; its budget is 630 lines. The platform lines of <code>cli</code> are the file and socket code behind <code>install</code> and <code>serve</code>. The
 ratio counts the default targets: JVM, Linux, macOS, Windows and Wasm. <code>core</code> and the common code of
 <code>bench</code> use no <code>Double</code> or <code>Float</code>, so their results are the same on every target.</p>
 <hr />
@@ -748,8 +783,13 @@ are implemented and tested. The Android and iOS apps build and launch on an emul
 No real Android or iOS device has been tried, and the iOS build is a simulator build.</p>
 <p>What a result does and does not show:</p>
 <ul>
-<li>The ranking weights are hand-set. On the development benchmark the ranker beats a random order at the
-top only narrowly, and a <code>plausible</code> tier candidate is more often wrong than right.</li>
+<li>The ranking weights are hand-set. On the development benchmark the ranker beats a random order at
+top-1 (21 of 45, P = 0.018) and top-3 (29 of 45, P = 0.009), and a <code>plausible</code> tier candidate is
+more often wrong than right (14 of 25).</li>
+<li><code>upgrade-check</code> was scored once, on a PHP 7.4 to 8.3 move of one library: 0 true positives and 12
+false positives, and what did break had no rule.</li>
+<li>The <code>triage</code> claim check flags none of 67 labelled issue threads, and its facts score a precision of
+0.78 on form-labelled issues of large trackers.</li>
 <li>The Lab confirms a cause only under a rule fixed before the first trial, and <code>verify</code> checks the
 arithmetic of a case, not that the experiment would repeat.</li>
 <li>Some Atlas probes depend on hardware and on the build host. NaN bit patterns and the last digits of
@@ -780,10 +820,13 @@ library.</li>
 <hr />
 <h2 id="license">License</h2>
 <p>MIT. See <a href="https://github.com/gmitch215/Drift/blob/master/LICENSE">LICENSE</a>.</p></div>
-		</main>
-		<footer>
-			<a href="https://github.com/gmitch215/Drift">github.com/gmitch215/Drift</a> &middot;
-			<a href="https://github.com/gmitch215/Drift/blob/master/LICENSE">MIT License</a>
-		</footer>
-	</body>
+            <div class="pager">
+<a class="card next" href="advanced-usage.html" rel="next"><span>Next</span><strong>Advanced Usage</strong></a>
+</div>
+        </main>
+        <footer>
+            <a href="https://github.com/gmitch215/Drift">github.com/gmitch215/Drift</a> &middot;
+            <a href="https://github.com/gmitch215/Drift/blob/master/LICENSE">MIT License</a>
+        </footer>
+    </body>
 </html>

@@ -1,0 +1,393 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Score</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
+                    Drift Engine Documentation
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">1.0.0
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":tools/jvmMain">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":tools/jvmMain" data-filter=":tools/jvmMain">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Drift Engine Documentation
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="tools::dev.gmitch215.drift.tools.corpus/Score///PointingToDeclaration//169571170">
+  <div class="breadcrumbs"><a href="../../index.html">tools</a><span class="delimiter">/</span><a href="../index.html">dev.gmitch215.drift.tools.corpus</a><span class="delimiter">/</span><span class="current">Score</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Score</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">Score</a><span class="source-link-wrapper"><span class="source-link" data-element-type="source-link">(<a href="https://github.com/gmitch215/Drift/blob/master/tools/src/jvm/main/dev/gmitch215/drift/tools/corpus/Eval.kt#L12">source</a>)</span></span></div><p class="paragraph">Counts for one slice of the corpus; every number in the report is a ratio of these.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="1833731568%2FConstructors%2F169571170" anchor-label="Score" id="1833731568%2FConstructors%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-score.html"><span><span>Score</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1833731568%2FConstructors%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="1927816937%2FClasslikes%2F169571170" anchor-label="Companion" id="1927816937%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1927816937%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="-1137901231%2FProperties%2F169571170" anchor-label="binConfidence" id="-1137901231%2FProperties%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="bin-confidence.html"><span>bin</span><wbr><span><span>Confidence</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1137901231%2FProperties%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="bin-confidence.html">binConfidence</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long-array/index.html">LongArray</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-624912779%2FProperties%2F169571170" anchor-label="binCorrect" id="-624912779%2FProperties%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="bin-correct.html"><span>bin</span><wbr><span><span>Correct</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-624912779%2FProperties%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="bin-correct.html">binCorrect</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long-array/index.html">LongArray</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-106646583%2FProperties%2F169571170" anchor-label="binScored" id="-106646583%2FProperties%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="bin-scored.html"><span>bin</span><wbr><span><span>Scored</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-106646583%2FProperties%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="bin-scored.html">binScored</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long-array/index.html">LongArray</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1830693468%2FProperties%2F169571170" anchor-label="brier" id="1830693468%2FProperties%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="brier.html"><span><span>brier</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1830693468%2FProperties%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="brier.html">brier</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="177823534%2FProperties%2F169571170" anchor-label="confidence" id="177823534%2FProperties%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="confidence.html"><span><span>confidence</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="177823534%2FProperties%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">var </span><a href="confidence.html">confidence</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-463254088%2FProperties%2F169571170" anchor-label="correct" id="-463254088%2FProperties%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="correct.html"><span><span>correct</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-463254088%2FProperties%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">var </span><a href="correct.html">correct</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="665095904%2FProperties%2F169571170" anchor-label="found" id="665095904%2FProperties%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="found.html"><span><span>found</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="665095904%2FProperties%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">var </span><a href="found.html">found</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1916403625%2FProperties%2F169571170" anchor-label="meanConfidence" id="1916403625%2FProperties%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="mean-confidence.html"><span>mean</span><wbr><span><span>Confidence</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1916403625%2FProperties%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="mean-confidence.html">meanConfidence</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-999585052%2FProperties%2F169571170" anchor-label="precision" id="-999585052%2FProperties%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="precision.html"><span><span>precision</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-999585052%2FProperties%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="precision.html">precision</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1177619961%2FProperties%2F169571170" anchor-label="recall" id="-1177619961%2FProperties%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="recall.html"><span><span>recall</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1177619961%2FProperties%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="recall.html">recall</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="452757542%2FProperties%2F169571170" anchor-label="scored" id="452757542%2FProperties%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="scored.html"><span><span>scored</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="452757542%2FProperties%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">var </span><a href="scored.html">scored</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2141790036%2FProperties%2F169571170" anchor-label="squares" id="-2141790036%2FProperties%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="squares.html"><span><span>squares</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2141790036%2FProperties%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">var </span><a href="squares.html">squares</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="206655511%2FProperties%2F169571170" anchor-label="truth" id="206655511%2FProperties%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="truth.html"><span><span>truth</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="206655511%2FProperties%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">var </span><a href="truth.html">truth</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="2138584538%2FFunctions%2F169571170" anchor-label="fact" id="2138584538%2FFunctions%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="fact.html"><span><span>fact</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2138584538%2FFunctions%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="fact.html"><span class="token function">fact</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">permille<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">ok<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-228080868%2FFunctions%2F169571170" anchor-label="truth" id="-228080868%2FFunctions%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="truth.html"><span><span>truth</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-228080868%2FFunctions%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="truth.html"><span class="token function">truth</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">isFound<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>Copyright (c) Gregory Mitchell</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

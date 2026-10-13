@@ -1,319 +1,325 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Advanced Usage - Drift</title>
-		<meta name="description" content="Every drift command and flag, with output from real runs." />
-		<link rel="icon" href="drift.ico" sizes="any" />
-		<link rel="icon" href="drift_128.png" type="image/png" sizes="128x128" />
-		<link rel="apple-touch-icon" href="drift.png" />
-		<meta property="og:title" content="Advanced Usage - Drift" />
-		<meta property="og:description" content="Every drift command and flag, with output from real runs." />
-		<meta property="og:image" content="https://drift.gmitch215.dev/drift.png" />
-		<style>
-			:root {
-				color-scheme: light dark;
-				--fg: #1d1a26;
-				--muted: #5b556b;
-				--bg: #fcfbfe;
-				--card: #ffffff;
-				--line: #e4def0;
-				--accent: #6b3fd4;
-				--accent-strong: #8a63f0;
-				--pink: #b0399a;
-				--pink-soft: #c768bd;
-				--coral: #e4707a;
-				--code-bg: #f4f0fb;
-				--code-fg: #96307f;
-				--tint: #efe8fb;
-				--gradient: linear-gradient(90deg, #7a4fe0 0%, #a548c6 60%, #bd3a93 100%);
-				--glow: color-mix(in oklab, #8a63f0 16%, transparent);
-				--glow-pink: color-mix(in oklab, #c768bd 11%, transparent);
-				--glow-coral: color-mix(in oklab, #e4707a 7%, transparent);
-			}
-			@media (prefers-color-scheme: dark) {
-				:root {
-					--fg: #ece9f3;
-					--muted: #a69fb8;
-					--bg: #110e17;
-					--card: #191521;
-					--line: #2b2438;
-					--accent: #b99cff;
-					--accent-strong: #9d7bf5;
-					--pink: #e58fd8;
-					--pink-soft: #c872bd;
-					--coral: #f08a92;
-					--code-bg: #1f1a2a;
-					--code-fg: #f0a6e4;
-					--tint: #2a2140;
-					--gradient: linear-gradient(90deg, #b99cff 0%, #d595ee 60%, #f09ad0 100%);
-					--glow: color-mix(in oklab, #9d7bf5 22%, transparent);
-					--glow-pink: color-mix(in oklab, #c872bd 14%, transparent);
-					--glow-coral: color-mix(in oklab, #f08a92 7%, transparent);
-				}
-			}
-			* {
-				box-sizing: border-box;
-			}
-			body {
-				margin: 0;
-				padding: 0 1rem 5rem;
-				background:
-					radial-gradient(60rem 30rem at 30% -10rem, var(--glow), transparent 70%),
-					radial-gradient(40rem 24rem at 95% 0, var(--glow-pink), transparent 70%),
-					radial-gradient(30rem 16rem at 100% 8rem, var(--glow-coral), transparent 70%),
-					var(--bg);
-				color: var(--fg);
-				font:
-					16px/1.7 ui-sans-serif,
-					system-ui,
-					-apple-system,
-					'Segoe UI',
-					Roboto,
-					sans-serif;
-				overflow-wrap: break-word;
-			}
-			main,
-			nav .bar,
-			footer {
-				max-width: 52rem;
-				margin: 0 auto;
-			}
-			nav {
-				margin: 0 -1rem 2.5rem;
-				padding: 0.75rem 1rem;
-				border-bottom: 1px solid var(--line);
-			}
-			nav .bar {
-				display: flex;
-				flex-wrap: wrap;
-				align-items: center;
-				gap: 0.25rem 1rem;
-			}
-			nav a {
-				color: var(--muted);
-				font-size: 0.925rem;
-				text-decoration: none;
-			}
-			nav a:hover,
-			nav a[aria-current] {
-				color: var(--accent);
-			}
-			nav a[aria-current] {
-				text-decoration: underline;
-				text-decoration-color: var(--pink-soft);
-				text-decoration-thickness: 2px;
-				text-underline-offset: 0.5em;
-			}
-			nav a.brand {
-				display: flex;
-				align-items: center;
-				gap: 0.5rem;
-				margin-right: auto;
-				color: var(--fg);
-				font-size: 1.05rem;
-				font-weight: 700;
-				letter-spacing: -0.01em;
-			}
-			nav a.brand[aria-current] {
-				color: var(--fg);
-				text-decoration: none;
-			}
-			nav a.brand img {
-				width: 1.75rem;
-				height: 1.75rem;
-			}
-			h1 {
-				margin: 0 0 1rem;
-				font-size: 2.25rem;
-				line-height: 1.2;
-				letter-spacing: -0.03em;
-			}
-			.hero {
-				margin: 0 0 2rem;
-			}
-			.hero img {
-				display: block;
-				margin: 0 0 1rem;
-			}
-			.hero h1 {
-				width: fit-content;
-				margin: 0 0 0.25rem;
-				color: var(--accent);
-				font-size: 3rem;
-			}
-			@supports (background-clip: text) or (-webkit-background-clip: text) {
-				.hero h1 {
-					background: var(--gradient);
-					-webkit-background-clip: text;
-					background-clip: text;
-					-webkit-text-fill-color: transparent;
-					color: transparent;
-				}
-			}
-			.hero .lead {
-				margin: 0;
-				color: var(--muted);
-				font-size: 1.2rem;
-			}
-			.links {
-				display: grid;
-				gap: 0.85rem;
-				grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-				margin: 0 0 3rem;
-			}
-			a.card {
-				display: block;
-				padding: 1rem 1.25rem;
-				border: 1px solid var(--line);
-				border-radius: 0.8rem;
-				background: var(--card);
-				color: inherit;
-				text-decoration: none;
-				transition:
-					border-color 0.15s,
-					box-shadow 0.15s;
-			}
-			a.card:hover {
-				border-color: var(--accent-strong);
-				box-shadow: 0 0 36px -10px var(--accent-strong);
-			}
-			a.card strong {
-				color: var(--accent);
-			}
-			a.card strong {
-				display: block;
-				font-size: 1.02rem;
-			}
-			a.card span {
-				color: var(--muted);
-				font-size: 0.875rem;
-				line-height: 1.5;
-			}
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Advanced Usage - Drift</title>
+        <meta name="description" content="Every drift command and flag, with output from real runs." />
+        <link rel="icon" href="drift.ico" sizes="any" />
+        <link rel="icon" href="drift_128.png" type="image/png" sizes="128x128" />
+        <link rel="apple-touch-icon" href="drift.png" />
+        <meta property="og:title" content="Advanced Usage - Drift" />
+        <meta property="og:description" content="Every drift command and flag, with output from real runs." />
+        <meta property="og:image" content="https://drift.gmitch215.dev/drift.png" />
+        <style>
+            :root {
+                color-scheme: light dark;
+                --canvas: #fcfbfe;
+                --surface: #ffffff;
+                --line: #e4def0;
+                                --fg: #1d1a26;
+                --muted: #5b556b;
+                --accent: #8a63f0;
+                --accent-text: #6b3fd4;
+                --tint: #efe8fb;
+                --radius: 6px;
+                --u: 4px;
+            }
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --canvas: #110e17;
+                    --surface: #191521;
+                    --line: #2b2438;
+                    --fg: #ece9f3;
+                    --muted: #a69fb8;
+                    --accent: #9d7bf5;
+                    --accent-text: #b99cff;
+                    --tint: #2a2140;
+                }
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                padding: 0 calc(var(--u) * 4) calc(var(--u) * 20);
+                background: var(--canvas);
+                color: var(--fg);
+                font:
+                    16px/1.65 ui-sans-serif,
+                    system-ui,
+                    -apple-system,
+                    'Segoe UI',
+                    Roboto,
+                    sans-serif;
+                overflow-wrap: break-word;
+            }
+            main,
+            nav .bar,
+            footer {
+                max-width: 52rem;
+                margin: 0 auto;
+            }
+            a:focus-visible {
+                outline: 2px solid var(--accent-text);
+                outline-offset: 2px;
+                border-radius: var(--radius);
+            }
+            nav {
+                margin: 0 calc(var(--u) * -4) calc(var(--u) * 8);
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border-bottom: 1px solid var(--line);
+                background: var(--surface);
+            }
+            nav .bar {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: var(--u) calc(var(--u) * 4);
+            }
+            nav a {
+                color: var(--muted);
+                font-size: 14px;
+                text-decoration: none;
+            }
+            nav a:hover,
+            nav a[aria-current] {
+                color: var(--accent-text);
+            }
+            nav a[aria-current] {
+                text-decoration: underline;
+                text-decoration-color: var(--accent);
+                text-decoration-thickness: 2px;
+                text-underline-offset: 0.5em;
+            }
+            nav a.brand {
+                display: flex;
+                align-items: center;
+                gap: calc(var(--u) * 2);
+                margin-right: auto;
+                color: var(--fg);
+                font-size: 16px;
+                font-weight: 600;
+            }
+            nav a.brand[aria-current] {
+                color: var(--fg);
+                text-decoration: none;
+            }
+            nav a.brand img {
+                width: 28px;
+                height: 28px;
+            }
+            h1 {
+                margin: 0 0 calc(var(--u) * 4);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .hero {
+                margin: 0 0 calc(var(--u) * 8);
+            }
+            .hero img {
+                display: block;
+                margin: 0 0 calc(var(--u) * 4);
+            }
+            .hero h1 {
+                margin: 0 0 var(--u);
+                font-size: 32px;
+                line-height: 40px;
+            }
+            .hero .lead {
+                margin: 0;
+                color: var(--muted);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .steps,
+            .links {
+                display: grid;
+                gap: calc(var(--u) * 3);
+                grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+                margin: 0 0 calc(var(--u) * 4);
+                padding: 0;
+                list-style: none;
+            }
+            .steps {
+                counter-reset: step;
+            }
+            .links {
+                margin-bottom: calc(var(--u) * 12);
+            }
+            .steps li {
+                display: flex;
+                counter-increment: step;
+            }
+            a.card {
+                display: block;
+                flex: 1;
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: var(--surface);
+                color: inherit;
+                text-decoration: none;
+            }
+            a.card:hover {
+                border-color: var(--accent);
+            }
+            a.card strong {
+                display: block;
+                color: var(--accent-text);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .steps a.card strong::before {
+                content: counter(step) '. ';
+            }
+            a.card span {
+                color: var(--muted);
+                font-size: 14px;
+                line-height: 22px;
+            }
 
-			.readme h2 {
-				margin: 3rem 0 1rem;
-				padding-bottom: 0.4rem;
-				border-bottom: 2px solid transparent;
-				border-image: linear-gradient(90deg, var(--accent-strong), var(--pink-soft) 40%, var(--line)) 1;
-				font-size: 1.55rem;
-				letter-spacing: -0.01em;
-			}
-			.readme h3 {
-				margin: 2rem 0 0.75rem;
-				padding-left: 0.6rem;
-				border-left: 3px solid var(--pink-soft);
-				font-size: 1.2rem;
-			}
-			.readme h4 {
-				margin: 1.5rem 0 0.5rem;
-			}
-			.readme a {
-				color: var(--accent);
-				text-underline-offset: 0.2em;
-			}
-			.readme hr {
-				margin: 3rem 0;
-				border: 0;
-				border-top: 1px solid var(--line);
-			}
-			.readme blockquote {
-				margin: 1.5rem 0;
-				padding: 0.25rem 0 0.25rem 1.25rem;
-				border-left: 3px solid var(--pink-soft);
-				color: var(--muted);
-			}
-			.readme ul,
-			.readme ol {
-				padding-left: 1.4rem;
-			}
-			.readme li {
-				margin: 0.35rem 0;
-			}
-			.readme li::marker {
-				color: var(--pink-soft);
-			}
-			.readme code {
-				font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-			}
-			.readme :not(pre) > code {
-				padding: 0.15em 0.4em;
-				border-radius: 0.35rem;
-				background: var(--code-bg);
-				color: var(--code-fg);
-				font-size: 0.85em;
-				overflow-wrap: anywhere;
-			}
-			.readme pre {
-				margin: 1.25rem 0;
-				padding: 1rem 1.25rem;
-				border: 1px solid var(--line);
-				border-radius: 0.8rem;
-				overflow-x: auto;
-				background: var(--code-bg);
-				font-size: 0.85rem;
-				line-height: 1.6;
-			}
-			.readme pre code {
-				display: block;
-			}
-			.readme .table {
-				overflow-x: auto;
-				margin: 1.25rem 0;
-				border: 1px solid var(--line);
-				border-radius: 0.8rem;
-			}
-			.readme table {
-				width: 100%;
-				border-collapse: collapse;
-				font-size: 0.925rem;
-			}
-			.readme th,
-			.readme td {
-				padding: 0.55rem 0.9rem;
-				border-bottom: 1px solid var(--line);
-				text-align: left;
-				vertical-align: top;
-			}
-			.readme th {
-				background: var(--tint);
-				border-bottom-color: var(--accent-strong);
-				font-weight: 600;
-			}
-			.readme tbody tr:last-child td {
-				border-bottom: 0;
-			}
-			.readme img {
-				max-width: 100%;
-			}
+            .readme h2 {
+                margin: calc(var(--u) * 12) 0 calc(var(--u) * 3);
+                padding-bottom: calc(var(--u) * 2);
+                border-bottom: 1px solid var(--line);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .readme h3 {
+                margin: calc(var(--u) * 8) 0 calc(var(--u) * 2);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .readme h4 {
+                margin: calc(var(--u) * 6) 0 calc(var(--u) * 2);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .readme a {
+                color: var(--accent-text);
+                text-underline-offset: 0.2em;
+            }
+            .readme hr {
+                margin: calc(var(--u) * 12) 0;
+                border: 0;
+                border-top: 1px solid var(--line);
+            }
+            .readme blockquote {
+                margin: calc(var(--u) * 6) 0;
+                padding: var(--u) 0 var(--u) calc(var(--u) * 4);
+                border-left: 3px solid var(--accent);
+                color: var(--muted);
+            }
+            .readme ul,
+            .readme ol {
+                padding-left: calc(var(--u) * 6);
+            }
+            .readme li {
+                margin: calc(var(--u) * 1.5) 0;
+            }
+            .readme code {
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            }
+            .readme :not(pre) > code {
+                padding: 0.15em 0.4em;
+                border-radius: var(--radius);
+                background: var(--tint);
+                color: var(--accent-text);
+                font-size: 13px;
+                overflow-wrap: anywhere;
+            }
+            .readme pre {
+                margin: calc(var(--u) * 5) 0;
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                overflow-x: auto;
+                background: var(--surface);
+                font-size: 13px;
+                line-height: 20px;
+            }
+            .readme pre code {
+                display: block;
+            }
+            .readme .table {
+                overflow-x: auto;
+                margin: calc(var(--u) * 5) 0;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+            }
+            .readme table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 14px;
+                line-height: 22px;
+            }
+            .readme th,
+            .readme td {
+                padding: calc(var(--u) * 2) calc(var(--u) * 3);
+                border-bottom: 1px solid var(--line);
+                text-align: left;
+                vertical-align: top;
+            }
+            .readme th {
+                background: var(--tint);
+                font-weight: 600;
+            }
+            .readme tbody tr:last-child td {
+                border-bottom: 0;
+            }
+            .readme img {
+                max-width: 100%;
+            }
 
-			footer {
-				margin-top: 4rem;
-				padding-top: 1.5rem;
-				border-top: 1px solid var(--line);
-				color: var(--muted);
-				font-size: 0.9rem;
-			}
-			footer a {
-				color: inherit;
-			}
-		</style>
-	</head>
-	<body>
-		<nav>
-			<div class="bar"><a class="brand" href="index.html"><img src="drift_128.png" alt="" width="28" height="28">Drift</a>
+            .pager {
+                display: flex;
+                flex-wrap: wrap;
+                gap: calc(var(--u) * 3);
+                margin: calc(var(--u) * 12) 0 0;
+            }
+            .pager a.card {
+                min-width: 13rem;
+            }
+            .pager a.next {
+                margin-left: auto;
+                text-align: right;
+            }
+            .pager a.card span {
+                display: block;
+                font-size: 12px;
+                line-height: 18px;
+            }
+            .pager a.card strong {
+                font-size: 16px;
+            }
+
+            footer {
+                margin-top: calc(var(--u) * 16);
+                padding-top: calc(var(--u) * 6);
+                border-top: 1px solid var(--line);
+                color: var(--muted);
+                font-size: 14px;
+            }
+            footer a {
+                color: inherit;
+            }
+        </style>
+    </head>
+    <body>
+        <nav>
+            <div class="bar"><a class="brand" href="index.html"><img src="drift_128.png" alt="" width="28" height="28">Drift</a>
 <a href="advanced-usage.html" aria-current="page">Usage</a>
 <a href="technical-report.html">Report</a>
 <a href="atlas/">Atlas</a>
 <a href="engine/">Engine</a>
 <a href="https://github.com/gmitch215/Drift">GitHub</a></div>
-		</nav>
-		<main>
-			
-			<div class="readme"><h1 id="advanced-usage-the-full-cli">Advanced Usage: The Full CLI</h1>
-<p>This guide covers every <code>drift</code> command and flag for people who have already run <code>drift capture</code>. It shows scripting patterns, the JSON and text output levels, cases, reproduction, the Lab (<code>solve</code>, <code>ingest</code>, <code>pack</code>, <code>report</code>, <code>verify</code>), the Atlas, and the commands that install and serve Drift (<code>install</code>, <code>uninstall</code>, <code>serve</code>, <code>install.sh</code>, <code>install.ps1</code>). For the design and the measurements behind the commands, see <a href="technical-report.html">TECHNICAL_REPORT.md</a>.</p>
-<p>Every example below was run with the macOS release executable (<code>drift version 1.0.0 (macos)</code>) from a directory that holds <code>fixtures/</code> and <code>bench/</code>, against the files in <a href="https://github.com/gmitch215/Drift/tree/master/fixtures"><code>fixtures/</code></a> and <a href="https://github.com/gmitch215/Drift/tree/master/bench/data"><code>bench/data/</code></a>. Output is copied from those runs; a line that holds only <code>...</code> marks output cut for length. Where a command prints to standard error, the example says so. The <code>install</code>, <code>uninstall</code> and <code>serve</code> examples ran with a scratch home directory and a scratch prefix, never the real profile, registry or trust store. Their output shows the scratch home as <code>/home/you</code>, the scratch work directory as <code>/work</code> and the scratch release directory as <code>/release</code>. The Windows and Linux builds and the <code>.ps1</code> script were not run for this guide, and the sections say where a statement comes from a recorded run of someone else's.</p>
+        </nav>
+        <main>
+            
+            <div class="readme"><h1 id="advanced-usage-the-full-cli">Advanced Usage: The Full CLI</h1>
+<p>This guide covers every <code>drift</code> command and flag for people who have already run <code>drift capture</code>. It shows scripting patterns, the JSON and text output levels, cases, reproduction, the Lab (<code>solve</code>, <code>ingest</code>, <code>pack</code>, <code>report</code>, <code>verify</code>), CI commands (<code>run</code>, <code>import</code>, <code>diagnose --against</code>, <code>bisect plan</code>, <code>bisect apply</code>), portability contracts (<code>contract create</code>, <code>contract verify</code>), issue triage (<code>triage</code>), upgrade preflight (<code>upgrade-check</code>), the Atlas, and the commands that install and serve Drift (<code>install</code>, <code>uninstall</code>, <code>serve</code>, <code>install.sh</code>, <code>install.ps1</code>). For the design and the measurements behind the commands, see <a href="technical-report.html">TECHNICAL_REPORT.md</a>.</p>
+<p>Every example below was run with the macOS release executable (<code>drift version 1.0.0 (macos)</code>) from a directory that holds <code>fixtures/</code> and <code>bench/</code>, against the files in <a href="https://github.com/gmitch215/Drift/tree/master/fixtures"><code>fixtures/</code></a> and <a href="https://github.com/gmitch215/Drift/tree/master/bench/data"><code>bench/data/</code></a>. Output is copied from those runs; a line that holds only <code>...</code> marks output cut for length. Where a command prints to standard error, the example says so. The offline run in <a href="#offline">Offline</a> used the Linux arm64 executable inside a Docker container. The <code>install</code>, <code>uninstall</code> and <code>serve</code> examples ran with a scratch home directory and a scratch prefix, never the real profile, registry or trust store. Their output shows the scratch home as <code>/home/you</code>, the scratch work directory as <code>/work</code> and the scratch release directory as <code>/release</code>. The Windows and Linux builds and the <code>.ps1</code> script were not run for this guide, and the sections say where a statement comes from a recorded run of someone else's.</p>
 <p>The executable is <code>cli/build/bin/macosArm64/releaseExecutable/drift.kexe</code>; the README explains how to build it and how to download one. The examples call it <code>drift</code>; put it on <code>PATH</code> (see <a href="#install-and-uninstall">Install and Uninstall</a>) or alias it.</p>
 <h2 id="command-index">Command Index</h2>
 <div class="table"><table>
@@ -336,6 +342,36 @@
 <td><a href="#diagnose"><code>diagnose</code></a></td>
 <td>two capsules</td>
 <td>JSON or text, optionally a case directory</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#against-a-baseline"><code>diagnose --against</code></a></td>
+<td>a baseline and a capsule, or this machine</td>
+<td>JSON or text, optionally a case directory</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#run"><code>run</code></a></td>
+<td>this machine, a command</td>
+<td>a capsule directory</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#import"><code>import</code></a></td>
+<td>a saved GitHub Actions or GitLab CI log</td>
+<td>a capsule directory</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#bisect"><code>bisect plan</code></a></td>
+<td>two capsules</td>
+<td>a plan file</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#bisect"><code>bisect apply</code></a></td>
+<td>a plan file</td>
+<td>the plan file</td>
 <td>no</td>
 </tr>
 <tr>
@@ -381,8 +417,32 @@
 <td>no</td>
 </tr>
 <tr>
+<td><a href="#open"><code>open</code></a></td>
+<td>a <code>.driftcase</code></td>
+<td>Studio, or <code>&lt;name&gt;.report.html</code> next to the case</td>
+<td>no</td>
+</tr>
+<tr>
 <td><a href="#pack-report-and-verify"><code>verify</code></a></td>
 <td>a <code>.driftcase</code></td>
+<td>text or JSON</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#create"><code>contract create</code></a></td>
+<td>green capsules, optionally red capsules</td>
+<td>a contract file</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#verify"><code>contract verify</code></a></td>
+<td>a contract, a capsule or this machine</td>
+<td>text or JSON</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#upgrade-check"><code>upgrade-check</code></a></td>
+<td>a capsule or this machine, target versions</td>
 <td>text or JSON</td>
 <td>no</td>
 </tr>
@@ -390,6 +450,18 @@
 <td><a href="#atlas"><code>atlas record</code></a></td>
 <td>this machine</td>
 <td>a transcript</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#probe"><code>probe cloudflare</code></a></td>
+<td>a built Worker directory</td>
+<td>a transcript</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#triage"><code>triage</code></a></td>
+<td>an issue body (a file or standard input)</td>
+<td>text or JSON</td>
 <td>no</td>
 </tr>
 <tr>
@@ -406,6 +478,12 @@
 </tr>
 <tr>
 <td><a href="#atlas"><code>atlas show</code></a></td>
+<td>a dataset</td>
+<td>text</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#atlas"><code>atlas diff</code></a></td>
 <td>a dataset</td>
 <td>text</td>
 <td>no</td>
@@ -616,7 +694,11 @@ d97d073465e339c52eb89708936692297998cac742a0845ae5c86b215def0bd7  -
 </tr>
 <tr>
 <td><code>--tools</code></td>
-<td>also run the toolchain scanners (<code>tool.*</code> attributes such as <code>tool.git.version</code> and <code>tool.java.version</code>)</td>
+<td>also run the toolchain scanners (<code>tool.*</code> attributes such as <code>tool.git.version</code>, <code>tool.java.version</code>, <code>tool.npm.version</code>, <code>tool.python.gil-disabled</code>, <code>tool.openssl.version</code>, <code>tool.ssh.version</code>, <code>tool.curl.version</code> and, for clang, <code>tool.cc.vendor</code> as <code>apple</code> or <code>llvm</code>; see <a href="#tool-and-system-keys">Tool and System Keys</a>)</td>
+</tr>
+<tr>
+<td><code>--project</code></td>
+<td>also read dependency and platform versions from the manifests and lockfiles in the working directory, and the imports and call sites of its source files (<code>project.*</code> attributes, see <a href="#project-facts">Project Facts</a> and <a href="#source-facts">Source Facts</a>)</td>
 </tr>
 <tr>
 <td><code>--probes</code></td>
@@ -632,8 +714,8 @@ d97d073465e339c52eb89708936692297998cac742a0845ae5c86b215def0bd7  -
 jq '.attributes | length' cap.json cap-full.json
 jq '.probes | length' cap.json cap-full.json
 </code></pre>
-<pre><code>86
-99
+<pre><code>90
+117
 0
 71
 </code></pre>
@@ -642,7 +724,7 @@ jq '.probes | length' cap.json cap-full.json
 <pre><code class="language-sh">drift capture --label demo | jq '[.attributes[] | select(.source | test(&quot;anonymized&quot;))] | length'
 drift capture --label demo | jq '[.attributes[] | select(.value == &quot;&lt;redacted&gt;&quot;)] | length'
 </code></pre>
-<pre><code>18
+<pre><code>22
 13
 </code></pre>
 <p><code>--keep-identifiers</code> turns the first rule off and prints a warning on standard error:</p>
@@ -650,8 +732,244 @@ drift capture --label demo | jq '[.attributes[] | select(.value == &quot;&lt;red
 </code></pre>
 <p>Use it only for a capsule that stays on your machine, for example to see which attribute holds a home path. Do not use it for a capsule that you commit, attach to an issue, put in a case, or hand to <code>reproduce --env-all</code>. The redactor knows paths and secret-looking names. It has no rule for email addresses or account ids, so those pass through in any mode.</p>
 <p>Exit codes: 0 on success; 1 for a usage error such as an unknown flag (<code>Error: no such option --bogus</code>).</p>
+<h3 id="project-facts">Project Facts</h3>
+<p><code>--project</code> reads the project files in the working directory and adds <code>project.&lt;ecosystem&gt;.&lt;name&gt;</code> attributes whose values are resolved version strings or constraints. It never runs a tool and never uses the network; a file that is missing or does not parse adds nothing. The source scan lists files with <code>find</code> (see <a href="#source-facts">Source Facts</a>). <code>drift run --project</code> does the same, and <code>contract verify --capture</code> turns it on when an assertion path starts with <code>project.</code>. The Wasm build has no file access and adds none.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Ecosystem</th>
+<th>Files read</th>
+<th>Keys</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Composer</td>
+<td><code>composer.json</code>, <code>composer.lock</code></td>
+<td><code>project.composer.require.php</code>, <code>.require.ext-*</code> and <code>.require.lib-*</code> (the <code>require</code> constraint as written, such as <code>^8.1</code>), <code>project.composer.platform.php</code> and the other <code>.platform.*</code> keys (a concrete version from <code>config.platform</code>, absent when that is unset or a constraint), <code>project.composer.&lt;vendor&gt;/&lt;package&gt;</code> (locked version), <code>project.composer.json.config.policy</code> (<code>true</code> when <code>config.policy</code> exists), <code>project.composer.json.plugins.unlisted</code> (comma-separated <code>composer-plugin</code> packages in the lock that no <code>config.allow-plugins</code> entry matches; absent when none, when <code>allow-plugins</code> is <code>true</code>, or without both files)</td>
+</tr>
+<tr>
+<td>npm</td>
+<td><code>package.json</code> and the first of <code>package-lock.json</code>, <code>npm-shrinkwrap.json</code>, <code>pnpm-lock.yaml</code>, <code>yarn.lock</code>, <code>bun.lock</code></td>
+<td><code>project.npm.engines.node</code>, <code>project.npm.engines.npm</code>, <code>project.npm.&lt;name&gt;</code> (scoped names keep <code>@scope/name</code>), <code>project.npm.lockfile-version</code> (<code>lockfileVersion</code> of <code>package-lock.json</code> or <code>npm-shrinkwrap.json</code>), <code>project.npm.ts-entry</code> (<code>true</code> when <code>main</code> or a <code>bin</code> entry is a <code>.ts</code>, <code>.mts</code> or <code>.cts</code> file, or a script runs <code>node</code> on one)</td>
+</tr>
+<tr>
+<td>Gradle</td>
+<td><code>gradle/libs.versions.toml</code>, <code>settings.gradle(.kts)</code>, <code>build.gradle(.kts)</code> of the root and of each included module (50 at most), <code>gradle.properties</code>, <code>gradle/wrapper/gradle-wrapper.properties</code>, <code>gradle/gradle-daemon-jvm.properties</code></td>
+<td><code>project.gradle.&lt;group&gt;:&lt;artifact&gt;</code>, <code>project.gradle.plugin.&lt;id&gt;</code>, <code>project.gradle.wrapper</code>, <code>project.gradle.jdk.version</code>, <code>project.gradle.properties.&lt;key&gt;</code>, <code>project.gradle.kotlin.version</code>, <code>project.gradle.agp.version</code>, <code>project.gradle.kotlin.target.&lt;name&gt;</code>, <code>project.gradle.kotlin.jvm-target</code>, <code>.toolchain</code>, <code>.language-version</code>, <code>.annotation-default-target</code>, <code>project.gradle.kmp-android-module</code>, <code>project.gradle.dsl</code> (<code>kotlin</code> or <code>groovy</code>, from the first build file), <code>project.gradle.calls.&lt;name&gt;</code> (see below)</td>
+</tr>
+<tr>
+<td>Maven</td>
+<td><code>pom.xml</code></td>
+<td><code>project.maven.&lt;group&gt;:&lt;artifact&gt;</code> for the parent and the direct dependencies, <code>project.maven.property.&lt;name&gt;</code> for <code>java.version</code> and the <code>maven.compiler.*</code> properties</td>
+</tr>
+<tr>
+<td>Python</td>
+<td><code>pyproject.toml</code>, then <code>uv.lock</code> or <code>poetry.lock</code>, then <code>requirements.txt</code></td>
+<td><code>project.python.&lt;name&gt;</code> (lowercase, runs of <code>-</code>, <code>_</code> and <code>.</code> as one <code>-</code>), <code>project.python.requires-python</code></td>
+</tr>
+<tr>
+<td>Go</td>
+<td><code>go.mod</code></td>
+<td><code>project.go.version</code> (the <code>go</code> line), <code>project.go.toolchain</code>, <code>project.go.&lt;module path&gt;</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Each ecosystem adds at most 200 package keys: packages a rule reads first, then direct dependencies, then the rest by name; <code>project.&lt;ecosystem&gt;.omitted</code> holds the number left out. Only versions the files state literally are recorded. A dynamic range, a version from a BOM or a Maven parent, and a <code>requirements.txt</code> line that is not pinned with <code>==</code> add nothing. A lockfile that lists a package twice gives the version that the root project resolves for a direct dependency and the first listed version otherwise.</p>
+<p>Some Gradle values are derived rather than copied:</p>
+<ul>
+<li><code>project.gradle.plugin.&lt;id&gt;</code> holds the plugin version, or <code>true</code> when no file states one. It names plugins that a build file declares, applied or not. <code>kotlin(&quot;jvm&quot;)</code>, <code>alias(libs.plugins.x)</code> and <code>apply plugin: 'kotlin-android'</code> resolve to the full plugin id.</li>
+<li><code>project.gradle.kotlin.version</code> is the version of the first <code>org.jetbrains.kotlin.*</code> plugin that has one, then of <code>kotlin-gradle-plugin</code>. <code>project.gradle.agp.version</code> is the same for <code>com.android.*</code> plugins and <code>com.android.tools.build:gradle</code>.</li>
+<li><code>project.gradle.kotlin.target.&lt;name&gt;</code> is <code>true</code> for each Kotlin Multiplatform target a build file calls (<code>jvm</code>, <code>js</code>, <code>wasmJs</code>, <code>androidTarget</code>, <code>iosArm64</code> and the other native targets). A rule tests it with <code>present: 'true'</code>; an absent key means the target is not declared.</li>
+<li><code>project.gradle.kmp-android-module</code> lists the modules that apply the Kotlin Multiplatform plugin together with <code>com.android.application</code> or <code>com.android.library</code>, and is absent when no module does.</li>
+<li><code>project.gradle.properties.&lt;key&gt;</code> copies the <code>gradle.properties</code> keys that start with <code>android.</code>, <code>kotlin.</code> or <code>org.gradle.</code>; other keys, such as signing passwords, are not read.</li>
+<li><code>project.gradle.jdk.version</code> comes from <code>toolchainVersion</code> in <code>gradle/gradle-daemon-jvm.properties</code>. Without that file the JDK that runs Gradle is unknown and the key is absent.</li>
+</ul>
+<p><code>project.gradle.calls.&lt;name&gt;</code> is <code>true</code> when a build script matches a fixed text pattern, and a rule tests it with <code>present: 'true'</code>: <code>compile-configuration</code> (<code>compile</code> or <code>runtime</code> dependencies), <code>archive-basename</code> (<code>baseName</code> set on an archive task), <code>convention-api</code> (<code>convention.</code> access), <code>project-exec</code> (<code>exec {</code> or <code>javaexec {</code> on the project) and <code>kotlin-dsl-quoted-notation</code> (<code>&quot;name&quot; {</code> or <code>&quot;name&quot;()</code> in a <code>.gradle.kts</code> file). The match is on text with comments removed, so a pattern inside a string still counts.</p>
+<p>Names reserved for rules, with no scanner behind them yet: <code>project.build.c.std-flag</code>, <code>project.build.link.libs</code> and <code>project.build.target.triple</code>, and the source-level <code>project.java.*</code> keys the JDK rules name that <a href="#source-facts">Source Facts</a> does not emit (<code>script-engines</code>, <code>keystore-type</code>, <code>javah-invocation</code>, <code>value-based-sync</code>, <code>dynamic-agent-load</code>). A rule that reads a reserved key stays <code>pending-scanner</code>.</p>
+<h3 id="source-facts">Source Facts</h3>
+<p>With <code>--project</code> the scan also reads source files and records what they import and a few call-site patterns. It runs <code>find</code> through the host (so it needs a Unix-like host that can run it; Windows and the Wasm build add nothing), skips <code>node_modules</code>, <code>vendor</code>, <code>build</code>, <code>.gradle</code>, <code>venv</code>, <code>.venv</code>, <code>target</code>, <code>dist</code>, <code>.git</code>, <code>.tox</code>, <code>__pycache__</code> and <code>site-packages</code>, and looks 12 directory levels deep. Matching is by regular expression on the text, with no parser, so an import inside a comment or a string counts.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Ecosystem</th>
+<th>Files</th>
+<th>Imports</th>
+<th>Calls</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>python</code></td>
+<td><code>.py</code></td>
+<td><code>import a.b</code>, <code>from a.b import c</code></td>
+<td><code>asyncio.get_event_loop</code>, <code>ast-removed-nodes</code>, <code>urllib-urlopener</code>, <code>ssl.wrap_socket</code>, <code>ssl.match_hostname</code>, <code>unittest-deprecated-aliases</code>, <code>annotation-readers</code>, <code>multiprocessing-start-method</code>, <code>open-without-encoding</code>, <code>copy.replace</code>, <code>itertools.batched</code>, <code>datetime.UTC</code>, <code>str.removeprefix</code>, <code>math.lcm</code>, <code>itertools.pairwise</code> (also <code>from itertools import pairwise</code>), <code>contextlib.chdir</code>, <code>hashlib.file_digest</code>, <code>asyncio.TaskGroup</code>, <code>typing.override</code> (also <code>from typing import override</code>), <code>warnings.deprecated</code> (also <code>from warnings import deprecated</code>)</td>
+</tr>
+<tr>
+<td><code>java</code></td>
+<td><code>.java</code>, <code>.kt</code></td>
+<td><code>import a.b.C</code>, <code>import a.b.*</code>, <code>import static</code>, Kotlin <code>as</code></td>
+<td><code>System.setSecurityManager</code>, <code>virtual-threads</code>, <code>Math.clamp</code>, <code>sequenced-first-last</code> (<code>getFirst()</code> or <code>getLast()</code> with no arguments), <code>Files.readString</code>, <code>Files.writeString</code>, <code>Files.mismatch</code>, <code>Path.of</code>, <code>Predicate.not</code>, <code>Stream.mapMulti</code></td>
+</tr>
+<tr>
+<td><code>php</code></td>
+<td><code>.php</code></td>
+<td><code>use A\B\C</code>, <code>use function</code>, grouped <code>use A\{B, C}</code>; <code>\</code> is written as <code>.</code></td>
+<td><code>each</code>, <code>create_function</code>, <code>mcrypt</code>, <code>json_validate</code>, <code>array_is_list</code>, <code>str_contains</code>, <code>str_starts_with</code>, <code>str_ends_with</code>, <code>fdiv</code>, <code>get_debug_type</code>, <code>mb_trim</code>, <code>array_find</code>, <code>array_find_key</code>, <code>array_any</code>, <code>array_all</code></td>
+</tr>
+<tr>
+<td><code>js</code></td>
+<td><code>.js</code>, <code>.mjs</code>, <code>.cjs</code>, <code>.jsx</code>, <code>.ts</code>, <code>.mts</code>, <code>.cts</code>, <code>.tsx</code></td>
+<td><code>import ... from</code>, <code>import 'x'</code>, <code>export ... from</code>, <code>require('x')</code>, <code>import('x')</code>; relative paths and URLs are skipped</td>
+<td><code>exitcode-string</code> (<code>process.exitCode</code> set to a string), <code>import-assert</code> (<code>assert { type: ... }</code> on an import), <code>Array.fromAsync</code>, <code>Object.groupBy</code>, <code>Promise.withResolvers</code>, <code>fs.globSync</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Each import adds <code>project.&lt;ecosystem&gt;.imports.&lt;name&gt;: 'true'</code> for the name and for every dotted prefix of it, so <code>import sun.misc.Unsafe</code> gives <code>sun.misc.Unsafe</code>, <code>sun.misc</code> and <code>sun</code>. A JavaScript import adds the package (<code>@scope/name</code> or <code>name</code>, including <code>node:fs</code>) and, when the specifier has a subpath, the full specifier. A call pattern adds <code>project.&lt;ecosystem&gt;.calls.&lt;name&gt;: 'true'</code>; an absent key means the pattern was not found. <code>open-without-encoding</code> is a text-mode <code>open(</code> call whose arguments name neither <code>encoding=</code> nor a binary mode.</p>
+<p>The caps are fixed: 500 files per ecosystem (the first 500 by sorted path; <code>project.&lt;ecosystem&gt;.source-omitted</code> holds the number left out), 200000 characters per file (larger files are skipped), 16000000 characters in all, and 500 import keys per ecosystem (names a rule reads first, then the rest by name; <code>project.&lt;ecosystem&gt;.imports-omitted</code> holds the number left out). Keys are sorted, so the same tree gives the same attributes on every target.</p>
+<p><code>network.tls-version-offered</code> describes the other end of a connection, not this machine: a space-separated list of the protocol names (<code>TLSv1.0 TLSv1.1 TLSv1.2 TLSv1.3</code>) that the peer of the failing connection offers or accepts. For a client-side rule (the JDK, Go client, Python and Node TLS defaults) the peer is the server; for a server-side rule (the Go 1.22 server default) it is the client. A rule tests membership with <code>has</code>. No scanner can read a peer from a capture, so the rules that use it stay <code>pending-scanner</code> until a run records a handshake.</p>
+<h3 id="tool-and-system-keys">Tool and System Keys</h3>
+<p><code>--tools</code> runs one version command per tool through the host. A tool that is not installed adds nothing, so a rule that tests for an absent key cannot tell &quot;not installed&quot; from &quot;not captured&quot;. Output that no parser recognizes gives <code>tool.&lt;name&gt;.version</code> as <code>unparsed</code> and <code>tool.&lt;name&gt;.raw</code>.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Command</th>
+<th>Keys</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenSSL</td>
+<td><code>openssl version</code></td>
+<td><code>tool.openssl.family</code> (<code>openssl</code> or <code>libressl</code>), <code>tool.openssl.version</code> (OpenSSL only, with its letter: <code>1.1.1w</code>, <code>1.0.2k-fips</code>), <code>tool.openssl.libressl-version</code> (LibreSSL only; it has no version key because its numbers do not follow OpenSSL's)</td>
+</tr>
+<tr>
+<td>OpenSSL providers</td>
+<td><code>openssl list -providers</code></td>
+<td><code>runtime.openssl.legacy-provider</code> (<code>true</code> or <code>false</code>); absent where the command does not exist (1.1.1, LibreSSL)</td>
+</tr>
+<tr>
+<td>OpenSSH</td>
+<td><code>ssh -V</code></td>
+<td><code>tool.ssh.version</code> (<code>9.6</code>), <code>tool.ssh.release</code> (<code>p1</code>)</td>
+</tr>
+<tr>
+<td>sudo</td>
+<td><code>sudo --version</code></td>
+<td><code>tool.sudo.flavor</code> (<code>ws</code> for sudo.ws, <code>rs</code> for sudo-rs), <code>tool.sudo.version</code>, <code>tool.sudo.release</code> (<code>p5</code>, sudo.ws only)</td>
+</tr>
+<tr>
+<td>Composer</td>
+<td><code>composer --version</code></td>
+<td><code>tool.composer.version</code></td>
+</tr>
+<tr>
+<td>Ruby</td>
+<td><code>ruby --version</code></td>
+<td><code>tool.ruby.version</code>, <code>tool.ruby.release</code> (<code>p225</code>, when printed)</td>
+</tr>
+<tr>
+<td>BIND</td>
+<td><code>named -v</code></td>
+<td><code>tool.named.version</code> (the whole token, such as <code>9.18.39-0ubuntu0.22.04.6-Ubuntu</code>)</td>
+</tr>
+<tr>
+<td>iptables</td>
+<td><code>iptables --version</code></td>
+<td><code>tool.iptables.version</code>, <code>tool.iptables.backend</code> (<code>nft</code> or <code>legacy</code>, only when the version line names it)</td>
+</tr>
+<tr>
+<td>curl</td>
+<td><code>curl --version</code></td>
+<td><code>tool.curl.version</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><code>tool.openssl.version</code> orders by the OpenSSL scheme: <code>1.1.1 &lt; 1.1.1a &lt; 1.1.1w &lt; 3.0.0</code>, so a <code>ver</code> range on it can mix letter releases and numbered ones.</p>
+<p>A normal capture also reads these facts, without <code>--tools</code>:</p>
+<ul>
+<li><code>cgroup.version</code> is <code>v2</code> when every line of <code>/proc/self/cgroup</code> starts with <code>0::</code> and <code>v1</code> when any line names a v1 controller (a hybrid host counts as <code>v1</code>).</li>
+<li><code>tz.system-zone</code> is the target of the <code>/etc/localtime</code> link below <code>zoneinfo/</code>, then the content of <code>/etc/timezone</code>. <code>Etc/UTC</code>, <code>Etc/UCT</code>, <code>Etc/Universal</code>, <code>Etc/Zulu</code>, <code>UCT</code>, <code>Universal</code> and <code>Zulu</code> are written as <code>UTC</code>; <code>Etc/GMT</code> stays as it is. It is absent on Windows and where neither source exists. <code>env.TZ</code> is separate.</li>
+<li><code>runtime.jvm.options</code> joins <code>JAVA_TOOL_OPTIONS</code> and <code>JDK_JAVA_OPTIONS</code>, in that order, and is absent when both are empty. Flags on a <code>java</code> command line are not visible to a capture.</li>
+<li><code>java.net.preferIPv6Addresses</code> is the last <code>-Djava.net.preferIPv6Addresses=</code> value in those options, and absent when they do not set it.</li>
+</ul>
+<p>Keys that a capture of this machine cannot supply: <code>runtime.database.server.*</code>, <code>network.tls-version-offered</code> and <code>net.dns.aaaa.present</code> need a connection or a name lookup against a named target, and <code>browser.name</code> needs a browser. Rules that read them stay <code>pending-scanner</code>.</p>
+<h3 id="attribute-prefixes">Attribute Prefixes</h3>
+<p>A rule's <code>applies</code> list and the ranking use one of 14 dimensions. The dimension of an attribute path comes from the longest matching prefix in this table; a path that no prefix claims, such as <code>drift.platform</code>, has no dimension.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Prefixes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>os</code></td>
+<td><code>os.name</code>, <code>os.version</code>, <code>os.release.</code>, <code>tool.libc.</code>, <code>libc.</code>, <code>windows.</code>, <code>fs.</code>, <code>crypto.</code>, <code>file.</code></td>
+</tr>
+<tr>
+<td><code>kernel</code></td>
+<td><code>kernel.</code>, <code>cgroup.</code> (except the two below), <code>sysctl.</code></td>
+</tr>
+<tr>
+<td><code>cpu</code></td>
+<td><code>os.arch</code>, <code>cpu.</code></td>
+</tr>
+<tr>
+<td><code>cpu-limit</code></td>
+<td><code>cgroup.cpu.</code></td>
+</tr>
+<tr>
+<td><code>memory</code></td>
+<td><code>cgroup.memory.</code>, <code>memory.</code></td>
+</tr>
+<tr>
+<td><code>runtime</code></td>
+<td><code>tool.java.</code>, <code>tool.go.</code>, <code>tool.node.</code>, <code>tool.python.</code>, <code>tool.php.</code>, <code>tool.rust.</code>, <code>tool.kotlin.</code>, <code>tool.dotnet.</code>, <code>tool.workerd.</code>, <code>runtime.</code></td>
+</tr>
+<tr>
+<td><code>compiler</code></td>
+<td><code>tool.cc.</code>, <code>tool.visualstudio.</code></td>
+</tr>
+<tr>
+<td><code>build</code></td>
+<td><code>tool.npm.</code>, <code>tool.gradle.</code>, <code>tool.pip.</code>, <code>ci.</code>, <code>deps.</code>, <code>project.</code></td>
+</tr>
+<tr>
+<td><code>userland</code></td>
+<td><code>tool.coreutils.</code>, <code>tool.git.</code>, <code>tool.make.</code>, every other <code>tool.</code> path, <code>pkg.</code>, <code>git.config.</code></td>
+</tr>
+<tr>
+<td><code>env</code></td>
+<td><code>env.</code></td>
+</tr>
+<tr>
+<td><code>locale</code></td>
+<td><code>env.LANG</code>, <code>env.LC_</code>, <code>env.TZ</code>, <code>tz.</code></td>
+</tr>
+<tr>
+<td><code>limits</code></td>
+<td><code>limits.</code></td>
+</tr>
+<tr>
+<td><code>network</code></td>
+<td><code>env.HTTP_PROXY</code>, <code>env.HTTPS_PROXY</code>, <code>env.NO_PROXY</code> and their lowercase forms, <code>env.REQUESTS_CA_BUNDLE</code>, <code>env.CURL_CA_BUNDLE</code>, <code>env.SSL_CERT_FILE</code>, <code>env.SSL_CERT_DIR</code>, <code>env.NODE_EXTRA_CA_CERTS</code>, <code>network.</code>, <code>net.</code>, <code>tls.</code>, <code>java.net.</code></td>
+</tr>
+<tr>
+<td><code>browser</code></td>
+<td><code>browser.</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Every environment variable is captured as <code>env.&lt;NAME&gt;</code>, so no allowlist gates the proxy and certificate variables. Credentials in a proxy URL (<code>http://user:pass@host</code>) are masked before the capsule is written. A rule path may contain <code>/</code> and <code>@</code>, which package names need, in addition to letters, digits and <code>_ . : * -</code>.</p>
 <h2 id="diagnose">Diagnose</h2>
 <p><code>drift diagnose GREEN RED</code> compares the capsule of a passing run with the capsule of a failing run, ranks the attributes that differ and proposes experiments. The default output is canonical JSON.</p>
+<p>A <code>.driftcase</code> archive can stand for either capsule. Add <code>#passing</code> or <code>#failing</code> to the archive path to select the capsule in <code>environments/passing.json</code> or <code>environments/failing.json</code>:</p>
+<pre><code class="language-sh">drift diagnose case.driftcase#passing case.driftcase#failing
+</code></pre>
+<p>An archive without a selector is refused, because both capsules are in it and the command cannot tell which one you mean. The same selectors work on every command that reads a capsule.</p>
 <pre><code class="language-sh">G=fixtures/drangler/capsules/36702683742.json
 R=fixtures/drangler/capsules/36995781138.json
 drift diagnose $G $R &gt; diag.json
@@ -660,14 +978,14 @@ shasum -a 256 diag.json
 </code></pre>
 <pre><code>tool.node.version
 false
-8
-717191f28a8d593ecf8a5fcedee04b4471187cddfe29718dbd2e38e6676de52e  diag.json
+9
+e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08  diag.json
 </code></pre>
 <p>The top-level keys are <code>bundles</code>, <code>changed</code>, <code>competing</code>, <code>facts</code>, <code>relevant</code>, <code>unattached</code> and <code>weights</code>. <code>weights.calibrated: false</code> means the ranking uses hand-set weights, so the order of candidates is not a probability of being the cause.</p>
 <p><code>--detail</code> prints text instead, at three levels. It cannot be combined with <code>--json</code>.</p>
 <pre><code class="language-sh">drift diagnose --detail summary $G $R
 </code></pre>
-<pre><code>8 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
+<pre><code>9 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
 so the data does not name one cause.
 </code></pre>
 <p><code>--detail detail</code> adds the ranked candidates, the bundle and the next experiment (64 lines for this pair). <code>--detail full</code> adds every changed attribute (285 lines). The text is plain ASCII, wrapped at 100 columns.</p>
@@ -675,11 +993,11 @@ so the data does not name one cause.
 </code></pre>
 <pre><code>Candidates, best first. Scores come from hand-set weights (hand-set-1, uncalibrated); they order
   candidates and are not probabilities.
-  1. tool.node.version tier difference inferred bundle bundle-1
+  1. tool.node.version (tier difference, basis inferred, in bundle-1)
       evidence: attribute tool.node.version; no run history behind it
-  2. ci.provisioner.build-date tier difference inferred bundle bundle-1
+  2. ci.provisioner.build-date (tier difference, basis inferred, in bundle-1)
       evidence: attribute ci.provisioner.build-date; no run history behind it
-  3. ci.provisioner.version tier difference inferred bundle bundle-1
+  3. ci.provisioner.version (tier difference, basis inferred, in bundle-1)
 </code></pre>
 <p>A bundle lists candidates the data cannot separate: &quot;none is the cause on its own&quot;.</p>
 <p><strong>Cases.</strong> <code>--case DIR</code> writes a case directory (11 files: <code>case.json</code>, <code>manifest.json</code>, the two capsules, the observation chain, the ranking, the prior and the plan) and prints the usual output. The <code>wrote 11 files to DIR</code> line goes to standard error.</p>
@@ -689,7 +1007,7 @@ ls case
 jq -r .name case/case.json
 </code></pre>
 <pre><code>wrote 11 files to case
-8 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
+9 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
 so the data does not name one cause.
 case.json
 eliminations
@@ -733,6 +1051,225 @@ drangler-nightly
 </table></div>
 <p>The planner's trial counts and costs depend on these three numbers. With <code>--failures 3 --runs 5 --trial-minutes 4</code> the first proposal is 18 trials at 9 minutes; with the defaults it is 14 trials at 10 minutes.</p>
 <p>Exit codes: 0 whenever the command ran, including when it finds no cause. 1 for a missing or malformed capsule (<code>invalid capsule file broken.json: expected key at 2</code>), an unsupported schema (<code>unsupported capsule schema 2</code>), <code>--json</code> with <code>--detail</code>, a bad <code>--failures</code> or <code>--trial-minutes</code>, and a <code>--case</code> directory that already holds a case.</p>
+<h3 id="against-a-baseline">Against a Baseline</h3>
+<p><code>drift diagnose --against BASELINE [CURRENT]</code> compares a saved passing run with a failing one. <code>BASELINE</code> and <code>CURRENT</code> are capsule directories (see <a href="#run">Run</a> and <a href="#import">Import</a>) or capsule files. With no <code>CURRENT</code>, the command captures this machine, as <code>drift capture</code> does. Every <code>diagnose</code> flag works the same way.</p>
+<pre><code class="language-sh">drift run --out green-run --label green -- sh -c 'echo building; echo tests passed'
+TZ=Asia/Tokyo drift run --out red-run --label red -- sh -c 'if [ &quot;$TZ&quot; != UTC ]; then echo &quot;Error: unexpected timezone $TZ&quot;; exit 3; fi; echo ok'
+drift diagnose --against green-run red-run --detail summary
+</code></pre>
+<pre><code>building
+tests passed
+drift: exit 0 after 8 ms; capsule in green-run
+Error: unexpected timezone Asia/Tokyo
+drift: exit 3 after 9 ms; capsule in red-run
+env.TZ differs most (tier difference); this ranks differences and does not confirm a cause.
+</code></pre>
+<p>The two <code>drift:</code> lines go to standard error. The comparison reads the capsules only; the symptoms and steps stored beside them are not part of the ranking. Compare like with like: a capsule from <code>run</code> or <code>capture</code> holds attributes such as <code>os.name</code> and <code>kernel.release</code>, and a capsule from <code>import</code> holds the attributes a CI log prints (<code>ci.runner.image.version</code>), so a baseline from one and a current run from the other differ in most paths.</p>
+<p><code>--against</code> with two capsules fails with <code>--against takes at most one capsule</code>. Without <code>--against</code>, <code>diagnose</code> still takes exactly two capsules, and each may now be a directory.</p>
+<h2 id="run">Run</h2>
+<p><code>drift run [--out DIR] [--label TEXT] [--tail-lines N] [--tools] [--project] [--force] -- COMMAND...</code> runs a command, captures the environment before it starts and writes a capsule directory. The command's output passes through to standard output as it arrives (standard error is merged into it), and the command's exit code is the exit code of <code>drift run</code>. One line goes to standard error: <code>drift: exit 3 after 9 ms; capsule in red-run</code>.</p>
+<pre><code class="language-sh">TZ=Asia/Tokyo drift run --out red-run --label red -- sh -c 'if [ &quot;$TZ&quot; != UTC ]; then echo &quot;Error: unexpected timezone $TZ&quot;; exit 3; fi; echo ok'
+echo &quot;exit $?&quot;
+ls red-run
+cat red-run/result.json
+cat red-run/tail.log
+jq -r '.symptoms[] | &quot;\(.kind) \(.value)&quot;' red-run/run.json
+</code></pre>
+<pre><code>Error: unexpected timezone Asia/Tokyo
+drift: exit 3 after 9 ms; capsule in red-run
+exit 3
+capsule.json
+result.json
+run.json
+tail.log
+{&quot;command&quot;:&quot;sh -c \&quot;if [ \&quot;$TZ\&quot; != UTC ]; then echo \&quot;Error: unexpected timezone $TZ\&quot;; exit 3; fi; echo ok\&quot;&quot;,&quot;durationMs&quot;:9,&quot;exitCode&quot;:3,&quot;schema&quot;:1,&quot;truncated&quot;:false}
+Error: unexpected timezone Asia/Tokyo
+signature Error: unexpected timezone Asia/Tokyo
+</code></pre>
+<p>A capsule directory holds:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>File</th>
+<th>Holds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>capsule.json</code></td>
+<td>the capsule, as <code>drift capture</code> prints it</td>
+</tr>
+<tr>
+<td><code>run.json</code></td>
+<td>the run: outcome (<code>pass</code> for exit 0, <code>fail</code> otherwise), one step with the command line and its duration, and the symptoms read from the tail</td>
+</tr>
+<tr>
+<td><code>result.json</code></td>
+<td>the command line, exit code, duration in milliseconds and whether the tail was cut; written by <code>run</code> only</td>
+</tr>
+<tr>
+<td><code>tail.log</code></td>
+<td>the last <code>--tail-lines</code> lines of output (default 200), at most 64 KiB, with secret-looking values masked as <code>&lt;redacted&gt;</code>; written by <code>run</code> only</td>
+</tr>
+</tbody>
+</table></div>
+<p>Symptoms come from the tail, not from the whole output, and only the last 128 KiB of output is kept in memory while the command runs. The command line in <code>result.json</code> and <code>run.json</code> is masked the same way and shows an argument with spaces in double quotes. <code>drift run</code> refuses to write into a directory that already holds a <code>capsule.json</code> unless <code>--force</code> is given, and it checks that before it starts the command.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--out DIR</code></td>
+<td>capsule directory to write (default <code>drift-run</code>)</td>
+</tr>
+<tr>
+<td><code>--label TEXT</code></td>
+<td>name stored in the capsule and the run (default <code>run</code>)</td>
+</tr>
+<tr>
+<td><code>--tail-lines N</code></td>
+<td>lines kept in <code>tail.log</code> (default 200, at least 1)</td>
+</tr>
+<tr>
+<td><code>--tools</code></td>
+<td>also run the toolchain scanners, as <code>capture --tools</code> does</td>
+</tr>
+<tr>
+<td><code>--project</code></td>
+<td>also read the project facts, as <code>capture --project</code> does</td>
+</tr>
+<tr>
+<td><code>--force</code></td>
+<td>replace the files of an earlier run in <code>--out</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Put <code>--</code> before the command so that its own flags are not read as <code>drift</code> flags; arguments after the first word of the command are passed through either way. A program that does not exist makes the shell report exit code 127, which <code>drift run</code> passes through. The command is started directly when the host can (the JVM build) and through <code>sh</code> on the native builds. The Windows build was not run for this guide.</p>
+<h2 id="import">Import</h2>
+<p><code>drift import LOG --format github|gitlab --out DIR [--summary FILE] [--job NAME] [--label TEXT] [--force]</code> turns a saved CI log into a capsule directory. It reads files only and never contacts GitHub or GitLab. The directory holds <code>capsule.json</code> and <code>run.json</code>, so it works as a baseline or as the current run for <code>diagnose --against</code>.</p>
+<pre><code class="language-sh">drift import fixtures/drangler/logs/36702683742.log --format github --job &quot;Docker E2E&quot; \
+  --summary fixtures/drangler/runs/36702683742.json --label green --out green-import
+drift import fixtures/drangler/logs/37114464625.log --format github --job &quot;Docker E2E&quot; \
+  --summary fixtures/drangler/runs/37114464625.json --label red --out red-import
+jq -r '.attributes[] | &quot;\(.path) = \(.value)&quot;' red-import/capsule.json
+jq -r '.outcome, (.steps | length), ([.symptoms[].kind] | unique | join(&quot;,&quot;))' red-import/run.json
+drift diagnose --against green-import red-import --detail summary
+</code></pre>
+<pre><code>wrote 11 attributes and 0 symptoms to green-import
+wrote 11 attributes and 9 symptoms to red-import
+ci.provisioner.build-date = 2026-09-01T19:56:44Z
+ci.provisioner.name = Hosted Compute Agent
+ci.provisioner.version = 20260901.588
+ci.runner.image = ubuntu-24.04
+ci.runner.image.version = 20260927.320.1
+ci.runner.region = westcentralus
+ci.runner.version = 2.337.0
+env.REQUIRE_DOCKER = 1
+os.release.channel = LTS
+os.release.name = Ubuntu
+os.version = 24.04.5
+fail
+49
+duration,exit,signature,step,transport
+3 changes differ with the same support, and ci.provisioner.build-date ranks first only by hand-set
+weights, so the data does not name one cause.
+</code></pre>
+<p>The first two lines go to standard error. The logs are the sanitized job logs in <a href="https://github.com/gmitch215/Drift/tree/master/fixtures/drangler/logs"><code>fixtures/drangler/logs</code></a>; <code>gh run view --log</code> printed them and <code>gh run view --json</code> printed the summaries.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Format</th>
+<th><code>LOG</code></th>
+<th><code>--summary</code></th>
+<th>Attributes read</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>github</code></td>
+<td>a job log, raw or as printed by <code>gh run view --log</code></td>
+<td>the output of <code>gh run view --json</code></td>
+<td><code>os.release.name</code>, <code>os.version</code>, <code>os.release.channel</code> (the Operating System group), <code>ci.runner.image</code>, <code>ci.runner.image.version</code> (the Runner Image group), <code>ci.provisioner.*</code>, <code>ci.runner.region</code> (volatile), <code>ci.runner.version</code> and the <code>env:</code> block of the first <code>run:</code> step (a <code>***</code> value is skipped)</td>
+</tr>
+<tr>
+<td><code>gitlab</code></td>
+<td>a job trace</td>
+<td>a pipeline object, an object with a <code>jobs</code> array, or a jobs array from the REST API</td>
+<td><code>ci.runner.version</code>, <code>ci.runner.executor</code>, <code>ci.runner.image</code>, <code>ci.runner.image.digest</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Without <code>--summary</code> the outcome comes from the log: for GitHub <code>fail</code> when an error annotation is present and <code>unknown</code> otherwise, for GitLab <code>pass</code> on a <code>Job succeeded</code> line, <code>fail</code> on an <code>ERROR: Job failed</code> line and <code>unknown</code> otherwise. With <code>--summary</code> the outcome and the steps come from the summary; GitHub steps carry their job name and GitLab jobs appear as steps with the stage as the job. Symptoms (error signatures, exit codes, signals, transport errors, and for GitHub the failing step and its duration) come from the log text.</p>
+<p><code>--job</code> picks the job of a multi-job <code>gh run view --log</code> file. Without it, the first job with a Runner Image group is read. Values are masked the same way <code>capture</code> masks them.</p>
+<p><code>import</code> fails with exit code 1 and writes nothing when the log holds no runner environment, when a file cannot be read, when the summary is not valid JSON, and with <code>--job</code> for GitLab. Input cut off at any point never raises an error: the importer reads what is there. A GitLab example from the synthetic fixtures in <a href="https://github.com/gmitch215/Drift/tree/master/fixtures/ci"><code>fixtures/ci</code></a>:</p>
+<pre><code class="language-sh">drift import fixtures/ci/gitlab-red.trace --format gitlab --summary fixtures/ci/gitlab-jobs.json --out gl
+jq -r '.attributes[] | &quot;\(.path) = \(.value)&quot;' gl/capsule.json
+jq -r '.outcome, (.steps[] | &quot;\(.job)/\(.name) \(.conclusion) \(.durationMs)&quot;)' gl/run.json
+</code></pre>
+<pre><code>wrote 4 attributes and 4 symptoms to gl
+ci.runner.executor = docker
+ci.runner.image = ruby:3.3
+ci.runner.image.digest = ruby@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+ci.runner.version = 17.5.1
+fail
+build/build success 31512
+test/rspec failure 192
+deploy/deploy skipped null
+</code></pre>
+<p>The GitLab fixtures are written by hand in the shape of the real format; the field names of the pipeline and job JSON were checked against the GitLab REST documentation, not against a real pipeline.</p>
+<h2 id="bisect">Bisect</h2>
+<p><code>drift bisect plan GREEN RED --out PLAN</code> lists the static attributes that differ between two capsules (files or directories) and writes a plan. <code>drift bisect apply PLAN --step N --green|--red</code> records what happened when you ran your test on step N, and prints the next step or the minimal set. Drift never runs the test: a step names attributes to set to their red values in the green environment, and you run whatever applies them (a container flag, a version pin, an environment variable).</p>
+<pre><code class="language-sh">drift bisect plan green-import red-import --out plan.json
+drift bisect apply plan.json --step 1 --green
+drift bisect apply plan.json --step 2 --red
+drift bisect apply plan.json --step 3 --red
+</code></pre>
+<pre><code>wrote a plan over 3 attributes to plan.json
+step 1: in the green environment, set these attributes to their red values and run the test
+  ci.provisioner.build-date: 2026-08-28T16:44:25Z -&gt; 2026-09-01T19:56:44Z
+then: drift bisect apply plan.json --step 1 --green (test passed) or --red (test failed)
+step 2: in the green environment, set these attributes to their red values and run the test
+  ci.provisioner.version: 20260828.587 -&gt; 20260901.588
+  ci.runner.image.version: 20260920.314.1 -&gt; 20260927.320.1
+then: drift bisect apply plan.json --step 2 --green (test passed) or --red (test failed)
+step 3: in the green environment, set these attributes to their red values and run the test
+  ci.provisioner.version: 20260828.587 -&gt; 20260901.588
+then: drift bisect apply plan.json --step 3 --green (test passed) or --red (test failed)
+minimal set: 1 of 3 attributes after 3 tests; the test fails with all of them and passes when any one is left out
+  ci.provisioner.version: 20260828.587 -&gt; 20260901.588
+</code></pre>
+<p>The first line goes to standard error. The search is Zeller's ddmin. The full set of differences counts as failing (it is the red environment) and the empty set as passing (it is the green one); neither is ever a step. Attributes are ordered by the ranking, so the likeliest culprits sit in the first chunk. An attribute that exists on one side only is listed as <code>(unset)</code> on the other.</p>
+<p>The plan file is canonical JSON and holds the whole state: the flips, the recorded trials, and the derived <code>status</code>, <code>next</code> and <code>minimal</code> fields. The same two capsules always give the same bytes (the plan above hashes to <code>c788ced1...e1c3</code> on every run). <code>apply</code> accepts only the pending step; repeating the last recorded outcome changes nothing, and a different outcome for a recorded step fails with <code>step 2 already holds red</code>. A test that cannot be judged has no third outcome: stop and rerun it rather than guessing.</p>
+<p>Only static attributes are flipped. Volatile attributes and probe differences are left out, and a plan over capsules with no static difference fails with <code>the capsules have no static attribute differences to bisect</code>.</p>
+<h2 id="offline">Offline</h2>
+<p>Nothing in <code>run</code>, <code>import</code>, <code>diagnose --against</code> or <code>bisect</code> opens a network connection. This run used the Linux arm64 executable in a container with <code>--network none</code>, whose network namespace holds the loopback device and the kernel's default tunnel devices, all <code>down</code> or <code>unknown</code> in <code>/sys/class/net/*/operstate</code>:</p>
+<pre><code class="language-sh">docker run --rm --network none -v &quot;$PWD/n:/n&quot; -w /n debian:bookworm-slim sh /n.sh
+</code></pre>
+<pre><code>wrote 11 attributes and 0 symptoms to green
+wrote 11 attributes and 9 symptoms to red
+3 changes differ with the same support, and ci.provisioner.build-date ranks first only by hand-set
+weights, so the data does not name one cause.
+exit 0
+building
+tests passed
+drift: exit 0 after 1 ms; capsule in base
+Error: unexpected timezone Asia/Tokyo
+drift: exit 3 after 1 ms; capsule in cur
+exit 3
+env.TZ differs most (tier difference); this ranks differences and does not confirm a cause.
+exit 0
+</code></pre>
+<p><code>n</code> held the executable, the two sanitized logs and their summaries; <code>n.sh</code> ran <code>import</code>, <code>diagnose --against</code>, two <code>drift run</code> calls and a second <code>diagnose --against</code> (exit codes echoed by the script).</p>
+<p><strong>In a CI job.</strong> Run the failing step through <code>drift run</code>, keep the capsule directory as an artifact, and keep the directory of the last green run as the baseline. A job that has no baseline yet can <code>import</code> a saved log of a green run instead:</p>
+<pre><code class="language-sh">drift run --out current --label &quot;$GITHUB_RUN_ID&quot; -- make test || status=$?
+drift diagnose --against baseline current --detail summary
+exit &quot;${status:-0}&quot;
+</code></pre>
+<p>This shape was not run in a CI service for this guide.</p>
 <h2 id="next-and-case-show">Next and Case Show</h2>
 <p><code>drift next CASE</code> prints the proposed experiments of a case. <code>drift case show CASE</code> prints what the case holds and whether it still checks out.</p>
 <pre><code class="language-sh">drift case show case
@@ -743,7 +1280,7 @@ observations: 2, chain head 51c3d18ef57180a4ee97f29a1afd87d1584bc5f95e8239e06647
 integrity: ok, 10 files match the manifest and the chain holds
 rule sha256: 85d28ec6c5ccb9292603be15d730a5685942efb2690a8b0ead6143480948d588 (ingest names it as ruleSha256)
 
-8 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
+9 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
 so the data does not name one cause.
 </code></pre>
 <p><code>--detail summary|detail|full</code> applies to both. <code>next</code> at <code>detail</code> prints the best automatic experiment with the instructions for a workflow variant, then the manual ones (experiments Drift cannot run, such as a runner image the CI provider owns).</p>
@@ -790,7 +1327,7 @@ This is not the original environment. Attributes that are not mirrored are liste
   at --detail detail.
 # drift reproduce: capsule 540e5c225a8ee48280f38e3c96a68e4d43ee1b2879e9d2d7d21f1c8fcb006531; manifest.json says what is not mirrored
 FROM node:22.12.0-alpine3.20
-RUN apk add --no-cache tzdata
+RUN apk add --no-cache gcompat tzdata
 RUN npm install -g npm@10.9.2
 WORKDIR /work
 </code></pre>
@@ -1227,9 +1764,475 @@ manifest results-chain counts fisher
 </code></pre>
 <p>(<code>${pipestatus[1]}</code> is zsh; in bash use <code>${PIPESTATUS[0]}</code>.) On failure the report goes to standard output and one extra line, <code>verification failed: FAIL manifest: ...</code>, goes to standard error.</p>
 <p><code>verify</code> shows that an archive agrees with itself. It does not show that the experiments happened. Someone who rewrites every file, both chains, the hashes, the certificate and the manifest consistently makes an archive that verifies; preregistration is bound by hash, not by time. The technical report describes a second edit that also reseals the chains and the manifest and is still caught by <code>counts</code> and <code>fisher</code>.</p>
+<h2 id="open">Open</h2>
+<p>A <code>.driftcase</code> is a tar archive, so a text editor shows binary noise. Studio opens it and shows what <code>drift verify</code> finds: the check list, the first failure and the verdict. A tampered or truncated archive shows the failing check in the Case tab and does not crash Studio.</p>
+<p>Studio Desktop takes a case three ways: as a launch argument (<code>Drift /path/x.driftcase</code>; Windows and Linux pass a double-clicked file this way, not run here), through the macOS open-file event (<code>java.awt.Desktop.setOpenFileHandler</code>), and through <code>drift open</code>. The packages declare the association for <code>.driftcase</code> (MIME type <code>application/x-driftcase</code>) with the <code>fileAssociation</code> call that the Compose Multiplatform Gradle plugin offers in its <code>macOS</code>, <code>windows</code> and <code>linux</code> blocks (<code>PlatformSettings.kt</code> in compose-gradle-plugin 1.12.1). On macOS the generated <code>Info.plist</code> of <code>createDistributable</code> carries a <code>CFBundleDocumentTypes</code> entry for the <code>driftcase</code> extension.</p>
+<pre><code class="language-sh">open fixtures/lab/cases/locale-tz-date-2.driftcase
+</code></pre>
+<p>With the Drift app registered, that command starts Studio on the Case tab. It was run here from the <code>createDistributable</code> app (not the dmg, and not on Windows or Linux).</p>
+<h3 id="drift-open">drift open</h3>
+<p><code>drift open FILE</code> hands the archive to Studio and falls back to a report when Studio is not installed.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Studio is launched with</th>
+<th>Used when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>macOS</td>
+<td><code>open -a Drift FILE</code></td>
+<td>the app named Drift exists</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td><code>explorer.exe FILE</code></td>
+<td><code>reg query HKCR\.driftcase</code> finds the association</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td><code>xdg-open FILE</code></td>
+<td><code>xdg-mime query default application/x-driftcase</code> names a handler</td>
+</tr>
+</tbody>
+</table></div>
+<p>The path always reaches the launcher as one argument and never through <code>cmd</code>: a relative path is prefixed with <code>./</code> (<code>.\</code> on Windows), so a name such as <code>a&amp;calc.driftcase</code> or <code>-x.driftcase</code> is a literal file name. When no launcher applies or the launch fails, <code>open</code> writes the report to <code>&lt;name&gt;.report.html</code> beside the case and prints the path. It refuses a case directory and an unreadable file the way <code>verify</code> and <code>report</code> do. <code>explorer.exe</code> reports exit code 1 on success, so on Windows the command counts a started launcher as success.</p>
+<h3 id="from-an-editor">From an Editor</h3>
+<p>No marketplace plugin is involved.</p>
+<p>IntelliJ IDEA: under Settings, Editor, File Types, select &quot;Files opened in associated applications&quot; and add the pattern <code>*.driftcase</code>. The JetBrains documentation says matching files then open in the default application of the operating system, which is Studio once the package is installed.</p>
+<p>VS Code 1.140.0 has no built-in way to open a file in the system application. <code>workbench.editorAssociations</code> only maps a file pattern to an editor that VS Code or an extension provides, and Open With lists editors; a search of the bundled workbench found no command for an external application. Three routes work without an extension:</p>
+<ul>
+<li>Run <code>drift open</code> from the integrated terminal.</li>
+<li>Choose Reveal in Finder (or Reveal in File Explorer) and double-click the file.</li>
+<li>Add a task that runs <code>drift open</code> on the current file. The variable <code>${file}</code> is documented for <code>command</code> and <code>args</code> in <code>tasks.json</code>; this route was not run here.</li>
+</ul>
+<pre><code class="language-json">{
+  &quot;version&quot;: &quot;2.0.0&quot;,
+  &quot;tasks&quot;: [
+    {
+      &quot;label&quot;: &quot;Open Case in Studio&quot;,
+      &quot;type&quot;: &quot;process&quot;,
+      &quot;command&quot;: &quot;drift&quot;,
+      &quot;args&quot;: [&quot;open&quot;, &quot;--&quot;, &quot;${file}&quot;]
+    }
+  ]
+}
+</code></pre>
+<p>A sideloaded <code>.vsix</code> is possible and not built. A custom editor for <code>*.driftcase</code> would read the archive, take the <code>report.html</code> entry from the tar (a USTAR reader of about 100 lines of TypeScript) and show it in a webview. The estimate is two source files and a package under 50 KB, shipped as a release asset. The Drift report is static HTML with no script, so the webview needs no remote content.</p>
+<h2 id="contract">Contract</h2>
+<p>A contract says what a program needs from an environment, as a list of assertions that every known green capsule satisfies. <code>drift contract create</code> writes one from capsules, and <code>drift contract verify</code> checks another environment against it. The contract is evidence from the capsules you give it. It does not claim to know what the program depends on.</p>
+<p>The file is JSON with one assertion or capsule per line, so a person can read it, delete an assertion and review a change in a diff. It is JSON because the CLI reads only JSON at run time. Assertions come in two kinds:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Kind</th>
+<th><code>id</code></th>
+<th><code>expect</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>attribute</code></td>
+<td>the attribute path, such as <code>os.arch</code>; only static attributes are used</td>
+<td>the attribute's value</td>
+</tr>
+<tr>
+<td><code>probe</code></td>
+<td>the probe id, such as <code>text.sort</code>; only probes with status <code>ok</code> are used</td>
+<td>the SHA-256 of the probe transcript</td>
+</tr>
+</tbody>
+</table></div>
+<p>Each assertion has a <code>role</code>. <code>discriminating</code> means a red capsule broke it and no green did. <code>coincidental</code> means every green agrees on the value and no red has shown that it matters. The <code>breaks</code> list names the red capsules a discriminating assertion tells apart from the greens.</p>
+<h3 id="create">Create</h3>
+<pre><code class="language-sh">C=fixtures/drangler/capsules
+drift contract create \
+  --from $C/35585969640.json $C/36232485230.json $C/36311117223.json \
+         $C/36412389380.json $C/36702683742.json \
+  --red $C/36995781138.json $C/37114464625.json $C/37195797966.json \
+  -o drangler.contract.json
+cat drangler.contract.json
+shasum -a 256 drangler.contract.json
+</code></pre>
+<pre><code>contract: 1 assertion(s) separate 5 green capsule(s) from 3 red capsule(s); no assertion can be removed (24 shared values, 5 ddmin tests)
+wrote drangler.contract.json
+{
+  &quot;assertions&quot;: [
+    {&quot;breaks&quot;:[&quot;drangler-36995781138&quot;,&quot;drangler-37114464625&quot;,&quot;drangler-37195797966&quot;],&quot;expect&quot;:&quot;2026-08-28T16:44:25Z&quot;,&quot;id&quot;:&quot;ci.provisioner.build-date&quot;,&quot;kind&quot;:&quot;attribute&quot;,&quot;role&quot;:&quot;discriminating&quot;}
+  ],
+  &quot;format&quot;: &quot;drift-contract-1&quot;,
+  &quot;greens&quot;: [
+    {&quot;hash&quot;:&quot;50255d41ca40855469fcef01b1d2f38c807451fa32551984adc5ed2d8d9d0809&quot;,&quot;label&quot;:&quot;drangler-35585969640&quot;},
+    {&quot;hash&quot;:&quot;b15b8360a447f468ed98525d992ec320fb86d46db42005597c7f55ffdecba8b0&quot;,&quot;label&quot;:&quot;drangler-36232485230&quot;},
+    ...
+  ],
+  &quot;mode&quot;: &quot;separating&quot;,
+  &quot;reds&quot;: [
+    {&quot;hash&quot;:&quot;40380c709345110b5af7fd2c2af356b387b9143a25518407b6704b84091a4cc7&quot;,&quot;label&quot;:&quot;drangler-36995781138&quot;},
+    ...
+  ],
+  &quot;schema&quot;: 1
+}
+01e3954e9d78251503528308251d6dd706ff4edd88a1bc86e1007433497b8125  drangler.contract.json
+</code></pre>
+<p>The first two lines go to standard error. Without <code>-o</code> the contract goes to standard output.</p>
+<p>Of the 24 values that all five greens share, <code>create</code> keeps a smallest set that still breaks every red. It uses the same ddmin routine as the minimal causal set. The result is 1-minimal: no assertion can be removed. It is not always the smallest possible set, and when several values separate equally it keeps one of them. Here four values (<code>ci.provisioner.build-date</code>, <code>ci.provisioner.version</code>, <code>deps.prettier-plugin-sh.version</code> and <code>deps.wrangler.version</code>) each break all three reds, and <code>create</code> kept <code>ci.provisioner.build-date</code>. Treat the kept assertion as one member of that group, not as the cause. The <code>greens</code> and <code>reds</code> lists record each capsule's label and hash. The same capsules in any order give the same bytes, and the macOS, JVM and wasm builds produce the same file.</p>
+<p>With no <code>--red</code>, <code>create</code> lists every static attribute and probe that is the same in all the greens, each <code>coincidental</code>.</p>
+<pre><code class="language-sh">drift contract create --from $C/36232485230.json $C/36702683742.json -o greens.json
+head -n 5 greens.json
+</code></pre>
+<pre><code>contract: 25 values are constant across 2 green capsule(s); all are coincidental until a red capsule discriminates them
+wrote greens.json
+{
+  &quot;assertions&quot;: [
+    {&quot;expect&quot;:&quot;2026-08-28T16:44:25Z&quot;,&quot;id&quot;:&quot;ci.provisioner.build-date&quot;,&quot;kind&quot;:&quot;attribute&quot;,&quot;role&quot;:&quot;coincidental&quot;},
+    {&quot;expect&quot;:&quot;Hosted Compute Agent&quot;,&quot;id&quot;:&quot;ci.provisioner.name&quot;,&quot;kind&quot;:&quot;attribute&quot;,&quot;role&quot;:&quot;coincidental&quot;},
+    {&quot;expect&quot;:&quot;20260828.587&quot;,&quot;id&quot;:&quot;ci.provisioner.version&quot;,&quot;kind&quot;:&quot;attribute&quot;,&quot;role&quot;:&quot;coincidental&quot;},
+</code></pre>
+<p>A red capsule breaks an assertion only when it has the attribute or probe and the value differs. A red that lacks the value breaks nothing. When a red breaks no assertion that every green satisfies, no set separates it, and <code>create</code> writes no contract and exits 3. This run passes a green (<code>36412389380</code>) as if it had failed:</p>
+<pre><code class="language-sh">drift contract create --from $C/36232485230.json $C/36702683742.json \
+  --red $C/36995781138.json $C/36412389380.json
+echo $?
+</code></pre>
+<pre><code>no separating set: red capsule(s) drangler-36412389380 contradict none of the 25 values every green shares
+3
+</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--from CAPSULE...</code></td>
+<td>one or more capsules of passing runs (required)</td>
+</tr>
+<tr>
+<td><code>--red CAPSULE...</code></td>
+<td>one or more capsules of failing runs</td>
+</tr>
+<tr>
+<td><code>-o FILE</code>, <code>--out FILE</code></td>
+<td>write the contract to <code>FILE</code> instead of standard output</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="verify">Verify</h3>
+<p><code>drift contract verify CONTRACT CAPSULE</code> reports each assertion as <code>HOLDS</code>, <code>BREAKS</code> or <code>UNVERIFIABLE</code>. An assertion is unverifiable when the capsule has no such attribute, or the probe is missing or has status <code>unavailable</code>. The command exits 1 when any assertion breaks. Unverifiable assertions alone do not change the exit code.</p>
+<pre><code class="language-sh">drift contract verify drangler.contract.json $C/36412389380.json
+echo $?
+drift contract verify drangler.contract.json $C/36995781138.json
+echo $?
+</code></pre>
+<pre><code>HOLDS attribute ci.provisioner.build-date (discriminating): &quot;2026-08-28T16:44:25Z&quot;
+contract: 1 hold, 0 break, 0 unverifiable
+0
+BREAKS attribute ci.provisioner.build-date (discriminating): expected &quot;2026-08-28T16:44:25Z&quot;, found &quot;2026-09-01T19:56:44Z&quot;
+contract: 0 hold, 1 break, 0 unverifiable
+contract broken: attribute ci.provisioner.build-date
+1
+</code></pre>
+<p>Long values are cut to 72 characters in the text report and shown in full in the JSON. <code>--json</code> prints canonical JSON with the keys <code>schema</code>, <code>format</code> (<code>drift-contract-verify-1</code>), <code>ok</code>, <code>holds</code>, <code>breaks</code>, <code>unverifiable</code> and <code>results</code>; each result has <code>kind</code>, <code>id</code>, <code>role</code>, <code>status</code>, <code>expect</code> and <code>found</code>. <code>found</code> is <code>null</code> for an unverifiable assertion and the transcript hash for a probe.</p>
+<pre><code class="language-sh">drift contract verify drangler.contract.json $C/37195797966.json --json
+</code></pre>
+<pre><code>{&quot;breaks&quot;:1,&quot;format&quot;:&quot;drift-contract-verify-1&quot;,&quot;holds&quot;:0,&quot;ok&quot;:false,&quot;results&quot;:[{&quot;expect&quot;:&quot;2026-08-28T16:44:25Z&quot;,&quot;found&quot;:&quot;2026-09-01T19:56:44Z&quot;,&quot;id&quot;:&quot;ci.provisioner.build-date&quot;,&quot;kind&quot;:&quot;attribute&quot;,&quot;role&quot;:&quot;discriminating&quot;,&quot;status&quot;:&quot;breaks&quot;}],&quot;schema&quot;:1,&quot;unverifiable&quot;:0}
+</code></pre>
+<p><code>--capture</code> checks this machine instead of a capsule file. It captures the environment, runs the probes the contract names, and runs the toolchain scanners when an assertion's path starts with <code>tool.</code>. Give either a capsule or <code>--capture</code>, not both. A laptop has no CI runner attributes, so the drangler contract cannot be checked here:</p>
+<pre><code class="language-sh">drift contract verify drangler.contract.json --capture
+echo $?
+</code></pre>
+<pre><code>UNVERIFIABLE attribute ci.provisioner.build-date (discriminating): not in the capsule
+contract: 0 hold, 0 break, 1 unverifiable
+0
+</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--capture</code></td>
+<td>check this machine instead of a capsule file</td>
+</tr>
+<tr>
+<td><code>--json</code></td>
+<td>print the report as canonical JSON</td>
+</tr>
+</tbody>
+</table></div>
+<p>Exit codes: <code>contract create</code> exits 0 when it wrote a contract and 3 when no set separates a red. <code>contract verify</code> exits 1 when an assertion breaks. Each exits 1 for a missing or malformed capsule or contract file. <code>contract create</code> also exits 1 when it cannot write the file, and <code>contract verify</code> exits 1 with neither or both of a capsule and <code>--capture</code>.</p>
+<h2 id="upgrade-check">Upgrade Check</h2>
+<p><code>drift upgrade-check</code> answers &quot;what breaks if we move to these versions&quot; from one capsule of today's environment. It sets the target versions on the matching attributes, evaluates every rule with the capsule as side <code>a</code> and the changed copy as side <code>b</code>, and prints the rules the move triggers in four groups. It runs offline with no model, and the same capsule and targets give the same bytes on the JVM and Native builds.</p>
+<pre><code class="language-sh">drift upgrade-check [--json] [--to &lt;name=version,...&gt;] [--to-file &lt;file&gt;] [&lt;capsule&gt;]
+</code></pre>
+<p><code>&lt;capsule&gt;</code> is a capsule file or directory. Without it the command captures this machine with <code>--tools --project</code>. Capture the project with <code>drift capture --project</code> (see <a href="#project-facts">Project Facts</a>) so the dependency versions are in the capsule; a capsule without them puts every dependency rule under Unknown.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--to</code></td>
+<td>versions to move to, as <code>php=8.3,drupal=11</code>; repeatable</td>
+</tr>
+<tr>
+<td><code>--to-file</code></td>
+<td>a YAML file of flat <code>name: version</code> lines (<code>#</code> starts a comment); a name in <code>--to</code> replaces the same name in the file</td>
+</tr>
+<tr>
+<td><code>--json</code></td>
+<td>print canonical JSON (<code>schema</code> 2) instead of text</td>
+</tr>
+</tbody>
+</table></div>
+<p>At least one target is required. A name is an alias from the table, or an attribute path (a name that contains a dot, such as <code>project.gradle.properties.android.builtInKotlin</code>), which accepts any value. Alias targets must parse as versions. A version without a patch number compares as <code>.0</code>, so <code>drupal=11</code> means 11.0.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Alias</th>
+<th>Attribute</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agp</code></td>
+<td><code>project.gradle.agp.version</code></td>
+</tr>
+<tr>
+<td><code>composer</code></td>
+<td><code>tool.composer.version</code></td>
+</tr>
+<tr>
+<td><code>docker</code></td>
+<td><code>tool.docker.version</code></td>
+</tr>
+<tr>
+<td><code>drupal</code></td>
+<td><code>project.composer.drupal/core</code></td>
+</tr>
+<tr>
+<td><code>git</code></td>
+<td><code>tool.git.version</code></td>
+</tr>
+<tr>
+<td><code>go</code></td>
+<td><code>tool.go.version</code></td>
+</tr>
+<tr>
+<td><code>gradle</code></td>
+<td><code>project.gradle.wrapper</code></td>
+</tr>
+<tr>
+<td><code>java</code>, <code>jdk</code></td>
+<td><code>tool.java.version</code></td>
+</tr>
+<tr>
+<td><code>kotlin</code></td>
+<td><code>project.gradle.kotlin.version</code></td>
+</tr>
+<tr>
+<td><code>node</code></td>
+<td><code>tool.node.version</code></td>
+</tr>
+<tr>
+<td><code>npm</code></td>
+<td><code>tool.npm.version</code></td>
+</tr>
+<tr>
+<td><code>openssl</code></td>
+<td><code>tool.openssl.version</code></td>
+</tr>
+<tr>
+<td><code>php</code></td>
+<td><code>tool.php.version</code></td>
+</tr>
+<tr>
+<td><code>python</code></td>
+<td><code>tool.python.version</code></td>
+</tr>
+<tr>
+<td><code>ruby</code></td>
+<td><code>tool.ruby.version</code></td>
+</tr>
+<tr>
+<td><code>symfony</code></td>
+<td><code>project.composer.symfony/http-kernel</code></td>
+</tr>
+<tr>
+<td><code>twig</code></td>
+<td><code>project.composer.twig/twig</code></td>
+</tr>
+<tr>
+<td><code>tzdata</code></td>
+<td><code>tz.database.version</code></td>
+</tr>
+</tbody>
+</table></div>
+<pre><code class="language-sh">drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=8.3,drupal=11,symfony=7.1
+</code></pre>
+<pre><code>upgrade-check: drupal-10-site
+  drupal   project.composer.drupal/core          10.3.6 -&gt; 11
+  symfony  project.composer.symfony/http-kernel  v6.4.12 -&gt; 7.1
+  php      tool.php.version                      8.1.34 -&gt; 8.3
+71 of 296 rules read a target key
+
+Will break (0)
+  none
+
+May break (7)
+  1. [high, inferred] Drupal 11 minimum database versions are MySQL 8.0, MariaDB 10.6, PostgreSQL 16 and SQLite 3.45 (json1); Drupal 10 minimums are no longer enough
+     rule: drupal-11-database-server-minimums
+     boundary: project.composer.drupal/core 10.3.6 -&gt; 11 (rule: was any, now &gt;=11)
+     needs: runtime.database.server.kind, runtime.database.server.version; the rule is pending-scanner
+     mechanism: The Drupal 11.0.0 release notes list the database driver minimums as MySQL 8.0, MariaDB 10.6, PostgreSQL 16 and SQLite 3.45 with the json1 extension.
+     source: https://www.drupal.org/project/drupal/releases/11.0.0
+...
+
+Version boundary crossed (2)
+  These rules apply to the versions crossed; no project fact or other environment key in the capture matched them.
+  1. [medium, verified] PHP 8.2 deprecates creating dynamic properties on classes that do not declare them
+     rule: php-8-2-dynamic-properties-deprecated
+     boundary: tool.php.version 8.1.34 -&gt; 8.3 (rule: was &lt;8.2.0, now &gt;=8.2.0)
+     mechanism: PHP 8.2 deprecates creating dynamic properties unless the class uses the #[\AllowDynamicProperties] attribute.
+     source: https://www.php.net/manual/en/migration82.deprecated.php
+  2. [medium, inferred] Drupal 10 uses Symfony 6.2; Drupal 11.0 moves core to Symfony 7.1.1, so Symfony 6 code that relies on changed APIs breaks
+     rule: drupal-10-to-11-symfony-6-2-to-7-1
+     boundary: project.composer.drupal/core 10.3.6 -&gt; 11 (rule: was &lt;11, now &gt;=11)
+     boundary: project.composer.symfony/http-kernel v6.4.12 -&gt; 7.1 (rule: was &gt;=6.2,&lt;7, now &gt;=7)
+     mechanism: The Drupal 11.0.0 release notes state that Symfony has been upgraded to 7.1.1.
+     source: https://www.drupal.org/project/drupal/releases/11.0.0
+     source: https://www.drupal.org/project/drupal/releases/10.0.0
+
+Unknown (0)
+  none
+</code></pre>
+<p>The capsule is a real capture of <a href="https://github.com/gmitch215/Drift/tree/master/fixtures/projects/composer"><code>fixtures/projects/composer</code></a> inside the <code>php:8.1-cli-bookworm</code> image, saved as <a href="https://github.com/gmitch215/Drift/blob/master/fixtures/upgrade-check/drupal-10-php-8-1.json"><code>fixtures/upgrade-check/drupal-10-php-8-1.json</code></a>. Each finding gives the severity and basis of the rule, the attributes the move changes with the condition the rule had on each side (<code>was</code> for side <code>a</code>, <code>now</code> for side <code>b</code>), what the rule still needs, the mechanism and its sources. Within a group, findings run from high to low severity, then verified before inferred, then by rule id.</p>
+<p>The groups come from the three-valued verdict of the rule engine, not from a score:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Will break</td>
+<td>the rule matches, every fact it reads is known, the capsule alone does not already match it, and at least one clause that matched reads a project fact or an environment key that is not a target; the finding lists those keys under <code>evidence</code></td>
+</tr>
+<tr>
+<td>May break</td>
+<td>the targets satisfy the rule's version condition, and the verdict is unknown because another fact it reads is missing from the capsule or is one no scanner emits yet (the output says which, and marks a <code>pending-scanner</code> rule)</td>
+</tr>
+<tr>
+<td>Version boundary crossed</td>
+<td>the rule matches, but every clause that matched reads only a target key, so the evidence is the version crossing and nothing about the project; the change applies to those versions and the project may not use the affected feature</td>
+</tr>
+<tr>
+<td>Unknown</td>
+<td>the capsule has no current value for a target key, or the target is not a version the rule can compare, so the boundary cannot be judged</td>
+</tr>
+</tbody>
+</table></div>
+<p>Only rules that read a target key on side <code>b</code> and give a different verdict for the targets than for the capsule alone are listed. The line <code>71 of 296 rules read a target key</code> counts the rules that read one before that filter. Probe results and run facts describe today's environment, so side <code>b</code> has none, and a rule that reads one is unknown.</p>
+<p><code>--json</code> prints the same findings. A finding holds <code>rule</code>, <code>title</code>, <code>severity</code>, <code>basis</code>, <code>status</code>, <code>mechanism</code>, <code>crossings</code> (<code>key</code>, <code>from</code>, <code>to</code>, <code>was</code>, <code>now</code>), <code>missing</code>, <code>evidence</code> and <code>sources</code>, under the keys <code>will-break</code>, <code>may-break</code>, <code>version-boundary</code> and <code>unknown</code>, next to <code>targets</code>, <code>rules</code> and <code>touched</code>:</p>
+<pre><code class="language-sh">drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=8.3,drupal=11,symfony=7.1 --json \
+  | jq -c '{rules, touched, willBreak: [.&quot;will-break&quot;[] | {rule}], versionBoundary: [.&quot;version-boundary&quot;[] | {rule, crossings: [.crossings[] | {key, from, to}]}]}'
+</code></pre>
+<pre><code>{&quot;rules&quot;:296,&quot;touched&quot;:71,&quot;willBreak&quot;:[],&quot;versionBoundary&quot;:[{&quot;rule&quot;:&quot;php-8-2-dynamic-properties-deprecated&quot;,&quot;crossings&quot;:[{&quot;key&quot;:&quot;tool.php.version&quot;,&quot;from&quot;:&quot;8.1.34&quot;,&quot;to&quot;:&quot;8.3&quot;}]},{&quot;rule&quot;:&quot;drupal-10-to-11-symfony-6-2-to-7-1&quot;,&quot;crossings&quot;:[{&quot;key&quot;:&quot;project.composer.drupal/core&quot;,&quot;from&quot;:&quot;10.3.6&quot;,&quot;to&quot;:&quot;11&quot;},{&quot;key&quot;:&quot;project.composer.symfony/http-kernel&quot;,&quot;from&quot;:&quot;v6.4.12&quot;,&quot;to&quot;:&quot;7.1&quot;}]}]}
+</code></pre>
+<p>The targets can sit in a file instead. This file gives the same result:</p>
+<pre><code class="language-yaml">php: 8.3
+drupal: 11
+symfony: '7.1'
+</code></pre>
+<pre><code class="language-sh">drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to-file stack.yml --json | jq -c '[.&quot;version-boundary&quot;[].rule]'
+</code></pre>
+<pre><code>[&quot;php-8-2-dynamic-properties-deprecated&quot;,&quot;drupal-10-to-11-symfony-6-2-to-7-1&quot;]
+</code></pre>
+<p>A rule that reads a project fact or another environment key lands under Will break and names it. Moving the same Drupal 10 capsule down to PHP 7.4 breaks two rules on the Drupal and Symfony versions the capsule holds, and one rule that reads only the PHP version stays under Version boundary crossed:</p>
+<pre><code class="language-sh">drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=7.4
+</code></pre>
+<pre><code>upgrade-check: drupal-10-site
+  php  tool.php.version  8.1.34 -&gt; 7.4
+44 of 296 rules read a target key
+
+Will break (2)
+  1. [high, inferred] Drupal 10 cannot run on PHP 8.0 or earlier; PHP 8.0 sites must move to 8.1 before upgrading core
+     rule: drupal-10-php-8-1-minimum
+     boundary: tool.php.version 8.1.34 -&gt; 7.4 (rule: was &gt;=8.1, now &lt;8.1)
+     evidence: project.composer.drupal/core
+     mechanism: The Drupal 10.0.0 release notes state that Drupal 10 requires PHP 8.1 or higher, and the Drupal 10 minimum PHP change record states that it will not be possible to run Drupal 10 on PHP 8.0 or earlier.
+     source: https://www.drupal.org/project/drupal/releases/10.0.0
+     source: https://www.drupal.org/node/3264830
+  2. [high, inferred] Symfony 6.1 declares PHP 8.1 or higher, so a PHP 8.0 host cannot install it
+     rule: symfony-6-1-php-8-1-minimum
+     boundary: tool.php.version 8.1.34 -&gt; 7.4 (rule: was &gt;=8.1, now &lt;8.1)
+     evidence: project.composer.symfony/http-kernel
+     mechanism: Symfony 6.1.0 declares require.php as &gt;=8.1 in its composer.json, while 6.0.0 declares &gt;=8.0.2.
+     source: https://raw.githubusercontent.com/symfony/symfony/v6.1.0/composer.json
+     source: https://raw.githubusercontent.com/symfony/symfony/v6.0.0/composer.json
+
+May break (0)
+  none
+
+Version boundary crossed (1)
+  These rules apply to the versions crossed; no project fact or other environment key in the capture matched them.
+  1. [medium, verified] PHP 8 compares a number with a non-numeric string as strings
+     rule: php-8-string-number-comparison
+     boundary: tool.php.version 8.1.34 -&gt; 7.4 (rule: was any, now differs on &gt;=8.0.0)
+     mechanism: PHP 8 casts the number to a string and compares strings when the other operand is non-numeric, so loose comparisons that were true in PHP 7 are false.
+     source: https://github.com/php/doc-en/blob/master/appendices/migration80/incompatible.xml
+
+Unknown (0)
+  none
+</code></pre>
+<p>A capsule that lacks the key a target replaces lists the dependency rules under Unknown. This is the PHP 7.4 capsule from <a href="https://github.com/gmitch215/Drift/tree/master/bench/data/capsules"><code>bench/data/capsules</code></a>, which has no Drupal facts:</p>
+<pre><code class="language-sh">drift upgrade-check bench/data/capsules/migration-php-json-validate-1.red.json --to drupal=11
+</code></pre>
+<pre><code>upgrade-check: red
+  drupal  project.composer.drupal/core  unknown -&gt; 11
+21 of 296 rules read a target key
+
+Will break (0)
+  none
+
+May break (0)
+  none
+
+Version boundary crossed (0)
+  none
+
+Unknown (15)
+  1. [high, verified] Drupal 10 removes the Aggregator, Color, HAL, Quick Edit and RDF modules and the Bartik, Seven, Classy and Stable themes from core
+     rule: drupal-10-removed-core-modules-and-themes
+     boundary: project.composer.drupal/core unknown -&gt; 11 (rule: was &lt;10, now &gt;=10)
+     needs: project.composer.drupal/core, project.drupal.modules.aggregator, project.drupal.modules.color, project.drupal.modules.hal, project.drupal.modules.quickedit, project.drupal.modules.rdf, project.drupal.themes.bartik, project.drupal.themes.classy, project.drupal.themes.seven, project.drupal.themes.stable; the rule is pending-scanner
+...
+</code></pre>
+<p>A bad target stops the command with exit code 1 and no output on standard output: <code>php=zzz is not a version</code>, <code>unknown target 'rust'</code> (the message lists the aliases), a name given twice with different values (<code>java=21,jdk=17</code>), and an unreadable <code>--to-file</code>.</p>
+<h3 id="upgrade-check-limits">Upgrade Check Limits</h3>
+<ul>
+<li>The rules were written as a passing side and a failing side, so many describe a move in one direction only. A rule that says &quot;side <code>a</code> is JDK 20 or newer and side <code>b</code> is older&quot; fires for a downgrade and not for <code>java=17</code> to <code>java=21</code>. A move that triggers no rule shows nothing under Will break; it does not show that the move is safe.</li>
+<li>A rule under Version boundary crossed says the version change is documented, not that the project is affected. The capsule held no source fact for it to read, so check whether the project uses the feature the rule names.</li>
+<li>Targets are independent. <code>drupal=11</code> does not set <code>symfony=7.1</code> or <code>php=8.3</code>; a rule that needs those lists them under May break or Unknown until they are given.</li>
+<li>Everything the targets do not name stays at its captured value on side <code>b</code>, including the operating system and the tools.</li>
+<li>A rule that reads source facts (<code>project.java.*</code>, <code>project.symfony.source.*</code>) or other keys no scanner emits stays under May break, with the keys listed under <code>needs</code>. The rule catalog has no rule for APIs that a version only adds, such as <code>json_validate()</code> in PHP 8.3, so adding an API is never reported.</li>
+<li>Group counts change when the rule catalog changes. The counts above are from this checkout.</li>
+</ul>
 <h2 id="atlas">Atlas</h2>
-<p>The Atlas asks, per probe, whether a Kotlin program prints the same thing on every target. It holds 38 probes. <code>atlas record</code> runs them on this target, <code>atlas build</code> aggregates transcripts into a dataset, <code>atlas compare</code> places this device against it and <code>atlas show</code> prints the matrix or a draft for one probe.</p>
-<p><strong>Columns.</strong> <code>fixtures/atlas/</code> holds 13 recorded columns on Kotlin 2.4.20, and <code>fixtures/atlas/2.5.0-beta1/</code> holds 5 on 2.5.0-Beta1 (<code>jvm</code>, <code>macos</code>, <code>wasm</code>, <code>android</code>, <code>ios</code>). <a href="https://github.com/gmitch215/Drift/blob/master/atlas/columns.yml"><code>atlas/columns.yml</code></a> says how each was measured.</p>
+<p>The Atlas asks, per probe, whether a Kotlin program prints the same thing on every target. It holds 38 probes. <code>atlas record</code> runs them on this target, <code>atlas build</code> aggregates transcripts into a dataset, <code>atlas compare</code> places this device against it, <code>atlas show</code> prints the matrix or a draft for one probe and <code>atlas diff</code> lists what changed between two Kotlin versions.</p>
+<p><strong>Columns.</strong> <code>fixtures/atlas/</code> holds 15 recorded columns on Kotlin 2.4.20, and <code>fixtures/atlas/2.5.0-beta1/</code> holds 5 on 2.5.0-Beta1 (<code>jvm</code>, <code>macos</code>, <code>wasm</code>, <code>android</code>, <code>ios</code>). <a href="https://github.com/gmitch215/Drift/blob/master/atlas/columns.yml"><code>atlas/columns.yml</code></a> says how each was measured.</p>
 <div class="table"><table>
 <thead>
 <tr>
@@ -1263,6 +2266,10 @@ manifest results-chain counts fisher
 <td>the Studio web build in each browser, driven by Playwright in a Linux container (WebKit here is not Safari)</td>
 </tr>
 <tr>
+<td><code>cloudflare-wasm</code>, <code>cloudflare-jvm</code></td>
+<td>Workers on workerd under <code>wrangler dev</code>, macOS arm64 (see <a href="#probe">Probe</a>)</td>
+</tr>
+<tr>
 <td><code>android</code></td>
 <td>the debug build on an arm64 emulator (Pixel 7 profile, API 37)</td>
 </tr>
@@ -1291,8 +2298,8 @@ identical-to-fixture
 <pre><code class="language-sh">drift atlas build fixtures/atlas/jvm.txt fixtures/atlas/macos.txt fixtures/atlas/wasm.txt --out atlas.json
 drift atlas build fixtures/atlas/*.txt fixtures/atlas/2.5.0-beta1/*.txt --out atlas-all.json
 </code></pre>
-<pre><code>dataset: 38 probes, 3 columns, 23 divergent, sha256 3cf771d67a004c85570eeb323050261a6a2a1d8f74fac71f04551760fb8f0470
-dataset: 38 probes, 18 columns, 23 divergent, sha256 de6b25cac2fed7bc5f357d3130be44d1629961efa94d5fdac4ab8a572a2ccebb
+<pre><code>dataset: 38 probes, 3 columns, 23 divergent, sha256 18e154bf26aba9464760e3e5ed1b8e02307e33f1c07fe3565bc20906c0c3d3e7
+dataset: 38 probes, 21 columns, 32 divergent, sha256 2d7e84b9b90a560a26301f77215ad15d9671c43a44273eaa24bda45369fad3af
 </code></pre>
 <p>The summary goes to standard error. The sha256 is the hash of the dataset body; the file on disk has one more trailing newline. Building twice gives identical files, and the order of the arguments does not change the bytes. <code>--out</code> is required. <code>build</code> refuses a transcript that lacks a probe of the catalog, names an unknown probe, lacks a header (<code>bad transcript header in badt.txt: missing kotlin.target</code>) or duplicates a column (<code>fixtures/atlas/jvm.txt and fixtures/atlas/jvm.txt both record jvm@2.4.20</code>).</p>
 <p><strong>Show.</strong> Without <code>--probe</code>, <code>atlas show</code> prints the matrix: one row per probe, one letter per distinct output, and a repeated letter on a row marks a byte-identical transcript.</p>
@@ -1304,18 +2311,18 @@ drift atlas show atlas.json | tail -5
 probe                                     classification    jvm@2.4.20  macos@2.4.20  wasm@2.4.20
 kotlin.char.bmp-case-mapping              platform-defined  A           B             B
 kotlin.char.bmp-categories                platform-defined  A           B             B
-kotlin.char.case-special                  documented        A           A             A
+kotlin.char.case-special                  unclassified      A           A             A
 a letter repeated on a row marks a byte-identical transcript
 divergent probes: 23 of 38
-  documented: 6 of 18
-  platform-defined: 4 of 4
-  unclassified: 13 of 16
+  documented: 3 of 11
+  platform-defined: 3 of 3
+  unclassified: 17 of 24
 </code></pre>
 <p>With more than one Kotlin version in the dataset the summary adds a line per version:</p>
 <pre><code class="language-sh">drift atlas show atlas-all.json | tail -3
 </code></pre>
 <pre><code>divergent probes per kotlin version:
-  2.4.20: 23
+  2.4.20: 29
   2.5.0-Beta1: 18
 </code></pre>
 <p><strong>Classification.</strong> Every probe carries one of three labels, written by hand from primary sources in <a href="https://github.com/gmitch215/Drift/blob/master/atlas/classification.yml"><code>atlas/classification.yml</code></a> and embedded in the dataset:</p>
@@ -1331,24 +2338,24 @@ divergent probes: 23 of 38
 <tr>
 <td><code>documented</code></td>
 <td>a Kotlin documentation page states the behavior</td>
-<td>18</td>
+<td>11</td>
 </tr>
 <tr>
 <td><code>platform-defined</code></td>
 <td>a JDK or ECMAScript page does</td>
-<td>4</td>
+<td>3</td>
 </tr>
 <tr>
 <td><code>unclassified</code></td>
 <td>no explanation was found; the entry records what was searched</td>
-<td>16</td>
+<td>24</td>
 </tr>
 </tbody>
 </table></div>
 <p>Each entry also has a <code>basis</code> (<code>verified</code> when the cited page states the contract, <code>inferred</code> when the page implies it), the references with a short quote, and the linked issue ids with the state read on the research date. <code>unclassified</code> is not a finding. The 13 divergent unclassified probes each have a repro draft under <a href="https://github.com/gmitch215/Drift/tree/master/atlas/repros"><code>atlas/repros/</code></a>.</p>
 <p><strong>Compare.</strong> <code>atlas compare DATASET TRANSCRIPT</code> places this device against each recorded column. <code>--detail summary</code> prints counts; <code>detail</code> adds the probes that differ.</p>
 <pre><code class="language-sh">drift atlas compare atlas.json tr/macos.txt
-drift atlas compare atlas-all.json tr/macos.txt | tail -19
+drift atlas compare atlas-all.json tr/macos.txt | tail -21
 </code></pre>
 <pre><code>this device: macos, kotlin 2.4.20, 38 probes measured
 dataset: 38 probes, 3 columns: jvm@2.4.20, macos@2.4.20, wasm@2.4.20
@@ -1363,8 +2370,11 @@ per column:
 per column:
   android@2.4.20: 20 of 38 probes match
   android@2.5.0-Beta1: 20 of 38 probes match
+  cloudflare-jvm@2.4.20: 15 of 38 probes match
+  cloudflare-wasm@2.4.20: 25 of 38 probes match
   ios@2.4.20: 38 of 38 probes match
   ios@2.5.0-Beta1: 37 of 38 probes match
+  js-ir@2.4.20: 11 of 38 probes match
   jvm@2.4.20: 21 of 38 probes match
   jvm@2.5.0-Beta1: 21 of 38 probes match
   jvm-17@2.4.20: 22 of 38 probes match
@@ -1381,6 +2391,21 @@ per column:
   wasm-webkit@2.4.20: 25 of 38 probes match
 </code></pre>
 <p>The Mac that recorded the transcript matches its own column on 38 of 38 probes, which makes a useful check that a fresh recording is unchanged. A column from another machine can differ for hardware reasons (for example the sign bit of a NaN), and a Linux executable linked on Ubuntu instead of macOS prints different last digits for three lines of <code>kotlin.math.transcendental-bits</code>. A mismatch against a column recorded elsewhere is not a Kotlin finding by itself.</p>
+<p><strong>Version changes.</strong> <code>atlas diff DATASET --from X --to Y [--target T]</code> lists the probes whose transcript differs between two Kotlin versions on the targets recorded for both. A target recorded for only one of the two versions is named and left out. <code>--detail summary</code> prints counts, <code>detail</code> (the default) adds each changed probe with the differing lines, and <code>full</code> adds the probes that did not change. Versions match ignoring case. The ladder dataset is <code>fixtures/atlas</code> plus <code>fixtures/atlas-ladder</code> without its duplicate <code>2.4.20/linux.txt</code>: <code>./gradlew atlasLadderDataset</code> writes it to <code>build/atlas-work/ladder.json</code>, and <code>atlasSite</code> publishes it as <code>data/ladder.json</code> and as the <code>versions.html</code> page, which lists the change between each pair of consecutive versions per target.</p>
+<pre><code class="language-sh">drift atlas diff ladder.json --from 2.4.21 --to 2.5.0-Beta1 --target js-ir
+</code></pre>
+<pre><code>kotlin 2.4.21 to 2.5.0-Beta1: 1 of 38 probes change
+targets compared: js-ir
+measured on 2.5.0-Beta1 only: android, ios, wasm
+per target:
+  js-ir: 1 of 38 change (0 became available, 0 became unavailable)
+
+kotlin.exceptions.messages [unclassified]
+  js-ir: changed
+    line 8 (2.4.21): long-div-zero = err:Exception:division by zero
+    line 8 (2.5.0-Beta1): long-div-zero = err:ArithmeticException:/ by zero
+</code></pre>
+<p>A probe that did not compile on the older version and runs on the newer one shows as <code>became available</code> with the first compiler error, so an API that appears is separate from a value that changes.</p>
 <p><strong>Repro drafts.</strong> <code>atlas show DATASET --probe ID</code> prints a draft for one probe. It begins <code>GENERATED DRAFT, NOT REVIEWED</code>.</p>
 <pre><code class="language-sh">drift atlas show atlas.json --probe kotlin.collections.iterator-modification | sed -n 1,13p
 drift atlas show atlas.json --probe kotlin.collections.iterator-modification \
@@ -1434,6 +2459,387 @@ curl -s -o /dev/null -w '%{http_code} %{content_type}\n' http://localhost:PORT/p
 </code></pre>
 <p><code>./gradlew docsSite</code> runs <code>dokkaGenerate</code> and <code>atlasSite</code> first, then assembles <code>build/site</code> (3,089 files): <code>README.md</code> as <code>index.html</code>, <code>ADVANCED_USAGE.md</code> as <code>advanced-usage.html</code> and <code>TECHNICAL_REPORT.md</code> as <code>technical-report.html</code>, each rendered into <code>assets/site-template.html</code>, the Atlas site under <code>atlas/</code>, the Dokka site under <code>engine/</code>, the icons from <code>assets/</code>, <code>CNAME</code> and <code>.nojekyll</code>. A relative link in the three Markdown files to a repository path that does not exist fails the render, and a link to one that does exist becomes a GitHub URL on <code>master</code>. <code>checkSiteLinks</code> runs after it and fails on a relative <code>href</code> or <code>src</code> that does not resolve inside <code>build/site</code>. It scanned 73,286 links and found none unresolved outside <code>engine/</code>, where Dokka leaves 14 unresolved; those are counted and printed and do not fail it.</p>
 <p>The <code>docs.yml</code> workflow runs <code>./gradlew dokkaGenerate atlasSite docsSite</code> and pushes <code>build/site</code> to the <code>gh-pages</code> branch. It builds on pushes to <code>master</code>, <code>ver/*</code>, <code>feat/*</code> and <code>renovate/*</code> and deploys only from <code>master</code>, with a <code>CNAME</code> file for <code>drift.gmitch215.dev</code>. It has not run yet.</p>
+<h2 id="probe">Probe</h2>
+<p><code>probe cloudflare</code> runs the Kotlin probes in a Cloudflare Worker and writes the transcript in the Atlas format, the same file <code>atlas record</code> writes. The default run is local: <code>wrangler dev --local</code> serves the Worker on workerd at <code>127.0.0.1</code>, so it needs no network and no Cloudflare account. It needs Node and <code>wrangler</code> (on <code>PATH</code>, or through <code>npx wrangler</code>), and a directory that holds a built Worker.</p>
+<p>Drift has no HTTP client and cannot stop a process it started, so it hands the work to Node. It runs <code>node -e</code> with a short script that starts <code>wrangler dev</code>, waits for the <code>Ready on</code> line, requests the Worker once, prints the response between two marker lines and stops wrangler. Drift reads the output, checks that the text is a transcript, rewrites the <code>kotlin.target</code> header to <code>--target</code> and writes <code>&lt;out&gt;/&lt;target&gt;.txt</code>.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--worker DIR</code></td>
+<td>the built Worker: the directory that holds <code>wrangler.jsonc</code> (required)</td>
+</tr>
+<tr>
+<td><code>--target LABEL</code></td>
+<td>the column label (default <code>cloudflare</code>)</td>
+</tr>
+<tr>
+<td><code>--out DIR</code></td>
+<td>write <code>DIR/&lt;target&gt;.txt</code>; without it the transcript goes to standard output</td>
+</tr>
+<tr>
+<td><code>--wrangler CMD</code></td>
+<td>the wrangler command, for example <code>npx wrangler@4</code> (default: <code>wrangler</code> if it runs, else <code>npx wrangler</code>)</td>
+</tr>
+<tr>
+<td><code>--port N</code></td>
+<td>the port for <code>wrangler dev</code>; <code>0</code> picks a free one</td>
+</tr>
+<tr>
+<td><code>--timeout S</code></td>
+<td>seconds to wait for wrangler and for the Worker (default 120)</td>
+</tr>
+<tr>
+<td><code>--deploy</code></td>
+<td>deploy to your Cloudflare account instead of running locally</td>
+</tr>
+<tr>
+<td><code>--dry-run</code></td>
+<td>with <code>--deploy</code>, run <code>wrangler deploy --dry-run</code>: bundle only, nothing is uploaded</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Building the Workers.</strong> <code>tools/cloudflare</code> is a standalone Gradle build that Drift's own build does not include. It compiles the probe sources from <code>scan</code> and <code>core</code> into two Workers:</p>
+<pre><code class="language-sh">cd tools/cloudflare
+../../gradlew :wasm:stageWorker :jvm:buildWorker
+(cd jvm/build/bytebox/worker &amp;&amp; npm install)
+</code></pre>
+<p><code>wasm/build/worker</code> is the Kotlin/Wasm (<code>wasmJs</code>) probe module with a 14-line JavaScript entry that replaces Kotlin's loader, which does not run on workerd. <code>jvm/build/bytebox/worker</code> is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the <a href="https://github.com/gmitch215/bytebox">bytebox</a> 1.0.3 Gradle plugin, which uses TeaVM. bytebox is an external build dependency of that directory only; nothing else in Drift refers to it.</p>
+<pre><code class="language-sh">drift probe cloudflare --worker tools/cloudflare/wasm/build/worker --target cloudflare-wasm --out tr
+drift probe cloudflare --worker tools/cloudflare/jvm/build/bytebox/worker --target cloudflare-jvm --out tr
+</code></pre>
+<pre><code>wrangler dev ready on http://127.0.0.1:64193
+wrote 38 probes for cloudflare-wasm on kotlin 2.4.20, 0 unavailable to tr/cloudflare-wasm.txt
+wrangler dev ready on http://127.0.0.1:64228
+wrote 38 probes for cloudflare-jvm on kotlin 2.4.20, 4 unavailable to tr/cloudflare-jvm.txt
+</code></pre>
+<p>Both runs used wrangler 4.146.0 and workerd 1.20261001.1 on macOS arm64. <code>cloudflare-wasm</code> is byte-identical to the <code>wasm</code> column apart from the target line. <code>cloudflare-jvm</code> runs TeaVM's class library, not a JDK, and it differs from every other column on 18 probes. Four probes are recorded as <code>[UNAVAILABLE]</code>:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Probe</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kotlin.exceptions.messages</code>, <code>kotlin.int.overflow</code></td>
+<td>the compiled module traps on integer division (<code>divide by zero</code>, <code>divide result unrepresentable</code>) and a trap aborts the whole request, so the Worker skips both probes and records the reason</td>
+</tr>
+<tr>
+<td><code>kotlin.exceptions.tostring-cause</code></td>
+<td>the probe fails with a <code>NullPointerException</code>; the cause inside TeaVM's class library was not isolated</td>
+</tr>
+<tr>
+<td><code>kotlin.regex.anchors-lines</code></td>
+<td>the build refuses <code>java.util.regex.Matcher.useAnchoringBounds</code>, which <code>Regex.matchAt</code> calls, so the <code>matchAt</code> lines are replaced by a thrown exception in the Worker's copy of the source</td>
+</tr>
+</tbody>
+</table></div>
+<p>kotlinx-coroutines does not build through bytebox, and the Kotlin probe family has no probe that needs it, so none is refused for that reason.</p>
+<p><strong>Deploying.</strong> <code>--deploy</code> runs <code>wrangler deploy</code> against your account, requests the new Worker and writes the transcript. Before it deploys it prints a price estimate from the Workers pricing page:</p>
+<pre><code class="language-sh">drift probe cloudflare --worker tools/cloudflare/wasm/build/worker --deploy --dry-run
+</code></pre>
+<pre><code>Deploying sends one request to a new Worker on your Cloudflare account, and up to 10 more while it propagates.
+Free plan: 100,000 requests per day and 10 ms of CPU per invocation at no charge; a run that needs more CPU than that fails there.
+Paid plan (5 USD a month minimum): 10 million requests and 30 million CPU ms a month included, then 0.30 USD per million requests and 0.02 USD per million CPU ms.
+The Worker stays deployed until you delete it with wrangler delete.
+Source: https://developers.cloudflare.com/workers/platform/pricing/, read 2026-10-12.
+⛅️ wrangler 4.146.0 (update available 4.149.0)
+───────────────────────────────────────────────
+Total Upload: 372.15 KiB / gzip: 138.15 KiB
+No bindings found.
+--dry-run: exiting now.
+</code></pre>
+<p>The figures are the ones on the pricing page on the date shown; the command does not fetch the page again. The bundle of the bytebox Worker uploads 1107.00 KiB in the same dry run. A real <code>--deploy</code> ran once for each Worker on a free account (38 probes each, 4 unavailable on <code>cloudflare-jvm</code>, uploads of 372.15 KiB and 1107.00 KiB, no charge). The deployed output matched the local fixtures except for the sign bit of NaN results: <code>0/0-raw</code> printed <code>fff8000000000000</code> deployed against <code>7ff8000000000000</code> locally on both Workers, and <code>sqrt-neg-raw</code> the same on the JVM Worker. Both Workers were deleted afterwards.</p>
+<h2 id="triage">Triage</h2>
+<p><code>drift triage</code> reads the text of an issue and says what it can about the reporter's environment: facts as Drift attribute keys, the rules that apply, statements that contradict what Drift knows, and a draft rule when the report suggests a new one. It runs offline with no model. The same text gives the same bytes on the JVM, Native and Wasm builds, because the arithmetic is integer and the text scanning has no regular expressions.</p>
+<pre><code class="language-sh">drift triage [--json] [--publish-threshold &lt;0 to 1&gt;] [--learned &lt;dir&gt;] [--confidence &lt;table.json&gt;] [--author &lt;login&gt;] [--date &lt;yyyy-mm-dd&gt;] &lt;issue&gt;
+drift triage calibrate --corpus &lt;file.json|file.json.zst&gt; --out &lt;table.json&gt; [--seed &lt;text&gt;] [--min-facts &lt;n&gt;]
+</code></pre>
+<p><code>&lt;issue&gt;</code> is a Markdown file, or <code>-</code> for standard input (the build reads <code>/dev/stdin</code>, so <code>-</code> does not work on Windows). The input is an issue body as the host renders it: a GitHub issue form (<code>### Label</code>, then the value), a GitLab description template (<code>## Label</code> or <code>**Label**</code>), <code>Key: value</code> lines, tables, pasted tool output, or free text. Text longer than 262,144 characters is cut there and the result says so.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--json</code></td>
+<td>print canonical JSON (<code>schema</code> 1) instead of text</td>
+</tr>
+<tr>
+<td><code>--publish-threshold</code></td>
+<td>confidence from 0 to 1 at which a draft rule is published instead of drafted; without it every rule stays a draft</td>
+</tr>
+<tr>
+<td><code>--learned</code></td>
+<td>a directory holding the learned-rule store; its rules are matched with the shipped ones, and a published draft is added to it</td>
+</tr>
+<tr>
+<td><code>--confidence</code></td>
+<td>a table written by <code>triage calibrate</code>; it replaces the starting confidence of each path it names</td>
+</tr>
+<tr>
+<td><code>--author</code></td>
+<td>the reporter's login; only a hash of it is stored</td>
+</tr>
+<tr>
+<td><code>--date</code></td>
+<td>the day the report was read, written into the draft rule's provenance; a rule is never published without it</td>
+</tr>
+</tbody>
+</table></div>
+<pre><code class="language-sh">drift triage fixtures/triage/s03-python-distutils.md
+</code></pre>
+<pre><code>Triage of issue text e55da05dc5b3
+
+Facts (6)
+  os.name                linux                                             failing  0.855  section      7:1
+  os.release.ID          debian                                            failing  0.950  section      7:1
+  os.release.VERSION_ID  12                                                failing  0.950  section      7:8
+  run:signature          ModuleNotFoundError: No module named 'distutils'  failing  0.900  tool-output  16:1
+  tool.python.version    3.12.1                                            failing  0.985  section      3:1
+  tool.python.version    3.11.7                                            passing  0.700  pattern      11:44
+
+Rules (2)
+  python-3-12-distutils-removed              match    plausible  0.700  high
+  python-3-12-asynchat-asyncore-imp-removed  symptom  -          0.490  high
+  python-3-12-distutils-removed: facts tool.python.version; text &quot;ModuleNotFoundError&quot;
+  python-3-12-asynchat-asyncore-imp-removed: facts tool.python.version; text &quot;ModuleNotFoundError&quot;
+
+Claims (0)
+
+Draft rule: none
+</code></pre>
+<p>The input is <a href="https://github.com/gmitch215/Drift/blob/master/fixtures/triage/s03-python-distutils.md"><code>fixtures/triage/s03-python-distutils.md</code></a>, an invented issue form. Each fact names the attribute key, the value, which environment it describes (<code>failing</code> or <code>passing</code>), a confidence, how it was found and the line and column of the value. <code>3.12.1</code> reached 0.985 because the form field and the sentence below it agree.</p>
+<h3 id="facts-and-confidence">Facts and Confidence</h3>
+<p>A confidence is a number from 0 to 1 printed with three decimals. The starting value depends on how the value was found:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Where the value comes from</th>
+<th>Start</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>section</code></td>
+<td>the first line under a heading or bold label that names the field, as an issue form renders it</td>
+<td>0.950</td>
+</tr>
+<tr>
+<td><code>tool-output</code></td>
+<td>a verbatim tool line: <code>openjdk version &quot;21.0.2&quot;</code>, <code>Python 3.12.1</code>, a <code>uname -a</code> line, a Dockerfile <code>FROM</code>, the line after a <code>$ node -v</code> echo, an error line in a code block</td>
+<td>0.900</td>
+</tr>
+<tr>
+<td><code>key-value</code></td>
+<td><code>Key: value</code>, a table row, <code>NAME=value</code>, a Gradle or npm dependency line</td>
+<td>0.490</td>
+</tr>
+<tr>
+<td><code>pattern</code></td>
+<td>a known name followed by a version in running text</td>
+<td>0.700, or 0.800 under an environment heading</td>
+</tr>
+</tbody>
+</table></div>
+<p>Three adjustments follow, in this order:</p>
+<ol>
+<li>Spans that give the same value agree. Independent confidences combine as the chance that at least one is right, capped at 0.990. <code>17</code> and <code>17.0.9</code> agree, and the longer value is kept.</li>
+<li>A different value for the same key and side is a conflict. The stronger value keeps 0.6 of its confidence and the others are listed as alternatives.</li>
+<li>A hedge on the line (<code>maybe</code>, <code>probably</code>, <code>i think</code>, <code>not sure</code>) scales the start by 0.7. A distribution name that implies Linux gives <code>os.name</code> at 0.9 of the distribution's confidence.</li>
+</ol>
+<p>The side comes from the words around the value. The nearest verdict word before it in the clause decides: <code>works on Node 18</code> is <code>passing</code>, <code>fails on Node 20</code> is <code>failing</code>. A verdict word right after it wins (<code>Node 18 works</code>). <code>upgraded from Node 18 to Node 20</code> reads 18 as <code>passing</code>. With no verdict word, a value is <code>failing</code>.</p>
+<p>The keys are the ones the rules read: <code>os.name</code>, <code>os.version</code>, <code>os.arch</code>, <code>os.release.ID</code>, <code>os.release.VERSION_ID</code>, <code>tool.&lt;name&gt;.version</code> for Java, Kotlin, Gradle, Node, npm, Python, PHP, Go, Rust, Git, .NET, workerd, pip, <code>tool.cc.*</code> and <code>tool.libc.*</code>, <code>project.gradle.kotlin.version</code>, <code>project.gradle.agp.version</code>, <code>project.&lt;ecosystem&gt;.&lt;package&gt;</code> for dependencies pasted from a build file or an install command, <code>browser.name</code>, <code>browser.version</code>, <code>ci.provider</code>, <code>ci.runner.label</code>, <code>runtime.platform</code>, <code>runtime.container.image</code>, <code>runtime.jvm.options</code>, <code>env.LANG</code>, <code>env.TZ</code>, and <code>run:signature</code> for the first error line, normalized the way a failing step is.</p>
+<p><code>tool-output</code>, <code>key-value</code> and <code>pattern</code> were set from a seeded half of the triage corpus (see Corpus below). <code>section</code> keeps 0.950: the corpus takes its truth from form sections, so that path cannot be scored against it. On the other half of the corpus the facts on form-labelled keys score a precision of 0.783 and a Brier score of 0.1486 over 1,376 facts. <code>key-value</code> is the weakest path: 9 held-out facts, precision 0.444.</p>
+<h3 id="rules">Rules</h3>
+<p>A rule applies when its detect tree holds on the stated facts. A tree that reads <code>a</code> and <code>b</code> sides is evaluated with the passing facts as <code>a</code> and the failing facts as <code>b</code>.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Grade</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>match</code></td>
+<td>every condition holds on facts the issue states</td>
+</tr>
+<tr>
+<td><code>failing-side</code></td>
+<td>every failing-side condition holds and the passing side is not stated; reported only when the issue also carries the rule's symptom text, since almost every rule about a newer version would apply otherwise</td>
+</tr>
+<tr>
+<td><code>symptom</code></td>
+<td>the failing-side conditions that can be checked hold, some are not stated, and the issue carries the rule's symptom text</td>
+</tr>
+</tbody>
+</table></div>
+<p>Only a <code>match</code> has a tier: <code>known</code> when every symptom of the rule is verified and <code>plausible</code> otherwise, the ranker's own policy. The other grades lack the two-sided difference a tier describes, so none is shown. The confidence of a rule is the weakest fact it rests on, times 0.7 for a <code>symptom</code>. It is not the chance that the rule is the cause. Rules with status <code>pending-scanner</code> are matched too, since the reporter can state attributes no scanner emits yet.</p>
+<p>Symptom text comes from the rule's <code>symptoms</code>: quoted strings, <code>ERR_CODE</code> names and <code>...Error</code> names.</p>
+<h3 id="claims">Claims</h3>
+<p>A claim check flags a sentence that contradicts something Drift knows. Each claim names its source: a rule, or two columns of an Atlas probe. A test checks that every rule exists and that the two Atlas columns print different results.</p>
+<pre><code class="language-sh">drift triage fixtures/triage/c06-distutils-still-available.md
+</code></pre>
+<pre><code>Triage of issue text ce4d64e01c01
+
+Facts (1)
+  tool.python.version  3.12.1  failing  0.700  pattern  3:9
+
+Rules (0)
+
+Claims (1)
+  line 5 (0.490): distutils is still available on this build.
+    says: distutils is part of the standard library
+    Drift: Python 3.12 deletes the distutils package from the standard library and venv no longer pre-installs setuptools, which still provides distutils when installed.
+    source: rule:python-3-12-distutils-removed
+
+Draft rule: none
+</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Claim</th>
+<th>Contradicted by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hash-order-same</code></td>
+<td>Atlas <code>kotlin.collections.hash-order</code>: JVM and Linux differ</td>
+</tr>
+<tr>
+<td><code>double-tostring-same</code></td>
+<td>Atlas <code>kotlin.double.tostring-boundaries</code>: JVM and Wasm differ</td>
+</tr>
+<tr>
+<td><code>regex-same</code></td>
+<td>Atlas <code>kotlin.regex.syntax-support</code>: JVM and Wasm differ</td>
+</tr>
+<tr>
+<td><code>cloudflare-jvm-like-jvm</code></td>
+<td>Atlas <code>kotlin.collections.hash-order</code>: JVM and <code>cloudflare-jvm</code> differ</td>
+</tr>
+<tr>
+<td><code>nashorn-available</code></td>
+<td>rule <code>jdk-15-nashorn-removed</code>, with Java 15 or newer stated</td>
+</tr>
+<tr>
+<td><code>cms-collector-works</code></td>
+<td>rule <code>jdk-14-cms-collector-removed</code>, with Java 14 or newer stated</td>
+</tr>
+<tr>
+<td><code>distutils-available</code></td>
+<td>rule <code>python-3-12-distutils-removed</code>, with Python 3.12 or newer stated</td>
+</tr>
+<tr>
+<td><code>jaxb-in-jdk</code></td>
+<td>rule <code>jdk-11-java-ee-modules-removed</code>, with Java 11 or newer stated</td>
+</tr>
+<tr>
+<td><code>security-manager-enable</code></td>
+<td>rule <code>jdk-24-security-manager-disabled</code>, with Java 24 or newer stated</td>
+</tr>
+</tbody>
+</table></div>
+<p>A claim fires on a sentence outside code blocks that has a phrase from each of its word groups and no negation. A claim that depends on the environment stays silent when the fact is missing. The confidence is 0.700, times the weakest fact the claim depends on.</p>
+<h3 id="draft-rules">Draft Rules</h3>
+<p>A draft needs a symptom signature, one version key stated on both sides with the passing version below the failing one, and no rule that already holds on that key. Its detect tree is the version range each side stated plus the signature:</p>
+<pre><code class="language-sh">drift triage fixtures/triage/f11-node-typeerror.md --publish-threshold 0.5 --date 2026-10-13
+</code></pre>
+<pre><code>Triage of issue text 3ba2ef819767
+
+Facts (3)
+  run:signature      TypeError: path must be a string  failing  0.700  pattern  1:63
+  tool.node.version  20.11.1                           failing  0.700  pattern  1:49
+  tool.node.version  18.19.0                           passing  0.700  pattern  1:19
+
+Rules (0)
+
+Claims (0)
+
+Draft rule triage-tool-node-version-3ba2ef81: publish (confidence 0.700)
+schema: 1
+id: triage-tool-node-version-3ba2ef81
+title: 'Reported: TypeError: path must be a string after tool.node.version 18.19.0 to 20.11.1'
+applies:
+  - runtime
+difference: 'the failing side has tool.node.version 20.11.1 or newer and the passing side has 18.19.0 or older'
+symptoms:
+  - text: 'TypeError: path must be a string'
+    basis: inferred
+mechanism: 'Not established: drafted from one issue report that nobody has reproduced.'
+detect:
+  all:
+    - a: tool.node.version
+      ver: '&lt;=18.19.0'
+    - b: tool.node.version
+      ver: '&gt;=20.11.1'
+    - b: run:signature
+      has: 'TypeError: path must be a string'
+...
+status: active
+</code></pre>
+<p>The YAML has the schema of <code>rules/</code>. A draft carries <code>status: draft</code>, which is not a rule status, so it cannot load into the catalog by accident. <code>kind: report</code> marks the source as an unreproduced report, and the mechanism says so. The confidence of a draft is the weakest of the two versions and the signature.</p>
+<p>A draft is published when a threshold is set, its confidence reaches it, <code>--date</code> is given and the rule passes <code>RuleCompiler.validate</code> and its own fixtures. A published rule has status <code>active</code> when an active rule already reads the key and <code>pending-scanner</code> otherwise. Without all four it stays a draft, and <code>notes</code> says which condition failed.</p>
+<h3 id="auto-publish">Auto-Publish</h3>
+<p>With <code>--publish-threshold</code> and <code>--learned &lt;dir&gt;</code>, a published draft is added to <code>&lt;dir&gt;/learned.json</code>; below the threshold the draft is only printed, and without <code>--publish-threshold</code> every draft stays a draft. Nothing is written into <code>rules/</code>. The store is one canonical JSON file, <code>{&quot;schema&quot;:1,&quot;rules&quot;:[...]}</code>, in the schema of <code>rules/</code>. Every read runs <code>RuleCompiler</code> over each rule and refuses a rule whose id a shipped rule already uses. Rules are kept sorted by id and a rule with the same id is replaced, so publishing the same issue twice leaves the file as it was; the id carries the hash of the redacted issue text. The command reports the addition on standard error.</p>
+<pre><code class="language-sh">drift triage issue.md --publish-threshold 0.7 --date 2026-10-13 --learned .drift/learned
+drift diagnose green.json red.json --learned .drift/learned
+drift upgrade-check capsule.json --to node=20 --learned .drift/learned
+</code></pre>
+<p><code>diagnose</code>, <code>upgrade-check</code> and <code>triage</code> read the store from <code>--learned</code> and rank or match its rules with the shipped ones. A missing store adds nothing; a store that does not compile is an error. The Action's <code>publish-threshold</code> input only changes the decision shown in the comment, since the Action passes no store.</p>
+<h3 id="redaction">Redaction</h3>
+<p>Secrets are masked before anything is stored or printed, with the same redactor as <code>capture</code>. Other users' home directories become <code>.../user</code>. An <code>@login</code> mention becomes <code>@</code> and a hash, <code>u</code> followed by ten hex digits of the SHA-256 of the lowercase login; <code>--author</code> is hashed the same way. A mention inside a code block stays, since it is usually an annotation. The result keeps the SHA-256 of the redacted text and the line and column of each value, never the text.</p>
+<h3 id="fixtures-and-scores">Fixtures and Scores</h3>
+<p><a href="https://github.com/gmitch215/Drift/tree/master/fixtures/triage"><code>fixtures/triage/</code></a> holds 66 issue bodies, each with an expectation file. The first 52 are strict forms (10), forms with blank issues (8), free text (12), sparse or wrong beginner reports (10) and mixed phrasing (12); the other 14 cover false positives of the key-value path and claim wording. The bodies are invented for this repository; none is copied from an issue. The expectation lists every fact the text states, the rules and claims it should trigger and whether a draft follows. <code>TriageTest</code> scores the extractor on them and prints the result:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>facts extracted</td>
+<td>185</td>
+</tr>
+<tr>
+<td>precision, recall</td>
+<td>0.989, 0.978 (183 true positives, 2 false positives, 4 false negatives)</td>
+</tr>
+<tr>
+<td>Brier score</td>
+<td>0.0855</td>
+</tr>
+</tbody>
+</table></div>
+<p>The misses are the intended hard cases: a form field that still holds the old version (<code>b07-form-wrong-version</code>), a fix reported as <code>upgraded to node 20 ... went away</code> (<code>h05-form-then-fix</code>), <code>Go 1.22 tutorials</code> read as an environment (<code>h11-lookalike-prose</code>) and <code>on my mac</code> not read as macOS (<code>b01-form-no-response</code>). The test fails when precision drops below 0.95, recall below 0.93 or the Brier score above 0.12, and when any path's mean confidence exceeds its accuracy by more than 0.05. The scores are an upper bound for real issues.</p>
+<h3 id="limits">Limits</h3>
+<p>A version with no name next to it is not read (<code>since upgrading to 3.13.0</code>). One value is kept per key and side. A form field that holds the wrong value is read as written, with 0.950. The text of a pasted log is read only for its first error line. Claims cover nine statements. The draft rule generalizes from one report and is a starting point for a person, not a finding. <code>-</code> was not run on Windows.</p>
+<h3 id="corpus">Corpus</h3>
+<p><code>triage/corpus.yml</code> lists the trackers the extractor is measured on: 43 repositories on GitHub and GitLab, 15 large and 28 small (50 to 1,000 stars), with their issue template policy. <code>./gradlew :tools:buildCorpus</code> pages every repo newest first with <code>gh</code> or <code>glab</code> (a 100-issue page per call, resumable, at most 25,000 issues per repo, none created after the manifest cutoff), redacts titles and bodies with the log sanitizer, replaces every login with <code>u</code> and twelve hex digits of an HMAC-SHA256 keyed with the manifest salt, sorts by repo and issue number, and writes one JSON file in <code>tools/build/corpus</code> and its <code>zstd -19</code> copy. The same input gives the same bytes. The file is not in the repository: the manifest pins its SHA-256 and size under <code>asset:</code>, and <code>./gradlew :tools:downloadCorpus</code> downloads it from that URL and refuses a file that does not match.</p>
+<p><code>./gradlew :tools:evalTriage</code> runs <code>drift triage</code> over the corpus. It is not part of <code>build</code>. A form body (<code>### Label</code> sections from a repo whose template is a form) states its environment under labelled headings, and the facts read from those sections are the truth. The sections that gave a fact are cut out and the extractor runs again on the rest, so the tool-output, key-value and pattern paths are scored against what the reporter typed into the form. Only failing-side facts on keys the form labelled are scored, and <code>8.1</code> agrees with <code>8.1.0</code>. Recall is the share of form values found again elsewhere in the body. Issues are split by SHA-256 of a seed, repo and number; bases are set on the dev half and reported on the held-out half. Bodies from repos without forms have no truth and only report coverage. <code>-Pdrift.corpus=&lt;file&gt;</code> uses a local file instead of the download.</p>
+<h3 id="calibrating-on-your-own-issues">Calibrating on Your Own Issues</h3>
+<p><code>drift triage calibrate</code> repeats the dev-half recalibration on a corpus of your own. Build the corpus with <code>buildCorpus</code> from your manifest, then:</p>
+<pre><code class="language-sh">drift triage calibrate --corpus corpus.json.zst --out table.json
+drift triage issue.md --confidence table.json
+</code></pre>
+<p>Issues are split by SHA-256 of <code>--seed</code> (default <code>drift-triage-split-v1</code>), repo and number. Form bodies (<code>### Label</code> sections) give the truth as described above. On the dev half each path's base is scaled by its accuracy over its mean confidence, rounded to 10 and kept between 100 and 990; a path with fewer than <code>--min-facts</code> dev facts (default 100) keeps its default. The held-out half is scored twice, with the default bases and with the new ones, and the command prints both Brier scores and writes them into the table next to the bases. The same corpus, seed and build give the same table. <code>.json.zst</code> is read by running your <code>zstd -dc</code>; the command fails and says so when <code>zstd</code> is not on the path, and a plain <code>.json</code> needs no program. The whole file is read into memory, so keep team corpora well below the size of the public one. A body that does not start with <code>### </code> is not scored, whatever its repository.</p>
+<p>The corpus used for the numbers above holds 222,707 issues. Held-out results after recalibration and the extractor fixes, over 1,376 scored facts (<code>./gradlew :tools:evalTriage</code>, rerun on the final tree): precision 0.783 and Brier 0.1486 overall, 0.854 and 0.1301 in repos with blank issues allowed next to forms, 0.741 and 0.1595 in repos with strict forms. A fact was found in 75% of the issues of large strict-form repos, 63% of large form repos with blank issues, 60% and 40% of large markdown-template repos (strict, blank), 36% and 49% of small form repos, and 21% of small repos with no template.</p>
+<p>Small repositories are worse on every measure that has a number: a fact is found in 21% to 49% of their issues against 40% to 75% in large repositories, and 3 of the 9 scored small facts are right. The scored sample is large trackers: PHP, Node, .NET and Python account for most of it.</p>
 <h2 id="install-and-uninstall">Install and Uninstall</h2>
 <p><code>drift install</code> copies the executable you are running into a directory and records every change in a receipt. <code>drift uninstall</code> reads the receipt and reverses it. Only a native build can do this. From the JVM build, <code>drift install</code> prints <code>error: the JVM distribution cannot install itself; install the native executable</code> and exits 2.</p>
 <div class="table"><table>
@@ -1474,7 +2880,7 @@ curl -s -o /dev/null -w '%{http_code} %{content_type}\n' http://localhost:PORT/p
 scope: user
 create directory /home/you/.local
 create directory /home/you/.local/bin
-write /home/you/.local/bin/drift (mode 0755, 6742776 bytes)
+write /home/you/.local/bin/drift (mode 0755, 9866776 bytes)
 create directory /home/you/.config
 create directory /home/you/.config/drift
 append to /home/you/.profile:
@@ -1573,7 +2979,7 @@ drift uninstall
 scope: user
 create directory /opt
 create directory /opt/tools
-write /opt/tools/drift (mode 0755, 6742776 bytes)
+write /opt/tools/drift (mode 0755, 9866776 bytes)
 create directory /home/you/.config
 create directory /home/you/.config/drift
 PATH is not modified
@@ -1594,7 +3000,7 @@ uninstalled drift
 scope: user
 create directory /home/you/.local
 create directory /home/you/.local/bin
-write /home/you/.local/bin/drift (mode 0755, 6742776 bytes)
+write /home/you/.local/bin/drift (mode 0755, 9866776 bytes)
 create directory /home/you/.config
 create directory /home/you/.config/drift
 PATH is not modified
@@ -1961,7 +3367,7 @@ dry run: nothing is changed
 scope: user
 create directory /home/you/.local
 create directory /home/you/.local/bin
-write /home/you/.local/bin/drift (mode 0755, 6742776 bytes)
+write /home/you/.local/bin/drift (mode 0755, 9866776 bytes)
 create directory /home/you/.config
 create directory /home/you/.config/drift
 PATH is not modified
@@ -2071,6 +3477,150 @@ shasum: WARNING: 1 listed file could not be read
 drift-1.0.0-macos-arm64.tar.gz: OK
 </code></pre>
 <p>The commands exit 0, 1 and 0. The second ran with a <code>SHA256SUMS</code> that lists one more asset than the directory holds. On Linux use <code>sha256sum -c</code>, and in PowerShell compare <code>(Get-FileHash &lt;file&gt;).Hash</code> with the sidecar (not run here). The Studio installers and the CLI archives are unsigned. Studio's <code>.deb</code> and <code>.rpm</code> are desktop packages: jpackage's install script needs the desktop directories (<code>/usr/share/applications</code>, <code>/usr/share/mime/packages</code>, <code>/etc/xdg/menus</code>), and <code>dpkg -i</code> or <code>dnf install</code> fails in a bare container without them.</p>
+<h2 id="ci-integration">CI Integration</h2>
+<p>The repository root holds a GitHub composite action (<code>action.yml</code>) and <code>templates/drift.yml</code>, a GitLab CI/CD component. Both install the release archive for the runner, run the command or capture the job, compare a failing run with the last green baseline using <code>diagnose --against</code>, and write the ranked diagnosis to the job summary (GitHub) or the job log (GitLab). Neither needs a secret beyond the token the CI system already gives a job. Nothing has been published yet, so the <code>@v1.0.0</code> references below work once the release exists; the scripts were run locally and the GitHub and GitLab services were not.</p>
+<h3 id="github-action">GitHub Action</h3>
+<pre><code class="language-yaml">on:
+  push:
+    branches: [master]
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: gmitch215/Drift@v1.0.0
+        with:
+          command: ./gradlew test
+</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>version</code></td>
+<td><code>v1.0.0</code></td>
+<td>release tag to download; the asset is <code>drift-&lt;version&gt;-&lt;os&gt;-&lt;arch&gt;.tar.gz</code> (<code>.zip</code> on Windows) with its <code>.sha256</code>, verified before it is extracted</td>
+</tr>
+<tr>
+<td><code>mode</code></td>
+<td><code>run</code></td>
+<td><code>run</code> runs <code>command</code> and captures; <code>capture</code> only captures; <code>diagnose</code> captures and compares with the baseline; <code>triage</code> triages the issue body and comments on the issue (see <a href="#issue-triage">Issue Triage</a>)</td>
+</tr>
+<tr>
+<td><code>publish-threshold</code></td>
+<td>empty</td>
+<td><code>triage</code> only; confidence from 0 to 1 at which a draft rule is published; empty keeps every draft</td>
+</tr>
+<tr>
+<td><code>slack-webhook</code></td>
+<td>empty</td>
+<td><code>triage</code> only; a Slack incoming webhook URL, passed from a secret; empty sends nothing</td>
+</tr>
+<tr>
+<td><code>command</code></td>
+<td>empty</td>
+<td>shell command for <code>run</code>, started with <code>bash -c</code>; the step exits with its exit code</td>
+</tr>
+<tr>
+<td><code>baseline</code></td>
+<td>empty</td>
+<td>a capsule path, or an artifact name; empty looks up <code>drift-baseline-&lt;ref&gt;-&lt;label&gt;</code></td>
+</tr>
+<tr>
+<td><code>label</code></td>
+<td>job, OS and architecture</td>
+<td>names the capsule and the artifacts; matrix jobs need different labels</td>
+</tr>
+<tr>
+<td><code>directory</code></td>
+<td><code>drift-capsule</code></td>
+<td>where the capsule is written</td>
+</tr>
+<tr>
+<td><code>save-baseline</code></td>
+<td><code>true</code></td>
+<td>upload the capsule of a green push run as the baseline</td>
+</tr>
+<tr>
+<td><code>retention-days</code></td>
+<td><code>30</code></td>
+<td>days the artifacts are kept</td>
+</tr>
+</tbody>
+</table></div>
+<p>Outputs are <code>exit-code</code> and <code>capsule</code>. <code>mode: run</code> of a failing command uploads the capsule as <code>drift-capsule-&lt;label&gt;</code>, fetches the baseline, runs <code>diagnose --against</code> and still fails the step with the command's exit code. Use <code>mode: diagnose</code> in a later step with <code>if: failure()</code> when the failing step is not the action's:</p>
+<pre><code class="language-yaml">      - run: make
+      - if: ${{ failure() }}
+        uses: gmitch215/Drift@v1.0.0
+        with:
+          mode: diagnose
+</code></pre>
+<p>A green <code>run</code> on a <code>push</code> event uploads the capsule as <code>drift-baseline-&lt;branch&gt;-&lt;label&gt;</code>. A <code>capture</code> step saves a baseline the same way, so put it last in the job to save one only when the job passed. Fetching needs <code>actions: read</code> and <code>contents: read</code> for <code>GITHUB_TOKEN</code>; uploads use the runner's own credential. The summary of a failed run looks like this (from the script run locally with a green and a red <code>drift run</code> of the same command, the red one under <code>TZ=Asia/Tokyo</code>):</p>
+<pre><code>## Drift: test
+
+The command exited with 3.
+
+Compared with green:
+
+```text
+env.TZ differs most (tier difference); this ranks differences and does not confirm a cause.
+```
+</code></pre>
+<p>Before the command starts, the action captures the environment with the variables that name the run itself removed (<code>GITHUB_*</code>, <code>ACTIONS_*</code>, <code>INPUT_*</code>, <code>STATE_*</code>, <code>RUNNER_TEMP</code>, <code>RUNNER_TRACKING_ID</code>, <code>GH_TOKEN</code>). Their values change on every run, so left in they outrank every real difference. The command still sees its normal environment. The capsule is not otherwise filtered, and the usual masking applies.</p>
+<h3 id="issue-triage">Issue Triage</h3>
+<p><code>mode: triage</code> runs <code>drift triage</code> on the body of an issue and posts one comment with the extracted facts, the matched rules, the claim checks and the draft rule decision. It runs only on <code>issues</code> events, needs <code>issues: write</code>, and does not capture the job, so it writes no capsule and no baseline. Nothing has been run on GitHub yet.</p>
+<pre><code class="language-yaml">on:
+  issues:
+    types: [opened, edited]
+permissions:
+  contents: read
+  issues: write
+jobs:
+  triage:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: gmitch215/Drift@v1.0.0
+        with:
+          mode: triage
+          publish-threshold: '0.9'
+          slack-webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+</code></pre>
+<p>The comment starts with the hidden marker <code>&lt;!-- drift-triage --&gt;</code>. An <code>edited</code> run replaces the body of that comment instead of adding another one. Only comments from a Bot account are matched, so a reader who pastes the marker into a comment does not get that comment edited. The report is indented as a code block, so Markdown in the issue text is shown and not rendered.</p>
+<p>The issue body reaches the script through an environment variable and is then piped to <code>drift triage -</code>. It never becomes part of a shell command. Without <code>publish-threshold</code> every draft rule stays a draft. Slack receives one line with the counts and the draft decision, and only when the comment is created; an edit sends nothing. Leave <code>slack-webhook</code> empty to send nothing. Pass the URL from a secret so GitHub masks it in the log.</p>
+<h3 id="baseline-trust">Baseline Trust</h3>
+<p>An artifact name is not a credential, so the lookup does not trust it alone. The action lists successful runs of the <code>push</code> event on one branch (the current branch on a push, the base branch on a pull request, then the default branch), keeps runs whose head repository is this repository and whose <code>head_branch</code> is that branch, and takes the artifact from one of those runs only if its own <code>workflow_run</code> agrees. A pull request run never looks up its head branch, and it never uploads a baseline: only <code>push</code> runs do, and never when <code>github.event.pull_request.head.repo.full_name</code> differs from the repository. A fork can therefore not plant a <code>drift-baseline-master-...</code> artifact that a later run would pick up. A <code>baseline</code> input that is a path on disk is used as given.</p>
+<p>The GitLab component asks for the artifacts of the latest successful pipeline of one branch of this project, using the <code>jobs/artifacts/:ref_name/download</code> endpoint. Merge request pipelines have the ref <code>refs/merge-requests/:iid/head</code>, so their artifacts are never returned for a branch name, and a fork runs its pipelines in the fork's own project. The component asks for the target branch in a merge request pipeline (never the source branch), then the default branch; outside a merge request it asks for the current branch, then the default branch. The job token travels in the <code>JOB-TOKEN</code> header, not in the URL.</p>
+<h3 id="artifact-access">Artifact Access</h3>
+<p>A capsule is an artifact, and anyone who can download it can read it. On GitHub that is anyone with read access to the repository. The GitLab component sets <code>artifacts: access: developer</code>, so only Developer, Maintainer and Owner roles can download it (<a href="https://docs.gitlab.com/ee/ci/yaml/index.html#artifactsaccess">https://docs.gitlab.com/ee/ci/yaml/index.html#artifactsaccess</a>).</p>
+<p>Before a capsule is written, <code>drift capture</code> redacts environment values whose names contain <code>KEY</code>, <code>TOKEN</code>, <code>SECRET</code>, <code>PASSWORD</code>, <code>PASSWD</code>, <code>CREDENTIAL</code>, <code>AUTH</code>, <code>COOKIE</code> or <code>JWT</code>, and values in known token formats (GitHub, GitLab, npm, PyPI and JWT tokens, AWS keys, Slack tokens, private keys, bearer tokens and credentials in URLs). This is pattern matching, not a guarantee. Keep secrets out of the environment of a captured job, and do not pass <code>--keep-identifiers</code> in CI.</p>
+<h3 id="gitlab-component">GitLab Component</h3>
+<p><code>templates/drift.yml</code> follows the component layout in the GitLab documentation (a <code>templates/</code> directory, a <code>spec:inputs</code> header and the jobs after <code>---</code>; <a href="https://docs.gitlab.com/ci/components/">https://docs.gitlab.com/ci/components/</a>). The artifact lookup is the job artifacts API (<a href="https://docs.gitlab.com/api/job_artifacts/">https://docs.gitlab.com/api/job_artifacts/</a>).</p>
+<pre><code class="language-yaml">include:
+  - component: $CI_SERVER_FQDN/gmitch215/drift/drift@1.0.0
+    inputs:
+      command: ./gradlew test
+</code></pre>
+<p>The inputs are <code>command</code> (required), <code>stage</code> (<code>test</code>), <code>image</code> (<code>ubuntu:24.04</code>), <code>version</code> (<code>v1.0.0</code>), <code>job_name</code> (<code>drift</code>) and <code>expire_in</code> (<code>30 days</code>). The image needs <code>curl</code>, <code>tar</code>, <code>sha256sum</code> and <code>unzip</code> (the script installs <code>curl</code> and <code>unzip</code> with <code>apt-get</code> when they are missing) and glibc, since the Linux release is not built for musl. The job installs the <code>linux-x64</code> or <code>linux-arm64</code> archive, verifies its checksum, runs the command through <code>drift run --out drift-capsule</code> and keeps <code>drift-capsule/</code> as an artifact in every case. Only a successful pipeline provides a baseline, so a green job in a pipeline that failed elsewhere is not one. On a failure the job downloads the artifact of the job with the same name, prints the diagnosis to the log, writes it to <code>drift-capsule/diagnosis.txt</code> and exits with the command's code. The job log of the red run in the local test (one run of the template's script in a Linux container against a stub of the artifact API) reads:</p>
+<pre><code>Error: unexpected timezone Asia/Tokyo
+drift: exit 3 after 0 ms; capsule in drift-capsule
+drift: baseline is the latest green drift on master
+env.TZ differs most (tier difference); this this ranks differences and does not confirm a cause.
+</code></pre>
+<p>The component path above assumes the repository is mirrored to gitlab.com as <code>gmitch215/drift</code>; the mirror does not exist yet, and the component has not run on gitlab.com.</p>
+<h3 id="checking-the-scripts">Checking the Scripts</h3>
+<pre><code class="language-sh">.github/action/test-drift.sh drift
+.github/action/test-gitlab.sh drift
+</code></pre>
+<p>The first installs a locally staged release archive, verifies its digest, and runs every mode against a stub <code>gh</code>, including a fork-built artifact that must be ignored. The second runs the template's script lines, extracted from the YAML, against a stub of the artifact API. The GitLab test runs on Linux only. Both run in the <code>build.yml</code> test job.</p>
 <h2 id="scripting-patterns">Scripting Patterns</h2>
 <p><strong>Gate a step on <code>verify</code>.</strong> <code>verify</code> exits 1 when any check fails and prints the report either way, so a script can stop on the exit code and read the JSON for the reason. <code>solve</code> and <code>ingest</code> encode their verdict in the exit code only with <code>--exit-status</code>, and <code>diagnose</code> never does (it prints a ranking, not a verdict); otherwise read their output.</p>
 <pre><code class="language-sh">set -eu
@@ -2090,12 +3640,12 @@ verify failed: manifest
 ci.provisioner.build-date
 ci.provisioner.version
 </code></pre>
-<p><strong>Determinism and hashing.</strong> These outputs are functions of their inputs, so a hash identifies them. Over the same two capsules <code>diagnose</code> printed the same bytes on every run here (<code>717191f2...de52</code>), <code>reproduce</code> wrote identical files, <code>pack</code> identical archives and <code>atlas build</code> an identical dataset.</p>
+<p><strong>Determinism and hashing.</strong> These outputs are functions of their inputs, so a hash identifies them. Over the same two capsules <code>diagnose</code> printed the same bytes on every run here (<code>e47bd4ac...cc08</code>), <code>reproduce</code> wrote identical files, <code>pack</code> identical archives and <code>atlas build</code> an identical dataset.</p>
 <pre><code class="language-sh">drift diagnose $G $R | shasum -a 256
 drift diagnose $G $R | shasum -a 256
 </code></pre>
-<pre><code>717191f28a8d593ecf8a5fcedee04b4471187cddfe29718dbd2e38e6676de52e  -
-717191f28a8d593ecf8a5fcedee04b4471187cddfe29718dbd2e38e6676de52e  -
+<pre><code>e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08  -
+e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08  -
 </code></pre>
 <p>The test suite pins these outputs for fixtures on the JVM, macOS Native and Wasm targets (see <a href="technical-report.html">TECHNICAL_REPORT.md</a>, &quot;Reproducing the Numbers&quot;). A capsule from <code>capture</code> is the exception: it describes the machine, so two machines give two hashes.</p>
 <p><strong>CI.</strong> Capture in a failing job and in a passing job, keep both files as artifacts, then diagnose anywhere:</p>
@@ -2114,6 +3664,14 @@ drift diagnose $G $R | shasum -a 256
 <tr>
 <td>0</td>
 <td>the command ran, including <code>diagnose</code> with no cause found, <code>solve</code> or <code>ingest</code> with any verdict (<code>STUCK</code> included) unless <code>--exit-status</code> is given, <code>drift</code> or <code>drift case</code> alone (they print help), <code>install</code> and <code>uninstall</code> (also with <code>--dry-run</code>), <code>uninstall</code> with no receipt, and <code>serve</code> after Ctrl+C or SIGTERM on a native build</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>contract create</code> found no assertion set that separates a red capsule from the greens</td>
+</tr>
+<tr>
+<td>the command's own</td>
+<td><code>run</code>: the exit code of the command it ran (0 included); a command the shell cannot find gives 127</td>
 </tr>
 <tr>
 <td>10</td>
@@ -2141,11 +3699,27 @@ drift diagnose $G $R | shasum -a 256
 </tr>
 <tr>
 <td>1</td>
+<td><code>contract verify</code> when any assertion breaks (the report is still printed on standard output)</td>
+</tr>
+<tr>
+<td>1</td>
 <td><code>verify</code> when any check fails (the report is still printed on standard output)</td>
 </tr>
 <tr>
 <td>1</td>
+<td><code>run</code> with <code>--tail-lines</code> below 1, an existing capsule directory without <code>--force</code> or a directory it cannot write; <code>import</code> with a log that holds no runner environment, an unreadable file or an invalid summary; <code>bisect plan</code> over capsules with no static difference; <code>bisect apply</code> for a step that is not pending, with neither or both of <code>--green</code> and <code>--red</code>, or on a finished plan</td>
+</tr>
+<tr>
+<td>1</td>
 <td>a refusal: <code>ingest</code> with any bad result, <code>pack</code> on an unsolved case, <code>diagnose --case</code> or <code>solve --case</code> into an existing case, a bad <code>--budget</code> or <code>--fail-when</code>, <code>install</code> into a directory that is not writable or while another install exists</td>
+</tr>
+<tr>
+<td>1</td>
+<td><code>upgrade-check</code> with no target, a target that is not <code>name=version</code>, an unknown name, a value that is not a version for an alias, two names for one attribute with different values, or an unreadable capsule or <code>--to-file</code></td>
+</tr>
+<tr>
+<td>1</td>
+<td><code>triage</code> with an unreadable file, a <code>--publish-threshold</code> outside 0 to 1, a <code>--date</code> that is not <code>yyyy-mm-dd</code>, an unreadable or invalid <code>--confidence</code> table or <code>--learned</code> store, <code>--corpus</code> or <code>--out</code> without <code>calibrate</code>, or <code>calibrate</code> without both or with an unreadable corpus</td>
 </tr>
 <tr>
 <td>1</td>
@@ -2184,6 +3758,18 @@ drift diagnose $G $R | shasum -a 256
 <td>no such file</td>
 </tr>
 <tr>
+<td><code>case.driftcase is a .driftcase archive; select a capsule with case.driftcase#passing or case.driftcase#failing (drift verify, drift report and drift open read the whole archive)</code></td>
+<td>a capsule command was given an archive without <code>#passing</code> or <code>#failing</code></td>
+</tr>
+<tr>
+<td><code>case.driftcase has no environments/failing.json; use drift verify, drift report or drift open</code></td>
+<td>the archive does not hold the selected capsule</td>
+</tr>
+<tr>
+<td><code>green.json is not a .driftcase archive; drop #passing</code></td>
+<td>a selector was given for a plain capsule file</td>
+</tr>
+<tr>
 <td><code>Error: missing argument &lt;red&gt;</code></td>
 <td><code>diagnose</code> and <code>solve</code> take two capsules, green first</td>
 </tr>
@@ -2202,6 +3788,34 @@ drift diagnose $G $R | shasum -a 256
 <tr>
 <td><code>cannot read case nonexistent: missing case file: manifest.json</code></td>
 <td>the path is not a case directory</td>
+</tr>
+<tr>
+<td><code>cannot start command: nope</code></td>
+<td><code>run</code> could not start the command (the JVM build; native builds report exit code 127 instead)</td>
+</tr>
+<tr>
+<td><code>red-run already holds a capsule directory; pass --force to replace it</code></td>
+<td><code>run</code> and <code>import</code> never overwrite a capsule directory by default</td>
+</tr>
+<tr>
+<td><code>cannot import job.log: no runner environment found (expected an Operating System or Runner Image group)</code></td>
+<td>the file is not a log of that <code>--format</code>, or it was cut before the runner header</td>
+</tr>
+<tr>
+<td><code>--against takes at most one capsule</code></td>
+<td><code>diagnose --against</code> takes the baseline and at most one current capsule</td>
+</tr>
+<tr>
+<td><code>the pending step is 1, not 3</code></td>
+<td><code>bisect apply</code> takes the step the plan printed last</td>
+</tr>
+<tr>
+<td><code>step 2 already holds red</code></td>
+<td>that step was recorded with the other outcome; the plan is not changed</td>
+</tr>
+<tr>
+<td><code>the bisection is finished</code></td>
+<td>the plan already holds a minimal set</td>
 </tr>
 <tr>
 <td><code>--env NOPE does not name an env.* attribute of the capsule</code></td>
@@ -2314,10 +3928,11 @@ drift diagnose $G $R | shasum -a 256
 </tbody>
 </table></div>
 <p>When a <code>solve</code> trial cannot start, the certificate records an infrastructure problem (a failed <code>docker build</code>, a <code>docker run</code> error, a timeout) and the loop retries once before it ends <code>STUCK</code> with reason <code>executor</code>. Check <code>docker info</code> first, and run <code>./repro/run.sh</code> from a <code>reproduce</code> of the same capsule to see the failure by hand.</p>
-<h2 id="limits">Limits</h2>
+<h2 id="limits-1">Limits</h2>
 <ul>
 <li>A container mirrors a part of a machine. Never mirrored: the kernel (<code>kernel.*</code>), the CPU (<code>cpu.*</code>, <code>hw.*</code>), the CI provider's image and provisioner (<code>ci.*</code>), dependencies installed by the test command (<code>deps.*</code>) and the properties of the capturing binary. <code>reproduce</code> lists every unmirrored attribute and its reason, and the certificate carries the list. A <code>solve</code> verdict is about containers built from the capsules, not about the original host.</li>
 <li>The ranking uses hand-set weights (<code>hand-set-1</code>, <code>weights.calibrated: false</code> in <code>diagnose</code> output). A score orders candidates; it is not a probability. On the dev benchmark the <code>plausible</code> tier (a probe differs in the candidate's dimension) was unreliable: 10 of its 19 candidates were wrong, and probes helped no scenario. The numbers and their intervals are in <a href="technical-report.html">TECHNICAL_REPORT.md</a> under &quot;Evaluation and Limits&quot;.</li>
+<li><code>run</code> merges standard error into standard output and keeps only the tail of the output. <code>import</code> reads what a log prints, which is less than a capture: no kernel, CPU or probe data. <code>bisect</code> does not run tests and treats the empty and full sets as known.</li>
 <li><code>ingest</code> can narrow a case or rule a hypothesis out. It never confirms a cause.</li>
 <li><code>solve</code> runs on local Docker only. It does not use a remote host, a CI service or a cluster, and a failure that needs a different kernel, CPU model or CI-owned image cannot be varied by it (the run ends <code>STUCK</code> with reason <code>uncontrollable</code>).</li>
 <li><code>solve</code> assumes a single cause: the first supported experiment ends the loop.</li>
@@ -2328,10 +3943,14 @@ drift diagnose $G $R | shasum -a 256
 <li><code>serve</code> is a development server for a local Studio build. It binds to loopback, has no range requests, compression or directory listing, reads each file whole, and has no TLS on Windows. The embedded-asset option (a CLI that carries Studio inside it) is not built.</li>
 <li>No release has been published. The asset names, the <code>brew</code> and <code>choco</code> commands and the install scripts' default download URL are what the workflows and templates say, and they have not been exercised against GitHub.</li>
 </ul></div>
-		</main>
-		<footer>
-			<a href="https://github.com/gmitch215/Drift">github.com/gmitch215/Drift</a> &middot;
-			<a href="https://github.com/gmitch215/Drift/blob/master/LICENSE">MIT License</a>
-		</footer>
-	</body>
+            <div class="pager">
+<a class="card" href="index.html" rel="prev"><span>Prev</span><strong>Drift</strong></a>
+<a class="card next" href="technical-report.html" rel="next"><span>Next</span><strong>Technical Report</strong></a>
+</div>
+        </main>
+        <footer>
+            <a href="https://github.com/gmitch215/Drift">github.com/gmitch215/Drift</a> &middot;
+            <a href="https://github.com/gmitch215/Drift/blob/master/LICENSE">MIT License</a>
+        </footer>
+    </body>
 </html>

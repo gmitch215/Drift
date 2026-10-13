@@ -32,6 +32,7 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <a href="../../">Drift</a>
 <a href="../">Interactive Atlas</a>
 <a href="../probe/">All probes</a>
+<a href="../versions.html">Version changes</a>
 <a href="../data/dataset.json">dataset.json</a>
 <a href="../data/classification.json">classification.json</a>
 </nav>
@@ -73,23 +74,26 @@ option(&quot;ic-dotted-i&quot;, &quot;^i$&quot;, RegexOption.IGNORE_CASE, &quot;
 option(&quot;ic-dotless-i&quot;, &quot;^ı$&quot;, RegexOption.IGNORE_CASE, &quot;I&quot;)
 option(&quot;ic-deseret&quot;, &quot;^𐐨$&quot;, RegexOption.IGNORE_CASE, &quot;𐐀&quot;)</code></pre>
 <h2>Results on Kotlin 2.4.20</h2>
-<p>4 different results; 13 of 27 lines differ.</p>
+<p>6 different results; 17 of 27 lines differ.</p>
 <table>
 <caption>Result per column, Kotlin 2.4.20</caption>
 <tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
-<tr class="differs"><th scope="row">android</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
-<tr><th scope="row">ios</th><td>B</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
-<tr><th scope="row">linux</th><td>B</td><td>ok</td><td><a href="../data/transcripts/linux.txt">file</a></td></tr>
-<tr><th scope="row">linux-arm64</th><td>B</td><td>ok</td><td><a href="../data/transcripts/linux-arm64.txt">file</a></td></tr>
-<tr><th scope="row">macos</th><td>B</td><td>ok</td><td><a href="../data/transcripts/macos.txt">file</a></td></tr>
-<tr><th scope="row">wasm</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm.txt">file</a></td></tr>
-<tr><th scope="row">wasm-chromium</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
-<tr><th scope="row">wasm-firefox</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
-<tr><th scope="row">wasm-webkit</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm-21</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-21.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm-25</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-25.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm-17</th><td>D (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">android</th><td>A (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">cloudflare-jvm</th><td>B (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/cloudflare-jvm.txt">file</a></td></tr>
+<tr><th scope="row">cloudflare-wasm</th><td>C</td><td>ok</td><td><a href="../data/transcripts/cloudflare-wasm.txt">file</a></td></tr>
+<tr><th scope="row">ios</th><td>C</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
+<tr><th scope="row">linux</th><td>C</td><td>ok</td><td><a href="../data/transcripts/linux.txt">file</a></td></tr>
+<tr><th scope="row">linux-arm64</th><td>C</td><td>ok</td><td><a href="../data/transcripts/linux-arm64.txt">file</a></td></tr>
+<tr><th scope="row">macos</th><td>C</td><td>ok</td><td><a href="../data/transcripts/macos.txt">file</a></td></tr>
+<tr><th scope="row">wasm</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm.txt">file</a></td></tr>
+<tr><th scope="row">wasm-chromium</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
+<tr><th scope="row">wasm-firefox</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
+<tr><th scope="row">wasm-webkit</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">js-ir</th><td>D (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/js-ir.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm</th><td>E (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-21</th><td>E (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm-21.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-25</th><td>E (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm-25.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-17</th><td>F (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
 </table>
 <h3>Group A: android</h3>
 <pre><mark>digit-arabic = ok:true</mark>
@@ -104,50 +108,22 @@ space-vt = ok:true
 <mark>boundary-accent = ok:false</mark>
 dot-lf = ok:false
 dot-cr = ok:false
-dot-nel = ok:false
+<mark>dot-nel = ok:false</mark>
 dot-line-separator = ok:false
 dot-emoji = ok:true
 two-dots-emoji = ok:false
-letter-deseret = ok:true
-upper-deseret = ok:true
+<mark>letter-deseret = ok:true</mark>
+<mark>upper-deseret = ok:true</mark>
 ic-ascii = ok:true
 ic-accent = ok:true
 <mark>ic-sharp-s = ok:true</mark>
-ic-kelvin = ok:true
+<mark>ic-kelvin = ok:true</mark>
 ic-dz = ok:true
 <mark>ic-final-sigma = ok:true</mark>
 <mark>ic-dotted-i = ok:false</mark>
 <mark>ic-dotless-i = ok:false</mark>
 <mark>ic-deseret = ok:true</mark></pre>
-<h3>Group B: ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
-<pre><mark>digit-arabic = ok:false</mark>
-<mark>digit-fullwidth = ok:false</mark>
-<mark>word-accent = ok:false</mark>
-<mark>word-greek = ok:false</mark>
-word-underscore = ok:true
-<mark>space-nbsp = ok:false</mark>
-<mark>space-em = ok:false</mark>
-<mark>space-nel = ok:false</mark>
-space-vt = ok:true
-<mark>boundary-accent = ok:false</mark>
-dot-lf = ok:false
-dot-cr = ok:false
-dot-nel = ok:false
-dot-line-separator = ok:false
-dot-emoji = ok:true
-two-dots-emoji = ok:false
-letter-deseret = ok:true
-upper-deseret = ok:true
-ic-ascii = ok:true
-ic-accent = ok:true
-<mark>ic-sharp-s = ok:false</mark>
-ic-kelvin = ok:true
-ic-dz = ok:true
-<mark>ic-final-sigma = ok:false</mark>
-<mark>ic-dotted-i = ok:true</mark>
-<mark>ic-dotless-i = ok:false</mark>
-<mark>ic-deseret = ok:false</mark></pre>
-<h3>Group C: jvm, jvm-21, jvm-25</h3>
+<h3>Group B: cloudflare-jvm</h3>
 <pre><mark>digit-arabic = ok:false</mark>
 <mark>digit-fullwidth = ok:false</mark>
 <mark>word-accent = ok:false</mark>
@@ -160,22 +136,22 @@ space-vt = ok:true
 <mark>boundary-accent = ok:true</mark>
 dot-lf = ok:false
 dot-cr = ok:false
-dot-nel = ok:false
+<mark>dot-nel = ok:false</mark>
 dot-line-separator = ok:false
 dot-emoji = ok:true
 two-dots-emoji = ok:false
-letter-deseret = ok:true
-upper-deseret = ok:true
+<mark>letter-deseret = err:PatternSyntaxException</mark>
+<mark>upper-deseret = err:PatternSyntaxException</mark>
 ic-ascii = ok:true
 ic-accent = ok:true
 <mark>ic-sharp-s = ok:false</mark>
-ic-kelvin = ok:true
+<mark>ic-kelvin = ok:false</mark>
 ic-dz = ok:true
 <mark>ic-final-sigma = ok:true</mark>
-<mark>ic-dotted-i = ok:true</mark>
-<mark>ic-dotless-i = ok:true</mark>
-<mark>ic-deseret = ok:true</mark></pre>
-<h3>Group D: jvm-17</h3>
+<mark>ic-dotted-i = ok:false</mark>
+<mark>ic-dotless-i = ok:false</mark>
+<mark>ic-deseret = ok:false</mark></pre>
+<h3>Group C: cloudflare-wasm, ios, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
 <pre><mark>digit-arabic = ok:false</mark>
 <mark>digit-fullwidth = ok:false</mark>
 <mark>word-accent = ok:false</mark>
@@ -188,16 +164,100 @@ space-vt = ok:true
 <mark>boundary-accent = ok:false</mark>
 dot-lf = ok:false
 dot-cr = ok:false
-dot-nel = ok:false
+<mark>dot-nel = ok:false</mark>
 dot-line-separator = ok:false
 dot-emoji = ok:true
 two-dots-emoji = ok:false
-letter-deseret = ok:true
-upper-deseret = ok:true
+<mark>letter-deseret = ok:true</mark>
+<mark>upper-deseret = ok:true</mark>
 ic-ascii = ok:true
 ic-accent = ok:true
 <mark>ic-sharp-s = ok:false</mark>
-ic-kelvin = ok:true
+<mark>ic-kelvin = ok:true</mark>
+ic-dz = ok:true
+<mark>ic-final-sigma = ok:false</mark>
+<mark>ic-dotted-i = ok:true</mark>
+<mark>ic-dotless-i = ok:false</mark>
+<mark>ic-deseret = ok:false</mark></pre>
+<h3>Group D: js-ir</h3>
+<pre><mark>digit-arabic = ok:false</mark>
+<mark>digit-fullwidth = ok:false</mark>
+<mark>word-accent = ok:false</mark>
+<mark>word-greek = ok:false</mark>
+word-underscore = ok:true
+<mark>space-nbsp = ok:true</mark>
+<mark>space-em = ok:true</mark>
+<mark>space-nel = ok:false</mark>
+space-vt = ok:true
+<mark>boundary-accent = ok:true</mark>
+dot-lf = ok:false
+dot-cr = ok:false
+<mark>dot-nel = ok:true</mark>
+dot-line-separator = ok:false
+dot-emoji = ok:true
+two-dots-emoji = ok:false
+<mark>letter-deseret = ok:true</mark>
+<mark>upper-deseret = ok:true</mark>
+ic-ascii = ok:true
+ic-accent = ok:true
+<mark>ic-sharp-s = ok:false</mark>
+<mark>ic-kelvin = ok:true</mark>
+ic-dz = ok:true
+<mark>ic-final-sigma = ok:true</mark>
+<mark>ic-dotted-i = ok:false</mark>
+<mark>ic-dotless-i = ok:false</mark>
+<mark>ic-deseret = ok:true</mark></pre>
+<h3>Group E: jvm, jvm-21, jvm-25</h3>
+<pre><mark>digit-arabic = ok:false</mark>
+<mark>digit-fullwidth = ok:false</mark>
+<mark>word-accent = ok:false</mark>
+<mark>word-greek = ok:false</mark>
+word-underscore = ok:true
+<mark>space-nbsp = ok:false</mark>
+<mark>space-em = ok:false</mark>
+<mark>space-nel = ok:false</mark>
+space-vt = ok:true
+<mark>boundary-accent = ok:true</mark>
+dot-lf = ok:false
+dot-cr = ok:false
+<mark>dot-nel = ok:false</mark>
+dot-line-separator = ok:false
+dot-emoji = ok:true
+two-dots-emoji = ok:false
+<mark>letter-deseret = ok:true</mark>
+<mark>upper-deseret = ok:true</mark>
+ic-ascii = ok:true
+ic-accent = ok:true
+<mark>ic-sharp-s = ok:false</mark>
+<mark>ic-kelvin = ok:true</mark>
+ic-dz = ok:true
+<mark>ic-final-sigma = ok:true</mark>
+<mark>ic-dotted-i = ok:true</mark>
+<mark>ic-dotless-i = ok:true</mark>
+<mark>ic-deseret = ok:true</mark></pre>
+<h3>Group F: jvm-17</h3>
+<pre><mark>digit-arabic = ok:false</mark>
+<mark>digit-fullwidth = ok:false</mark>
+<mark>word-accent = ok:false</mark>
+<mark>word-greek = ok:false</mark>
+word-underscore = ok:true
+<mark>space-nbsp = ok:false</mark>
+<mark>space-em = ok:false</mark>
+<mark>space-nel = ok:false</mark>
+space-vt = ok:true
+<mark>boundary-accent = ok:false</mark>
+dot-lf = ok:false
+dot-cr = ok:false
+<mark>dot-nel = ok:false</mark>
+dot-line-separator = ok:false
+dot-emoji = ok:true
+two-dots-emoji = ok:false
+<mark>letter-deseret = ok:true</mark>
+<mark>upper-deseret = ok:true</mark>
+ic-ascii = ok:true
+ic-accent = ok:true
+<mark>ic-sharp-s = ok:false</mark>
+<mark>ic-kelvin = ok:true</mark>
 ic-dz = ok:true
 <mark>ic-final-sigma = ok:true</mark>
 <mark>ic-dotted-i = ok:true</mark>
@@ -308,7 +368,7 @@ ic-dz = ok:true
 <blockquote><p>Note that the pattern syntax and the option set has differences on each platform.</p>
 <footer><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/">https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/</a></footer></blockquote>
 <h3>Notes</h3>
-<p>Three groups of lines. Android: Unicode classes always on (documented). jvm-17 versus jvm-21 and jvm-25 on boundary-accent: JDK 19 note on \b (consistent with the note; Native, Wasm and Android match JDK 17). Native and Wasm versus JVM on ic-final-sigma, ic-dotless-i, ic-deseret: unexplained. KT-51859 says UNICODE_CASE is always on in Native, which does not predict these three lines.</p>
+<p>Three groups of lines. Android: Unicode classes always on (documented). jvm-17 versus jvm-21 and jvm-25 on boundary-accent: JDK 19 note on \b (consistent with the note; Native, Wasm and Android match JDK 17). Native and Wasm versus JVM on ic-final-sigma, ic-dotless-i, ic-deseret: unexplained. KT-51859 says UNICODE_CASE is always on in Native, which does not predict these three lines. cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on letter-deseret, upper-deseret, ic-kelvin.</p>
 <p class="muted">Read on 2026-10-07.</p>
 <h2>Issues</h2>
 <table>
@@ -409,6 +469,61 @@ Existing tracker issues (read through the YouTrack REST API on 2026-10-07; nothi
 What is known: Three groups of lines. Android: Unicode classes always on (documented). jvm-17 versus jvm-21 and jvm-25 on boundary-accent: JDK 19 note on \b (consistent with the note; Native, Wasm and Android match JDK 17). Native and Wasm versus JVM on ic-final-sigma, ic-dotless-i, ic-deseret: unexplained. KT-51859 says UNICODE_CASE is always on in Native, which does not predict these three lines.
 
 What is NOT known: the intended behavior where no page read states one; whether the divergent column is a defect or by design; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device of the same target differs (one device per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies; the ladder agent re-compiled the displayed text and matched 37 of 38 probes on JVM and macOS Native).
+
+## Cloudflare columns
+
+Recorded 2026-10-12 on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local, macOS arm64), one run per cell. cloudflare-wasm is the Kotlin/Wasm probe module with a hand-written Worker entry; cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 plugin (TeaVM), so its Java classes are not a JDK. These rows are not part of the results above.
+
+Rows for the differing lines of this draft:
+
+- `digit-arabic`
+  - `ok:true`: android
+  - `ok:false`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `digit-fullwidth`
+  - `ok:true`: android
+  - `ok:false`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `word-accent`
+  - `ok:true`: android
+  - `ok:false`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `word-greek`
+  - `ok:true`: android
+  - `ok:false`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `space-nbsp`
+  - `ok:true`: android
+  - `ok:false`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `space-em`
+  - `ok:true`: android
+  - `ok:false`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `space-nel`
+  - `ok:true`: android
+  - `ok:false`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `boundary-accent`
+  - `ok:false`: android+cloudflare-wasm+ios+jvm-17+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `ok:true`: cloudflare-jvm+jvm-21+jvm-25+jvm
+- `letter-deseret`
+  - `ok:true`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:PatternSyntaxException`: cloudflare-jvm
+- `upper-deseret`
+  - `ok:true`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:PatternSyntaxException`: cloudflare-jvm
+- `ic-sharp-s`
+  - `ok:true`: android
+  - `ok:false`: cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `ic-kelvin`
+  - `ok:true`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `ok:false`: cloudflare-jvm
+- `ic-final-sigma`
+  - `ok:true`: android+cloudflare-jvm+jvm-17+jvm-21+jvm-25+jvm
+  - `ok:false`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `ic-dotted-i`
+  - `ok:false`: android+cloudflare-jvm
+  - `ok:true`: cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `ic-dotless-i`
+  - `ok:false`: android+cloudflare-jvm+cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `ok:true`: jvm-17+jvm-21+jvm-25+jvm
+- `ic-deseret`
+  - `ok:true`: android+jvm-17+jvm-21+jvm-25+jvm
+  - `ok:false`: cloudflare-jvm+cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
 </pre>
 </div>
 <h2>Kotlin versions measured</h2>
@@ -416,7 +531,10 @@ What is NOT known: the intended behavior where no page read states one; whether 
 <h2>How it was measured</h2>
 <ul>
 <li><strong>android</strong>: The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</li>
+<li><strong>cloudflare-jvm</strong>: The probes compiled as Kotlin/JVM 2.4.20 classes and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM), run on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). The Java classes are TeaVM's class library, not a JDK. Four probes are recorded as unavailable: two are skipped because integer division traps in the compiled module and a trap aborts the request, one fails with a NullPointerException, and one is refused at build time because java.util.regex.Matcher.useAnchoringBounds is missing; tools/cloudflare has the details. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bits of 0/0-raw and sqrt-neg-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
+<li><strong>cloudflare-wasm</strong>: The Kotlin/Wasm (wasmJs) probe module on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). A 14-line JavaScript entry replaces Kotlin's loader, which does not run on workerd. Built and recorded by tools/cloudflare and drift probe cloudflare. Byte-identical to the wasm column apart from the target line. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bit of 0/0-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
 <li><strong>ios</strong>: The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</li>
+<li><strong>js-ir</strong>: Kotlin/JS IR on Node 26.8.2, macOS, Apple Silicon (arm64). The standalone Kotlin 2.4.20 compiler builds each probe from the displayed source through tools/ladder; Node runs it. Same transcript as fixtures/atlas-ladder/2.4.20/js-ir.txt.</li>
 <li><strong>jvm</strong>: The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
 <li><strong>jvm-17</strong>: The CLI JVM classes (jvmTarget 17) on Temurin 17.0.20.1, x86-64 Linux container, recorded with --target jvm-17.</li>
 <li><strong>jvm-21</strong>: The same classes on Temurin 21.0.12.1, x86-64 Linux container. Differs from the jvm column in hardware only.</li>

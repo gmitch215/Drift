@@ -32,6 +32,7 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <a href="../../">Drift</a>
 <a href="../">Interactive Atlas</a>
 <a href="../probe/">All probes</a>
+<a href="../versions.html">Version changes</a>
 <a href="../data/dataset.json">dataset.json</a>
 <a href="../data/classification.json">classification.json</a>
 </nav>
@@ -39,7 +40,7 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <main id="main">
 <h1>kotlin.numbers.type-checks</h1>
 <p>Can a boxed number be mistaken for another numeric type?</p>
-<p><strong>unclassified</strong> (basis: inferred); identical on every column</p>
+<p><strong>unclassified</strong> (basis: inferred); differs between targets</p>
 <h2>Source</h2>
 <pre><code>val d: Any = 1.0
 val i: Any = 1
@@ -63,11 +64,12 @@ line(&quot;1.0-hash&quot;, d.hashCode())
 line(&quot;1-hash&quot;, i.hashCode())
 line(&quot;1L-hash&quot;, l.hashCode())</code></pre>
 <h2>Results on Kotlin 2.4.20</h2>
-<p>Identical on every column.</p>
+<p>3 different results; 10 of 17 lines differ.</p>
 <table>
 <caption>Result per column, Kotlin 2.4.20</caption>
 <tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
 <tr><th scope="row">android</th><td>A</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
+<tr><th scope="row">cloudflare-wasm</th><td>A</td><td>ok</td><td><a href="../data/transcripts/cloudflare-wasm.txt">file</a></td></tr>
 <tr><th scope="row">ios</th><td>A</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
 <tr><th scope="row">jvm</th><td>A</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
 <tr><th scope="row">jvm-17</th><td>A</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
@@ -80,23 +82,61 @@ line(&quot;1L-hash&quot;, l.hashCode())</code></pre>
 <tr><th scope="row">wasm-chromium</th><td>A</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
 <tr><th scope="row">wasm-firefox</th><td>A</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
 <tr><th scope="row">wasm-webkit</th><td>A</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">cloudflare-jvm</th><td>B (differs from group A)</td><td>ok</td><td><a href="../data/transcripts/cloudflare-jvm.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">js-ir</th><td>C (differs from group A)</td><td>ok</td><td><a href="../data/transcripts/js-ir.txt">file</a></td></tr>
 </table>
-<h3>Group A: android, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
-<pre>1.0-is-Int = false
+<h3>Group A: android, cloudflare-wasm, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
+<pre><mark>1.0-is-Int = false</mark>
 1.0-is-Double = true
-1-is-Double = false
+<mark>1-is-Double = false</mark>
 1-is-Long = false
-1.5f-is-Double = false
-1.0-class = Double
-1-class = Int
+<mark>1.5f-is-Double = false</mark>
+<mark>1.0-class = Double</mark>
+<mark>1-class = Int</mark>
 1L-class = Long
-1.5f-class = Float
+<mark>1.5f-class = Float</mark>
 1==1L = false
-1==1.0 = false
+<mark>1==1.0 = false</mark>
 1==1 = true
-1.0-as?-Int = null
-1.0-toString = 1.0
-1.0-hash = 1072693248
+<mark>1.0-as?-Int = null</mark>
+<mark>1.0-toString = 1.0</mark>
+<mark>1.0-hash = 1072693248</mark>
+1-hash = 1
+1L-hash = 1</pre>
+<h3>Group B: cloudflare-jvm</h3>
+<pre><mark>1.0-is-Int = false</mark>
+1.0-is-Double = true
+<mark>1-is-Double = false</mark>
+1-is-Long = false
+<mark>1.5f-is-Double = false</mark>
+<mark>1.0-class = Double</mark>
+<mark>1-class = Integer</mark>
+1L-class = Long
+<mark>1.5f-class = Float</mark>
+1==1L = false
+<mark>1==1.0 = false</mark>
+1==1 = true
+<mark>1.0-as?-Int = null</mark>
+<mark>1.0-toString = 1.0</mark>
+<mark>1.0-hash = 1072693248</mark>
+1-hash = 1
+1L-hash = 1</pre>
+<h3>Group C: js-ir</h3>
+<pre><mark>1.0-is-Int = true</mark>
+1.0-is-Double = true
+<mark>1-is-Double = true</mark>
+1-is-Long = false
+<mark>1.5f-is-Double = true</mark>
+<mark>1.0-class = Int</mark>
+<mark>1-class = Int</mark>
+1L-class = Long
+<mark>1.5f-class = Double</mark>
+1==1L = false
+<mark>1==1.0 = true</mark>
+1==1 = true
+<mark>1.0-as?-Int = 1</mark>
+<mark>1.0-toString = 1</mark>
+<mark>1.0-hash = 1</mark>
 1-hash = 1
 1L-hash = 1</pre>
 <h2>Results on Kotlin 2.5.0-Beta1</h2>
@@ -132,16 +172,58 @@ line(&quot;1L-hash&quot;, l.hashCode())</code></pre>
 <p>unclassified, basis inferred.</p>
 <p>No explanation was found in the sources searched.</p>
 <h3>Notes</h3>
-<p>Identical on every column of fixtures/atlas at 2.4.20 and of fixtures/atlas-extra. Not researched: nothing to explain.</p>
+<p>cloudflare-jvm prints Integer for the runtime class name of 1 (1-class) where every other column prints Int. No page was read for this line. cloudflare-wasm prints what wasm prints.</p>
 <p class="muted">Read on 2026-10-07.</p>
 <h2>What was searched</h2>
-<p>Not searched: no column differs, so there is no divergence to explain.</p>
+<p>Not searched: the only column that differs is cloudflare-jvm, and no page or tracker issue was read for it.</p>
+<h2>Repro draft</h2>
+<div class="draft">
+<p><strong>Draft for human review; not filed.</strong></p>
+<pre>Draft for human review. Not filed.
+
+# kotlin.numbers.type-checks
+
+This text was written by an agent from measured transcripts and pages it read. A person must rerun the probe, read the pages named below and rewrite it in their own words before anything is posted; the Kotlin maintainers do not want generated reports. The columns cloudflare-wasm and cloudflare-jvm named below are measured transcripts in fixtures/atlas; the tools/cloudflare build in this repository produces them.
+
+Question: Can a boxed number be mistaken for another numeric type?
+
+Classification now: unclassified (was unclassified); cause letters: none; basis: inferred.
+
+Measured: Kotlin 2.4.20 on 15 columns of fixtures/atlas (android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, linux x64, linux arm64, and cloudflare-wasm and cloudflare-jvm on workerd 1.20261001.1 under wrangler 4.146.0 on macOS arm64). cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM), so its Java classes are not a JDK. Single run per cell; no spread measured.
+
+Helpers (not shown below): `line(label, v)` prints `label = v`; `outcome(label) { }` prints `ok:&lt;value&gt;` or `err:&lt;ExceptionClass&gt;`; `failure(label) { }` prints `err:&lt;Class&gt;:&lt;message&gt;`; `bits(d)` prints `d.toRawBits()` as unsigned hex.
+
+Code for the differing lines (from the displayed probe source):
+
+```kotlin
+line(&quot;1-class&quot;, i::class.simpleName)
+```
+
+Results at 2.4.20, one row per distinct output (columns that agree share a row):
+
+- `1-class`
+  - `Int`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `Integer`: cloudflare-jvm
+
+Docs read (FULL text):
+
+
+Existing tracker issues: none read. No tracker was queried for the cloudflare columns.
+
+What is known: cloudflare-jvm prints Integer for the runtime class name of 1 (1-class) where every other column prints Int. No page was read for this line. cloudflare-wasm prints what wasm prints.
+
+What is NOT known: why the cloudflare-jvm output differs (TeaVM's class library, the bytebox build or the Worker runtime were not examined line by line); whether it is a defect or by design; whether a different bytebox or TeaVM release changes the result; whether a different workerd release differs (one runtime version per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies).
+</pre>
+</div>
 <h2>Kotlin versions measured</h2>
 <p>2.4.20, 2.5.0-Beta1</p>
 <h2>How it was measured</h2>
 <ul>
 <li><strong>android</strong>: The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</li>
+<li><strong>cloudflare-jvm</strong>: The probes compiled as Kotlin/JVM 2.4.20 classes and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM), run on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). The Java classes are TeaVM's class library, not a JDK. Four probes are recorded as unavailable: two are skipped because integer division traps in the compiled module and a trap aborts the request, one fails with a NullPointerException, and one is refused at build time because java.util.regex.Matcher.useAnchoringBounds is missing; tools/cloudflare has the details. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bits of 0/0-raw and sqrt-neg-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
+<li><strong>cloudflare-wasm</strong>: The Kotlin/Wasm (wasmJs) probe module on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). A 14-line JavaScript entry replaces Kotlin's loader, which does not run on workerd. Built and recorded by tools/cloudflare and drift probe cloudflare. Byte-identical to the wasm column apart from the target line. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bit of 0/0-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
 <li><strong>ios</strong>: The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</li>
+<li><strong>js-ir</strong>: Kotlin/JS IR on Node 26.8.2, macOS, Apple Silicon (arm64). The standalone Kotlin 2.4.20 compiler builds each probe from the displayed source through tools/ladder; Node runs it. Same transcript as fixtures/atlas-ladder/2.4.20/js-ir.txt.</li>
 <li><strong>jvm</strong>: The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
 <li><strong>jvm-17</strong>: The CLI JVM classes (jvmTarget 17) on Temurin 17.0.20.1, x86-64 Linux container, recorded with --target jvm-17.</li>
 <li><strong>jvm-21</strong>: The same classes on Temurin 21.0.12.1, x86-64 Linux container. Differs from the jvm column in hardware only.</li>

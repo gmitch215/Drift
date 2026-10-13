@@ -1,15 +1,18 @@
 $dokka.format:html-v1
 $dokka.linkExtension:html
-$dokka.location:dev.gmitch215.drift.studio.ui//main/#/PointingToDeclaration/studio/dev.gmitch215.drift.studio.ui/[wasm-js]main.html
+
 module:bench
 dev.gmitch215.drift.bench
 module:cli
 dev.gmitch215.drift.cli
+dev.gmitch215.drift.cli.cloudflare
 dev.gmitch215.drift.cli.command
 dev.gmitch215.drift.cli.install
 dev.gmitch215.drift.cli.serve
 module:core
 dev.gmitch215.drift.case
+dev.gmitch215.drift.ci
+dev.gmitch215.drift.contract
 dev.gmitch215.drift.delta
 dev.gmitch215.drift.diff
 dev.gmitch215.drift.hash
@@ -25,6 +28,8 @@ dev.gmitch215.drift.redact
 dev.gmitch215.drift.spectrum
 dev.gmitch215.drift.studio
 dev.gmitch215.drift.symptom
+dev.gmitch215.drift.triage
+dev.gmitch215.drift.upgrade
 module:host
 dev.gmitch215.drift.host
 module:scan
@@ -32,10 +37,12 @@ dev.gmitch215.drift.scan
 dev.gmitch215.drift.scan.atlas
 dev.gmitch215.drift.scan.probe
 dev.gmitch215.drift.scan.probe.kotlin
+dev.gmitch215.drift.scan.project
 dev.gmitch215.drift.scan.scanner
 module:studio
 dev.gmitch215.drift.studio.ui
 module:tools
 dev.gmitch215.drift.tools
+dev.gmitch215.drift.tools.corpus
 dev.gmitch215.drift.tools.ladder
 dev.gmitch215.drift.tools.verify

@@ -1,0 +1,489 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>dev.gmitch215.drift.tools.corpus</title>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../styles/style.css" rel="Stylesheet">
+<link href="../../styles/main.css" rel="Stylesheet">
+<link href="../../styles/prism.css" rel="Stylesheet">
+<link href="../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../index.html" tabindex="1">
+                    Drift Engine Documentation
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">1.0.0
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":tools/jvmMain">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":tools/jvmMain" data-filter=":tools/jvmMain">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Drift Engine Documentation
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="package" id="content" pageids="tools::dev.gmitch215.drift.tools.corpus////PointingToDeclaration//169571170">
+  <div class="breadcrumbs"><a href="../index.html">tools</a><span class="delimiter">/</span><span class="current">dev.gmitch215.drift.tools.corpus</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="383388785%2FClasslikes%2F169571170" anchor-label="CorpusAsset" id="383388785%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-corpus-asset/index.html"><span>Corpus</span><wbr><span><span>Asset</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="383388785%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-corpus-asset/index.html">CorpusAsset</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>url<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>sha256<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>bytes<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Where the frozen corpus is hosted and the hashes a download must match.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1973320371%2FClasslikes%2F169571170" anchor-label="CorpusBuild" id="1973320371%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-corpus-build/index.html"><span>Corpus</span><wbr><span><span>Build</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1973320371%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-corpus-build/index.html">CorpusBuild</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">manifest<span class="token operator">: </span><a href="-corpus-manifest/index.html">CorpusManifest</a><span class="token punctuation">, </span></span><span class="parameter ">source<span class="token operator">: </span><a href="-page-source/index.html">PageSource</a><span class="token punctuation">, </span></span><span class="parameter ">work<span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/Path.html">Path</a><span class="token punctuation">, </span></span><span class="parameter ">log<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{}<span class="token punctuation">, </span></span><span class="parameter ">pause<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{ Thread.sleep(it) }</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Builds the triage corpus. Each repo is paged newest first into <code class="lang-kotlin">&lt;work&gt;/&lt;owner&gt;__&lt;name&gt;.jsonl</code> (already redacted, one canonical JSON issue per line) with a <code class="lang-kotlin">.state</code> file beside it, so a stopped run resumes at the last whole page. <a href="-corpus-build/assemble.html">assemble</a> sorts everything into one file whose bytes depend only on those lines.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-616986824%2FClasslikes%2F169571170" anchor-label="CorpusClean" id="-616986824%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-corpus-clean/index.html"><span>Corpus</span><wbr><span><span>Clean</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-616986824%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-corpus-clean/index.html">CorpusClean</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">salt<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Redaction and hashing for stored issue text. A login becomes <code class="lang-kotlin">u</code> and twelve hex digits of HMAC-SHA256 keyed with the manifest salt over the lowercase login, so it cannot be looked up in a table of unsalted hashes.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="145634681%2FClasslikes%2F169571170" anchor-label="CorpusDownload" id="145634681%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-corpus-download/index.html"><span>Corpus</span><wbr><span><span>Download</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="145634681%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-corpus-download/index.html">CorpusDownload</a></div><div class="brief "><p class="paragraph">Downloads the frozen corpus; a file that differs from the manifest hash or size is refused.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1785424216%2FClasslikes%2F169571170" anchor-label="CorpusIssue" id="-1785424216%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-corpus-issue/index.html"><span>Corpus</span><wbr><span><span>Issue</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1785424216%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-corpus-issue/index.html">CorpusIssue</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>repo<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>number<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>created<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>state<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>title<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>author<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>body<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">An issue as stored: no raw login, and the title and body pass through <a href="-corpus-clean/index.html">CorpusClean</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="139504050%2FClasslikes%2F169571170" anchor-label="CorpusManifest" id="139504050%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-corpus-manifest/index.html"><span>Corpus</span><wbr><span><span>Manifest</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="139504050%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-corpus-manifest/index.html">CorpusManifest</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>cutoff<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>cap<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>salt<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>repos<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-corpus-repo/index.html">CorpusRepo</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>asset<span class="token operator">: </span><a href="-corpus-asset/index.html">CorpusAsset</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph"><a href="../../tools/dev.gmitch215.drift.tools.corpus/-corpus-manifest/--root--.html">cap</a> is the most issues kept per repo and <a href="../../tools/dev.gmitch215.drift.tools.corpus/-corpus-manifest/--root--.html">cutoff</a> the last creation day, <code class="lang-kotlin">yyyy-mm-dd</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-477281890%2FClasslikes%2F169571170" anchor-label="CorpusReader" id="-477281890%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-corpus-reader/index.html"><span>Corpus</span><wbr><span><span>Reader</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-477281890%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-corpus-reader/index.html">CorpusReader</a></div><div class="brief "><p class="paragraph">Reads the corpus file written by <a href="-corpus-build/assemble.html">CorpusBuild.assemble</a>, one issue at a time.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1150404047%2FClasslikes%2F169571170" anchor-label="CorpusRepo" id="1150404047%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-corpus-repo/index.html"><span>Corpus</span><wbr><span><span>Repo</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1150404047%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-corpus-repo/index.html">CorpusRepo</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>repo<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>host<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>stratum<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>formPolicy<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>why<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">One tracker in <code class="lang-kotlin">triage/corpus.yml</code>. <a href="../../tools/dev.gmitch215.drift.tools.corpus/-corpus-repo/--root--.html">formPolicy</a> is the issue template policy of the repo.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="599579771%2FClasslikes%2F169571170" anchor-label="CorpusSummary" id="599579771%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-corpus-summary/index.html"><span>Corpus</span><wbr><span><span>Summary</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="599579771%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-corpus-summary/index.html">CorpusSummary</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>jsonSha256<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>jsonBytes<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>zstSha256<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>zstBytes<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>counts<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">What a build wrote: hashes and sizes of the JSON and of its zstd file, and counts per repo.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-340631295%2FClasslikes%2F169571170" anchor-label="Coverage" id="-340631295%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-coverage/index.html"><span><span>Coverage</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-340631295%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-coverage/index.html">Coverage</a></div><div class="brief "><p class="paragraph">How much the extractor read from issues of one kind, with or without ground truth.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-518018512%2FClasslikes%2F169571170" anchor-label="EvalResult" id="-518018512%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-eval-result/index.html"><span>Eval</span><wbr><span><span>Result</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-518018512%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-eval-result/index.html">EvalResult</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>dev<span class="token operator">: </span><a href="-slice/index.html">Slice</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>heldOut<span class="token operator">: </span><a href="-slice/index.html">Slice</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>claims<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>bodies<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>excludedTruth<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">0</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1810972345%2FClasslikes%2F169571170" anchor-label="EvalTriage" id="1810972345%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-eval-triage/index.html"><span>Eval</span><wbr><span><span>Triage</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1810972345%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-eval-triage/index.html">EvalTriage</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">manifest<span class="token operator">: </span><a href="-corpus-manifest/index.html">CorpusManifest</a><span class="token punctuation">, </span></span><span class="parameter ">seed<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span>SEED<span class="token punctuation">, </span></span><span class="parameter ">onClaim<span class="token operator">: </span><span class="token punctuation">(</span><a href="-corpus-issue/index.html">CorpusIssue</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{ _, _, _, _ -&gt; }<span class="token punctuation">, </span></span><span class="parameter ">onMiss<span class="token operator">: </span><span class="token punctuation">(</span><a href="-corpus-issue/index.html">CorpusIssue</a><span class="token punctuation">, </span><a href="../../core/dev.gmitch215.drift.triage/-fact/index.html">Fact</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{ _, _, _ -&gt; }</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Scores the free-text extractor on the corpus. A form body (<code class="lang-kotlin">### Label</code> sections, from a repo whose issue template is a form) states its environment under labelled headings; the facts read from those sections are the truth. The sections that gave a fact are cut out of the body and the extractor runs again on what is left, so the tool-output, key-value and pattern paths are judged against what the reporter typed into the form fields. Facts on keys the form did not label cannot be judged and are not scored. Heading-to-key mapping and value normalization are shared between the truth and the extractor, so the section path itself is not measured here.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1222164939%2FClasslikes%2F169571170" anchor-label="GithubSource" id="1222164939%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-github-source/index.html"><span>Github</span><wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1222164939%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-github-source/index.html">GithubSource</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">shell<span class="token operator">: </span><a href="-shell/index.html">Shell</a><span class="token operator"> = </span>ProcessShell</span></span><span class="token punctuation">)</span> : <a href="-page-source/index.html">PageSource</a></div><div class="brief "><p class="paragraph">GitHub issues through <code class="lang-kotlin">gh api graphql</code>, which lists issues only and never pull requests.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1753031219%2FClasslikes%2F169571170" anchor-label="GitlabSource" id="1753031219%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-gitlab-source/index.html"><span>Gitlab</span><wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1753031219%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-gitlab-source/index.html">GitlabSource</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">shell<span class="token operator">: </span><a href="-shell/index.html">Shell</a><span class="token operator"> = </span>ProcessShell</span></span><span class="token punctuation">)</span> : <a href="-page-source/index.html">PageSource</a></div><div class="brief "><p class="paragraph">GitLab issues through <code class="lang-kotlin">glab api</code>, paged by number; the cursor is the next page number.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="12025190%2FClasslikes%2F169571170" anchor-label="HostSource" id="12025190%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-host-source/index.html"><span>Host</span><wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="12025190%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-host-source/index.html">HostSource</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">github<span class="token operator">: </span><a href="-page-source/index.html">PageSource</a><span class="token punctuation">, </span></span><span class="parameter ">gitlab<span class="token operator">: </span><a href="-page-source/index.html">PageSource</a></span></span><span class="token punctuation">)</span> : <a href="-page-source/index.html">PageSource</a></div><div class="brief "><p class="paragraph">Sends each repo to the source for its host.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1872218682%2FClasslikes%2F169571170" anchor-label="Page" id="1872218682%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-page/index.html"><span><span>Page</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1872218682%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-page/index.html">Page</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>issues<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-raw-issue/index.html">RawIssue</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>next<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">One page of issues, newest first. <a href="../../tools/dev.gmitch215.drift.tools.corpus/-page/--root--.html">next</a> is the cursor of the next page, null at the end.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-19909729%2FClasslikes%2F169571170" anchor-label="PageSource" id="-19909729%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-page-source/index.html"><span>Page</span><wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-19909729%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-page-source/index.html">PageSource</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1361787912%2FClasslikes%2F169571170" anchor-label="ProcessShell" id="1361787912%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-process-shell/index.html"><span>Process</span><wbr><span><span>Shell</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1361787912%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-process-shell/index.html">ProcessShell</a> : <a href="-shell/index.html">Shell</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="355089784%2FClasslikes%2F169571170" anchor-label="RawIssue" id="355089784%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-raw-issue/index.html"><span>Raw</span><wbr><span><span>Issue</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="355089784%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-raw-issue/index.html">RawIssue</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>number<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>created<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>state<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>title<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>author<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>body<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">An issue as the fetcher read it, before redaction. <a href="../../tools/dev.gmitch215.drift.tools.corpus/-raw-issue/--root--.html">author</a> is a raw login.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="687148839%2FClasslikes%2F169571170" anchor-label="Score" id="687148839%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-score/index.html"><span><span>Score</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="687148839%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-score/index.html">Score</a></div><div class="brief "><p class="paragraph">Counts for one slice of the corpus; every number in the report is a ratio of these.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1147477321%2FClasslikes%2F169571170" anchor-label="Shell" id="1147477321%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-shell/index.html"><span><span>Shell</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1147477321%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-shell/index.html">Shell</a></div><div class="brief "><p class="paragraph">Runs a command and returns its output; the real one starts <code class="lang-kotlin">gh</code> or <code class="lang-kotlin">glab</code>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1675759577%2FClasslikes%2F169571170" anchor-label="Slice" id="-1675759577%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-slice/index.html"><span><span>Slice</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1675759577%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-slice/index.html">Slice</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="132489093%2FClasslikes%2F169571170" anchor-label="SourceException" id="132489093%2FClasslikes%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-source-exception/index.html"><span>Source</span><wbr><span><span>Exception</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="132489093%2FClasslikes%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-source-exception/index.html">SourceException</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">message<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span> : <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/IOException.html">IOException</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="1711526007%2FFunctions%2F169571170" anchor-label="main" id="1711526007%2FFunctions%2F169571170" data-filterable-set=":tools/jvmMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":tools/jvmMain" data-filterable-set=":tools/jvmMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="main.html"><span><span>main</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1711526007%2FFunctions%2F169571170"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":tools/jvmMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="main.html"><span class="token function">main</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">args<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>Copyright (c) Gregory Mitchell</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

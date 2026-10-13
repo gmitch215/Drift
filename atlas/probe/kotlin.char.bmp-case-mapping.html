@@ -32,6 +32,7 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <a href="../../">Drift</a>
 <a href="../">Interactive Atlas</a>
 <a href="../probe/">All probes</a>
+<a href="../versions.html">Version changes</a>
 <a href="../data/dataset.json">dataset.json</a>
 <a href="../data/classification.json">classification.json</a>
 </nav>
@@ -72,23 +73,26 @@ line(&quot;title-changed&quot;, titChanged)
 line(&quot;upper-string-length-sum&quot;, upString)
 line(&quot;lower-string-length-sum&quot;, lowString)</code></pre>
 <h2>Results on Kotlin 2.4.20</h2>
-<p>4 different results; 6 of 8 lines differ.</p>
+<p>6 different results; 8 of 8 lines differ.</p>
 <table>
 <caption>Result per column, Kotlin 2.4.20</caption>
 <tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
-<tr class="differs"><th scope="row">android</th><td>A (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
-<tr><th scope="row">ios</th><td>B</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
-<tr><th scope="row">jvm-17</th><td>B</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
-<tr><th scope="row">linux</th><td>B</td><td>ok</td><td><a href="../data/transcripts/linux.txt">file</a></td></tr>
-<tr><th scope="row">linux-arm64</th><td>B</td><td>ok</td><td><a href="../data/transcripts/linux-arm64.txt">file</a></td></tr>
-<tr><th scope="row">macos</th><td>B</td><td>ok</td><td><a href="../data/transcripts/macos.txt">file</a></td></tr>
-<tr><th scope="row">wasm</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm.txt">file</a></td></tr>
-<tr><th scope="row">wasm-chromium</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
-<tr><th scope="row">wasm-firefox</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
-<tr><th scope="row">wasm-webkit</th><td>B</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm-21</th><td>C (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-21.txt">file</a></td></tr>
-<tr class="differs"><th scope="row">jvm-25</th><td>D (differs from group B)</td><td>ok</td><td><a href="../data/transcripts/jvm-25.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">android</th><td>A (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">cloudflare-jvm</th><td>B (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/cloudflare-jvm.txt">file</a></td></tr>
+<tr><th scope="row">cloudflare-wasm</th><td>C</td><td>ok</td><td><a href="../data/transcripts/cloudflare-wasm.txt">file</a></td></tr>
+<tr><th scope="row">ios</th><td>C</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
+<tr><th scope="row">jvm-17</th><td>C</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
+<tr><th scope="row">linux</th><td>C</td><td>ok</td><td><a href="../data/transcripts/linux.txt">file</a></td></tr>
+<tr><th scope="row">linux-arm64</th><td>C</td><td>ok</td><td><a href="../data/transcripts/linux-arm64.txt">file</a></td></tr>
+<tr><th scope="row">macos</th><td>C</td><td>ok</td><td><a href="../data/transcripts/macos.txt">file</a></td></tr>
+<tr><th scope="row">wasm</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm.txt">file</a></td></tr>
+<tr><th scope="row">wasm-chromium</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm-chromium.txt">file</a></td></tr>
+<tr><th scope="row">wasm-firefox</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
+<tr><th scope="row">wasm-webkit</th><td>C</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">js-ir</th><td>D (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/js-ir.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm</th><td>E (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-21</th><td>E (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm-21.txt">file</a></td></tr>
+<tr class="differs"><th scope="row">jvm-25</th><td>F (differs from group C)</td><td>ok</td><td><a href="../data/transcripts/jvm-25.txt">file</a></td></tr>
 </table>
 <h3>Group A: android</h3>
 <pre><mark>upper-checksum = 1407852868</mark>
@@ -97,35 +101,53 @@ line(&quot;lower-string-length-sum&quot;, lowString)</code></pre>
 <mark>upper-changed = 1198</mark>
 <mark>lower-changed = 1181</mark>
 <mark>title-changed = 1152</mark>
-upper-string-length-sum = 65654
-lower-string-length-sum = 65537</pre>
-<h3>Group B: ios, jvm-17, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
+<mark>upper-string-length-sum = 65654</mark>
+<mark>lower-string-length-sum = 65537</mark></pre>
+<h3>Group B: cloudflare-jvm</h3>
+<pre><mark>upper-checksum = -255076099</mark>
+<mark>lower-checksum = -1709974356</mark>
+<mark>title-checksum = -255076099</mark>
+<mark>upper-changed = 1232</mark>
+<mark>lower-changed = 1233</mark>
+<mark>title-changed = 1232</mark>
+<mark>upper-string-length-sum = 65536</mark>
+<mark>lower-string-length-sum = 65536</mark></pre>
+<h3>Group C: cloudflare-wasm, ios, jvm-17, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
 <pre><mark>upper-checksum = -1243923102</mark>
 <mark>lower-checksum = 410735865</mark>
 <mark>title-checksum = 1190914722</mark>
 <mark>upper-changed = 1185</mark>
 <mark>lower-changed = 1168</mark>
 <mark>title-changed = 1139</mark>
-upper-string-length-sum = 65654
-lower-string-length-sum = 65537</pre>
-<h3>Group C: jvm, jvm-21</h3>
+<mark>upper-string-length-sum = 65654</mark>
+<mark>lower-string-length-sum = 65537</mark></pre>
+<h3>Group D: js-ir</h3>
+<pre><mark>upper-checksum = -722058327</mark>
+<mark>lower-checksum = -578680773</mark>
+<mark>title-checksum = 1712779497</mark>
+<mark>upper-changed = 1171</mark>
+<mark>lower-changed = 1181</mark>
+<mark>title-changed = 1125</mark>
+<mark>upper-string-length-sum = 65654</mark>
+<mark>lower-string-length-sum = 65537</mark></pre>
+<h3>Group E: jvm, jvm-21</h3>
 <pre><mark>upper-checksum = -1506922386</mark>
 <mark>lower-checksum = 1565606117</mark>
 <mark>title-checksum = 927915438</mark>
 <mark>upper-changed = 1190</mark>
 <mark>lower-changed = 1173</mark>
 <mark>title-changed = 1144</mark>
-upper-string-length-sum = 65654
-lower-string-length-sum = 65537</pre>
-<h3>Group D: jvm-25</h3>
+<mark>upper-string-length-sum = 65654</mark>
+<mark>lower-string-length-sum = 65537</mark></pre>
+<h3>Group F: jvm-25</h3>
 <pre><mark>upper-checksum = -1922765689</mark>
 <mark>lower-checksum = -408720610</mark>
 <mark>title-checksum = 512072135</mark>
 <mark>upper-changed = 1195</mark>
 <mark>lower-changed = 1178</mark>
 <mark>title-changed = 1149</mark>
-upper-string-length-sum = 65654
-lower-string-length-sum = 65537</pre>
+<mark>upper-string-length-sum = 65654</mark>
+<mark>lower-string-length-sum = 65537</mark></pre>
 <h2>Results on Kotlin 2.5.0-Beta1</h2>
 <p>3 different results; 6 of 8 lines differ.</p>
 <table>
@@ -175,7 +197,7 @@ lower-string-length-sum = 65537</pre>
 <blockquote><p>A character is considered to be a letter if its category is CharCategory.UPPERCASE_LETTER</p>
 <footer><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/is-letter.html">https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/is-letter.html</a></footer></blockquote>
 <h3>Notes</h3>
-<p>JDK 17, 21, 25 columns split exactly as their Character Javadocs name Unicode 13.0, 15.0, 16.0 (verified). Native, Wasm, iOS, linux, mingw-wine and the browsers print the JDK 17 numbers (observed): that they use Unicode 13.0 tables is inferred; no FULL doc names the Native table version and KT-58195 (created 2023-04-24) says UnicodeData 12.0 for Native, which does not match the observed numbers (stale or other tables). Android prints its own numbers and the Android Character page read names no Unicode version. The Kotlin isLetter KDoc defines letters by category and names no version, so the version is left to the platform.</p>
+<p>JDK 17, 21, 25 columns split exactly as their Character Javadocs name Unicode 13.0, 15.0, 16.0 (verified). Native, Wasm, iOS, linux, mingw-wine and the browsers print the JDK 17 numbers (observed): that they use Unicode 13.0 tables is inferred; no FULL doc names the Native table version and KT-58195 (created 2023-04-24) says UnicodeData 12.0 for Native, which does not match the observed numbers (stale or other tables). Android prints its own numbers and the Android Character page read names no Unicode version. The Kotlin isLetter KDoc defines letters by category and names no version, so the version is left to the platform. cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on upper-checksum, lower-checksum, title-checksum, upper-changed, lower-changed, title-changed, upper-string-length-sum, lower-string-length-sum.</p>
 <p class="muted">Read on 2026-10-07.</p>
 <h2>Issues</h2>
 <table>
@@ -188,7 +210,10 @@ lower-string-length-sum = 65537</pre>
 <h2>How it was measured</h2>
 <ul>
 <li><strong>android</strong>: The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</li>
+<li><strong>cloudflare-jvm</strong>: The probes compiled as Kotlin/JVM 2.4.20 classes and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM), run on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). The Java classes are TeaVM's class library, not a JDK. Four probes are recorded as unavailable: two are skipped because integer division traps in the compiled module and a trap aborts the request, one fails with a NullPointerException, and one is refused at build time because java.util.regex.Matcher.useAnchoringBounds is missing; tools/cloudflare has the details. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bits of 0/0-raw and sqrt-neg-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
+<li><strong>cloudflare-wasm</strong>: The Kotlin/Wasm (wasmJs) probe module on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). A 14-line JavaScript entry replaces Kotlin's loader, which does not run on workerd. Built and recorded by tools/cloudflare and drift probe cloudflare. Byte-identical to the wasm column apart from the target line. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bit of 0/0-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
 <li><strong>ios</strong>: The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</li>
+<li><strong>js-ir</strong>: Kotlin/JS IR on Node 26.8.2, macOS, Apple Silicon (arm64). The standalone Kotlin 2.4.20 compiler builds each probe from the displayed source through tools/ladder; Node runs it. Same transcript as fixtures/atlas-ladder/2.4.20/js-ir.txt.</li>
 <li><strong>jvm</strong>: The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
 <li><strong>jvm-17</strong>: The CLI JVM classes (jvmTarget 17) on Temurin 17.0.20.1, x86-64 Linux container, recorded with --target jvm-17.</li>
 <li><strong>jvm-21</strong>: The same classes on Temurin 21.0.12.1, x86-64 Linux container. Differs from the jvm column in hardware only.</li>

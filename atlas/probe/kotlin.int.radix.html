@@ -32,6 +32,7 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <a href="../../">Drift</a>
 <a href="../">Interactive Atlas</a>
 <a href="../probe/">All probes</a>
+<a href="../versions.html">Version changes</a>
 <a href="../data/dataset.json">dataset.json</a>
 <a href="../data/classification.json">classification.json</a>
 </nav>
@@ -68,7 +69,10 @@ line(&quot;long-min&quot;, &quot;-9223372036854775808&quot;.toLongOrNull())</cod
 <caption>Result per column, Kotlin 2.4.20</caption>
 <tr><th scope="col">Column</th><th scope="col">Group</th><th scope="col">Status</th><th scope="col">Transcript</th></tr>
 <tr><th scope="row">android</th><td>A</td><td>ok</td><td><a href="../data/transcripts/android.txt">file</a></td></tr>
+<tr><th scope="row">cloudflare-jvm</th><td>A</td><td>ok</td><td><a href="../data/transcripts/cloudflare-jvm.txt">file</a></td></tr>
+<tr><th scope="row">cloudflare-wasm</th><td>A</td><td>ok</td><td><a href="../data/transcripts/cloudflare-wasm.txt">file</a></td></tr>
 <tr><th scope="row">ios</th><td>A</td><td>ok</td><td><a href="../data/transcripts/ios.txt">file</a></td></tr>
+<tr><th scope="row">js-ir</th><td>A</td><td>ok</td><td><a href="../data/transcripts/js-ir.txt">file</a></td></tr>
 <tr><th scope="row">jvm</th><td>A</td><td>ok</td><td><a href="../data/transcripts/jvm.txt">file</a></td></tr>
 <tr><th scope="row">jvm-17</th><td>A</td><td>ok</td><td><a href="../data/transcripts/jvm-17.txt">file</a></td></tr>
 <tr><th scope="row">jvm-21</th><td>A</td><td>ok</td><td><a href="../data/transcripts/jvm-21.txt">file</a></td></tr>
@@ -81,7 +85,7 @@ line(&quot;long-min&quot;, &quot;-9223372036854775808&quot;.toLongOrNull())</cod
 <tr><th scope="row">wasm-firefox</th><td>A</td><td>ok</td><td><a href="../data/transcripts/wasm-firefox.txt">file</a></td></tr>
 <tr><th scope="row">wasm-webkit</th><td>A</td><td>ok</td><td><a href="../data/transcripts/wasm-webkit.txt">file</a></td></tr>
 </table>
-<h3>Group A: android, ios, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
+<h3>Group A: android, cloudflare-jvm, cloudflare-wasm, ios, js-ir, jvm, jvm-17, jvm-21, jvm-25, linux, linux-arm64, macos, wasm, wasm-chromium, wasm-firefox, wasm-webkit</h3>
 <pre>255-bin = 11111111
 neg255-hex = -ff
 int-min-hex = -80000000
@@ -160,7 +164,10 @@ long-min = -9223372036854775808</pre>
 <h2>How it was measured</h2>
 <ul>
 <li><strong>android</strong>: The androidApp debug build on an arm64 Android emulator (Pixel 7 profile, API 37), started with an intent that writes the transcript.</li>
+<li><strong>cloudflare-jvm</strong>: The probes compiled as Kotlin/JVM 2.4.20 classes and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM), run on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). The Java classes are TeaVM's class library, not a JDK. Four probes are recorded as unavailable: two are skipped because integer division traps in the compiled module and a trap aborts the request, one fails with a NullPointerException, and one is refused at build time because java.util.regex.Matcher.useAnchoringBounds is missing; tools/cloudflare has the details. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bits of 0/0-raw and sqrt-neg-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
+<li><strong>cloudflare-wasm</strong>: The Kotlin/Wasm (wasmJs) probe module on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local on 127.0.0.1), compatibility date 2026-08-22, macOS, Apple Silicon (arm64). A 14-line JavaScript entry replaces Kotlin's loader, which does not run on workerd. Built and recorded by tools/cloudflare and drift probe cloudflare. Byte-identical to the wasm column apart from the target line. One deploy of this Worker with drift probe cloudflare --deploy matched this transcript except the sign bit of 0/0-raw (fff8000000000000 deployed, 7ff8000000000000 here).</li>
 <li><strong>ios</strong>: The iosApp simulator build on an iPhone 17 Pro simulator (iOS 26.5, arm64), started with an environment variable that writes the transcript.</li>
+<li><strong>js-ir</strong>: Kotlin/JS IR on Node 26.8.2, macOS, Apple Silicon (arm64). The standalone Kotlin 2.4.20 compiler builds each probe from the displayed source through tools/ladder; Node runs it. Same transcript as fixtures/atlas-ladder/2.4.20/js-ir.txt.</li>
 <li><strong>jvm</strong>: The CLI JVM build on Temurin 21 on macOS, Apple Silicon (arm64). Recorded with drift atlas record.</li>
 <li><strong>jvm-17</strong>: The CLI JVM classes (jvmTarget 17) on Temurin 17.0.20.1, x86-64 Linux container, recorded with --target jvm-17.</li>
 <li><strong>jvm-21</strong>: The same classes on Temurin 21.0.12.1, x86-64 Linux container. Differs from the jvm column in hardware only.</li>
