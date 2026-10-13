@@ -299,11 +299,53 @@ jobs:
       - name: Stop Gradle
         run: ./gradlew --stop
 
+  record-cloudflare:
+    name: Record Transcripts (Cloudflare)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24.20.0'
+      - name: Install Wrangler
+        run: npm install --global wrangler@4.146.0
+      - name: Build Workers
+        working-directory: tools/cloudflare
+        run: |
+          ../../gradlew :wasm:stageWorker :jvm:buildWorker
+          npm install --prefix jvm/build/bytebox/worker
+      - name: Record Transcripts
+        run: |
+          ./gradlew :cli:jvmRun --args="probe cloudflare --worker $PWD/tools/cloudflare/wasm/build/worker --target cloudflare-wasm --out $PWD/build/cloudflare"
+          ./gradlew :cli:jvmRun --args="probe cloudflare --worker $PWD/tools/cloudflare/jvm/build/bytebox/worker --target cloudflare-jvm --out $PWD/build/cloudflare"
+      - name: Archive Transcripts
+        uses: actions/upload-artifact@v7
+        with:
+          name: atlas-cloudflare
+          path: build/cloudflare/cloudflare-*.txt
+          if-no-files-found: error
+      - name: Stop Gradle
+        run: |
+          ./gradlew --stop
+          cd tools/cloudflare && ../../gradlew --stop
+
   site:
     name: Build Atlas Site
     runs-on: ubuntu-24.04
     timeout-minutes: 60
-    needs: [record, record-arm64, record-jvm, record-browsers]
+    needs: [record, record-arm64, record-jvm, record-browsers, record-cloudflare]
 
     permissions:
       contents: read
