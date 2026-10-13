@@ -1,0 +1,64 @@
+schema: 1
+id: php-8-1-internal-interface-return-type-deprecated
+title: PHP 8.1 deprecates implementing an internal interface method without a compatible return type
+applies:
+  - runtime
+difference: >-
+  side a is PHP 8.0 or older, where a class may implement an internal interface method such as
+  IteratorAggregate::getIterator() with no return type; side b is PHP 8.1 or newer, where the missing type is a
+  deprecated notice during inheritance, and a test runner that converts deprecations into exceptions can end
+  the run with a fatal error
+symptoms:
+  - text: 'a deprecated notice during inheritance validation for an overridden internal method, as the PHP 8.1 UPGRADING notice describes'
+    basis: verified
+mechanism: >-
+  PHP 8.1 deprecates implementing an internal interface method without a compatible return type or the #[\ReturnTypeWillChange] attribute.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '<8.1.0'
+    - b: tool.php.version
+      ver: '>=8.1.0'
+    - a: project.php.internal-interface-override-no-return-type
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/php/php-src/PHP-8.1/UPGRADING
+    kind: release-note
+    verified: '2026-10-13'
+    section: '1. Backward Incompatible Changes, Core'
+fixtures:
+  positive:
+    - name: php 8.0.30 with an internal interface method overridden without a return type to php 8.1.34
+      a:
+        attrs:
+          tool.php.version: '8.0.30'
+          project.php.internal-interface-override-no-return-type: 'true'
+      b:
+        attrs:
+          tool.php.version: '8.1.34'
+  negative:
+    - name: php 8.1.34 to php 8.0.30 with the same override (reverse direction)
+      a:
+        attrs:
+          tool.php.version: '8.1.34'
+          project.php.internal-interface-override-no-return-type: 'true'
+      b:
+        attrs:
+          tool.php.version: '8.0.30'
+    - name: php 8.0.30 without an internal interface override to php 8.1.34
+      a:
+        attrs:
+          tool.php.version: '8.0.30'
+      b:
+        attrs:
+          tool.php.version: '8.1.34'
+    - name: php 8.1.34 with the override to php 8.3.35 (both sides on or after 8.1)
+      a:
+        attrs:
+          tool.php.version: '8.1.34'
+          project.php.internal-interface-override-no-return-type: 'true'
+      b:
+        attrs:
+          tool.php.version: '8.3.35'
+status: pending-scanner

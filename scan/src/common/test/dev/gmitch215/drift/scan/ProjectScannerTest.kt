@@ -44,6 +44,7 @@ class ProjectScannerTest {
                 "drupal/core-recommended" to "10.3.6",
                 "drush/drush" to "13.2.3",
                 "phpunit/phpunit" to "10.5.20",
+                "mikey179/vfsstream" to "v1.6.8",
                 "drupal/core" to "10.3.6",
                 "symfony/console" to "v6.4.12",
                 "symfony/http-kernel" to "v6.4.12",

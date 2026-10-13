@@ -47,6 +47,11 @@
     ],
     "packages-dev": [
         {
+            "name": "mikey179/vfsstream",
+            "version": "v1.6.8",
+            "type": "library"
+        },
+        {
             "name": "phpunit/phpunit",
             "version": "10.5.20",
             "type": "library"

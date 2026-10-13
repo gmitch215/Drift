@@ -8,6 +8,7 @@
         "drush/drush": "^13"
     },
     "require-dev": {
+        "mikey179/vfsstream": "^1.6.8",
         "phpunit/phpunit": "^10.5"
     },
     "config": {
