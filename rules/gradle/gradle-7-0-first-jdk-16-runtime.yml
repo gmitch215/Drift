@@ -1,0 +1,62 @@
+schema: 1
+id: gradle-7-0-first-jdk-16-runtime
+title: Gradle 6.x is not a listed runtime for JDK 16; Gradle 7.0 is the first release that lists it
+applies:
+  - runtime
+difference: >-
+  side a is Gradle 7.0.0 or later; side b is Gradle 6.x on JDK 16 or later
+symptoms:
+  - text: >-
+      a Gradle 6.x build on JDK 16 or later is outside the listed runtime matrix (no failure text is quoted)
+    basis: inferred
+mechanism: >-
+  The Java compatibility matrix lists JDK 16 under running Gradle from Gradle 7.0 onward, so no Gradle 6.x release is listed for it.
+detect:
+  all:
+    - a: project.gradle.wrapper
+      ver: '>=7.0.0'
+    - b: project.gradle.wrapper
+      ver: '>=6.0.0,<7.0.0'
+    - b: tool.java.version
+      ver: '>=16'
+severity: medium
+provenance:
+  - url: https://docs.gradle.org/current/userguide/compatibility.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Table 1. Java Compatibility
+  - url: https://docs.gradle.org/7.0/release-notes.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: Support for Java 16
+fixtures:
+  positive:
+    - name: gradle 6.9.4 to gradle 7.6.3 on jdk 16
+      a:
+        attrs:
+          project.gradle.wrapper: '7.6.3'
+          tool.java.version: '16.0.2'
+      b:
+        attrs:
+          project.gradle.wrapper: '6.9.4'
+          tool.java.version: '16.0.2'
+  negative:
+    - name: gradle 6.9.4 on jdk 15 is inside the listed range
+      a:
+        attrs:
+          project.gradle.wrapper: '7.6.3'
+          tool.java.version: '15.0.2'
+      b:
+        attrs:
+          project.gradle.wrapper: '6.9.4'
+          tool.java.version: '15.0.2'
+    - name: gradle 7.0.0 on jdk 17 is outside the 6.x band
+      a:
+        attrs:
+          project.gradle.wrapper: '7.0.0'
+          tool.java.version: '17.0.11+9'
+      b:
+        attrs:
+          project.gradle.wrapper: '7.0.0'
+          tool.java.version: '17.0.11+9'
+status: active

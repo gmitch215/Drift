@@ -1,0 +1,43 @@
+schema: 1
+id: symfony-7-0-php-8-2-minimum
+title: Symfony 7.0 declares PHP 8.2 or higher, so a PHP 8.1 host cannot install it
+applies:
+  - runtime
+difference: >-
+  side a is PHP 8.2 or higher with Symfony 7.x; side b is PHP below 8.2 with the same Symfony 7.x
+symptoms:
+  - text: Composer refuses to resolve symfony/http-kernel 7.x on PHP 8.1 or lower
+    basis: inferred
+mechanism: Symfony 7.0.0 declares require.php as >=8.2 in its composer.json.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '>=8.2'
+    - b: tool.php.version
+      ver: '<8.2'
+    - a: project.composer.symfony/http-kernel
+      ver: '>=7,<8'
+    - b: project.composer.symfony/http-kernel
+      ver: '>=7,<8'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/symfony/symfony/v7.0.0/composer.json
+    kind: spec
+    verified: '2026-10-13'
+    section: require.php
+fixtures:
+  positive:
+    - name: php 8.3.12 with symfony 7.0.0 to php 8.1.27 with symfony 7.0.0
+      a: {attrs: {tool.php.version: '8.3.12', project.composer.symfony/http-kernel: '7.0.0'}}
+      b: {attrs: {tool.php.version: '8.1.27', project.composer.symfony/http-kernel: '7.0.0'}}
+  negative:
+    - name: php 8.1.27 to php 8.3.12 with symfony 7.0.0 (reverse direction)
+      a: {attrs: {tool.php.version: '8.1.27', project.composer.symfony/http-kernel: '7.0.0'}}
+      b: {attrs: {tool.php.version: '8.3.12', project.composer.symfony/http-kernel: '7.0.0'}}
+    - name: php 8.3.12 to php 8.1.27 with symfony 6.4.0 (not a symfony 7 host)
+      a: {attrs: {tool.php.version: '8.3.12', project.composer.symfony/http-kernel: '6.4.0'}}
+      b: {attrs: {tool.php.version: '8.1.27', project.composer.symfony/http-kernel: '6.4.0'}}
+    - name: php 8.1.27 to php 8.1.27 with symfony 7.0.0 (same band)
+      a: {attrs: {tool.php.version: '8.1.27', project.composer.symfony/http-kernel: '7.0.0'}}
+      b: {attrs: {tool.php.version: '8.1.27', project.composer.symfony/http-kernel: '7.0.0'}}
+status: active

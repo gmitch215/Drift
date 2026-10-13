@@ -1,0 +1,42 @@
+schema: 1
+id: symfony-twig-3-0-simple-filter-removed
+title: Twig 3.0 removes the Twig_SimpleFilter, Twig_SimpleFunction and Twig_SimpleTest classes; Twig\TwigFilter replaces them
+applies:
+  - build
+difference: >-
+  side a is Twig 2.x with an extension that builds Twig_SimpleFilter, Twig_SimpleFunction or Twig_SimpleTest; side b is Twig 3.x with the same extension
+symptoms:
+  - text: class-not-found fatal error when the extension loads
+    basis: inferred
+mechanism: Twig 2.15.5 says these three empty classes will be removed in Twig 3.0, and lib/Twig/SimpleFilter.php is absent at tag v3.0.0.
+detect:
+  all:
+    - a: project.composer.twig/twig
+      ver: '>=2,<3'
+    - b: project.composer.twig/twig
+      ver: '>=3,<4'
+    - b: project.symfony.source.twig-simple-class-use
+      present: 'true'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/twigphp/Twig/v2.15.5/doc/deprecated.rst
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Miscellaneous
+  - url: https://raw.githubusercontent.com/twigphp/Twig/v3.0.0/src/TwigFilter.php
+    kind: spec
+    verified: '2026-10-13'
+    section: class Twig\TwigFilter (replacement)
+fixtures:
+  positive:
+    - name: twig 2.15.5 to twig 3.14.0 with a Twig_SimpleFilter use
+      a: {attrs: {project.composer.twig/twig: '2.15.5'}}
+      b: {attrs: {project.composer.twig/twig: '3.14.0', project.symfony.source.twig-simple-class-use: 'true'}}
+  negative:
+    - name: twig 3.14.0 to twig 2.15.5 with a Twig_SimpleFilter use (reverse direction)
+      a: {attrs: {project.composer.twig/twig: '3.14.0', project.symfony.source.twig-simple-class-use: 'true'}}
+      b: {attrs: {project.composer.twig/twig: '2.15.5'}}
+    - name: twig 2.15.5 to twig 3.14.0 without a Twig_Simple class use
+      a: {attrs: {project.composer.twig/twig: '2.15.5'}}
+      b: {attrs: {project.composer.twig/twig: '3.14.0'}}
+status: pending-scanner

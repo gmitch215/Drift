@@ -1,0 +1,47 @@
+schema: 1
+id: symfony-8-0-php-8-4-minimum
+title: Symfony 8.0 requires PHP 8.4 or higher, so a PHP 8.2 or 8.3 host cannot run it
+applies:
+  - runtime
+difference: >-
+  side a is PHP 8.4 or higher with Symfony 8.x; side b is PHP below 8.4 with the same Symfony 8.x
+symptoms:
+  - text: Composer refuses to resolve symfony/http-kernel 8.x on PHP below 8.4
+    basis: inferred
+mechanism: UPGRADE-8.0.md states that Symfony v8 requires PHP v8.4 or higher, and composer.json at v8.0.0 declares >=8.4.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '>=8.4'
+    - b: tool.php.version
+      ver: '<8.4'
+    - a: project.composer.symfony/http-kernel
+      ver: '>=8,<9'
+    - b: project.composer.symfony/http-kernel
+      ver: '>=8,<9'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/symfony/symfony/v8.0.0/UPGRADE-8.0.md
+    kind: release-note
+    verified: '2026-10-13'
+    section: upgrade header note
+  - url: https://raw.githubusercontent.com/symfony/symfony/v8.0.0/composer.json
+    kind: spec
+    verified: '2026-10-13'
+    section: require.php
+fixtures:
+  positive:
+    - name: php 8.4.1 with symfony 8.0.0 to php 8.3.12 with symfony 8.0.0
+      a: {attrs: {tool.php.version: '8.4.1', project.composer.symfony/http-kernel: '8.0.0'}}
+      b: {attrs: {tool.php.version: '8.3.12', project.composer.symfony/http-kernel: '8.0.0'}}
+  negative:
+    - name: php 8.3.12 to php 8.4.1 with symfony 8.0.0 (reverse direction)
+      a: {attrs: {tool.php.version: '8.3.12', project.composer.symfony/http-kernel: '8.0.0'}}
+      b: {attrs: {tool.php.version: '8.4.1', project.composer.symfony/http-kernel: '8.0.0'}}
+    - name: php 8.3.12 to php 8.2.20 with symfony 7.0.0 (not a symfony 8 host)
+      a: {attrs: {tool.php.version: '8.3.12', project.composer.symfony/http-kernel: '7.0.0'}}
+      b: {attrs: {tool.php.version: '8.2.20', project.composer.symfony/http-kernel: '7.0.0'}}
+    - name: php 8.4.1 to php 8.4.1 with symfony 8.0.0 (same band)
+      a: {attrs: {tool.php.version: '8.4.1', project.composer.symfony/http-kernel: '8.0.0'}}
+      b: {attrs: {tool.php.version: '8.4.1', project.composer.symfony/http-kernel: '8.0.0'}}
+status: active

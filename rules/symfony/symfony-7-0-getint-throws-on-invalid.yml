@@ -1,0 +1,38 @@
+schema: 1
+id: symfony-7-0-getint-throws-on-invalid
+title: Symfony 7.0 makes ParameterBag::getInt() and getBool() throw instead of falling back to 0 or false
+applies:
+  - build
+difference: >-
+  side a is Symfony 6.x where an invalid or missing value through getInt() returns 0; side b is Symfony 7.x where the same input throws
+symptoms:
+  - text: ParameterBag::getInt() and getBool() throw UnexpectedValueException instead of returning 0 or false
+    basis: verified
+mechanism: UPGRADE-7.0.md in section HttpFoundation says getInt() and getBool() no longer fall back to 0 or false and throw UnexpectedValueException instead.
+detect:
+  all:
+    - a: project.composer.symfony/http-kernel
+      ver: '>=6,<7'
+    - b: project.composer.symfony/http-kernel
+      ver: '>=7,<8'
+    - b: project.symfony.source.parameterbag-getint-call
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/symfony/symfony/v7.0.0/UPGRADE-7.0.md
+    kind: release-note
+    verified: '2026-10-13'
+    section: HttpFoundation
+fixtures:
+  positive:
+    - name: symfony 6.4.0 to symfony 7.0.0 with a ParameterBag getInt() call site
+      a: {attrs: {project.composer.symfony/http-kernel: '6.4.0'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '7.0.0', project.symfony.source.parameterbag-getint-call: 'true'}}
+  negative:
+    - name: symfony 7.0.0 to symfony 6.4.0 with a ParameterBag getInt() call site (reverse direction)
+      a: {attrs: {project.composer.symfony/http-kernel: '7.0.0', project.symfony.source.parameterbag-getint-call: 'true'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '6.4.0'}}
+    - name: symfony 6.4.0 to symfony 7.0.0 without a ParameterBag getInt() call site
+      a: {attrs: {project.composer.symfony/http-kernel: '6.4.0'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '7.0.0'}}
+status: pending-scanner

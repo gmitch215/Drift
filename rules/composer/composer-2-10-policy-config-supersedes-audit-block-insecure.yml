@@ -1,0 +1,46 @@
+schema: 1
+id: composer-2-10-policy-config-supersedes-audit-block-insecure
+title: Composer 2.10 adds a config.policy block that replaces most of the config.audit keys
+applies:
+  - build
+difference: >-
+  side a is Composer 2.10.0 or newer with a config.policy block in composer.json; side b is Composer 2.9.x with the same composer.json
+symptoms:
+  - text: on Composer 2.9 the config.policy block has no effect, so advisory blocking follows the deprecated config.audit keys
+    basis: inferred
+mechanism: >-
+  Composer 2.10.0 added a config.policy block that replaces and deprecates most of the config.audit keys, including audit.block-insecure.
+detect:
+  all:
+    - a: tool.composer.version
+      ver: '>=2.10'
+    - b: tool.composer.version
+      ver: '>=2.9,<2.10'
+    - a: project.composer.json.config.policy
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/composer/composer/2.10.3/CHANGELOG.md
+    kind: release-note
+    verified: '2026-10-13'
+    section: '[2.10.0-RC2] 2026-05-20, feature entry (stable 2.10.0 heading dated 2026-05-28)'
+  - url: https://raw.githubusercontent.com/composer/composer/2.10.3/doc/06-config.md
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: block-insecure, deprecation note
+fixtures:
+  positive:
+    - name: composer 2.9.2 to composer 2.10.3 with a config.policy block
+      a: {attrs: {tool.composer.version: '2.10.3', project.composer.json.config.policy: 'advisories'}}
+      b: {attrs: {tool.composer.version: '2.9.2', project.composer.json.config.policy: 'advisories'}}
+  negative:
+    - name: composer 2.10.3 to composer 2.9.2 with a config.policy block (reverse direction)
+      a: {attrs: {tool.composer.version: '2.9.2', project.composer.json.config.policy: 'advisories'}}
+      b: {attrs: {tool.composer.version: '2.10.3', project.composer.json.config.policy: 'advisories'}}
+    - name: composer 2.9.2 to composer 2.10.3 with no config.policy block
+      a: {attrs: {tool.composer.version: '2.10.3'}}
+      b: {attrs: {tool.composer.version: '2.9.2'}}
+    - name: composer 2.10.3 to composer 2.10.3 with a config.policy block (same version)
+      a: {attrs: {tool.composer.version: '2.10.3', project.composer.json.config.policy: 'advisories'}}
+      b: {attrs: {tool.composer.version: '2.10.3', project.composer.json.config.policy: 'advisories'}}
+status: active

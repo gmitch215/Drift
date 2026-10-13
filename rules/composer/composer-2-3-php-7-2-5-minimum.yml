@@ -1,0 +1,45 @@
+schema: 1
+id: composer-2-3-php-7-2-5-minimum
+title: Composer 2.3.0 raised the minimum PHP to 7.2.5; a PHP host below 7.2.5 cannot move from Composer 2.2 LTS to 2.3
+applies:
+  - build
+difference: >-
+  side a is Composer 2.2.x on a PHP below 7.2.5; side b is Composer 2.3.0 or newer on the same PHP below 7.2.5
+symptoms:
+  - text: Composer 2.3.0 or newer does not start on a PHP below 7.2.5, so self-update and every other command fail
+    basis: inferred
+mechanism: >-
+  Composer 2.3.0 raised the minimum PHP version to 7.2.5, while the 2.2.x LTS line still supports PHP 5.3.2 and later.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '<7.2.5'
+    - a: tool.composer.version
+      ver: '>=2.2,<2.3'
+    - b: tool.php.version
+      ver: '<7.2.5'
+    - b: tool.composer.version
+      ver: '>=2.3'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/composer/composer/2.10.3/CHANGELOG.md
+    kind: release-note
+    verified: '2026-10-13'
+    section: '[2.3.0-RC1] 2022-03-16, BC Break entry'
+  - url: https://raw.githubusercontent.com/composer/composer/2.10.3/doc/00-intro.md
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: System Requirements
+fixtures:
+  positive:
+    - name: composer 2.2.9 to composer 2.3.0 on php 7.1.33
+      a: {attrs: {tool.php.version: '7.1.33', tool.composer.version: '2.2.9'}}
+      b: {attrs: {tool.php.version: '7.1.33', tool.composer.version: '2.3.0'}}
+  negative:
+    - name: composer 2.3.0 to composer 2.2.9 on php 7.1.33 (reverse direction)
+      a: {attrs: {tool.php.version: '7.1.33', tool.composer.version: '2.3.0'}}
+      b: {attrs: {tool.php.version: '7.1.33', tool.composer.version: '2.2.9'}}
+    - name: composer 2.2.9 to composer 2.3.0 on php 8.1.27 (minimum met)
+      a: {attrs: {tool.php.version: '8.1.27', tool.composer.version: '2.2.9'}}
+      b: {attrs: {tool.php.version: '8.1.27', tool.composer.version: '2.3.0'}}
+status: active

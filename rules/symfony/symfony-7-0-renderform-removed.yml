@@ -1,0 +1,38 @@
+schema: 1
+id: symfony-7-0-renderform-removed
+title: Symfony 7.0 removes AbstractController::renderForm(), so controllers that call it fail on Symfony 7
+applies:
+  - build
+difference: >-
+  side a is Symfony 6.x with a controller that calls renderForm(); side b is Symfony 7.x with the same controller
+symptoms:
+  - text: fatal error for an undefined method on the controller when the action runs
+    basis: inferred
+mechanism: UPGRADE-7.0.md in section FrameworkBundle says renderForm() was removed and the FormInterface is passed to render() instead.
+detect:
+  all:
+    - a: project.composer.symfony/http-kernel
+      ver: '>=6,<7'
+    - b: project.composer.symfony/http-kernel
+      ver: '>=7,<8'
+    - b: project.symfony.source.controller-renderform-call
+      present: 'true'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/symfony/symfony/v7.0.0/UPGRADE-7.0.md
+    kind: release-note
+    verified: '2026-10-13'
+    section: FrameworkBundle
+fixtures:
+  positive:
+    - name: symfony 6.4.0 to symfony 7.0.0 with a renderForm() call site
+      a: {attrs: {project.composer.symfony/http-kernel: '6.4.0'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '7.0.0', project.symfony.source.controller-renderform-call: 'true'}}
+  negative:
+    - name: symfony 7.0.0 to symfony 6.4.0 with a renderForm() call site (reverse direction)
+      a: {attrs: {project.composer.symfony/http-kernel: '7.0.0', project.symfony.source.controller-renderform-call: 'true'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '6.4.0'}}
+    - name: symfony 6.4.0 to symfony 7.0.0 without a renderForm() call site
+      a: {attrs: {project.composer.symfony/http-kernel: '6.4.0'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '7.0.0'}}
+status: pending-scanner

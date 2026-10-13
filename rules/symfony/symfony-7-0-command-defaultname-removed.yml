@@ -1,0 +1,38 @@
+schema: 1
+id: symfony-7-0-command-defaultname-removed
+title: Symfony 7.0 removes the Command::$defaultName and $defaultDescription properties, so commands must use the AsCommand attribute
+applies:
+  - build
+difference: >-
+  side a is Symfony 6.x with a command that sets protected static $defaultName; side b is Symfony 7.x with the same class
+symptoms:
+  - text: the command is not registered under its name on Symfony 7, or the class fails to load
+    basis: inferred
+mechanism: UPGRADE-7.0.md in section Console says Command::$defaultName and Command::$defaultDescription were removed in favor of the AsCommand attribute.
+detect:
+  all:
+    - a: project.composer.symfony/http-kernel
+      ver: '>=6,<7'
+    - b: project.composer.symfony/http-kernel
+      ver: '>=7,<8'
+    - b: project.symfony.source.command-defaultname-property
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/symfony/symfony/v7.0.0/UPGRADE-7.0.md
+    kind: release-note
+    verified: '2026-10-13'
+    section: Console
+fixtures:
+  positive:
+    - name: symfony 6.4.0 to symfony 7.0.0 with a static $defaultName property
+      a: {attrs: {project.composer.symfony/http-kernel: '6.4.0'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '7.0.0', project.symfony.source.command-defaultname-property: 'true'}}
+  negative:
+    - name: symfony 7.0.0 to symfony 6.4.0 with a static $defaultName property (reverse direction)
+      a: {attrs: {project.composer.symfony/http-kernel: '7.0.0', project.symfony.source.command-defaultname-property: 'true'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '6.4.0'}}
+    - name: symfony 6.4.0 to symfony 7.0.0 with the AsCommand attribute only
+      a: {attrs: {project.composer.symfony/http-kernel: '6.4.0'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '7.0.0'}}
+status: pending-scanner

@@ -1,0 +1,38 @@
+schema: 1
+id: symfony-6-0-security-getusername-removed
+title: Symfony 6.0 removes UserInterface::getUsername(), so user code that calls it fails on Symfony 6
+applies:
+  - build
+difference: >-
+  side a is Symfony 5.x with user code that calls getUsername(); side b is Symfony 6.x with the same call
+symptoms:
+  - text: fatal error for an undefined method on the user, or an authentication flow that cannot find the user identifier
+    basis: inferred
+mechanism: UPGRADE-6.0.md in section Security says UserInterface::getUsername() was removed in favor of getUserIdentifier().
+detect:
+  all:
+    - a: project.composer.symfony/http-kernel
+      ver: '>=5,<6'
+    - b: project.composer.symfony/http-kernel
+      ver: '>=6,<7'
+    - b: project.symfony.source.user-getusername-call
+      present: 'true'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/symfony/symfony/v6.0.0/UPGRADE-6.0.md
+    kind: release-note
+    verified: '2026-10-13'
+    section: Security
+fixtures:
+  positive:
+    - name: symfony 5.4.0 to symfony 6.0.0 with a getUsername() call site
+      a: {attrs: {project.composer.symfony/http-kernel: '5.4.0'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '6.0.0', project.symfony.source.user-getusername-call: 'true'}}
+  negative:
+    - name: symfony 6.0.0 to symfony 5.4.0 with a getUsername() call site (reverse direction)
+      a: {attrs: {project.composer.symfony/http-kernel: '6.0.0', project.symfony.source.user-getusername-call: 'true'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '5.4.0'}}
+    - name: symfony 5.4.0 to symfony 6.0.0 without a getUsername() call site
+      a: {attrs: {project.composer.symfony/http-kernel: '5.4.0'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '6.0.0'}}
+status: pending-scanner

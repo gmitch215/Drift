@@ -1,0 +1,46 @@
+schema: 1
+id: composer-2-2-allow-plugins-default-empty
+title: Composer 2.2 blocks each plugin that is not listed in config.allow-plugins; a plugin that loaded under Composer 2.1 stops loading until it is allowed
+applies:
+  - build
+difference: >-
+  side a is Composer 2.1.x with a composer plugin package in composer.json; side b is Composer 2.2.0 or newer with the same plugin not listed in config.allow-plugins
+symptoms:
+  - text: Composer prints a warning for the unlisted plugin (interactive runs prompt) and does not load it
+    basis: verified
+mechanism: >-
+  Composer 2.2.0 added config.allow-plugins, which defaults to an empty object and so loads no plugin until the plugin is listed in it.
+detect:
+  all:
+    - a: tool.composer.version
+      ver: '<2.2'
+    - b: tool.composer.version
+      ver: '>=2.2'
+    - b: project.composer.json.plugins.unlisted
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/composer/composer/2.10.3/doc/06-config.md
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: allow-plugins
+  - url: https://raw.githubusercontent.com/composer/composer/2.10.3/CHANGELOG.md
+    kind: release-note
+    verified: '2026-10-13'
+    section: '[2.2.0-RC1] 2021-12-08, UX Change entry'
+fixtures:
+  positive:
+    - name: composer 2.1.9 to composer 2.2.9 with an unlisted plugin
+      a: {attrs: {tool.composer.version: '2.1.9'}}
+      b: {attrs: {tool.composer.version: '2.2.9', project.composer.json.plugins.unlisted: 'acme/plugin'}}
+  negative:
+    - name: composer 2.2.9 to composer 2.1.9 with an unlisted plugin (reverse direction)
+      a: {attrs: {tool.composer.version: '2.2.9', project.composer.json.plugins.unlisted: 'acme/plugin'}}
+      b: {attrs: {tool.composer.version: '2.1.9'}}
+    - name: composer 2.1.9 to composer 2.2.9 with no unlisted plugin
+      a: {attrs: {tool.composer.version: '2.1.9'}}
+      b: {attrs: {tool.composer.version: '2.2.9'}}
+    - name: composer 2.2.9 to composer 2.2.9 with an unlisted plugin (same version)
+      a: {attrs: {tool.composer.version: '2.2.9', project.composer.json.plugins.unlisted: 'acme/plugin'}}
+      b: {attrs: {tool.composer.version: '2.2.9', project.composer.json.plugins.unlisted: 'acme/plugin'}}
+status: active

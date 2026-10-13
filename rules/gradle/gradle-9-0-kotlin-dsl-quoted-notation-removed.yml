@@ -1,0 +1,55 @@
+schema: 1
+id: gradle-9-0-kotlin-dsl-quoted-notation-removed
+title: The first Kotlin DSL "name"() notation is removed in Gradle 9.0
+applies:
+  - build
+difference: >-
+  side a is Gradle below 9.0.0; side b is Gradle 9.0.0 or later with a Kotlin DSL script that uses the first "name"() notation
+symptoms:
+  - text: >-
+      a .gradle.kts script that uses the first "name"() notation fails to compile on Gradle 9.0 (inferred; the compiler message is not quoted)
+    basis: inferred
+mechanism: >-
+  The first form of the Kotlin DSL "name"() notation, which gets a task by name without a type, is deprecated and will be removed in Gradle 9.0.
+detect:
+  all:
+    - a: project.gradle.wrapper
+      ver: '<9.0.0'
+    - b: project.gradle.wrapper
+      ver: '>=9.0.0'
+    - b: project.gradle.calls.kotlin-dsl-quoted-notation
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://docs.gradle.org/9.0.0/userguide/upgrading_version_8.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: 'Referencing tasks and domain objects by "name"() in Kotlin DSL'
+fixtures:
+  positive:
+    - name: gradle 8.14.3 to gradle 9.0.0 with a quoted task lookup
+      a:
+        attrs:
+          project.gradle.wrapper: '8.14.3'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.0.0'
+          project.gradle.calls.kotlin-dsl-quoted-notation: 'true'
+  negative:
+    - name: gradle 9.0.0 without a quoted task lookup
+      a:
+        attrs:
+          project.gradle.wrapper: '8.14.3'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.0.0'
+    - name: gradle 8.14.3 to gradle 8.14.3 with a quoted task lookup
+      a:
+        attrs:
+          project.gradle.wrapper: '8.14.3'
+          project.gradle.calls.kotlin-dsl-quoted-notation: 'true'
+      b:
+        attrs:
+          project.gradle.wrapper: '8.14.3'
+          project.gradle.calls.kotlin-dsl-quoted-notation: 'true'
+status: active

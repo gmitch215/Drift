@@ -1,0 +1,62 @@
+schema: 1
+id: gradle-9-0-requires-jvm-17
+title: Gradle 9.0 requires a JVM 17 or later to run the Gradle daemon
+applies:
+  - runtime
+difference: >-
+  side a is Gradle below 9.0.0; side b is Gradle 9.0.0 or later on a JVM below 17
+symptoms:
+  - text: >-
+      Gradle 9.0 does not run on a JVM below 17 (the failure text is not quoted)
+    basis: verified
+mechanism: >-
+  Starting in Gradle 9.0 the Gradle daemon requires JVM 17 or later, while the wrapper, launcher and Tooling API stay compatible with JVM 8.
+detect:
+  all:
+    - a: project.gradle.wrapper
+      ver: '<9.0.0'
+    - b: project.gradle.wrapper
+      ver: '>=9.0.0'
+    - b: tool.java.version
+      ver: '<17'
+severity: high
+provenance:
+  - url: https://docs.gradle.org/9.0.0/userguide/upgrading_version_8.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Running Gradle on older JVMs (Upgrading from 8.9 and earlier)
+  - url: https://docs.gradle.org/9.0.0/release-notes.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: Gradle requires Java Virtual Machine (JVM) version 17 or higher to run
+fixtures:
+  positive:
+    - name: gradle 8.14.3 to gradle 9.0.0 on jdk 11
+      a:
+        attrs:
+          project.gradle.wrapper: '8.14.3'
+          tool.java.version: '11.0.23'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.0.0'
+          tool.java.version: '11.0.23'
+  negative:
+    - name: gradle 8.14.3 to gradle 9.0.0 on jdk 17 is outside the rule
+      a:
+        attrs:
+          project.gradle.wrapper: '8.14.3'
+          tool.java.version: '17.0.11+9'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.0.0'
+          tool.java.version: '17.0.11+9'
+    - name: gradle 9.0.0 to gradle 9.1.0 on jdk 11 is outside the rule
+      a:
+        attrs:
+          project.gradle.wrapper: '9.0.0'
+          tool.java.version: '11.0.23'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.1.0'
+          tool.java.version: '11.0.23'
+status: active

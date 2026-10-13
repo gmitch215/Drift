@@ -1,0 +1,84 @@
+schema: 1
+id: spring-boot-3-java-17-minimum
+title: Spring Boot 3 requires Java 17, so a Boot 3 project on an older JDK fails
+applies:
+  - build
+  - runtime
+difference: >-
+  side a is a Spring Boot 3.x project on JDK 17 or newer; side b is the same project on a JDK below 17
+symptoms:
+  - text: >-
+      the build or start-up fails on a JDK below 17, for example with an unsupported class file version error (the error text is not verified)
+    basis: inferred
+mechanism: Spring Boot 3.0 requires Java 17 as a minimum version.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '>=17'
+    - b: tool.java.version
+      ver: '<17'
+    - any:
+        - a: project.maven.org.springframework.boot:spring-boot-starter-parent
+          ver: '>=3'
+        - a: project.gradle.plugin.org.springframework.boot
+          ver: '>=3'
+    - any:
+        - b: project.maven.org.springframework.boot:spring-boot-starter-parent
+          ver: '>=3'
+        - b: project.gradle.plugin.org.springframework.boot
+          ver: '>=3'
+severity: high
+provenance:
+  - url: https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Release-Notes
+    kind: release-note
+    verified: '2026-10-13'
+    section: Java 17 Baseline and Java 19 Support
+fixtures:
+  positive:
+    - name: spring boot 3.3.4 maven project on jdk 17 to jdk 11
+      a:
+        attrs:
+          tool.java.version: '17.0.11+9'
+          project.maven.org.springframework.boot:spring-boot-starter-parent: '3.3.4'
+      b:
+        attrs:
+          tool.java.version: '11.0.23'
+          project.maven.org.springframework.boot:spring-boot-starter-parent: '3.3.4'
+    - name: spring boot 3.3.4 gradle project on jdk 21 to jdk 16
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+          project.gradle.plugin.org.springframework.boot: '3.3.4'
+      b:
+        attrs:
+          tool.java.version: '16.0.2'
+          project.gradle.plugin.org.springframework.boot: '3.3.4'
+  negative:
+    - name: spring boot 3.3.4 on jdk 17 on both sides
+      a:
+        attrs:
+          tool.java.version: '17.0.11+9'
+          project.maven.org.springframework.boot:spring-boot-starter-parent: '3.3.4'
+      b:
+        attrs:
+          tool.java.version: '17.0.11+9'
+          project.maven.org.springframework.boot:spring-boot-starter-parent: '3.3.4'
+    - name: spring boot 2.7.18 on jdk 11 to jdk 8
+      a:
+        attrs:
+          tool.java.version: '11.0.23'
+          project.maven.org.springframework.boot:spring-boot-starter-parent: '2.7.18'
+      b:
+        attrs:
+          tool.java.version: '1.8.0_412'
+          project.maven.org.springframework.boot:spring-boot-starter-parent: '2.7.18'
+    - name: spring boot 3.3.4 from jdk 21 to jdk 17 stays on the supported side
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+          project.maven.org.springframework.boot:spring-boot-starter-parent: '3.3.4'
+      b:
+        attrs:
+          tool.java.version: '17.0.11+9'
+          project.maven.org.springframework.boot:spring-boot-starter-parent: '3.3.4'
+status: active

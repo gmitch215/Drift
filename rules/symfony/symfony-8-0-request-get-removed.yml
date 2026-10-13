@@ -1,0 +1,38 @@
+schema: 1
+id: symfony-8-0-request-get-removed
+title: Symfony 8.0 removes Request::get(), so code that reads a merged input value through it fails on Symfony 8
+applies:
+  - build
+difference: >-
+  side a is Symfony 7.x with $request->get(); side b is Symfony 8.x with the same call
+symptoms:
+  - text: fatal error for an undefined method on the request
+    basis: inferred
+mechanism: UPGRADE-8.0.md in section HttpFoundation says Request::get() was removed in favor of the attributes, query and request properties.
+detect:
+  all:
+    - a: project.composer.symfony/http-kernel
+      ver: '>=7,<8'
+    - b: project.composer.symfony/http-kernel
+      ver: '>=8,<9'
+    - b: project.symfony.source.request-get-call
+      present: 'true'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/symfony/symfony/v8.0.0/UPGRADE-8.0.md
+    kind: release-note
+    verified: '2026-10-13'
+    section: HttpFoundation
+fixtures:
+  positive:
+    - name: symfony 7.0.0 to symfony 8.0.0 with a Request::get() call site
+      a: {attrs: {project.composer.symfony/http-kernel: '7.0.0'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '8.0.0', project.symfony.source.request-get-call: 'true'}}
+  negative:
+    - name: symfony 8.0.0 to symfony 7.0.0 with a Request::get() call site (reverse direction)
+      a: {attrs: {project.composer.symfony/http-kernel: '8.0.0', project.symfony.source.request-get-call: 'true'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '7.0.0'}}
+    - name: symfony 7.0.0 to symfony 8.0.0 without a Request::get() call site
+      a: {attrs: {project.composer.symfony/http-kernel: '7.0.0'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '8.0.0'}}
+status: pending-scanner

@@ -1,0 +1,58 @@
+schema: 1
+id: gradle-9-1-first-jdk-25-runtime
+title: Gradle 9.1.0 is the first release that lists JDK 25 under running Gradle
+applies:
+  - runtime
+difference: >-
+  side a is Gradle 9.1.0 or later; side b is Gradle below 9.1.0 on JDK 25 or later
+symptoms:
+  - text: >-
+      a Gradle release below 9.1.0 on JDK 25 is outside the listed runtime matrix (no failure text is quoted)
+    basis: inferred
+mechanism: >-
+  The Java compatibility matrix lists JDK 25 under running Gradle only from Gradle 9.1.0, and it lists a version only after it works without warnings.
+detect:
+  all:
+    - a: project.gradle.wrapper
+      ver: '>=9.1.0'
+    - b: project.gradle.wrapper
+      ver: '<9.1.0'
+    - b: tool.java.version
+      ver: '>=25'
+severity: medium
+provenance:
+  - url: https://docs.gradle.org/current/userguide/compatibility.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Table 1. Java Compatibility
+fixtures:
+  positive:
+    - name: gradle 9.0.0 to gradle 9.1.0 on jdk 25
+      a:
+        attrs:
+          project.gradle.wrapper: '9.1.0'
+          tool.java.version: '25.0.4.1'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.0.0'
+          tool.java.version: '25.0.4.1'
+  negative:
+    - name: gradle 9.0.0 on jdk 21 is outside the JDK 25 row
+      a:
+        attrs:
+          project.gradle.wrapper: '9.1.0'
+          tool.java.version: '21.0.12.1'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.0.0'
+          tool.java.version: '21.0.12.1'
+    - name: gradle 9.4.0 on jdk 25 is inside the listed range
+      a:
+        attrs:
+          project.gradle.wrapper: '9.1.0'
+          tool.java.version: '25.0.4.1'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.4.0'
+          tool.java.version: '25.0.4.1'
+status: active

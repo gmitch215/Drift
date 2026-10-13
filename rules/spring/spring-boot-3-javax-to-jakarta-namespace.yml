@@ -1,0 +1,73 @@
+schema: 1
+id: spring-boot-3-javax-to-jakarta-namespace
+title: Spring Boot 3 moves Jakarta EE APIs from javax.* to jakarta.* packages
+applies:
+  - build
+  - runtime
+difference: >-
+  side a is a Spring Boot 2.x project that imports javax.* Servlet, Persistence or Validation APIs; side b is the same project on Spring Boot 3.x, where those imports no longer resolve
+symptoms:
+  - text: >-
+      a compile error for a javax.* import, such as "package javax.servlet does not exist", or a ClassNotFoundException for a javax.* class at start-up (the error text is not verified)
+    basis: inferred
+mechanism: Spring Boot 3.0 uses jakarta packages rather than javax for Jakarta EE APIs.
+detect:
+  all:
+    - any:
+        - a: project.maven.org.springframework.boot:spring-boot-starter-parent
+          ver: '<3'
+        - a: project.gradle.plugin.org.springframework.boot
+          ver: '<3'
+    - any:
+        - b: project.maven.org.springframework.boot:spring-boot-starter-parent
+          ver: '>=3'
+        - b: project.gradle.plugin.org.springframework.boot
+          ver: '>=3'
+severity: high
+provenance:
+  - url: https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Jakarta EE
+  - url: https://jakarta.ee/news/jakarta-ee-9-released/
+    kind: release-note
+    verified: '2026-10-13'
+fixtures:
+  positive:
+    - name: maven parent spring boot 2.7.18 to 3.3.4
+      a:
+        attrs:
+          project.maven.org.springframework.boot:spring-boot-starter-parent: '2.7.18'
+      b:
+        attrs:
+          project.maven.org.springframework.boot:spring-boot-starter-parent: '3.3.4'
+    - name: gradle plugin spring boot 2.7.18 to 3.3.4
+      a:
+        attrs:
+          project.gradle.plugin.org.springframework.boot: '2.7.18'
+      b:
+        attrs:
+          project.gradle.plugin.org.springframework.boot: '3.3.4'
+  negative:
+    - name: maven parent spring boot 3.3.4 on both sides
+      a:
+        attrs:
+          project.maven.org.springframework.boot:spring-boot-starter-parent: '3.3.4'
+      b:
+        attrs:
+          project.maven.org.springframework.boot:spring-boot-starter-parent: '3.3.4'
+    - name: maven parent spring boot 2.7.18 on both sides
+      a:
+        attrs:
+          project.maven.org.springframework.boot:spring-boot-starter-parent: '2.7.18'
+      b:
+        attrs:
+          project.maven.org.springframework.boot:spring-boot-starter-parent: '2.7.18'
+    - name: gradle plugin declared without a version
+      a:
+        attrs:
+          project.gradle.plugin.org.springframework.boot: 'true'
+      b:
+        attrs:
+          project.gradle.plugin.org.springframework.boot: '3.3.4'
+status: active

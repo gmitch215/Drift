@@ -1,0 +1,58 @@
+schema: 1
+id: gradle-8-0-worker-implicit-add-opens-removed
+title: Gradle 8.0 stops passing implicit --add-opens for java.base/java.util and java.base/java.lang to workers
+applies:
+  - runtime
+difference: >-
+  side a is Gradle below 8.0.0; side b is Gradle 8.0.0 or later on JDK 16 or later
+symptoms:
+  - text: >-
+      code in a Gradle worker that reflects into java.base/java.util or java.base/java.lang may fail on JDK 16 or later (inferred; the exception is not quoted)
+    basis: inferred
+mechanism: >-
+  Before Gradle 8.0 workers on JDK 9 or later opened java.base/java.util and java.base/java.lang with --add-opens, and Gradle 8.0 no longer passes those arguments.
+detect:
+  all:
+    - a: project.gradle.wrapper
+      ver: '<8.0.0'
+    - b: project.gradle.wrapper
+      ver: '>=8.0.0'
+    - b: tool.java.version
+      ver: '>=16'
+severity: medium
+provenance:
+  - url: https://docs.gradle.org/8.0/userguide/upgrading_version_7.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Remove implicit --add-opens for Gradle workers
+fixtures:
+  positive:
+    - name: gradle 7.6.4 to gradle 8.5.0 on jdk 17
+      a:
+        attrs:
+          project.gradle.wrapper: '7.6.4'
+          tool.java.version: '17.0.11+9'
+      b:
+        attrs:
+          project.gradle.wrapper: '8.5.0'
+          tool.java.version: '17.0.11+9'
+  negative:
+    - name: gradle 8.5.0 on jdk 11 is outside the JDK 16 floor
+      a:
+        attrs:
+          project.gradle.wrapper: '7.6.4'
+          tool.java.version: '11.0.23'
+      b:
+        attrs:
+          project.gradle.wrapper: '8.5.0'
+          tool.java.version: '11.0.23'
+    - name: gradle 8.5.0 to gradle 8.14.3 is inside the 8.x line
+      a:
+        attrs:
+          project.gradle.wrapper: '8.5.0'
+          tool.java.version: '17.0.11+9'
+      b:
+        attrs:
+          project.gradle.wrapper: '8.14.3'
+          tool.java.version: '17.0.11+9'
+status: active

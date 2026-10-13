@@ -1,0 +1,43 @@
+schema: 1
+id: symfony-4-0-php-7-1-3-minimum
+title: Symfony 4.0 declares PHP ^7.1.3, so a host below PHP 7.1.3 cannot install it
+applies:
+  - runtime
+difference: >-
+  side a is PHP 7.1.3 up to 8.0 with Symfony 4.x; side b is PHP below 7.1.3 with the same Symfony 4.x
+symptoms:
+  - text: Composer refuses to resolve symfony/http-kernel 4.x on PHP below 7.1.3
+    basis: inferred
+mechanism: Symfony 4.0.0 declares require.php as ^7.1.3 in its composer.json.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '>=7.1.3,<8'
+    - b: tool.php.version
+      ver: '<7.1.3'
+    - a: project.composer.symfony/http-kernel
+      ver: '>=4,<5'
+    - b: project.composer.symfony/http-kernel
+      ver: '>=4,<5'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/symfony/symfony/v4.0.0/composer.json
+    kind: spec
+    verified: '2026-10-13'
+    section: require.php
+fixtures:
+  positive:
+    - name: php 7.4.33 with symfony 4.0.0 to php 7.1.2 with symfony 4.0.0
+      a: {attrs: {tool.php.version: '7.4.33', project.composer.symfony/http-kernel: '4.0.0'}}
+      b: {attrs: {tool.php.version: '7.1.2', project.composer.symfony/http-kernel: '4.0.0'}}
+  negative:
+    - name: php 7.1.2 to php 7.4.33 with symfony 4.0.0 (reverse direction)
+      a: {attrs: {tool.php.version: '7.1.2', project.composer.symfony/http-kernel: '4.0.0'}}
+      b: {attrs: {tool.php.version: '7.4.33', project.composer.symfony/http-kernel: '4.0.0'}}
+    - name: php 8.2.12 to php 7.1.2 with symfony 4.0.0 (passing side outside the caret range)
+      a: {attrs: {tool.php.version: '8.2.12', project.composer.symfony/http-kernel: '4.0.0'}}
+      b: {attrs: {tool.php.version: '7.1.2', project.composer.symfony/http-kernel: '4.0.0'}}
+    - name: php 7.4.33 to php 7.1.2 with symfony 5.4.0 (not a symfony 4 host)
+      a: {attrs: {tool.php.version: '7.4.33', project.composer.symfony/http-kernel: '5.4.0'}}
+      b: {attrs: {tool.php.version: '7.1.2', project.composer.symfony/http-kernel: '5.4.0'}}
+status: active

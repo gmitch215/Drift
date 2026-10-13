@@ -1,0 +1,38 @@
+schema: 1
+id: symfony-5-0-token-getroles-removed
+title: Symfony 5.0 removes TokenInterface::getRoles(), so custom code that calls it fails on Symfony 5
+applies:
+  - build
+difference: >-
+  side a is Symfony 4.x with code that calls TokenInterface::getRoles(); side b is Symfony 5.x with the same call
+symptoms:
+  - text: fatal error for an undefined method on the token when the security code path runs
+    basis: inferred
+mechanism: UPGRADE-5.0.md in section Security says getRoles() was removed from TokenInterface and replaced by getRoleNames().
+detect:
+  all:
+    - a: project.composer.symfony/http-kernel
+      ver: '>=4,<5'
+    - b: project.composer.symfony/http-kernel
+      ver: '>=5,<6'
+    - b: project.symfony.source.token-getroles-call
+      present: 'true'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/symfony/symfony/v5.0.0/UPGRADE-5.0.md
+    kind: release-note
+    verified: '2026-10-13'
+    section: Security
+fixtures:
+  positive:
+    - name: symfony 4.4.9 to symfony 5.0.0 with a getRoles() call site
+      a: {attrs: {project.composer.symfony/http-kernel: '4.4.9'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '5.0.0', project.symfony.source.token-getroles-call: 'true'}}
+  negative:
+    - name: symfony 5.0.0 to symfony 4.4.9 with a getRoles() call site (reverse direction)
+      a: {attrs: {project.composer.symfony/http-kernel: '5.0.0', project.symfony.source.token-getroles-call: 'true'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '4.4.9'}}
+    - name: symfony 4.4.9 to symfony 5.0.0 without a getRoles() call site
+      a: {attrs: {project.composer.symfony/http-kernel: '4.4.9'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '5.0.0'}}
+status: pending-scanner

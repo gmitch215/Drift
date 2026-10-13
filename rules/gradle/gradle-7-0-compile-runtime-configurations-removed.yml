@@ -1,0 +1,55 @@
+schema: 1
+id: gradle-7-0-compile-runtime-configurations-removed
+title: The compile and runtime dependency configurations are removed in Gradle 7.0
+applies:
+  - build
+difference: >-
+  side a is Gradle below 7.0.0; side b is Gradle 7.0.0 or later with a build script that uses the compile or runtime configuration
+symptoms:
+  - text: >-
+      a dependency declaration that uses compile or runtime fails on Gradle 7.0 (inferred; the error text is not quoted)
+    basis: inferred
+mechanism: >-
+  Gradle 7.0 removes the compile and runtime configurations, so builds must use implementation and api instead.
+detect:
+  all:
+    - a: project.gradle.wrapper
+      ver: '<7.0.0'
+    - b: project.gradle.wrapper
+      ver: '>=7.0.0'
+    - b: project.gradle.calls.compile-configuration
+      present: 'true'
+severity: high
+provenance:
+  - url: https://docs.gradle.org/7.0/userguide/upgrading_version_6.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Removal of compile and runtime configurations
+fixtures:
+  positive:
+    - name: gradle 6.9.4 to gradle 7.6.3 with a compile declaration
+      a:
+        attrs:
+          project.gradle.wrapper: '6.9.4'
+      b:
+        attrs:
+          project.gradle.wrapper: '7.6.3'
+          project.gradle.calls.compile-configuration: 'true'
+  negative:
+    - name: gradle 7.6.3 without a compile declaration
+      a:
+        attrs:
+          project.gradle.wrapper: '6.9.4'
+      b:
+        attrs:
+          project.gradle.wrapper: '7.6.3'
+    - name: gradle 6.9.4 to gradle 6.9.4 with a compile declaration
+      a:
+        attrs:
+          project.gradle.wrapper: '6.9.4'
+          project.gradle.calls.compile-configuration: 'true'
+      b:
+        attrs:
+          project.gradle.wrapper: '6.9.4'
+          project.gradle.calls.compile-configuration: 'true'
+status: active

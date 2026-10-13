@@ -1,0 +1,51 @@
+schema: 1
+id: symfony-twig-3-20-php-8-1-minimum
+title: Twig 3.20.0 declares PHP 8.1.0 or higher, so a PHP 8.0 host can run Twig 3.14 but not Twig 3.20
+applies:
+  - runtime
+difference: >-
+  side a is PHP 8.1.0 or higher with Twig 3.20 or later; side b is PHP below 8.1 with the same Twig 3.20 or later
+symptoms:
+  - text: Composer refuses to resolve twig/twig 3.20 or later on PHP below 8.1
+    basis: inferred
+mechanism: twig/twig v3.20.0 and v3.21.0 declare require.php as >=8.1.0 in composer.json, while v3.14.0 declares >=8.0.2.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '>=8.1'
+    - b: tool.php.version
+      ver: '<8.1'
+    - a: project.composer.twig/twig
+      ver: '>=3.20,<4'
+    - b: project.composer.twig/twig
+      ver: '>=3.20,<4'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/twigphp/Twig/v3.20.0/composer.json
+    kind: spec
+    verified: '2026-10-13'
+    section: require.php
+  - url: https://raw.githubusercontent.com/twigphp/Twig/v3.21.0/composer.json
+    kind: spec
+    verified: '2026-10-13'
+    section: require.php
+  - url: https://raw.githubusercontent.com/twigphp/Twig/v3.14.0/composer.json
+    kind: spec
+    verified: '2026-10-13'
+    section: require.php
+fixtures:
+  positive:
+    - name: php 8.2.12 with twig 3.21.0 to php 8.0.30 with twig 3.21.0
+      a: {attrs: {tool.php.version: '8.2.12', project.composer.twig/twig: '3.21.0'}}
+      b: {attrs: {tool.php.version: '8.0.30', project.composer.twig/twig: '3.21.0'}}
+  negative:
+    - name: php 8.0.30 to php 8.2.12 with twig 3.21.0 (reverse direction)
+      a: {attrs: {tool.php.version: '8.0.30', project.composer.twig/twig: '3.21.0'}}
+      b: {attrs: {tool.php.version: '8.2.12', project.composer.twig/twig: '3.21.0'}}
+    - name: php 8.2.12 to php 8.0.30 with twig 3.14.0 (below the 3.20 floor)
+      a: {attrs: {tool.php.version: '8.2.12', project.composer.twig/twig: '3.14.0'}}
+      b: {attrs: {tool.php.version: '8.0.30', project.composer.twig/twig: '3.14.0'}}
+    - name: php 8.2.12 to php 8.2.12 with twig 3.21.0 (same band)
+      a: {attrs: {tool.php.version: '8.2.12', project.composer.twig/twig: '3.21.0'}}
+      b: {attrs: {tool.php.version: '8.2.12', project.composer.twig/twig: '3.21.0'}}
+status: active

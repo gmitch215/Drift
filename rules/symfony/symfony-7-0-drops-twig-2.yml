@@ -1,0 +1,41 @@
+schema: 1
+id: symfony-7-0-drops-twig-2
+title: Symfony 7.0 drops support for Twig 2, so an app that still locks twig/twig 2.x cannot move to Symfony 7.0
+applies:
+  - build
+difference: >-
+  side a is Symfony 6.x; side b is Symfony 7.x with twig/twig 2.x still locked
+symptoms:
+  - text: Composer fails to resolve the Twig constraint, or TwigBundle fails at container build
+    basis: inferred
+mechanism: UPGRADE-7.0.md lists "Drop support for Twig 2" in its TwigBundle section.
+detect:
+  all:
+    - a: project.composer.symfony/http-kernel
+      ver: '>=6,<7'
+    - b: project.composer.symfony/http-kernel
+      ver: '>=7,<8'
+    - b: project.composer.twig/twig
+      ver: '>=2,<3'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/symfony/symfony/v7.0.0/UPGRADE-7.0.md
+    kind: release-note
+    verified: '2026-10-13'
+    section: TwigBundle
+fixtures:
+  positive:
+    - name: symfony 6.4.0 with twig 2.15.5 to symfony 7.0.0 with twig 2.15.5
+      a: {attrs: {project.composer.symfony/http-kernel: '6.4.0', project.composer.twig/twig: '2.15.5'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '7.0.0', project.composer.twig/twig: '2.15.5'}}
+  negative:
+    - name: symfony 7.0.0 with twig 2.15.5 to symfony 6.4.0 with twig 2.15.5 (reverse direction)
+      a: {attrs: {project.composer.symfony/http-kernel: '7.0.0', project.composer.twig/twig: '2.15.5'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '6.4.0', project.composer.twig/twig: '2.15.5'}}
+    - name: symfony 6.4.0 to symfony 7.0.0 with twig 3.14.0 (Twig moved to 3)
+      a: {attrs: {project.composer.symfony/http-kernel: '6.4.0', project.composer.twig/twig: '3.14.0'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '7.0.0', project.composer.twig/twig: '3.14.0'}}
+    - name: symfony 6.4.0 with twig 2.15.5 to symfony 6.4.0 with twig 2.15.5 (no Symfony 7)
+      a: {attrs: {project.composer.symfony/http-kernel: '6.4.0', project.composer.twig/twig: '2.15.5'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '6.4.0', project.composer.twig/twig: '2.15.5'}}
+status: active

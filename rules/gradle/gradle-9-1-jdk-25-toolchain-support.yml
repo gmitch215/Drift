@@ -1,0 +1,60 @@
+schema: 1
+id: gradle-9-1-jdk-25-toolchain-support
+title: Gradle 9.1.0 is the first release that lists JDK 25 under toolchain support
+applies:
+  - compiler
+difference: >-
+  side a is Gradle 9.1.0 or later; side b is Gradle below 9.1.0 with a JDK 25 toolchain
+symptoms:
+  - text: >-
+      a JDK 25 toolchain on Gradle 9.0 is outside the listed toolchain support (no failure text is quoted)
+    basis: inferred
+mechanism: >-
+  The Java compatibility matrix lists JDK 25 under toolchain support only from Gradle 9.1.0.
+detect:
+  all:
+    - a: project.gradle.wrapper
+      ver: '>=9.1.0'
+    - b: project.gradle.wrapper
+      ver: '<9.1.0'
+    - a: project.gradle.kotlin.toolchain
+      eq: '25'
+    - b: project.gradle.kotlin.toolchain
+      eq: '25'
+severity: medium
+provenance:
+  - url: https://docs.gradle.org/current/userguide/compatibility.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Table 1. Java Compatibility
+fixtures:
+  positive:
+    - name: gradle 9.0.0 to gradle 9.1.0 with a jdk 25 toolchain
+      a:
+        attrs:
+          project.gradle.wrapper: '9.1.0'
+          project.gradle.kotlin.toolchain: '25'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.0.0'
+          project.gradle.kotlin.toolchain: '25'
+  negative:
+    - name: gradle 9.0.0 with a jdk 21 toolchain is outside the JDK 25 row
+      a:
+        attrs:
+          project.gradle.wrapper: '9.1.0'
+          project.gradle.kotlin.toolchain: '21'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.0.0'
+          project.gradle.kotlin.toolchain: '21'
+    - name: gradle 9.4.0 with a jdk 25 toolchain is inside the listed range
+      a:
+        attrs:
+          project.gradle.wrapper: '9.1.0'
+          project.gradle.kotlin.toolchain: '25'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.4.0'
+          project.gradle.kotlin.toolchain: '25'
+status: active

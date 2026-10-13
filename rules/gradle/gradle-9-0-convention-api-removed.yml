@@ -1,0 +1,55 @@
+schema: 1
+id: gradle-9-0-convention-api-removed
+title: Access to core plugin conventions becomes an error in Gradle 9.0
+applies:
+  - build
+difference: >-
+  side a is Gradle below 9.0.0; side b is Gradle 9.0.0 or later with a build script that reads core plugin conventions
+symptoms:
+  - text: >-
+      reading a core plugin convention becomes an error in Gradle 9.0
+    basis: verified
+mechanism: >-
+  Access to core plugin conventions is deprecated and will become an error in Gradle 9.0, and their extensions are the replacement.
+detect:
+  all:
+    - a: project.gradle.wrapper
+      ver: '<9.0.0'
+    - b: project.gradle.wrapper
+      ver: '>=9.0.0'
+    - b: project.gradle.calls.convention-api
+      present: 'true'
+severity: high
+provenance:
+  - url: https://docs.gradle.org/9.0.0/userguide/upgrading_version_8.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Deprecated access to plugin conventions
+fixtures:
+  positive:
+    - name: gradle 8.14.3 to gradle 9.0.0 reading a plugin convention
+      a:
+        attrs:
+          project.gradle.wrapper: '8.14.3'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.0.0'
+          project.gradle.calls.convention-api: 'true'
+  negative:
+    - name: gradle 9.0.0 without a plugin convention read
+      a:
+        attrs:
+          project.gradle.wrapper: '8.14.3'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.0.0'
+    - name: gradle 8.14.3 to gradle 8.14.3 reading a plugin convention
+      a:
+        attrs:
+          project.gradle.wrapper: '8.14.3'
+          project.gradle.calls.convention-api: 'true'
+      b:
+        attrs:
+          project.gradle.wrapper: '8.14.3'
+          project.gradle.calls.convention-api: 'true'
+status: active

@@ -1,0 +1,55 @@
+schema: 1
+id: gradle-8-0-archive-basename-removed
+title: AbstractArchiveTask baseName and version are removed in Gradle 8.0
+applies:
+  - build
+difference: >-
+  side a is Gradle below 8.0.0; side b is Gradle 8.0.0 or later with an archive task that sets baseName or version
+symptoms:
+  - text: >-
+      setting baseName or version on an archive task fails the build on Gradle 8.0 (inferred; the error text is not quoted)
+    basis: inferred
+mechanism: >-
+  Gradle 8.0 removes the deprecated baseName and version properties of AbstractArchiveTask, and archiveBaseName replaces baseName.
+detect:
+  all:
+    - a: project.gradle.wrapper
+      ver: '<8.0.0'
+    - b: project.gradle.wrapper
+      ver: '>=8.0.0'
+    - b: project.gradle.calls.archive-basename
+      present: 'true'
+severity: high
+provenance:
+  - url: https://docs.gradle.org/8.0/userguide/upgrading_version_7.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: AbstractArchiveTask API Cleanup
+fixtures:
+  positive:
+    - name: gradle 7.6.4 to gradle 8.5.0 with a baseName archive task
+      a:
+        attrs:
+          project.gradle.wrapper: '7.6.4'
+      b:
+        attrs:
+          project.gradle.wrapper: '8.5.0'
+          project.gradle.calls.archive-basename: 'true'
+  negative:
+    - name: gradle 8.5.0 without a baseName archive task
+      a:
+        attrs:
+          project.gradle.wrapper: '7.6.4'
+      b:
+        attrs:
+          project.gradle.wrapper: '8.5.0'
+    - name: gradle 7.6.4 to gradle 7.6.4 with a baseName archive task
+      a:
+        attrs:
+          project.gradle.wrapper: '7.6.4'
+          project.gradle.calls.archive-basename: 'true'
+      b:
+        attrs:
+          project.gradle.wrapper: '7.6.4'
+          project.gradle.calls.archive-basename: 'true'
+status: active

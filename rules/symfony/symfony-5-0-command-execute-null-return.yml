@@ -1,0 +1,38 @@
+schema: 1
+id: symfony-5-0-command-execute-null-return
+title: Symfony 5.0 stops accepting null from Command::execute(), so a command that returns null fails on Symfony 5
+applies:
+  - build
+difference: >-
+  side a is Symfony 4.x with a command whose execute() returns null; side b is Symfony 5.x with the same command
+symptoms:
+  - text: the command fails on Symfony 5 with a return type error or a non-zero exit
+    basis: inferred
+mechanism: UPGRADE-5.0.md in section Console says returning null from Command::execute() was removed and that 0 should be returned instead.
+detect:
+  all:
+    - a: project.composer.symfony/http-kernel
+      ver: '>=4,<5'
+    - b: project.composer.symfony/http-kernel
+      ver: '>=5,<6'
+    - b: project.symfony.source.command-execute-returns-null
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/symfony/symfony/v5.0.0/UPGRADE-5.0.md
+    kind: release-note
+    verified: '2026-10-13'
+    section: Console
+fixtures:
+  positive:
+    - name: symfony 4.4.9 to symfony 5.0.0 with a command returning null
+      a: {attrs: {project.composer.symfony/http-kernel: '4.4.9'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '5.0.0', project.symfony.source.command-execute-returns-null: 'true'}}
+  negative:
+    - name: symfony 5.0.0 to symfony 4.4.9 with a command returning null (reverse direction)
+      a: {attrs: {project.composer.symfony/http-kernel: '5.0.0', project.symfony.source.command-execute-returns-null: 'true'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '4.4.9'}}
+    - name: symfony 4.4.9 to symfony 5.0.0 without a null return
+      a: {attrs: {project.composer.symfony/http-kernel: '4.4.9'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '5.0.0'}}
+status: pending-scanner

@@ -1,0 +1,55 @@
+schema: 1
+id: gradle-9-0-javaexec-defaults-to-toolchain
+title: JavaExec defaults to the java extension toolchain from Gradle 9.0
+applies:
+  - runtime
+difference: >-
+  side a is Gradle below 9.0.0 where a JavaExec task runs on the JVM that runs Gradle; side b is Gradle 9.0.0 or later with the same task and no explicit JVM
+symptoms:
+  - text: >-
+      a JavaExec task runs on the toolchain JVM instead of the JVM that runs Gradle (inferred from the default change; no failure text is quoted)
+    basis: inferred
+mechanism: >-
+  From Gradle 9.0 a JavaExec task defaults to the java extension toolchain when the java-base plugin is applied.
+detect:
+  all:
+    - a: project.gradle.wrapper
+      ver: '<9.0.0'
+    - b: project.gradle.wrapper
+      ver: '>=9.0.0'
+    - b: project.gradle.javaexec-without-jvm-set
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://docs.gradle.org/9.0.0/userguide/upgrading_version_8.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: JavaExec now uses the toolchain from the java extension by default
+fixtures:
+  positive:
+    - name: gradle 8.14.3 to gradle 9.0.0 with an unpinned JavaExec task
+      a:
+        attrs:
+          project.gradle.wrapper: '8.14.3'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.0.0'
+          project.gradle.javaexec-without-jvm-set: 'true'
+  negative:
+    - name: gradle 9.0.0 without an unpinned JavaExec task
+      a:
+        attrs:
+          project.gradle.wrapper: '8.14.3'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.0.0'
+    - name: gradle 8.14.3 to gradle 8.14.3 with an unpinned JavaExec task
+      a:
+        attrs:
+          project.gradle.wrapper: '8.14.3'
+          project.gradle.javaexec-without-jvm-set: 'true'
+      b:
+        attrs:
+          project.gradle.wrapper: '8.14.3'
+          project.gradle.javaexec-without-jvm-set: 'true'
+status: pending-scanner

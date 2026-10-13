@@ -1,0 +1,38 @@
+schema: 1
+id: symfony-6-0-router-utf8-default-changed
+title: Symfony 6.0 changes the default of framework.router.utf8 to true, so non-ASCII route matching can change
+applies:
+  - build
+difference: >-
+  side a is Symfony 5.x with framework.router.utf8 unset (default false); side b is Symfony 6.x with the same config (default true)
+symptoms:
+  - text: routes with non-ASCII characters in paths or requirements can match differently
+    basis: inferred
+mechanism: UPGRADE-6.0.md in section FrameworkBundle says the framework.router.utf8 option defaults to true.
+detect:
+  all:
+    - a: project.composer.symfony/http-kernel
+      ver: '>=5,<6'
+    - b: project.composer.symfony/http-kernel
+      ver: '>=6,<7'
+    - b: project.symfony.config.framework-router-utf8
+      ne: 'true'
+severity: low
+provenance:
+  - url: https://raw.githubusercontent.com/symfony/symfony/v6.0.0/UPGRADE-6.0.md
+    kind: release-note
+    verified: '2026-10-13'
+    section: FrameworkBundle
+fixtures:
+  positive:
+    - name: symfony 5.4.0 to symfony 6.0.0 with framework.router.utf8 set to false
+      a: {attrs: {project.composer.symfony/http-kernel: '5.4.0'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '6.0.0', project.symfony.config.framework-router-utf8: 'false'}}
+  negative:
+    - name: symfony 6.0.0 to symfony 5.4.0 with framework.router.utf8 set to false (reverse direction)
+      a: {attrs: {project.composer.symfony/http-kernel: '6.0.0', project.symfony.config.framework-router-utf8: 'false'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '5.4.0'}}
+    - name: symfony 5.4.0 to symfony 6.0.0 with framework.router.utf8 set to true
+      a: {attrs: {project.composer.symfony/http-kernel: '5.4.0'}}
+      b: {attrs: {project.composer.symfony/http-kernel: '6.0.0', project.symfony.config.framework-router-utf8: 'true'}}
+status: pending-scanner

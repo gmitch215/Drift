@@ -1,0 +1,60 @@
+schema: 1
+id: gradle-7-0-groovy-3-stricter-parser
+title: Groovy DSL build scripts move to Groovy 3 with a stricter parser in Gradle 7.0
+applies:
+  - build
+difference: >-
+  side a is Gradle below 7.0.0; side b is Gradle 7.0.0 or later with a Groovy DSL build script
+symptoms:
+  - text: >-
+      a Groovy DSL build script fails to compile on Gradle 7.0 with code that earlier Groovy versions accepted (inferred; the parse error is not quoted)
+    basis: inferred
+mechanism: >-
+  Gradle 7.0 upgrades Groovy DSL build scripts to Groovy 3, whose stricter parser fails to compile code that earlier Groovy versions accepted.
+detect:
+  all:
+    - a: project.gradle.wrapper
+      ver: '<7.0.0'
+    - b: project.gradle.wrapper
+      ver: '>=7.0.0'
+    - b: project.gradle.dsl
+      eq: 'groovy'
+severity: medium
+provenance:
+  - url: https://docs.gradle.org/7.0/userguide/upgrading_version_6.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Changes to Groovy and Groovy DSL
+  - url: https://docs.gradle.org/7.0/release-notes.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: Groovy 3 upgrade
+fixtures:
+  positive:
+    - name: gradle 6.9.4 to gradle 7.6.3 with a groovy build script
+      a:
+        attrs:
+          project.gradle.wrapper: '6.9.4'
+      b:
+        attrs:
+          project.gradle.wrapper: '7.6.3'
+          project.gradle.dsl: 'groovy'
+  negative:
+    - name: gradle 7.6.3 with a kotlin build script
+      a:
+        attrs:
+          project.gradle.wrapper: '6.9.4'
+      b:
+        attrs:
+          project.gradle.wrapper: '7.6.3'
+          project.gradle.dsl: 'kotlin'
+    - name: gradle 6.9.4 to gradle 6.9.4 with a groovy build script
+      a:
+        attrs:
+          project.gradle.wrapper: '6.9.4'
+          project.gradle.dsl: 'groovy'
+      b:
+        attrs:
+          project.gradle.wrapper: '6.9.4'
+          project.gradle.dsl: 'groovy'
+status: active

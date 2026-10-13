@@ -1,0 +1,55 @@
+schema: 1
+id: spring-framework-6-jakarta-validation-7
+title: Spring Framework 6 uses Hibernate Validator 7 on jakarta.validation
+applies:
+  - build
+  - runtime
+difference: the failing side is Spring Framework 6.0 or newer, where validation runs on jakarta.validation; on 5.3 the javax.validation annotations are the ones enforced
+symptoms:
+  - text: javax.validation constraints are not enforced on Spring Framework 6, so invalid input passes without an error
+    basis: inferred
+  - text: compile error for javax.validation imports when the jakarta.validation API is on the classpath
+    basis: inferred
+mechanism: Spring Framework 6.0 pairs with Hibernate Validator 7.0.x, which is based on jakarta.validation (Jakarta EE 9).
+detect:
+  all:
+    - a: project.spring-framework.version
+      ver: '<6'
+    - b: project.spring-framework.version
+      ver: '>=6'
+    - b: project.java.imports.javax.validation
+      present: 'true'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/wiki/spring-projects/spring-framework/Spring-Framework-6.0-Release-Notes.md
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Upgrading From Spring Framework 5.3 > Data Access and Transactions'
+fixtures:
+  positive:
+    - name: spring framework 5.3.39 to 6.2.0 importing javax.validation
+      a:
+        attrs:
+          project.spring-framework.version: '5.3.39'
+      b:
+        attrs:
+          project.spring-framework.version: '6.2.0'
+          project.java.imports.javax.validation: 'true'
+  negative:
+    - name: spring framework 6.2.0 on both sides importing javax.validation
+      a:
+        attrs:
+          project.spring-framework.version: '6.2.0'
+          project.java.imports.javax.validation: 'true'
+      b:
+        attrs:
+          project.spring-framework.version: '6.2.0'
+          project.java.imports.javax.validation: 'true'
+    - name: spring framework 5.3.39 to 6.2.0 with no javax.validation import
+      a:
+        attrs:
+          project.spring-framework.version: '5.3.39'
+      b:
+        attrs:
+          project.spring-framework.version: '6.2.0'
+status: pending-scanner
