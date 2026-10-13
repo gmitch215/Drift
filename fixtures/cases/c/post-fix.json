@@ -1,0 +1,48 @@
+{
+    "label": "post-fix rerun of case C candidates; not part of the sealed protocol",
+    "sealedFile": "sealed.json",
+    "sealedSha256": "d92de5f5462780491b0e30cf4e6c5d0ae34e613c12e6565eb0b0543a4786f408",
+    "engine": "cli release executables rebuilt after the C-FIX and manifest packages changes (macOS and linuxArm64)",
+    "rows": [
+        {
+            "id": "INC-13",
+            "sealedVerdict": "CONFIRMED EFFECT (bundle), 12 members, exit 10, 36 trials (73 s)",
+            "verdict": "CONFIRMED EFFECT (bundle), 12 members, exit 10, 36 trials (38 s)",
+            "members": [
+                "component:bundled OpenSSL",
+                "component:bundled npm",
+                "component:busybox ash as /bin/sh",
+                "component:busybox utilities",
+                "component:ca-certificates",
+                "component:corepack",
+                "component:musl",
+                "component:openssl",
+                "component:tzdata",
+                "os.release.PRETTY_NAME",
+                "os.release.VERSION_ID",
+                "tool.libc.version"
+            ],
+            "trials": 36,
+            "changed": "solve output identical to the sealed run except the timing line; the arm Dockerfiles now install gcompat and the manifests list it under packages"
+        },
+        {
+            "id": "INC-07",
+            "sealedVerdict": "STUCK (executor): node:16.13.0-bookworm-slim does not exist, exit 12, 0 trials",
+            "verdict": "CONFIRMED EFFECT (bundle), 2 members, exit 10, 2 experiments, 36 trials (41 s)",
+            "members": [
+                "env.NODE_VERSION",
+                "tool.node.version"
+            ],
+            "trials": 36,
+            "changed": "the baseline node:16.13.0-buster-slim and the treatment node:17.0.0-buster-slim both build now; the earlier run that hit a full Docker VM disk (exit 12, 16 trials) was superseded by a rerun after the disk was freed; tool.node.version moved the failure count 0 of 5 to 5 of 5 (exact one-sided p 0.003968), the reverse arm 5 of 5 to 0 of 5"
+        },
+        {
+            "id": "INC-14",
+            "sealedVerdict": "STUCK (executor): gcc:13.2.1 does not exist, exit 12, 0 trials",
+            "verdict": "STUCK: the passing configuration fails as often as the failing one in a container (8 of 8 against 8 of 8), 3 candidate changes, 0 experiments, exit 12, 16 trials (17 s)",
+            "members": [],
+            "trials": 16,
+            "changed": "the base now resolves to gcc:13.2 (linux/arm64) and the arms build, run on the arm64 Mac; the sealed STUCK (gcc:13.2.1 does not exist) is no longer the blocker; the rerun does not separate the two sides, so no cause is named"
+        }
+    ]
+}
