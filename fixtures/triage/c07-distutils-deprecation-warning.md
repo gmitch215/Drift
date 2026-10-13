@@ -1,0 +1,5 @@
+Environment:
+
+Python: 3.12.1
+
+DeprecationWarning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives.

@@ -189,6 +189,15 @@ object Claims {
         "unlike",
         "instead of",
         "removed in",
+        "non-",
+        "nondeterministic",
+        "deprecat",
+        "slated",
+        "alternativ",
+        "instead",
+        "would",
+        "please",
+        "overflow",
     )
 
     private val parsed = mutableMapOf<String, Node>()
