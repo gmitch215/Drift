@@ -1,0 +1,71 @@
+schema: 1
+id: alpine-3-19-iptables-nft-default
+title: Alpine 3.19 makes iptables-nft the default iptables backend
+applies:
+  - os
+  - userland
+difference: >-
+  the passing side is Alpine 3.18 or earlier with an iptables backend and the failing side is Alpine 3.19 with the nft backend
+symptoms:
+  - text: >-
+      a rule inserted through the legacy iptables backend is not listed by the nft backend on Alpine 3.19
+    basis: inferred
+mechanism: >-
+  The Alpine 3.19 release announcement states that iptables-nft is now the default iptables backend.
+detect:
+  all:
+    - a: os.release.ID
+      eq: alpine
+    - a: os.release.VERSION_ID
+      ver: '<3.19'
+    - a: tool.iptables.backend
+      present: 'true'
+    - b: os.release.ID
+      eq: alpine
+    - b: os.release.VERSION_ID
+      ver: '>=3.19'
+    - b: tool.iptables.backend
+      eq: nft
+severity: medium
+provenance:
+  - url: https://alpinelinux.org/posts/Alpine-3.19.0-released.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Changed defaults: "iptables-nft is now the default iptables backend."'
+fixtures:
+  positive:
+    - name: alpine 3.18 legacy backend to alpine 3.19 nft backend
+      a:
+        attrs:
+          os.release.ID: alpine
+          os.release.VERSION_ID: '3.18.4'
+          tool.iptables.backend: legacy
+      b:
+        attrs:
+          os.release.ID: alpine
+          os.release.VERSION_ID: '3.19.0'
+          tool.iptables.backend: nft
+  negative:
+    - name: alpine 3.19 on both sides
+      a:
+        attrs:
+          os.release.ID: alpine
+          os.release.VERSION_ID: '3.19.0'
+          tool.iptables.backend: nft
+      b:
+        attrs:
+          os.release.ID: alpine
+          os.release.VERSION_ID: '3.19.0'
+          tool.iptables.backend: nft
+    - name: alpine 3.18 on the failing side is not 3.19
+      a:
+        attrs:
+          os.release.ID: alpine
+          os.release.VERSION_ID: '3.18.4'
+          tool.iptables.backend: legacy
+      b:
+        attrs:
+          os.release.ID: alpine
+          os.release.VERSION_ID: '3.18.9'
+          tool.iptables.backend: nft
+status: active

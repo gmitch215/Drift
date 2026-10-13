@@ -1,0 +1,52 @@
+schema: 1
+id: requests-ca-bundle-env-not-seen-by-prepared-requests
+title: Requests honours REQUESTS_CA_BUNDLE and falls back to CURL_CA_BUNDLE, and a prepared request ignores the environment
+applies:
+  - runtime
+  - network
+  - env
+difference: >-
+  a = a process with REQUESTS_CA_BUNDLE set to a corporate CA bundle; b = a process where that variable is unset and Requests is installed, so the bundle is not used
+symptoms:
+  - text: requests.get or a session send fails with CERTIFICATE_VERIFY_FAILED behind a TLS-intercepting proxy
+    basis: inferred
+mechanism: Requests reads REQUESTS_CA_BUNDLE and falls back to CURL_CA_BUNDLE, and a prepared request does not take the environment into account.
+detect:
+  all:
+    - a: env.REQUESTS_CA_BUNDLE
+      present: 'true'
+    - b: env.REQUESTS_CA_BUNDLE
+      present: 'false'
+    - b: deps.requests.version
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://requests.readthedocs.io/en/latest/user/advanced/
+    kind: vendor-doc
+    verified: '2026-10-13'
+fixtures:
+  positive:
+    - name: the passing side sets REQUESTS_CA_BUNDLE and the failing side has requests but no bundle
+      a:
+        attrs:
+          env.REQUESTS_CA_BUNDLE: /etc/ssl/corp-ca.pem
+      b:
+        attrs:
+          deps.requests.version: '2.32.3'
+  negative:
+    - name: both sides set REQUESTS_CA_BUNDLE
+      a:
+        attrs:
+          env.REQUESTS_CA_BUNDLE: /etc/ssl/corp-ca.pem
+      b:
+        attrs:
+          env.REQUESTS_CA_BUNDLE: /etc/ssl/corp-ca.pem
+          deps.requests.version: '2.32.3'
+    - name: the failing side has no requests package installed
+      a:
+        attrs:
+          env.REQUESTS_CA_BUNDLE: /etc/ssl/corp-ca.pem
+      b:
+        attrs:
+          tool.python.version: '3.12.4'
+status: pending-scanner

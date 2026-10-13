@@ -1,0 +1,73 @@
+schema: 1
+id: ubuntu-24-04-system-python-3-12
+title: Ubuntu 24.04 system python3 moves from 3.10 to 3.12
+applies:
+  - os
+  - runtime
+difference: >-
+  the passing side runs Ubuntu 22.04 with python3 3.10 and the failing side runs Ubuntu 24.04 with
+  python3 3.12
+symptoms:
+  - text: >-
+      C extension wheels tagged for cp310 fail to install or import with python3 on Ubuntu 24.04
+    basis: inferred
+mechanism: >-
+  The 24.04 release notes state that Python now defaults to version 3.12, where the 22.04 notes state
+  that Python now ships at version 3.10.4.
+detect:
+  all:
+    - a: os.release.VERSION_ID
+      eq: '22.04'
+    - a: tool.python.version
+      ver: '>=3.10,<3.11'
+    - b: os.release.VERSION_ID
+      eq: '24.04'
+    - b: tool.python.version
+      ver: '>=3.12'
+severity: medium
+provenance:
+  - url: https://discourse.ubuntu.com/t/noble-numbat-release-notes/39890
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Toolchain Upgrades: "Python now defaults to version 3.12"'
+  - url: https://discourse.ubuntu.com/t/jammy-jellyfish-release-notes/24668
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Toolchain Upgrades: "Python now ships at version 3.10.4"'
+fixtures:
+  positive:
+    - name: ubuntu 22.04 python 3.10 to 24.04 python 3.12
+      a:
+        attrs:
+          os.release.ID: ubuntu
+          os.release.VERSION_ID: '22.04'
+          tool.python.version: '3.10.12'
+      b:
+        attrs:
+          os.release.ID: ubuntu
+          os.release.VERSION_ID: '24.04'
+          tool.python.version: '3.12.3'
+  negative:
+    - name: ubuntu 22.04 with a newer python3 from a ppa
+      a:
+        attrs:
+          os.release.ID: ubuntu
+          os.release.VERSION_ID: '22.04'
+          tool.python.version: '3.12.3'
+      b:
+        attrs:
+          os.release.ID: ubuntu
+          os.release.VERSION_ID: '24.04'
+          tool.python.version: '3.12.3'
+    - name: 24.04 to 26.04 is outside this band
+      a:
+        attrs:
+          os.release.ID: ubuntu
+          os.release.VERSION_ID: '24.04'
+          tool.python.version: '3.12.3'
+      b:
+        attrs:
+          os.release.ID: ubuntu
+          os.release.VERSION_ID: '26.04'
+          tool.python.version: '3.14.0'
+status: active

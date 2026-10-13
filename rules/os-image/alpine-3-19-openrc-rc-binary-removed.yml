@@ -1,0 +1,65 @@
+schema: 1
+id: alpine-3-19-openrc-rc-binary-removed
+title: Alpine 3.19 removes the deprecated openrc /sbin/rc binary
+applies:
+  - os
+difference: >-
+  the passing side is Alpine 3.18 with /sbin/rc present and the failing side is Alpine 3.19 with /sbin/rc absent
+symptoms:
+  - text: >-
+      scripts that call /sbin/rc fail with a not found error on Alpine 3.19
+    basis: inferred
+mechanism: >-
+  The Alpine 3.19 release announcement states that openrc has removed the deprecated /sbin/rc binary.
+detect:
+  all:
+    - a: os.release.ID
+      eq: alpine
+    - a: os.release.VERSION_ID
+      ver: '<3.19'
+    - a: file./sbin/rc
+      present: 'true'
+    - b: os.release.ID
+      eq: alpine
+    - b: os.release.VERSION_ID
+      ver: '>=3.19'
+    - b: file./sbin/rc
+      present: 'false'
+severity: low
+provenance:
+  - url: https://alpinelinux.org/posts/Alpine-3.19.0-released.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Changed defaults: "the deprecated /sbin/rc binary"'
+fixtures:
+  positive:
+    - name: alpine 3.18 with /sbin/rc to alpine 3.19 without it
+      a:
+        attrs:
+          os.release.ID: alpine
+          os.release.VERSION_ID: '3.18.4'
+          file./sbin/rc: 'true'
+      b:
+        attrs:
+          os.release.ID: alpine
+          os.release.VERSION_ID: '3.19.0'
+  negative:
+    - name: alpine 3.19 on both sides without /sbin/rc
+      a:
+        attrs:
+          os.release.ID: alpine
+          os.release.VERSION_ID: '3.19.0'
+      b:
+        attrs:
+          os.release.ID: alpine
+          os.release.VERSION_ID: '3.19.0'
+    - name: alpine 3.18 without /sbin/rc on the passing side
+      a:
+        attrs:
+          os.release.ID: alpine
+          os.release.VERSION_ID: '3.18.4'
+      b:
+        attrs:
+          os.release.ID: alpine
+          os.release.VERSION_ID: '3.19.0'
+status: pending-scanner

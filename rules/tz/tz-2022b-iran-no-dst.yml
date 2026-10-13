@@ -1,0 +1,50 @@
+schema: 1
+id: tz-2022b-iran-no-dst
+title: tzdata 2022b ends daylight saving time in Iran after 2022
+applies:
+  - locale
+difference: >-
+  a = tzdata 2022b or later on the passing side; b = tzdata before 2022b on the failing side. The change
+  applies to dates after the 2022 transition; the 2022b NEWS text read does not name the zone
+symptoms:
+  - text: >-
+      Iranian times in the months after the 2022 change differ between tzdata before 2022b and tzdata 2022b
+    basis: inferred
+mechanism: tzdata 2022b ends daylight saving time in Iran after 2022.
+detect:
+  all:
+    - a: tz.database.version
+      ver: '>=2022b'
+    - b: tz.database.version
+      ver: '<2022b'
+severity: low
+provenance:
+  - url: https://raw.githubusercontent.com/eggert/tz/main/NEWS
+    kind: release-note
+    verified: '2026-10-13'
+    section: Release 2022b
+fixtures:
+  positive:
+    - name: tzdata 2022b against 2022a
+      a:
+        attrs:
+          tz.database.version: '2022b'
+      b:
+        attrs:
+          tz.database.version: '2022a'
+  negative:
+    - name: tzdata 2022b against 2022b
+      a:
+        attrs:
+          tz.database.version: '2022b'
+      b:
+        attrs:
+          tz.database.version: '2022b'
+    - name: tzdata 2022a against 2021e
+      a:
+        attrs:
+          tz.database.version: '2022a'
+      b:
+        attrs:
+          tz.database.version: '2021e'
+status: pending-scanner

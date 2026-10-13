@@ -1,0 +1,52 @@
+schema: 1
+id: tz-2026b-vancouver-permanent-mst
+title: tzdata 2026b makes America/Vancouver permanent UTC-7 with abbreviation MST
+applies:
+  - locale
+difference: >-
+  a = tzdata 2026b or later on the passing side; b = tzdata before 2026b on the failing side. The NEWS
+  gives 2026-03-09 as the legal change date and models it as a 2026-11-01 02:00 transition for CLDR 48.1;
+  the modelled date is a tzdb placeholder
+symptoms:
+  - text: >-
+      after the modelled 2026-11-01 02:00 change, Vancouver times differ between tzdata before 2026b and
+      tzdata 2026b
+    basis: inferred
+mechanism: tzdata 2026b makes America/Vancouver a permanent UTC-7 zone with abbreviation MST, so releases before 2026b disagree on its offset.
+detect:
+  all:
+    - a: tz.database.version
+      ver: '>=2026b'
+    - b: tz.database.version
+      ver: '<2026b'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/eggert/tz/main/NEWS
+    kind: release-note
+    verified: '2026-10-13'
+    section: Release 2026b
+fixtures:
+  positive:
+    - name: tzdata 2026b against 2026a
+      a:
+        attrs:
+          tz.database.version: '2026b'
+      b:
+        attrs:
+          tz.database.version: '2026a'
+  negative:
+    - name: tzdata 2026b against 2026b
+      a:
+        attrs:
+          tz.database.version: '2026b'
+      b:
+        attrs:
+          tz.database.version: '2026b'
+    - name: tzdata 2026a against 2025c
+      a:
+        attrs:
+          tz.database.version: '2026a'
+      b:
+        attrs:
+          tz.database.version: '2025c'
+status: pending-scanner

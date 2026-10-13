@@ -1,0 +1,73 @@
+schema: 1
+id: postgres-12-recovery-conf-removed
+title: PostgreSQL 12 refuses to start while a recovery.conf file exists in the data directory
+applies:
+  - runtime
+difference: >-
+  side a is PostgreSQL 11 or lower, which reads recovery.conf for standby or recovery settings; side b is PostgreSQL 12 or higher, which does not read it and stops when it is present
+symptoms:
+  - text: the server does not start while a restored or copied data directory still contains recovery.conf
+    basis: verified
+mechanism: >-
+  The PostgreSQL 12 release notes state that recovery.conf is no longer used and that the server will not start if that file exists.
+detect:
+  all:
+    - a: runtime.database.server.kind
+      eq: postgres
+    - a: runtime.database.server.version
+      ver: '<12.0'
+    - b: runtime.database.server.kind
+      eq: postgres
+    - b: runtime.database.server.version
+      ver: '>=12.0'
+    - b: runtime.database.server.recovery-conf-file
+      present: 'true'
+severity: high
+provenance:
+  - url: https://www.postgresql.org/docs/12/release-12.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Migration to Version 12'
+fixtures:
+  positive:
+    - name: postgres 11.22 to postgres 12.19 with recovery.conf in the data directory
+      a:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '11.22'
+      b:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '12.19'
+          runtime.database.server.recovery-conf-file: 'true'
+  negative:
+    - name: postgres 11.22 to postgres 12.19 without recovery.conf
+      a:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '11.22'
+      b:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '12.19'
+    - name: postgres 12.19 to postgres 12.19 (no version crossing)
+      a:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '12.19'
+      b:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '12.19'
+          runtime.database.server.recovery-conf-file: 'true'
+    - name: postgres 12.19 to postgres 11.22 (reverse direction)
+      a:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '12.19'
+          runtime.database.server.recovery-conf-file: 'true'
+      b:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '11.22'
+status: pending-scanner

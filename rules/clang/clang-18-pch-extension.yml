@@ -1,0 +1,74 @@
+schema: 1
+id: clang-18-pch-extension
+title: Clang 18 writes precompiled headers as .pch, not .gch
+applies:
+  - compiler
+difference: >-
+  the C or C++ compiler is LLVM Clang 18 or newer on the failing side and LLVM Clang 17 or older on
+  the passing side (Apple clang is excluded)
+symptoms:
+  - text: >-
+      -include a.h ignores a.h.gch when that file is not a Clang precompiled header
+    basis: verified
+  - text: build scripts that look for a .gch artefact after building a precompiled header find none
+    basis: inferred
+mechanism: >-
+  Clang 18 names generated precompiled headers .pch by default, and -include ignores a .gch file
+  that is not a Clang precompiled header.
+detect:
+  all:
+    - a: tool.cc.family
+      eq: clang
+    - b: tool.cc.family
+      eq: clang
+    - a: tool.cc.vendor
+      eq: llvm
+    - b: tool.cc.vendor
+      eq: llvm
+    - a: tool.cc.version
+      ver: '<18'
+    - b: tool.cc.version
+      ver: '>=18'
+severity: low
+provenance:
+  - url: https://releases.llvm.org/18.1.0/tools/clang/docs/ReleaseNotes.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'C/C++ Language Potentially Breaking Changes'
+fixtures:
+  positive:
+    - name: LLVM clang 17.0.6 to LLVM clang 18.1.3
+      a:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: llvm
+          tool.cc.version: '17.0.6'
+      b:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: llvm
+          tool.cc.version: '18.1.3'
+  negative:
+    - name: LLVM clang 18.1.3 to LLVM clang 19.1.0
+      a:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: llvm
+          tool.cc.version: '18.1.3'
+      b:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: llvm
+          tool.cc.version: '19.1.0'
+    - name: Apple clang 17.0.6 to Apple clang 18.1.3
+      a:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: apple
+          tool.cc.version: '17.0.6'
+      b:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: apple
+          tool.cc.version: '18.1.3'
+status: active

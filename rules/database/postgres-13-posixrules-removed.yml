@@ -1,0 +1,73 @@
+schema: 1
+id: postgres-13-posixrules-removed
+title: PostgreSQL 13 removes posixrules support and hard-wires the DST rule for POSIX-style time zones
+applies:
+  - runtime
+difference: >-
+  side a is PostgreSQL 12 or lower with a posixrules file in the time zone data; side b is PostgreSQL 13 or higher, where the rule is fixed
+symptoms:
+  - text: timestamps in POSIX-style zones that have no explicit DST rule shift by the daylight saving offset after the upgrade
+    basis: inferred
+mechanism: >-
+  The PostgreSQL 13 release notes state that support for posixrules files in the time zone database is removed, so the transition rule for POSIX-style zones without an explicit DST rule is hard-wired.
+detect:
+  all:
+    - a: runtime.database.server.kind
+      eq: postgres
+    - a: runtime.database.server.version
+      ver: '<13.0'
+    - a: runtime.database.server.timezone-posixrules-file
+      present: 'true'
+    - b: runtime.database.server.kind
+      eq: postgres
+    - b: runtime.database.server.version
+      ver: '>=13.0'
+severity: low
+provenance:
+  - url: https://www.postgresql.org/docs/13/release-13.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Migration to Version 13'
+fixtures:
+  positive:
+    - name: postgres 12.17 with a posixrules file to postgres 13.13
+      a:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '12.17'
+          runtime.database.server.timezone-posixrules-file: 'true'
+      b:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '13.13'
+  negative:
+    - name: postgres 12.17 without a posixrules file to postgres 13.13
+      a:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '12.17'
+      b:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '13.13'
+    - name: postgres 13.13 with a posixrules file to postgres 13.13 (no version crossing)
+      a:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '13.13'
+          runtime.database.server.timezone-posixrules-file: 'true'
+      b:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '13.13'
+    - name: postgres 13.13 to postgres 12.17 (reverse direction)
+      a:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '13.13'
+      b:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '12.17'
+          runtime.database.server.timezone-posixrules-file: 'true'
+status: pending-scanner

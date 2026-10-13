@@ -1,0 +1,66 @@
+schema: 1
+id: rhel-9-network-scripts-removed
+title: RHEL 9 removes the network-scripts package
+applies:
+  - os
+  - userland
+difference: >-
+  the passing side is RHEL 8 or earlier with network-scripts installed and the failing side is RHEL 9 without it
+symptoms:
+  - text: >-
+      ifcfg network definitions are not applied on RHEL 9 until they are migrated to NetworkManager
+    basis: inferred
+mechanism: >-
+  The RHEL 9.0 release notes state that the network-scripts package has been removed and that NetworkManager is used to configure network connections.
+detect:
+  all:
+    - a: os.release.ID
+      eq: rhel
+    - a: os.release.VERSION_ID
+      ver: '<9'
+    - a: pkg.network-scripts.installed
+      present: 'true'
+    - b: os.release.ID
+      eq: rhel
+    - b: os.release.VERSION_ID
+      ver: '>=9,<10'
+    - b: pkg.network-scripts.installed
+      present: 'false'
+severity: high
+provenance:
+  - url: https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html-single/9.0_release_notes/index
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Networking: "The network-scripts package has been removed."'
+fixtures:
+  positive:
+    - name: rhel 8.10 with network-scripts to rhel 9.4 without it
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '8.10'
+          pkg.network-scripts.installed: 'true'
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+  negative:
+    - name: rhel 9.4 on both sides without the package
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+    - name: rhel 8.10 without the package has nothing to remove
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '8.10'
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+status: pending-scanner

@@ -1,0 +1,74 @@
+schema: 1
+id: clang-19-relaxed-template-template-default
+title: Clang 19 enables P0522 relaxed template template argument matching by default
+applies:
+  - compiler
+difference: >-
+  the C++ compiler is LLVM Clang 19 or newer on the failing side and LLVM Clang 18 or older on the
+  passing side (Apple clang is excluded); the difference only shows in code that uses template
+  template parameters
+symptoms:
+  - text: >-
+      an overload or specialisation that was accepted before can become ambiguous or resolve to a
+      different template
+    basis: inferred
+mechanism: >-
+  Clang 19 enables P0522 relaxed template template argument matching in all language modes by
+  default.
+detect:
+  all:
+    - a: tool.cc.family
+      eq: clang
+    - b: tool.cc.family
+      eq: clang
+    - a: tool.cc.vendor
+      eq: llvm
+    - b: tool.cc.vendor
+      eq: llvm
+    - a: tool.cc.version
+      ver: '<19'
+    - b: tool.cc.version
+      ver: '>=19'
+severity: low
+provenance:
+  - url: https://releases.llvm.org/19.1.0/tools/clang/docs/ReleaseNotes.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Resolutions to C++ Defect Reports: C++ Language Changes'
+fixtures:
+  positive:
+    - name: LLVM clang 18.1.3 to LLVM clang 19.1.0
+      a:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: llvm
+          tool.cc.version: '18.1.3'
+      b:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: llvm
+          tool.cc.version: '19.1.0'
+  negative:
+    - name: LLVM clang 19.1.0 to LLVM clang 20.0.0
+      a:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: llvm
+          tool.cc.version: '19.1.0'
+      b:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: llvm
+          tool.cc.version: '20.0.0'
+    - name: Apple clang 18.1.3 to Apple clang 19.1.0
+      a:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: apple
+          tool.cc.version: '18.1.3'
+      b:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: apple
+          tool.cc.version: '19.1.0'
+status: active

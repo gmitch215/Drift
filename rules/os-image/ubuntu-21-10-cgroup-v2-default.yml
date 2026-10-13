@@ -1,0 +1,61 @@
+schema: 1
+id: ubuntu-21-10-cgroup-v2-default
+title: Ubuntu 21.10 switches systemd to the cgroup v2 unified hierarchy by default
+applies:
+  - kernel
+  - os
+difference: >-
+  the passing side runs Ubuntu 21.04 with the cgroup v1 hierarchy and the failing side runs Ubuntu 21.10 with the cgroup v2 unified hierarchy
+symptoms:
+  - text: >-
+      tools that read cgroup v1 paths report no resource limits or fail on Ubuntu 21.10 and later
+    basis: inferred
+mechanism: >-
+  The 21.10 release notes state that systemd is switched to the unified cgroup v2 hierarchy by default, with a boot parameter that restores the legacy hierarchy.
+detect:
+  all:
+    - a: os.release.VERSION_ID
+      in: ['21.04']
+    - a: cgroup.version
+      eq: v1
+    - b: os.release.VERSION_ID
+      in: ['21.10']
+    - b: cgroup.version
+      eq: v2
+severity: medium
+provenance:
+  - url: https://discourse.ubuntu.com/t/impish-indri-release-notes
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Base System: "cgroup v2) by default"'
+fixtures:
+  positive:
+    - name: ubuntu 21.04 cgroup v1 to 21.10 cgroup v2
+      a:
+        attrs:
+          os.release.VERSION_ID: '21.04'
+          cgroup.version: v1
+      b:
+        attrs:
+          os.release.VERSION_ID: '21.10'
+          cgroup.version: v2
+  negative:
+    - name: 22.04 on both sides with cgroup v2
+      a:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          cgroup.version: v2
+      b:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          cgroup.version: v2
+    - name: 21.04 already on cgroup v2 is not the change
+      a:
+        attrs:
+          os.release.VERSION_ID: '21.04'
+          cgroup.version: v2
+      b:
+        attrs:
+          os.release.VERSION_ID: '21.10'
+          cgroup.version: v2
+status: active

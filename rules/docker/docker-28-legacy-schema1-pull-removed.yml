@@ -1,0 +1,50 @@
+schema: 1
+id: docker-28-legacy-schema1-pull-removed
+title: Docker Engine 28.2.0 removes pulling legacy v2 schema 1 images
+applies:
+  - runtime
+difference: >-
+  the passing run used a Docker Engine before 28.2.0, which can pull legacy v2 schema 1 images, and the failing run used Docker Engine 28.2.0 or later
+symptoms:
+  - text: >-
+      docker pull of a legacy schema 1 image fails on Docker Engine 28.2.0 and later; the release note states the removal, not the error text
+    basis: inferred
+mechanism: >-
+  Docker Engine 28.2.0 removes support for pulling legacy v2 schema 1 images.
+detect:
+  all:
+    - a: tool.docker.version
+      ver: '<28.2.0'
+    - b: tool.docker.version
+      ver: '>=28.2.0'
+severity: low
+provenance:
+  - url: https://docs.docker.com/engine/release-notes/28/
+    kind: release-note
+    verified: '2026-10-13'
+    section: 28.2.0 release notes
+fixtures:
+  positive:
+    - name: Docker 28.1.1 then Docker 28.2.0
+      a:
+        attrs:
+          tool.docker.version: '28.1.1'
+      b:
+        attrs:
+          tool.docker.version: '28.2.0'
+  negative:
+    - name: both runs on Docker 28.2.0
+      a:
+        attrs:
+          tool.docker.version: '28.2.0'
+      b:
+        attrs:
+          tool.docker.version: '28.2.0'
+    - name: both runs before 28.2.0
+      a:
+        attrs:
+          tool.docker.version: '27.5.1'
+      b:
+        attrs:
+          tool.docker.version: '28.1.1'
+status: pending-scanner

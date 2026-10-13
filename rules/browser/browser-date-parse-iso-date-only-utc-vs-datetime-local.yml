@@ -1,0 +1,51 @@
+schema: 1
+id: browser-date-parse-iso-date-only-utc-vs-datetime-local
+title: Date.parse reads a date-only ISO string as UTC but a date-time string without an offset as local time
+applies:
+  - browser
+  - locale
+difference: >-
+  a = a runtime whose system time zone is UTC (CI runner default); b = a runtime in a non-UTC local time zone running the same code
+symptoms:
+  - text: an assertion on Date.parse of a date-only or offset-free string passes on a UTC runner and fails on a laptop in another zone, with an error of whole hours (inferred; not measured)
+    basis: inferred
+  - text: browsers are very lenient when parsing date strings and may discard any part of a string they cannot parse, and results differ by engine
+    basis: verified
+mechanism: Date.parse treats a date-only ISO string as UTC and a date-time string without an offset as local time.
+detect:
+  all:
+    - a: tz.system-zone
+      eq: UTC
+    - b: tz.system-zone
+      ne: UTC
+severity: medium
+provenance:
+  - url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Description
+fixtures:
+  positive:
+    - name: the passing side runs in UTC and the failing side runs in America/New_York
+      a:
+        attrs:
+          tz.system-zone: UTC
+      b:
+        attrs:
+          tz.system-zone: America/New_York
+  negative:
+    - name: both sides run in UTC
+      a:
+        attrs:
+          tz.system-zone: UTC
+      b:
+        attrs:
+          tz.system-zone: UTC
+    - name: the failing side has no zone captured
+      a:
+        attrs:
+          tz.system-zone: UTC
+      b:
+        attrs:
+          tool.node.version: '22.12.0'
+status: active

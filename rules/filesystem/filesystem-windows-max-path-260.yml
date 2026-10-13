@@ -1,0 +1,61 @@
+schema: 1
+id: filesystem-windows-max-path-260
+title: Win32 paths longer than 260 characters fail unless the registry flag and the application manifest both opt in
+applies:
+  - os
+difference: >-
+  a = LongPathsEnabled is 1 in HKLM on the passing side; b = LongPathsEnabled is 0 on the failing side,
+  both on Windows. The longPathAware manifest opt-in is per application and is not part of this detect
+symptoms:
+  - text: a path longer than 260 characters is rejected by the legacy Win32 file functions
+    basis: verified
+  - text: tools fail on deep paths with a path-too-long error (error text not checked)
+    basis: inferred
+mechanism: On Windows, MAX_PATH is 260 characters, and the long path behaviour needs both a registry value and an application manifest opt-in.
+detect:
+  all:
+    - a: os.name
+      eq: windows
+    - b: os.name
+      eq: windows
+    - a: windows.registry.LongPathsEnabled
+      eq: '1'
+    - b: windows.registry.LongPathsEnabled
+      eq: '0'
+severity: medium
+provenance:
+  - url: https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Enable long paths in Windows 10, version 1607, and later
+fixtures:
+  positive:
+    - name: windows with long paths enabled against disabled
+      a:
+        attrs:
+          os.name: windows
+          windows.registry.LongPathsEnabled: '1'
+      b:
+        attrs:
+          os.name: windows
+          windows.registry.LongPathsEnabled: '0'
+  negative:
+    - name: windows with long paths enabled on both sides
+      a:
+        attrs:
+          os.name: windows
+          windows.registry.LongPathsEnabled: '1'
+      b:
+        attrs:
+          os.name: windows
+          windows.registry.LongPathsEnabled: '1'
+    - name: linux against windows with long paths disabled
+      a:
+        attrs:
+          os.name: linux
+          windows.registry.LongPathsEnabled: '1'
+      b:
+        attrs:
+          os.name: windows
+          windows.registry.LongPathsEnabled: '0'
+status: pending-scanner

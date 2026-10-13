@@ -1,0 +1,60 @@
+schema: 1
+id: openssl-3-to-4-default-macos26-xcode27
+title: The default OpenSSL version on macOS 26 and Xcode 27 runners changes from 3 to 4
+applies:
+  - build
+difference: >-
+  the passing run used a macOS 26 runner image with OpenSSL 3 as the default and the failing run used the same label with OpenSSL 4 as the default
+symptoms:
+  - text: >-
+      a build or script that calls the default openssl binary or links against it can fail or change TLS behaviour across the 3 to 4 major version; the release note does not describe a failure
+    basis: inferred
+mechanism: >-
+  The runner image announcement states that the default OpenSSL version will change from 3 to 4 on macOS 26 and Xcode 27.
+detect:
+  all:
+    - a: os.name
+      eq: macos
+    - b: os.name
+      eq: macos
+    - a: tool.openssl.version
+      ver: '>=3.0.0,<4.0.0'
+    - b: tool.openssl.version
+      ver: '>=4.0.0'
+severity: medium
+provenance:
+  - url: https://github.com/actions/runner-images/releases/tag/xcode-27-arm64%2F20261012.0260
+    kind: release-note
+    verified: '2026-10-13'
+    section: Announcements, [macOS] The default OpenSSL version will be updated from 3 to 4 on macOS 26 and Xcode 27
+fixtures:
+  positive:
+    - name: macOS runner with OpenSSL 3.5.4 then OpenSSL 4.0.0
+      a:
+        attrs:
+          os.name: macos
+          tool.openssl.version: '3.5.4'
+      b:
+        attrs:
+          os.name: macos
+          tool.openssl.version: '4.0.0'
+  negative:
+    - name: both runs on OpenSSL 4
+      a:
+        attrs:
+          os.name: macos
+          tool.openssl.version: '4.0.0'
+      b:
+        attrs:
+          os.name: macos
+          tool.openssl.version: '4.0.1'
+    - name: Linux runner is outside the macOS claim
+      a:
+        attrs:
+          os.name: linux
+          tool.openssl.version: '3.5.4'
+      b:
+        attrs:
+          os.name: linux
+          tool.openssl.version: '4.0.0'
+status: active

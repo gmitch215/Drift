@@ -1,0 +1,63 @@
+schema: 1
+id: gcc-15-vector-cxx20-iterator-ctor
+title: GCC 15 std::vector range constructor uses C++20 iterator concepts
+applies:
+  - compiler
+difference: >-
+  the C++ compiler is GCC 15 or newer on the failing side and older on the passing side; GCC 14.3
+  is not separated from GCC 14.0 here
+symptoms:
+  - text: >-
+      iterators that meet only the older C++17 input-iterator requirements can fail inside the
+      std::vector range constructor
+    basis: inferred
+mechanism: >-
+  The std::vector range constructor now recognises iterators that satisfy the C++20 iterator
+  concepts.
+detect:
+  all:
+    - a: tool.cc.family
+      eq: gcc
+    - b: tool.cc.family
+      eq: gcc
+    - a: tool.cc.version
+      ver: '<15'
+    - b: tool.cc.version
+      ver: '>=15'
+severity: low
+provenance:
+  - url: https://gcc.gnu.org/gcc-15/porting_to.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: 'C++ language issues: C++20 iterator support in std::vector'
+fixtures:
+  positive:
+    - name: gcc 14.2.0 to gcc 15.1.0
+      a:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '14.2.0'
+      b:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '15.1.0'
+  negative:
+    - name: gcc 15.1.0 to gcc 15.1.0
+      a:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '15.1.0'
+      b:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '15.1.0'
+    - name: gcc 12.2.0 to gcc 14.2.0
+      a:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '12.2.0'
+      b:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '14.2.0'
+status: active

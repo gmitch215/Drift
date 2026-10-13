@@ -1,0 +1,67 @@
+schema: 1
+id: browser-third-party-cookie-default-divergence
+title: Chrome allows third-party cookies by default outside Incognito, while Firefox partitions them and Safari blocks them
+applies:
+  - browser
+difference: >-
+  a = Chrome, with third-party cookies allowed by default outside Incognito; b = Firefox with Enhanced Tracking Protection on by default, or Safari, which blocks cross-site cookies by default
+symptoms:
+  - text: an embedded third-party frame (login, payment, chat or SSO check) keeps its session in Chrome and loses it in Firefox or Safari
+    basis: inferred
+mechanism: Chrome allows third-party cookies by default outside Incognito, Firefox partitions them per site with Total Cookie Protection, and Safari blocks cross-site cookies by default.
+detect:
+  all:
+    - a: browser.name
+      eq: chrome
+    - b: browser.name
+      in:
+        - firefox
+        - safari
+severity: medium
+provenance:
+  - url: https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Third-party_cookies
+    kind: vendor-doc
+    verified: '2026-10-13'
+  - url: https://webkit.org/blog/10218/full-third-party-cookie-blocking-and-more/
+    kind: release-note
+    verified: '2026-10-13'
+fixtures:
+  positive:
+    - name: chrome to firefox with an embedded login frame
+      a:
+        attrs:
+          browser.name: chrome
+          browser.version: '131.0'
+      b:
+        attrs:
+          browser.name: firefox
+          browser.version: '133.0'
+    - name: chrome to safari with an embedded login frame
+      a:
+        attrs:
+          browser.name: chrome
+          browser.version: '131.0'
+      b:
+        attrs:
+          browser.name: safari
+          browser.version: '18.1'
+  negative:
+    - name: chrome to chrome
+      a:
+        attrs:
+          browser.name: chrome
+          browser.version: '131.0'
+      b:
+        attrs:
+          browser.name: chrome
+          browser.version: '132.0'
+    - name: firefox to firefox
+      a:
+        attrs:
+          browser.name: firefox
+          browser.version: '132.0'
+      b:
+        attrs:
+          browser.name: firefox
+          browser.version: '133.0'
+status: pending-scanner

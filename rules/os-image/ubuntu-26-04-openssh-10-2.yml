@@ -1,0 +1,61 @@
+schema: 1
+id: ubuntu-26-04-openssh-10-2
+title: Ubuntu 26.04 upgrades OpenSSH from 9.6p1 to 10.2p1 and removes DSA signature support
+applies:
+  - os
+  - userland
+difference: >-
+  the passing side runs Ubuntu 24.04 with OpenSSH 9.6p1 and the failing side runs Ubuntu 26.04 with OpenSSH 10.2p1
+symptoms:
+  - text: >-
+      DSA key authentication that worked on Ubuntu 24.04 fails on Ubuntu 26.04
+    basis: inferred
+mechanism: >-
+  The 26.04 summary states that the upgrade from OpenSSH 9.6p1 to 10.2p1 includes major changes and removes support for the DSA signature algorithm.
+detect:
+  all:
+    - a: os.release.VERSION_ID
+      eq: '24.04'
+    - a: tool.ssh.version
+      present: 'true'
+    - b: os.release.VERSION_ID
+      eq: '26.04'
+    - b: tool.ssh.version
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://documentation.ubuntu.com/release-notes/26.04/summary-for-lts-users/
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'OpenSSH: "The upgrade from Ubuntu 24.04 LTS, which had OpenSSH 1:9.6p1, to OpenSSH 1:10.2p1 includes major changes."; "Removes support for the weak DSA signature algorithm."'
+fixtures:
+  positive:
+    - name: ubuntu 24.04 openssh 9.6p1 to 26.04 openssh 10.2p1
+      a:
+        attrs:
+          os.release.VERSION_ID: '24.04'
+          tool.ssh.version: '9.6p1'
+      b:
+        attrs:
+          os.release.VERSION_ID: '26.04'
+          tool.ssh.version: '10.2p1'
+  negative:
+    - name: 26.04 on both sides
+      a:
+        attrs:
+          os.release.VERSION_ID: '26.04'
+          tool.ssh.version: '10.2p1'
+      b:
+        attrs:
+          os.release.VERSION_ID: '26.04'
+          tool.ssh.version: '10.2p1'
+    - name: 22.04 to 26.04 is not the 24.04 boundary
+      a:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          tool.ssh.version: '8.9p1'
+      b:
+        attrs:
+          os.release.VERSION_ID: '26.04'
+          tool.ssh.version: '10.2p1'
+status: active

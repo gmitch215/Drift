@@ -1,0 +1,54 @@
+schema: 1
+id: curl-no-proxy-cidr-7-86
+title: curl accepts CIDR ranges in NO_PROXY from version 7.86.0
+applies:
+  - network
+  - env
+difference: >-
+  a = curl 7.86.0 or later; b = curl before 7.86.0 with NO_PROXY set
+symptoms:
+  - text: internal hosts in a CIDR NO_PROXY range still go through the proxy on an older curl and fail or time out (inferred; not tested)
+    basis: inferred
+mechanism: curl accepts CIDR notation in NO_PROXY from version 7.86.0.
+detect:
+  all:
+    - a: tool.curl.version
+      ver: '>=7.86.0'
+    - b: tool.curl.version
+      ver: '<7.86.0'
+    - b: env.NO_PROXY
+      present: 'true'
+severity: low
+provenance:
+  - url: https://curl.se/docs/manpage.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: ENVIRONMENT
+fixtures:
+  positive:
+    - name: the passing side runs curl 7.88.0 and the failing side runs curl 7.81.0 with a CIDR NO_PROXY
+      a:
+        attrs:
+          tool.curl.version: '7.88.0'
+      b:
+        attrs:
+          tool.curl.version: '7.81.0'
+          env.NO_PROXY: 10.0.0.0/8
+  negative:
+    - name: the failing side runs curl 7.88.0
+      a:
+        attrs:
+          tool.curl.version: '7.81.0'
+          env.NO_PROXY: 10.0.0.0/8
+      b:
+        attrs:
+          tool.curl.version: '7.88.0'
+          env.NO_PROXY: 10.0.0.0/8
+    - name: the failing side has no NO_PROXY set
+      a:
+        attrs:
+          tool.curl.version: '7.88.0'
+      b:
+        attrs:
+          tool.curl.version: '7.81.0'
+status: active

@@ -1,0 +1,69 @@
+schema: 1
+id: mysql-8-0-utf8mb4-0900-ai-ci-default-collation
+title: MySQL 8.0 changes the default server collation from latin1_swedish_ci to utf8mb4_0900_ai_ci
+applies:
+  - runtime
+difference: >-
+  side a is MySQL 5.7 with collation_server latin1_swedish_ci; side b is MySQL 8.0 with utf8mb4_0900_ai_ci. Existing objects keep their collation after the upgrade, so only new objects change
+symptoms:
+  - text: ORDER BY and equality results differ for accented or mixed-case text in tables created after the upgrade
+    basis: inferred
+mechanism: >-
+  The MySQL 8.0 release notes state that the default of collation_server and collation_database changed from latin1_swedish_ci to utf8mb4_0900_ai_ci, and that the upgrade takes effect only for new objects.
+detect:
+  all:
+    - a: runtime.database.server.kind
+      eq: mysql
+    - a: runtime.database.server.version
+      ver: '<8.0.0'
+    - a: runtime.database.server.collation-server
+      eq: latin1_swedish_ci
+    - b: runtime.database.server.kind
+      eq: mysql
+    - b: runtime.database.server.version
+      ver: '>=8.0.0'
+    - b: runtime.database.server.collation-server
+      eq: utf8mb4_0900_ai_ci
+severity: medium
+provenance:
+  - url: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: 'Changed Server Defaults'
+fixtures:
+  positive:
+    - name: mysql 5.7.44 with latin1_swedish_ci to mysql 8.0.36 with utf8mb4_0900_ai_ci
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '5.7.44'
+          runtime.database.server.collation-server: latin1_swedish_ci
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+          runtime.database.server.collation-server: utf8mb4_0900_ai_ci
+  negative:
+    - name: mysql 8.0.36 to mysql 5.7.44 (reverse direction)
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+          runtime.database.server.collation-server: utf8mb4_0900_ai_ci
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '5.7.44'
+          runtime.database.server.collation-server: latin1_swedish_ci
+    - name: mysql 5.7.44 with utf8mb4_general_ci to mysql 8.0.36 (a is not the 5.7 default)
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '5.7.44'
+          runtime.database.server.collation-server: utf8mb4_general_ci
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+          runtime.database.server.collation-server: utf8mb4_0900_ai_ci
+status: pending-scanner

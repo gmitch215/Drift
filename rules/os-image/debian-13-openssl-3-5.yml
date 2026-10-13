@@ -1,0 +1,61 @@
+schema: 1
+id: debian-13-openssl-3-5
+title: Debian 13 (trixie) moves OpenSSL from 3.0 to 3.5
+applies:
+  - os
+  - userland
+difference: >-
+  the passing side is Debian 12 (bookworm) with OpenSSL 3.0 and the failing side is Debian 13 (trixie) with OpenSSL 3.5
+symptoms:
+  - text: >-
+      binaries linked against the bookworm libssl fail to load on trixie, and the reverse
+    basis: inferred
+mechanism: >-
+  The trixie release notes list OpenSSL at 3.5 and give bookworm's 3.0 as the earlier version in the package table.
+detect:
+  all:
+    - a: os.release.VERSION_ID
+      eq: '12'
+    - a: tool.openssl.version
+      ver: '>=3.0,<3.1'
+    - b: os.release.VERSION_ID
+      eq: '13'
+    - b: tool.openssl.version
+      ver: '>=3.5,<3.6'
+severity: medium
+provenance:
+  - url: https://www.debian.org/releases/trixie/release-notes/whats-new.en.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'package table, columns "Version in 12 (bookworm)" and "Version in 13 (trixie)": OpenSSL 3.0 and 3.5'
+fixtures:
+  positive:
+    - name: debian 12 openssl 3.0 to debian 13 openssl 3.5
+      a:
+        attrs:
+          os.release.VERSION_ID: '12'
+          tool.openssl.version: '3.0.15'
+      b:
+        attrs:
+          os.release.VERSION_ID: '13'
+          tool.openssl.version: '3.5.1'
+  negative:
+    - name: debian 13 on both sides
+      a:
+        attrs:
+          os.release.VERSION_ID: '13'
+          tool.openssl.version: '3.5.1'
+      b:
+        attrs:
+          os.release.VERSION_ID: '13'
+          tool.openssl.version: '3.5.1'
+    - name: debian 12 with openssl 3.5 on the passing side
+      a:
+        attrs:
+          os.release.VERSION_ID: '12'
+          tool.openssl.version: '3.5.1'
+      b:
+        attrs:
+          os.release.VERSION_ID: '13'
+          tool.openssl.version: '3.5.1'
+status: active

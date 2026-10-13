@@ -1,0 +1,62 @@
+schema: 1
+id: ubuntu-22-04-openssl-3-legacy-digests
+title: Ubuntu 22.04 OpenSSL 3.0 rejects SHA-1 and MD5 certificates at the default security level
+applies:
+  - os
+  - userland
+difference: >-
+  the passing side runs Ubuntu 20.04 and the failing side runs Ubuntu 22.04 with OpenSSL 3.0
+symptoms:
+  - text: >-
+      certificate verification that succeeds on Ubuntu 20.04 fails with a certificate-invalid error on
+      Ubuntu 22.04 when the chain uses a SHA-1 or MD5 signature
+    basis: inferred
+mechanism: >-
+  The 22.04 release notes state that OpenSSL 3.0 disables many legacy algorithms by default and that certificates using SHA1 or MD5 are invalid under the default security level.
+detect:
+  all:
+    - a: os.release.VERSION_ID
+      in: ['20.04']
+    - a: tool.openssl.version
+      present: 'true'
+    - b: os.release.VERSION_ID
+      in: ['22.04']
+    - b: tool.openssl.version
+      present: 'true'
+severity: high
+provenance:
+  - url: https://discourse.ubuntu.com/t/jammy-jellyfish-release-notes/24668
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'OpenSSL 3.0: "certificates using SHA1 or MD5 as hash algorithms are now invalid under the default security level"'
+fixtures:
+  positive:
+    - name: ubuntu 20.04 openssl 1.1.1 to 22.04 openssl 3.0
+      a:
+        attrs:
+          os.release.VERSION_ID: '20.04'
+          tool.openssl.version: '1.1.1f'
+      b:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          tool.openssl.version: '3.0.2'
+  negative:
+    - name: 22.04 on both sides
+      a:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          tool.openssl.version: '3.0.2'
+      b:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          tool.openssl.version: '3.0.2'
+    - name: 22.04 to 24.04 is outside this boundary
+      a:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          tool.openssl.version: '3.0.2'
+      b:
+        attrs:
+          os.release.VERSION_ID: '24.04'
+          tool.openssl.version: '3.0.13'
+status: active

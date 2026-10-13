@@ -1,0 +1,75 @@
+schema: 1
+id: clang-16-cxx17-default-dialect
+title: Clang 16 defaults C++ to gnu++17
+applies:
+  - compiler
+difference: >-
+  the C++ compiler is LLVM Clang 16 or newer on the failing side (default gnu++17) and LLVM Clang 15
+  or older on the passing side (default gnu++14); Apple clang is excluded because it has its own
+  version numbers
+symptoms:
+  - text: >-
+      code that is incompatible with C++17 needs -std=gnu++14 in the build settings to behave as
+      before
+    basis: verified
+  - text: >-
+      C++14-only code can change overload or lookup results where the C++17 default applies
+    basis: inferred
+mechanism: Clang 16 changed the default C++ dialect from gnu++14 to gnu++17.
+detect:
+  all:
+    - a: tool.cc.family
+      eq: clang
+    - b: tool.cc.family
+      eq: clang
+    - a: tool.cc.vendor
+      eq: llvm
+    - b: tool.cc.vendor
+      eq: llvm
+    - a: tool.cc.version
+      ver: '<16'
+    - b: tool.cc.version
+      ver: '>=16'
+severity: low
+provenance:
+  - url: https://releases.llvm.org/16.0.0/tools/clang/docs/ReleaseNotes.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Potentially Breaking Changes'
+fixtures:
+  positive:
+    - name: LLVM clang 15.0.0 to LLVM clang 16.0.0
+      a:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: llvm
+          tool.cc.version: '15.0.0'
+      b:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: llvm
+          tool.cc.version: '16.0.0'
+  negative:
+    - name: LLVM clang 16.0.0 to LLVM clang 18.1.3
+      a:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: llvm
+          tool.cc.version: '16.0.0'
+      b:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: llvm
+          tool.cc.version: '18.1.3'
+    - name: Apple clang 15.0.0 to Apple clang 17.0.0 (Apple numbering)
+      a:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: apple
+          tool.cc.version: '15.0.0'
+      b:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: apple
+          tool.cc.version: '17.0.0'
+status: active

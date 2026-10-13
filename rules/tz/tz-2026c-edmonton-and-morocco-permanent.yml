@@ -1,0 +1,55 @@
+schema: 1
+id: tz-2026c-edmonton-and-morocco-permanent
+title: tzdata 2026c makes Alberta (America/Edmonton) permanent UTC-6 and makes Morocco permanent UTC+0
+applies:
+  - locale
+difference: >-
+  a = tzdata 2026c or later on the passing side; b = tzdata before 2026c on the failing side. The NEWS
+  gives 2026-06-18 as the Alberta legal change date, modelled as 2026-11-01 02:00, and 2026-09-20 02:00
+  as the Morocco change, which also affects Western Sahara
+symptoms:
+  - text: >-
+      after the modelled 2026-11-01 02:00 change, Alberta times differ between tzdata before 2026c and
+      tzdata 2026c
+    basis: inferred
+  - text: >-
+      Morocco times from 2026-09-20 02:00 differ between tzdata before 2026c and tzdata 2026c
+    basis: inferred
+mechanism: tzdata 2026c makes Alberta (America/Edmonton) permanent UTC-6 and makes Morocco and Western Sahara permanent UTC+0 from 2026-09-20.
+detect:
+  all:
+    - a: tz.database.version
+      ver: '>=2026c'
+    - b: tz.database.version
+      ver: '<2026c'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/eggert/tz/main/NEWS
+    kind: release-note
+    verified: '2026-10-13'
+    section: Release 2026c
+fixtures:
+  positive:
+    - name: tzdata 2026c against 2026b
+      a:
+        attrs:
+          tz.database.version: '2026c'
+      b:
+        attrs:
+          tz.database.version: '2026b'
+  negative:
+    - name: tzdata 2026c against 2026c
+      a:
+        attrs:
+          tz.database.version: '2026c'
+      b:
+        attrs:
+          tz.database.version: '2026c'
+    - name: tzdata 2026b against 2026a
+      a:
+        attrs:
+          tz.database.version: '2026b'
+      b:
+        attrs:
+          tz.database.version: '2026a'
+status: pending-scanner

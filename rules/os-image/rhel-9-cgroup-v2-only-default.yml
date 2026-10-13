@@ -1,0 +1,67 @@
+schema: 1
+id: rhel-9-cgroup-v2-only-default
+title: RHEL 9 enables cgroup v2 by default
+applies:
+  - kernel
+  - os
+difference: >-
+  the passing side is RHEL 8 or earlier and the failing side is RHEL 9 with the cgroup v2 hierarchy
+symptoms:
+  - text: >-
+      container and monitoring tools that read cgroup v1 paths misreport CPU or memory limits on RHEL 9
+    basis: inferred
+mechanism: >-
+  The RHEL 9.0 release notes carry the heading "cgroup-v2 enabled by default in RHEL 9" in the kernel section.
+detect:
+  all:
+    - a: os.release.ID
+      eq: rhel
+    - a: os.release.VERSION_ID
+      ver: '<9'
+    - b: os.release.ID
+      eq: rhel
+    - b: os.release.VERSION_ID
+      ver: '>=9,<10'
+    - b: cgroup.version
+      eq: v2
+severity: medium
+provenance:
+  - url: https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html-single/9.0_release_notes/index
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Kernel: "cgroup-v2 enabled by default in RHEL 9"'
+fixtures:
+  positive:
+    - name: rhel 8.10 to rhel 9.4 on cgroup v2
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '8.10'
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+          cgroup.version: v2
+  negative:
+    - name: rhel 9.4 on both sides
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+          cgroup.version: v2
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+          cgroup.version: v2
+    - name: rhel 9.4 still on cgroup v1 is not the default
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '8.10'
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+          cgroup.version: v1
+status: active

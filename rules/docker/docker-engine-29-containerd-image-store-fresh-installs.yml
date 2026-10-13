@@ -1,0 +1,58 @@
+schema: 1
+id: docker-engine-29-containerd-image-store-fresh-installs
+title: Docker Engine 29 uses the containerd image store by default on fresh installs
+applies:
+  - runtime
+difference: >-
+  the passing run used a Docker Engine before 29.0.0 or an upgraded install with the existing image store, and the failing run used a fresh Docker Engine 29 install with the containerd image store
+symptoms:
+  - text: >-
+      docker images output and the on-disk image layout differ between the two stores, so tools that read the Docker data directory directly can miss images
+    basis: inferred
+mechanism: >-
+  The containerd image store is now the default for fresh installs of Docker Engine 29, except daemons configured with userns-remap.
+detect:
+  all:
+    - a: tool.docker.version
+      ver: '<29.0.0'
+    - b: tool.docker.version
+      ver: '>=29.0.0'
+    - b: tool.docker.image-store
+      eq: containerd
+severity: medium
+provenance:
+  - url: https://docs.docker.com/engine/release-notes/29/
+    kind: release-note
+    verified: '2026-10-13'
+    section: 29.0.0 release notes, containerd image store default for fresh installs
+fixtures:
+  positive:
+    - name: Docker 28.5.2 overlay2 then fresh Docker 29.0.0 containerd
+      a:
+        attrs:
+          tool.docker.version: '28.5.2'
+          tool.docker.image-store: overlay2
+      b:
+        attrs:
+          tool.docker.version: '29.0.0'
+          tool.docker.image-store: containerd
+  negative:
+    - name: fresh Docker 29 with userns-remap keeps the overlay2 store
+      a:
+        attrs:
+          tool.docker.version: '28.5.2'
+          tool.docker.image-store: overlay2
+      b:
+        attrs:
+          tool.docker.version: '29.0.0'
+          tool.docker.image-store: overlay2
+    - name: both runs on Docker 29 with containerd
+      a:
+        attrs:
+          tool.docker.version: '29.0.0'
+          tool.docker.image-store: containerd
+      b:
+        attrs:
+          tool.docker.version: '29.0.0'
+          tool.docker.image-store: containerd
+status: pending-scanner

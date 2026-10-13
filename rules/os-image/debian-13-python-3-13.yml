@@ -1,0 +1,72 @@
+schema: 1
+id: debian-13-python-3-13
+title: Debian 13 (trixie) ships python3 3.13 where Debian 12 (bookworm) ships 3.11
+applies:
+  - os
+  - runtime
+difference: >-
+  the passing side runs Debian 12 with python3 3.11 and the failing side runs Debian 13 with python3
+  3.13
+symptoms:
+  - text: >-
+      a C extension module built against the 3.11 ABI fails to load with python3 on Debian 13
+    basis: inferred
+mechanism: >-
+  The trixie release notes table lists python3 at 3.11 in bookworm and at 3.13 in trixie.
+detect:
+  all:
+    - a: os.release.ID
+      eq: debian
+    - a: os.release.VERSION_ID
+      eq: '12'
+    - a: tool.python.version
+      ver: '>=3.11,<3.12'
+    - b: os.release.ID
+      eq: debian
+    - b: os.release.VERSION_ID
+      eq: '13'
+    - b: tool.python.version
+      ver: '>=3.13'
+severity: medium
+provenance:
+  - url: https://www.debian.org/releases/trixie/release-notes/whats-new.en.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Section 2.2.10 Desktops and well known packages: table row "Python 3"'
+fixtures:
+  positive:
+    - name: debian 12 python 3.11 to debian 13 python 3.13
+      a:
+        attrs:
+          os.release.ID: debian
+          os.release.VERSION_ID: '12'
+          tool.python.version: '3.11.2'
+      b:
+        attrs:
+          os.release.ID: debian
+          os.release.VERSION_ID: '13'
+          tool.python.version: '3.13.5'
+  negative:
+    - name: debian 13 on both sides
+      a:
+        attrs:
+          os.release.ID: debian
+          os.release.VERSION_ID: '13'
+          tool.python.version: '3.13.5'
+      b:
+        attrs:
+          os.release.ID: debian
+          os.release.VERSION_ID: '13'
+          tool.python.version: '3.13.5'
+    - name: ubuntu 22.04 is not debian
+      a:
+        attrs:
+          os.release.ID: ubuntu
+          os.release.VERSION_ID: '22.04'
+          tool.python.version: '3.10.12'
+      b:
+        attrs:
+          os.release.ID: debian
+          os.release.VERSION_ID: '13'
+          tool.python.version: '3.13.5'
+status: active

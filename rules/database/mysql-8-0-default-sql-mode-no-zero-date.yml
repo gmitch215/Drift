@@ -1,0 +1,81 @@
+schema: 1
+id: mysql-8-0-default-sql-mode-no-zero-date
+title: MySQL 8.0 default sql_mode rejects zero dates and enforces ONLY_FULL_GROUP_BY, which a permissive server config lacks
+applies:
+  - runtime
+difference: >-
+  side a is a MySQL 8.0 server whose sql_mode lacks NO_ZERO_DATE (for example an empty sql_mode carried over from an old config); side b is the MySQL 8.0 default sql_mode
+symptoms:
+  - text: inserts of zero dates such as 0000-00-00 are rejected, and GROUP BY queries that select non-aggregated columns fail
+    basis: inferred
+mechanism: >-
+  The MySQL 8.0 SQL mode reference lists the default modes as ONLY_FULL_GROUP_BY, STRICT_TRANS_TABLES, NO_ZERO_IN_DATE, NO_ZERO_DATE, ERROR_FOR_DIVISION_BY_ZERO and NO_ENGINE_SUBSTITUTION.
+detect:
+  all:
+    - a: runtime.database.server.kind
+      eq: mysql
+    - not:
+        a: runtime.database.server.sql-mode
+        has: NO_ZERO_DATE
+    - b: runtime.database.server.kind
+      eq: mysql
+    - b: runtime.database.server.version
+      ver: '>=8.0.0'
+    - b: runtime.database.server.sql-mode
+      has: NO_ZERO_DATE
+    - b: runtime.database.server.sql-mode
+      has: ONLY_FULL_GROUP_BY
+severity: medium
+provenance:
+  - url: https://dev.mysql.com/doc/refman/8.0/en/sql-mode.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: 'Setting the SQL Mode'
+fixtures:
+  positive:
+    - name: mysql 8.0.36 with an empty sql_mode to mysql 8.0.36 with the default modes
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+          runtime.database.server.sql-mode: ''
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+          runtime.database.server.sql-mode: ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+  negative:
+    - name: default modes on both sides
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+          runtime.database.server.sql-mode: ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+          runtime.database.server.sql-mode: ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+    - name: default modes to an empty sql_mode (reverse direction)
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+          runtime.database.server.sql-mode: ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+          runtime.database.server.sql-mode: ''
+    - name: both sides permissive (b still lacks NO_ZERO_DATE)
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+          runtime.database.server.sql-mode: ''
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+          runtime.database.server.sql-mode: STRICT_TRANS_TABLES
+status: pending-scanner

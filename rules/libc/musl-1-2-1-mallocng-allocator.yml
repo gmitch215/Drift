@@ -1,0 +1,60 @@
+schema: 1
+id: musl-1-2-1-mallocng-allocator
+title: musl 1.2.1 replaces its allocator with mallocng
+applies:
+  - os
+difference: >-
+  the C library is musl 1.2.1 or newer on the failing side and older than 1.2.1 on the passing side
+symptoms:
+  - text: >-
+      a program that depended on the old allocator's behaviour or memory layout can change memory
+      use or crash after the upgrade
+    basis: inferred
+mechanism: musl 1.2.1 replaces its dlmalloc-like allocator with the new mallocng implementation.
+detect:
+  all:
+    - a: tool.libc.family
+      eq: musl
+    - b: tool.libc.family
+      eq: musl
+    - a: tool.libc.version
+      ver: '<1.2.1'
+    - b: tool.libc.version
+      ver: '>=1.2.1'
+severity: medium
+provenance:
+  - url: https://musl.libc.org/releases.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'musl-1.2.1 (August 4, 2020)'
+fixtures:
+  positive:
+    - name: musl 1.1.24 to musl 1.2.1
+      a:
+        attrs:
+          tool.libc.family: musl
+          tool.libc.version: '1.1.24'
+      b:
+        attrs:
+          tool.libc.family: musl
+          tool.libc.version: '1.2.1'
+  negative:
+    - name: musl 1.2.1 to musl 1.2.5
+      a:
+        attrs:
+          tool.libc.family: musl
+          tool.libc.version: '1.2.1'
+      b:
+        attrs:
+          tool.libc.family: musl
+          tool.libc.version: '1.2.5'
+    - name: glibc on the passing side
+      a:
+        attrs:
+          tool.libc.family: glibc
+          tool.libc.version: '2.36'
+      b:
+        attrs:
+          tool.libc.family: musl
+          tool.libc.version: '1.2.1'
+status: active

@@ -1,0 +1,68 @@
+schema: 1
+id: ubuntu-26-04-system-python-3-14
+title: Ubuntu 26.04 updates system python3 from 3.12 to 3.14
+applies:
+  - os
+  - runtime
+difference: >-
+  the passing side runs Ubuntu 24.04 with python3 3.12 and the failing side runs Ubuntu 26.04 with
+  python3 3.14
+symptoms:
+  - text: >-
+      C extension wheels tagged for cp312 fail to install or import with python3 on Ubuntu 26.04
+    basis: inferred
+mechanism: >-
+  The 26.04 release notes state that Python has been updated from version 3.12 to 3.14.
+detect:
+  all:
+    - a: os.release.VERSION_ID
+      eq: '24.04'
+    - a: tool.python.version
+      ver: '>=3.12,<3.13'
+    - b: os.release.VERSION_ID
+      eq: '26.04'
+    - b: tool.python.version
+      ver: '>=3.14'
+severity: medium
+provenance:
+  - url: https://documentation.ubuntu.com/release-notes/26.04/summary-for-lts-users/
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Development: "Python has been updated from version 3.12 to 3.14."'
+fixtures:
+  positive:
+    - name: ubuntu 24.04 python 3.12 to 26.04 python 3.14
+      a:
+        attrs:
+          os.release.ID: ubuntu
+          os.release.VERSION_ID: '24.04'
+          tool.python.version: '3.12.3'
+      b:
+        attrs:
+          os.release.ID: ubuntu
+          os.release.VERSION_ID: '26.04'
+          tool.python.version: '3.14.0'
+  negative:
+    - name: ubuntu 26.04 with python 3.14 on both sides
+      a:
+        attrs:
+          os.release.ID: ubuntu
+          os.release.VERSION_ID: '26.04'
+          tool.python.version: '3.14.0'
+      b:
+        attrs:
+          os.release.ID: ubuntu
+          os.release.VERSION_ID: '26.04'
+          tool.python.version: '3.14.0'
+    - name: ubuntu 22.04 to 24.04 is outside this band
+      a:
+        attrs:
+          os.release.ID: ubuntu
+          os.release.VERSION_ID: '22.04'
+          tool.python.version: '3.10.12'
+      b:
+        attrs:
+          os.release.ID: ubuntu
+          os.release.VERSION_ID: '24.04'
+          tool.python.version: '3.12.3'
+status: active

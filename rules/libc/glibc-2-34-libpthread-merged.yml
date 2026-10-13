@@ -1,0 +1,67 @@
+schema: 1
+id: glibc-2-34-libpthread-merged
+title: glibc 2.34 merges libpthread into libc, so new builds need no -lpthread
+applies:
+  - os
+  - build
+difference: >-
+  glibc 2.34 or later on the passing side and glibc 2.33 or earlier on the failing side, for a build
+  whose link line has no -lpthread
+symptoms:
+  - text: >-
+      on glibc 2.33 or earlier, a binary built without -lpthread fails to link with undefined
+      pthread_* references (inferred from the NEWS statement; the failing direction was not built)
+    basis: inferred
+mechanism: >-
+  glibc 2.34 moves the functions of libpthread, libdl, libutil and libanl into libc; new
+  applications need no -lpthread, and the empty archives keep old link lines working.
+detect:
+  all:
+    - a: tool.libc.family
+      eq: glibc
+    - b: tool.libc.family
+      eq: glibc
+    - a: tool.libc.version
+      ver: '>=2.34'
+    - b: tool.libc.version
+      ver: '<2.34'
+    - b: project.build.link.libs
+      present: 'false'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/bminor/glibc/glibc-2.34/NEWS
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Major new features'
+fixtures:
+  positive:
+    - name: glibc 2.34 to glibc 2.33 with no -lpthread
+      a:
+        attrs:
+          tool.libc.family: glibc
+          tool.libc.version: '2.34'
+      b:
+        attrs:
+          tool.libc.family: glibc
+          tool.libc.version: '2.33'
+  negative:
+    - name: glibc 2.34 to glibc 2.33 with -lpthread linked
+      a:
+        attrs:
+          tool.libc.family: glibc
+          tool.libc.version: '2.34'
+      b:
+        attrs:
+          tool.libc.family: glibc
+          tool.libc.version: '2.33'
+          project.build.link.libs: '-lpthread'
+    - name: glibc 2.34 to glibc 2.38 with no -lpthread
+      a:
+        attrs:
+          tool.libc.family: glibc
+          tool.libc.version: '2.34'
+      b:
+        attrs:
+          tool.libc.family: glibc
+          tool.libc.version: '2.38'
+status: pending-scanner

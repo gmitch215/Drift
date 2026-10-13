@@ -1,0 +1,66 @@
+schema: 1
+id: filesystem-windows-symlink-right
+title: Windows checkouts of symlinks become plain text files for users without the Create symbolic links right
+applies:
+  - os
+difference: >-
+  a = the running user holds the Create symbolic links right on the passing side; b = the user does not
+  hold it on the failing side, both on Windows. Developer Mode is not part of this detect, and its effect
+  on symlink creation is not verified
+symptoms:
+  - text: a repository symlink is checked out as a small plain file that contains the link text
+    basis: verified
+  - text: tools that follow the link fail because the path is a file (error text not checked)
+    basis: inferred
+mechanism: On Windows the Create symbolic links right defaults to the Administrators group, and git sets core.symlinks to false when a clone or init finds that the environment cannot create links.
+detect:
+  all:
+    - a: os.name
+      eq: windows
+    - b: os.name
+      eq: windows
+    - a: windows.user.create-symlink-right
+      eq: 'true'
+    - b: windows.user.create-symlink-right
+      eq: 'false'
+severity: medium
+provenance:
+  - url: https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/create-symbolic-links
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Default values (archived Windows 10 page)
+  - url: https://git-scm.com/docs/git-config
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: core.symlinks
+fixtures:
+  positive:
+    - name: windows administrator against standard user without the symlink right
+      a:
+        attrs:
+          os.name: windows
+          windows.user.create-symlink-right: 'true'
+      b:
+        attrs:
+          os.name: windows
+          windows.user.create-symlink-right: 'false'
+  negative:
+    - name: windows user with the symlink right on both sides
+      a:
+        attrs:
+          os.name: windows
+          windows.user.create-symlink-right: 'true'
+      b:
+        attrs:
+          os.name: windows
+          windows.user.create-symlink-right: 'true'
+    - name: windows user without the symlink right on both sides
+      a:
+        attrs:
+          os.name: windows
+          windows.user.create-symlink-right: 'false'
+      b:
+        attrs:
+          os.name: windows
+          windows.user.create-symlink-right: 'false'
+status: pending-scanner

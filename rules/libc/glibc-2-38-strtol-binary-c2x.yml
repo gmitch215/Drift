@@ -1,0 +1,62 @@
+schema: 1
+id: glibc-2-38-strtol-binary-c2x
+title: glibc 2.38 parses 0b binary input in strtol-family calls when C2X features are on
+applies:
+  - os
+  - build
+difference: >-
+  glibc 2.37 or earlier on the passing side and glibc 2.38 or later on the failing side, for a build
+  whose C standard flag enables C2X (c2x, gnu2x, c23 or gnu23)
+symptoms:
+  - text: >-
+      strtol("0b101", ..., 0) returns the binary value under a C2X build on glibc 2.38 instead of
+      stopping at the 0
+    basis: inferred
+mechanism: >-
+  When C2X features are enabled and the base argument is 0 or 2, glibc 2.38 strtol-family functions
+  accept binary integers with a 0b or 0B prefix.
+detect:
+  all:
+    - a: tool.libc.version
+      ver: '<2.38'
+    - b: tool.libc.version
+      ver: '>=2.38'
+    - any:
+        - b: project.build.c.std-flag
+          has: '2x'
+        - b: project.build.c.std-flag
+          has: '23'
+severity: low
+provenance:
+  - url: https://raw.githubusercontent.com/bminor/glibc/glibc-2.38/NEWS
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Major new features'
+fixtures:
+  positive:
+    - name: glibc 2.37 to glibc 2.38 with -std=gnu2x
+      a:
+        attrs:
+          tool.libc.version: '2.37'
+      b:
+        attrs:
+          tool.libc.version: '2.38'
+          project.build.c.std-flag: '-std=gnu2x'
+  negative:
+    - name: glibc 2.37 to glibc 2.38 with -std=gnu17
+      a:
+        attrs:
+          tool.libc.version: '2.37'
+      b:
+        attrs:
+          tool.libc.version: '2.38'
+          project.build.c.std-flag: '-std=gnu17'
+    - name: glibc 2.38 to glibc 2.39 with -std=gnu2x
+      a:
+        attrs:
+          tool.libc.version: '2.38'
+      b:
+        attrs:
+          tool.libc.version: '2.39'
+          project.build.c.std-flag: '-std=gnu2x'
+status: pending-scanner

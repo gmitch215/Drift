@@ -1,0 +1,73 @@
+schema: 1
+id: mysql-8-4-default-authentication-plugin-removed
+title: MySQL 8.4.0 removes the default_authentication_plugin system variable in favor of authentication_policy
+applies:
+  - runtime
+difference: >-
+  side a is MySQL 8.0.27 to 8.0.x with default_authentication_plugin set (deprecated since 8.0.27); side b is MySQL 8.4.0 or higher, where the variable is removed
+symptoms:
+  - text: a configuration that still sets default_authentication_plugin fails at startup or has no effect
+    basis: inferred
+mechanism: >-
+  The MySQL 8.4 release notes state that the default_authentication_plugin system variable, deprecated in MySQL 8.0.27, is removed and that authentication_policy replaces it.
+detect:
+  all:
+    - a: runtime.database.server.kind
+      eq: mysql
+    - a: runtime.database.server.version
+      ver: '>=8.0.27,<8.4.0'
+    - a: runtime.database.server.default-auth-plugin
+      present: 'true'
+    - b: runtime.database.server.kind
+      eq: mysql
+    - b: runtime.database.server.version
+      ver: '>=8.4.0'
+severity: medium
+provenance:
+  - url: https://dev.mysql.com/doc/refman/8.4/en/mysql-nutshell.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Features Removed in MySQL 8.4'
+fixtures:
+  positive:
+    - name: mysql 8.0.36 with the variable set to mysql 8.4.0
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+          runtime.database.server.default-auth-plugin: caching_sha2_password
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.4.0'
+  negative:
+    - name: mysql 8.0.20 (before the 8.0.27 deprecation) with the variable set
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.20'
+          runtime.database.server.default-auth-plugin: caching_sha2_password
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.4.0'
+    - name: mysql 8.0.36 with the variable unset to mysql 8.4.0
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.4.0'
+    - name: mysql 8.4.0 to mysql 8.0.36 (reverse direction)
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.4.0'
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+          runtime.database.server.default-auth-plugin: caching_sha2_password
+status: pending-scanner

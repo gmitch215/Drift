@@ -1,0 +1,84 @@
+schema: 1
+id: postgres-15-public-schema-create-revoked
+title: PostgreSQL 15 removes CREATE on the public schema from PUBLIC for new clusters and new databases
+applies:
+  - runtime
+difference: >-
+  side a is PostgreSQL 14 or lower, where any role can CREATE in public; side b is a PostgreSQL 15 cluster created on 15 or later, where only the owner can CREATE in public
+symptoms:
+  - text: permission denied for schema public when an application role creates a table on a new PostgreSQL 15 database
+    basis: inferred
+mechanism: >-
+  The PostgreSQL 15 release notes state that PUBLIC creation permission on the public schema is removed for new database clusters and for newly created databases, while an upgrade or dump restore keeps the existing permissions.
+detect:
+  all:
+    - a: runtime.database.server.kind
+      eq: postgres
+    - a: runtime.database.server.version
+      ver: '<15.0'
+    - b: runtime.database.server.kind
+      eq: postgres
+    - b: runtime.database.server.version
+      ver: '>=15.0'
+    - b: runtime.database.server.public-create-privilege
+      eq: 'false'
+    - b: runtime.database.server.cluster-created-version
+      ver: '>=15.0'
+severity: high
+provenance:
+  - url: https://www.postgresql.org/docs/15/release-15.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Migration to Version 15'
+fixtures:
+  positive:
+    - name: postgres 14.11 to a postgres 15.6 cluster created on 15.6 without public CREATE
+      a:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '14.11'
+          runtime.database.server.public-create-privilege: 'true'
+      b:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '15.6'
+          runtime.database.server.public-create-privilege: 'false'
+          runtime.database.server.cluster-created-version: '15.6'
+  negative:
+    - name: postgres 15.6 cluster upgraded from 14.11 keeps public CREATE
+      a:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '14.11'
+          runtime.database.server.public-create-privilege: 'true'
+      b:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '15.6'
+          runtime.database.server.public-create-privilege: 'true'
+          runtime.database.server.cluster-created-version: '14.11'
+    - name: postgres 15.6 to postgres 15.6 (no version crossing)
+      a:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '15.6'
+          runtime.database.server.public-create-privilege: 'false'
+      b:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '15.6'
+          runtime.database.server.public-create-privilege: 'false'
+          runtime.database.server.cluster-created-version: '15.6'
+    - name: postgres 15.6 to postgres 14.11 (reverse direction)
+      a:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '15.6'
+          runtime.database.server.public-create-privilege: 'false'
+          runtime.database.server.cluster-created-version: '15.6'
+      b:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '14.11'
+          runtime.database.server.public-create-privilege: 'true'
+status: pending-scanner

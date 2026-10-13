@@ -1,0 +1,55 @@
+schema: 1
+id: ubuntu-24-04-apparmor-userns-restricted
+title: Ubuntu 24.04 restricts unprivileged user namespaces when AppArmor is in use
+applies:
+  - os
+  - kernel
+difference: >-
+  the passing side runs Ubuntu 22.04 where unprivileged user namespaces are allowed and the failing side runs Ubuntu 24.04 with kernel.apparmor_restrict_unprivileged_userns set to 1
+symptoms:
+  - text: >-
+      sandbox helpers that create a user namespace and then need a capability inside it fail on Ubuntu 24.04 while they work on Ubuntu 22.04
+    basis: inferred
+mechanism: >-
+  The 24.04 release notes state that the Ubuntu kernel now restricts the use of unprivileged user namespaces when the apparmor package is in use, and that the default profile denies capabilities inside them.
+detect:
+  all:
+    - a: os.release.VERSION_ID
+      eq: '22.04'
+    - b: os.release.VERSION_ID
+      eq: '24.04'
+    - b: sysctl.kernel.apparmor_restrict_unprivileged_userns
+      eq: '1'
+severity: high
+provenance:
+  - url: https://discourse.ubuntu.com/t/noble-numbat-release-notes/39890
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Unprivileged user namespace restrictions: "the Ubuntu kernel now restricts the use of unprivileged user namespaces"'
+fixtures:
+  positive:
+    - name: ubuntu 22.04 to 24.04 with the restriction on
+      a:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+      b:
+        attrs:
+          os.release.VERSION_ID: '24.04'
+          sysctl.kernel.apparmor_restrict_unprivileged_userns: '1'
+  negative:
+    - name: 24.04 with the restriction off
+      a:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+      b:
+        attrs:
+          os.release.VERSION_ID: '24.04'
+          sysctl.kernel.apparmor_restrict_unprivileged_userns: '0'
+    - name: 24.04 without the sysctl captured
+      a:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+      b:
+        attrs:
+          os.release.VERSION_ID: '24.04'
+status: pending-scanner

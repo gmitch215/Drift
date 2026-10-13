@@ -1,0 +1,61 @@
+schema: 1
+id: ubuntu-22-04-ruby-bundled-gems-dropped
+title: Ubuntu 22.04 Ruby 3.0 no longer bundles sdbm, webrick, net-telnet and xmlrpc
+applies:
+  - os
+  - userland
+difference: >-
+  the passing side runs Ubuntu 20.04 with Ruby 2.7 and the failing side runs Ubuntu 22.04 with Ruby 3.0
+symptoms:
+  - text: >-
+      require 'webrick' or require 'xmlrpc/client' raises LoadError with the system Ruby on Ubuntu 22.04
+    basis: inferred
+mechanism: >-
+  The 22.04 release notes list sdbm, webrick, net-telnet and xmlrpc as libraries that are not bundled with Ruby 3.0, so they must be installed as separate gems.
+detect:
+  all:
+    - a: os.release.VERSION_ID
+      in: ['20.04']
+    - a: tool.ruby.version
+      present: 'true'
+    - b: os.release.VERSION_ID
+      in: ['22.04']
+    - b: tool.ruby.version
+      present: 'true'
+severity: low
+provenance:
+  - url: https://discourse.ubuntu.com/t/jammy-jellyfish-release-notes/24668
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Ruby 3.0: "the following libraries are not bundled anymore in Ruby"'
+fixtures:
+  positive:
+    - name: ubuntu 20.04 ruby 2.7 to 22.04 ruby 3.0
+      a:
+        attrs:
+          os.release.VERSION_ID: '20.04'
+          tool.ruby.version: '2.7.0'
+      b:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          tool.ruby.version: '3.0.2'
+  negative:
+    - name: 22.04 on both sides
+      a:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          tool.ruby.version: '3.0.2'
+      b:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          tool.ruby.version: '3.0.2'
+    - name: 22.04 to 24.04 is outside this boundary
+      a:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          tool.ruby.version: '3.0.2'
+      b:
+        attrs:
+          os.release.VERSION_ID: '24.04'
+          tool.ruby.version: '3.2.3'
+status: active

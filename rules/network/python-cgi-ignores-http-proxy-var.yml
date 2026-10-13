@@ -1,0 +1,53 @@
+schema: 1
+id: python-cgi-ignores-http-proxy-var
+title: Python urllib ignores HTTP_PROXY when REQUEST_METHOD is set because the process looks like a CGI request
+applies:
+  - network
+  - env
+difference: >-
+  a = a shell or CI job where HTTP_PROXY is set and REQUEST_METHOD is not; b = a process where HTTP_PROXY and REQUEST_METHOD are both set, as in a CGI-style environment
+symptoms:
+  - text: an outbound HTTP call from a web-server-spawned script goes direct instead of through the proxy with no error (inferred; not reproduced)
+    basis: inferred
+mechanism: Python urllib ignores the uppercase HTTP_PROXY variable when REQUEST_METHOD is set, because a client can inject that variable through the Proxy header.
+detect:
+  all:
+    - a: env.HTTP_PROXY
+      present: 'true'
+    - b: env.HTTP_PROXY
+      present: 'true'
+    - b: env.REQUEST_METHOD
+      present: 'true'
+severity: low
+provenance:
+  - url: https://docs.python.org/3/library/urllib.request.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: ProxyHandler
+fixtures:
+  positive:
+    - name: the passing side sets HTTP_PROXY and the failing side sets it with REQUEST_METHOD
+      a:
+        attrs:
+          env.HTTP_PROXY: http://proxy.corp.example:3128
+      b:
+        attrs:
+          env.HTTP_PROXY: http://proxy.corp.example:3128
+          env.REQUEST_METHOD: GET
+  negative:
+    - name: the failing side has HTTP_PROXY but no REQUEST_METHOD
+      a:
+        attrs:
+          env.HTTP_PROXY: http://proxy.corp.example:3128
+      b:
+        attrs:
+          env.HTTP_PROXY: http://proxy.corp.example:3128
+    - name: the passing side has no HTTP_PROXY
+      a:
+        attrs:
+          tool.python.version: '3.12.4'
+      b:
+        attrs:
+          env.HTTP_PROXY: http://proxy.corp.example:3128
+          env.REQUEST_METHOD: GET
+status: active

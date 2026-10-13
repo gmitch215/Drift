@@ -1,0 +1,75 @@
+schema: 1
+id: mysql-8-0-group-by-asc-desc-removed
+title: MySQL 8.0.13 removes the ASC and DESC qualifiers on GROUP BY
+applies:
+  - runtime
+difference: >-
+  side a is MySQL 8.0.12 or lower, which accepts ASC or DESC on GROUP BY; side b is MySQL 8.0.13 or higher, which does not
+symptoms:
+  - text: upgrading to MySQL 8.0.13 or higher may fail for statements or stored programs that use ASC or DESC on GROUP BY
+    basis: verified
+  - text: a query that relied on the implicit GROUP BY sort may return its rows in a different order
+    basis: verified
+mechanism: >-
+  The MySQL 8.0.13 release notes state that the deprecated ASC and DESC qualifiers for GROUP BY clauses were removed, and that queries which relied on GROUP BY sorting may produce different results.
+detect:
+  all:
+    - a: runtime.database.server.kind
+      eq: mysql
+    - a: runtime.database.server.version
+      ver: '<8.0.13'
+    - b: runtime.database.server.kind
+      eq: mysql
+    - b: runtime.database.server.version
+      ver: '>=8.0.13'
+    - b: project.sql.group-by-asc-desc
+      present: 'true'
+severity: high
+provenance:
+  - url: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: 'SQL Changes'
+fixtures:
+  positive:
+    - name: mysql 8.0.12 to mysql 8.0.36 with a GROUP BY ... DESC in the project
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.12'
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+          project.sql.group-by-asc-desc: 'true'
+  negative:
+    - name: mysql 8.0.12 to mysql 8.0.36 with no GROUP BY ASC or DESC in the project
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.12'
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+    - name: mysql 8.0.36 to mysql 8.0.36 (no version crossing)
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+          project.sql.group-by-asc-desc: 'true'
+    - name: mysql 8.0.36 to mysql 8.0.12 (reverse direction)
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+          project.sql.group-by-asc-desc: 'true'
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.12'
+status: pending-scanner

@@ -1,0 +1,54 @@
+schema: 1
+id: go-1-18-client-tls-min-1-2
+title: Go 1.18 clients default the TLS minimum to TLS 1.2 when Config.MinVersion is unset
+applies:
+  - runtime
+  - network
+difference: >-
+  a = Go 1.17 or earlier on the passing side; b = Go 1.18 or later on the failing side, with Config.MinVersion unset and a peer that offers only TLS 1.0 or 1.1
+symptoms:
+  - text: the client handshake fails against a TLS 1.0 or 1.1 only server (error text not checked)
+    basis: inferred
+mechanism: Go 1.18 sets the client TLS minimum to TLS 1.2 when Config.MinVersion is unset, and the server minimum stays at TLS 1.0.
+detect:
+  all:
+    - a: tool.go.version
+      ver: '<1.18'
+    - b: tool.go.version
+      ver: '>=1.18'
+    - b: network.tls-version-offered
+      has: TLSv1.0
+severity: medium
+provenance:
+  - url: https://go.dev/doc/go1.18
+    kind: release-note
+    verified: '2026-10-13'
+    section: crypto/tls
+fixtures:
+  positive:
+    - name: go 1.17.13 to go 1.18.10 with a TLS 1.0 only server
+      a:
+        attrs:
+          tool.go.version: '1.17.13'
+      b:
+        attrs:
+          tool.go.version: '1.18.10'
+          network.tls-version-offered: TLSv1.0
+  negative:
+    - name: go 1.17.13 to go 1.18.10 with a TLS 1.2 server
+      a:
+        attrs:
+          tool.go.version: '1.17.13'
+      b:
+        attrs:
+          tool.go.version: '1.18.10'
+          network.tls-version-offered: TLSv1.2
+    - name: go 1.22.5 to go 1.23.0 with a TLS 1.0 server (both past the 1.18 default)
+      a:
+        attrs:
+          tool.go.version: '1.22.5'
+      b:
+        attrs:
+          tool.go.version: '1.23.0'
+          network.tls-version-offered: TLSv1.0
+status: pending-scanner

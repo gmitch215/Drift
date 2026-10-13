@@ -1,0 +1,70 @@
+schema: 1
+id: rhel-10-postfix-berkeley-db-unavailable
+title: RHEL 10 Postfix does not provide the Berkeley DB map backend
+applies:
+  - os
+  - userland
+difference: >-
+  the passing side is RHEL 9 with Postfix installed and the failing side is RHEL 10 with Postfix installed
+symptoms:
+  - text: >-
+      Postfix lookup tables that rely on the previous Berkeley DB default backend fail to open on RHEL 10
+    basis: inferred
+mechanism: >-
+  The RHEL 10.0 release notes state that the previous default Postfix backend, Berkeley DB, is not available in RHEL 10.
+detect:
+  all:
+    - a: os.release.ID
+      eq: rhel
+    - a: os.release.VERSION_ID
+      ver: '>=9,<10'
+    - a: pkg.postfix.version
+      present: 'true'
+    - b: os.release.ID
+      eq: rhel
+    - b: os.release.VERSION_ID
+      ver: '>=10,<11'
+    - b: pkg.postfix.version
+      present: 'true'
+severity: low
+provenance:
+  - url: https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html-single/10.0_release_notes/index
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Postfix: "The previous default backend, Berkeley DB (BDB), is not available in RHEL 10."'
+fixtures:
+  positive:
+    - name: rhel 9.4 postfix to rhel 10.0 postfix
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+          pkg.postfix.version: '3.5.22'
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '10.0'
+          pkg.postfix.version: '3.8.5'
+  negative:
+    - name: rhel 10.0 on both sides
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '10.0'
+          pkg.postfix.version: '3.8.5'
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '10.0'
+          pkg.postfix.version: '3.8.5'
+    - name: rhel 9.4 without postfix on the passing side
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '10.0'
+          pkg.postfix.version: '3.8.5'
+status: pending-scanner

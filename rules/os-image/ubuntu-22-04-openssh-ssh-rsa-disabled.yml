@@ -1,0 +1,61 @@
+schema: 1
+id: ubuntu-22-04-openssh-ssh-rsa-disabled
+title: Ubuntu 22.04 disables the ssh-rsa signature algorithm in OpenSSH by default
+applies:
+  - os
+  - userland
+difference: >-
+  the passing side runs Ubuntu 20.04 and the failing side runs Ubuntu 22.04, where ssh-rsa is disabled by default
+symptoms:
+  - text: >-
+      ssh or scp to a server that offers only ssh-rsa keys fails on Ubuntu 22.04 while the same connection works on Ubuntu 20.04
+    basis: inferred
+mechanism: >-
+  The 22.04 release notes state that ssh-rsa is now disabled by default in OpenSSH.
+detect:
+  all:
+    - a: os.release.VERSION_ID
+      in: ['20.04']
+    - a: tool.ssh.version
+      present: 'true'
+    - b: os.release.VERSION_ID
+      in: ['22.04']
+    - b: tool.ssh.version
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://discourse.ubuntu.com/t/jammy-jellyfish-release-notes/24668
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Security Improvements: "ssh-rsa is now disabled by default in OpenSSH"'
+fixtures:
+  positive:
+    - name: ubuntu 20.04 ssh to 22.04 ssh
+      a:
+        attrs:
+          os.release.VERSION_ID: '20.04'
+          tool.ssh.version: '8.2p1'
+      b:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          tool.ssh.version: '8.9p1'
+  negative:
+    - name: 22.04 on both sides
+      a:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          tool.ssh.version: '8.9p1'
+      b:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          tool.ssh.version: '8.9p1'
+    - name: 22.04 to 24.04 is outside this boundary
+      a:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          tool.ssh.version: '8.9p1'
+      b:
+        attrs:
+          os.release.VERSION_ID: '24.04'
+          tool.ssh.version: '9.6p1'
+status: active

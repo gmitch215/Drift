@@ -1,0 +1,70 @@
+schema: 1
+id: gcc-11-cxx17-default-dialect
+title: GCC 11 defaults C++ to gnu++17; old exception specs and iostream members stop compiling
+applies:
+  - compiler
+difference: >-
+  the C++ compiler is GCC 11 or newer on the failing side and older on the passing side; the
+  default dialect is gnu++17 on the failing side and gnu++14 on the passing side
+symptoms:
+  - text: >-
+      dynamic exception specifications such as throw(T) should be removed or replaced with a
+      noexcept form
+    basis: verified
+  - text: >-
+      ios_base::io_state, ios_base::open_mode, ios_base::seek_dir and basic_streambuf::stossc are
+      not available in C++17 mode
+    basis: verified
+  - text: >-
+      after using std::tr1::bind, an unqualified call to bind can be reported as ambiguous
+    basis: verified
+mechanism: >-
+  The default C++ dialect moved to gnu++17, which removes dynamic exception specifications and
+  deprecated iostream members.
+detect:
+  all:
+    - a: tool.cc.family
+      eq: gcc
+    - b: tool.cc.family
+      eq: gcc
+    - a: tool.cc.version
+      ver: '<11'
+    - b: tool.cc.version
+      ver: '>=11'
+severity: medium
+provenance:
+  - url: https://gcc.gnu.org/gcc-11/porting_to.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: 'C++ language issues: Default standard is now GNU++17'
+fixtures:
+  positive:
+    - name: gcc 10.5.0 to gcc 11.4.0
+      a:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '10.5.0'
+      b:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '11.4.0'
+  negative:
+    - name: gcc 11.4.0 to gcc 13.2.1
+      a:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '11.4.0'
+      b:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '13.2.1'
+    - name: clang on both sides
+      a:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.version: '15.0.0'
+      b:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.version: '18.1.3'
+status: active

@@ -1,0 +1,58 @@
+schema: 1
+id: podman-5-3-pasta-host-connectivity
+title: Rootless Podman 5.3 fixes pasta networking between a container and the host
+applies:
+  - network
+difference: >-
+  the passing run used rootless Podman 5.3.0 or later and the failing run used rootless Podman before 5.3.0, where pasta networking could not connect the container to the host
+symptoms:
+  - text: >-
+      a container that reaches a service on the host, such as a database on localhost, gets connection refused on rootless Podman before 5.3.0; the tutorial states the fix, not the symptom
+    basis: inferred
+mechanism: >-
+  Rootless Podman uses pasta for networking, and Podman 5.3 fixes the default case where a container cannot communicate with the host.
+detect:
+  all:
+    - a: tool.podman.version
+      ver: '>=5.3.0'
+    - b: tool.podman.version
+      ver: '<5.3.0'
+    - b: tool.podman.rootless
+      eq: 'true'
+severity: medium
+provenance:
+  - url: https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: rootless networking with pasta
+fixtures:
+  positive:
+    - name: rootless Podman 5.3.0 then rootless Podman 5.2.1
+      a:
+        attrs:
+          tool.podman.version: '5.3.0'
+          tool.podman.rootless: 'true'
+      b:
+        attrs:
+          tool.podman.version: '5.2.1'
+          tool.podman.rootless: 'true'
+  negative:
+    - name: rootless Podman 5.2.1 on the passing side
+      a:
+        attrs:
+          tool.podman.version: '5.2.1'
+          tool.podman.rootless: 'true'
+      b:
+        attrs:
+          tool.podman.version: '5.2.1'
+          tool.podman.rootless: 'true'
+    - name: failing side is not rootless
+      a:
+        attrs:
+          tool.podman.version: '5.3.0'
+          tool.podman.rootless: 'true'
+      b:
+        attrs:
+          tool.podman.version: '5.2.1'
+          tool.podman.rootless: 'false'
+status: pending-scanner

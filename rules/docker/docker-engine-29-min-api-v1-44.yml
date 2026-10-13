@@ -1,0 +1,56 @@
+schema: 1
+id: docker-engine-29-min-api-v1-44
+title: Docker Engine 29 requires API version v1.44 or later
+applies:
+  - runtime
+difference: >-
+  the passing run used a Docker Engine before 29.0.0 and the failing run used Docker Engine 29.0.0 or later with a client that negotiates an API version below v1.44
+symptoms:
+  - text: >-
+      an older Docker client or SDK pinned to an API version below v1.44 gets an API error when it connects to the Docker 29 daemon; the release note states the requirement, not the error text
+    basis: inferred
+mechanism: >-
+  The daemon now requires API version v1.44 or later (Docker v25.0+).
+detect:
+  all:
+    - a: tool.docker.version
+      ver: '<29.0.0'
+    - b: tool.docker.version
+      ver: '>=29.0.0'
+    - b: tool.docker.api-version
+      ver: '<1.44'
+severity: high
+provenance:
+  - url: https://docs.docker.com/engine/release-notes/29/
+    kind: release-note
+    verified: '2026-10-13'
+    section: 29.0.0 breaking changes
+fixtures:
+  positive:
+    - name: Docker 28.5.2 then Docker 29.0.0 client on API 1.43
+      a:
+        attrs:
+          tool.docker.version: '28.5.2'
+      b:
+        attrs:
+          tool.docker.version: '29.0.0'
+          tool.docker.api-version: '1.43'
+  negative:
+    - name: Docker 29.0.0 client on API 1.44
+      a:
+        attrs:
+          tool.docker.version: '28.5.2'
+      b:
+        attrs:
+          tool.docker.version: '29.0.0'
+          tool.docker.api-version: '1.44'
+    - name: both runs on Docker 29
+      a:
+        attrs:
+          tool.docker.version: '29.0.0'
+          tool.docker.api-version: '1.43'
+      b:
+        attrs:
+          tool.docker.version: '29.0.1'
+          tool.docker.api-version: '1.43'
+status: pending-scanner

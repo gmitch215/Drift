@@ -1,0 +1,64 @@
+schema: 1
+id: alpine-3-19-python-externally-managed
+title: Alpine 3.19 marks the system Python package directory externally managed
+applies:
+  - os
+  - build
+difference: >-
+  the passing side is Alpine 3.18 and the failing side is Alpine 3.19 or later, where the system
+  Python package directory is marked externally managed
+symptoms:
+  - text: >-
+      pip fails with an externally-managed-environment error when it installs into the system Python
+      on Alpine 3.19 or later
+    basis: inferred
+mechanism: >-
+  The Alpine 3.19 release announcement says the Python package directory is now marked externally
+  managed, so pip cannot install into the directory that apk manages.
+detect:
+  all:
+    - a: os.release.ID
+      eq: alpine
+    - a: os.release.VERSION_ID
+      ver: '<3.19'
+    - b: os.release.ID
+      eq: alpine
+    - b: os.release.VERSION_ID
+      ver: '>=3.19'
+severity: medium
+provenance:
+  - url: https://alpinelinux.org/posts/Alpine-3.19.0-released.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Changed defaults: Python package directory marked as externally managed'
+fixtures:
+  positive:
+    - name: alpine 3.18 to alpine 3.19
+      a:
+        attrs:
+          os.release.ID: alpine
+          os.release.VERSION_ID: '3.18.4'
+      b:
+        attrs:
+          os.release.ID: alpine
+          os.release.VERSION_ID: '3.19.0'
+  negative:
+    - name: alpine 3.19 on both sides
+      a:
+        attrs:
+          os.release.ID: alpine
+          os.release.VERSION_ID: '3.19.0'
+      b:
+        attrs:
+          os.release.ID: alpine
+          os.release.VERSION_ID: '3.19.0'
+    - name: alpine 3.18 on both sides
+      a:
+        attrs:
+          os.release.ID: alpine
+          os.release.VERSION_ID: '3.18.4'
+      b:
+        attrs:
+          os.release.ID: alpine
+          os.release.VERSION_ID: '3.18.9'
+status: active

@@ -1,0 +1,62 @@
+schema: 1
+id: macos-latest-moves-to-macos-26
+title: The macos-latest label moves from macOS 15 to macOS 26 over 30 days from June 15, 2026
+applies:
+  - build
+difference: >-
+  the passing run used a macos-latest runner on the macOS 15 image and the failing run used a
+  macos-latest runner on the macOS 26 image under the same label
+symptoms:
+  - text: >-
+      a workflow that passed on the macOS 15 image may fail or behave differently on the macOS 26
+      image; the changelog does not describe failures
+    basis: inferred
+mechanism: >-
+  The macos-latest image label moves from the macOS 15 image to the macOS 26 image over a 30-day migration that begins June 15, 2026.
+detect:
+  all:
+    - a: ci.runner.label
+      eq: macos-latest
+    - b: ci.runner.label
+      eq: macos-latest
+    - a: os.version
+      ver: '<26.0.0'
+    - b: os.version
+      ver: '>=26.0.0'
+severity: medium
+provenance:
+  - url: https://github.blog/changelog/2026-05-14-github-actions-upcoming-image-migrations
+    kind: release-note
+    verified: '2026-10-13'
+    section: macOS (macos-latest) migration begins June 15 and takes 30 days
+fixtures:
+  positive:
+    - name: macos-latest on macOS 15.7 then macOS 26.0
+      a:
+        attrs:
+          ci.runner.label: macos-latest
+          os.version: '15.7'
+      b:
+        attrs:
+          ci.runner.label: macos-latest
+          os.version: '26.0'
+  negative:
+    - name: macos-latest on macOS 26.0 both sides
+      a:
+        attrs:
+          ci.runner.label: macos-latest
+          os.version: '26.0'
+      b:
+        attrs:
+          ci.runner.label: macos-latest
+          os.version: '26.0'
+    - name: pinned macos-15 label is not macos-latest
+      a:
+        attrs:
+          ci.runner.label: macos-15
+          os.version: '15.7'
+      b:
+        attrs:
+          ci.runner.label: macos-latest
+          os.version: '26.0'
+status: pending-scanner

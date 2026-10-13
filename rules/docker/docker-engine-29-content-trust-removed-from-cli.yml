@@ -1,0 +1,54 @@
+schema: 1
+id: docker-engine-29-content-trust-removed-from-cli
+title: Docker CLI 29 removes Docker Content Trust
+applies:
+  - build
+difference: >-
+  the passing run used a Docker CLI before 29.0.0 with DOCKER_CONTENT_TRUST set to 1 and the failing run used Docker CLI 29.0.0 or later
+symptoms:
+  - text: >-
+      a pipeline that relied on DOCKER_CONTENT_TRUST=1 for signed-image enforcement stops verifying signatures or errors on the variable; the release note does not say which
+    basis: inferred
+mechanism: >-
+  Docker Content Trust was removed from the Docker CLI in the 29.0.0 release.
+detect:
+  all:
+    - a: tool.docker.version
+      ver: '<29.0.0'
+    - b: tool.docker.version
+      ver: '>=29.0.0'
+    - a: env.DOCKER_CONTENT_TRUST
+      eq: '1'
+severity: medium
+provenance:
+  - url: https://docs.docker.com/engine/release-notes/29/
+    kind: release-note
+    verified: '2026-10-13'
+    section: 29.0.0 breaking changes
+fixtures:
+  positive:
+    - name: Docker 28.5.2 with content trust on then Docker 29.0.0
+      a:
+        attrs:
+          tool.docker.version: '28.5.2'
+          env.DOCKER_CONTENT_TRUST: '1'
+      b:
+        attrs:
+          tool.docker.version: '29.0.0'
+  negative:
+    - name: Docker 28.5.2 without content trust
+      a:
+        attrs:
+          tool.docker.version: '28.5.2'
+      b:
+        attrs:
+          tool.docker.version: '29.0.0'
+    - name: content trust on a Docker 29 side
+      a:
+        attrs:
+          tool.docker.version: '29.0.0'
+          env.DOCKER_CONTENT_TRUST: '1'
+      b:
+        attrs:
+          tool.docker.version: '29.0.0'
+status: pending-scanner

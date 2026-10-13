@@ -1,0 +1,60 @@
+schema: 1
+id: ubuntu-22-04-deprecation-2027-04-17
+title: The ubuntu-22.04 and ubuntu-22.04-arm labels deprecate from September 17, 2026 and are unsupported from April 17, 2027
+applies:
+  - os
+difference: >-
+  the passing run used a runner on Ubuntu 24.04 and the failing run used a runner on Ubuntu 22.04 under the ubuntu-22.04 or ubuntu-22.04-arm label
+symptoms:
+  - text: >-
+      after April 17, 2027 workflows on ubuntu-22.04 or ubuntu-22.04-arm are terminated with an error
+    basis: verified
+mechanism: >-
+  Deprecation of the ubuntu-22.04 and ubuntu-22.04-arm images begins September 17, 2026, and they are fully unsupported from April 17, 2027.
+detect:
+  all:
+    - a: os.release.VERSION_ID
+      eq: '24.04'
+    - b: os.release.VERSION_ID
+      eq: '22.04'
+    - b: ci.runner.label
+      in:
+        - ubuntu-22.04
+        - ubuntu-22.04-arm
+severity: medium
+provenance:
+  - url: https://github.com/actions/runner-images/issues/14254
+    kind: release-note
+    verified: '2026-10-13'
+    section: '[Ubuntu] The Ubuntu 22 based runner images will begin deprecation on September 17th'
+fixtures:
+  positive:
+    - name: ubuntu-24.04 passing then ubuntu-22.04 failing
+      a:
+        attrs:
+          ci.runner.label: ubuntu-latest
+          os.release.VERSION_ID: '24.04'
+      b:
+        attrs:
+          ci.runner.label: ubuntu-22.04
+          os.release.VERSION_ID: '22.04'
+  negative:
+    - name: both runs on ubuntu-22.04
+      a:
+        attrs:
+          ci.runner.label: ubuntu-22.04
+          os.release.VERSION_ID: '22.04'
+      b:
+        attrs:
+          ci.runner.label: ubuntu-22.04
+          os.release.VERSION_ID: '22.04'
+    - name: ubuntu-26.04 passing side is not 24.04
+      a:
+        attrs:
+          ci.runner.label: ubuntu-26.04
+          os.release.VERSION_ID: '26.04'
+      b:
+        attrs:
+          ci.runner.label: ubuntu-22.04
+          os.release.VERSION_ID: '22.04'
+status: active

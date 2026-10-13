@@ -1,0 +1,55 @@
+schema: 1
+id: filesystem-git-core-ignorecase-case-insensitive-fs
+title: git treats paths that differ only by case as one file on a case-insensitive filesystem
+applies:
+  - os
+  - userland
+difference: >-
+  a = the volume that holds the repository is case-sensitive on the passing side; b = the volume is
+  case-insensitive on the failing side. git sets core.ignoreCase during clone or init when it probes a
+  case-insensitive volume
+symptoms:
+  - text: >-
+      a directory listing that finds makefile where git expects Makefile is treated as the same file
+    basis: verified
+  - text: >-
+      one of two files whose names differ only by case is lost or merged in a checkout
+    basis: inferred
+mechanism: git sets core.ignoreCase to true when a clone or init finds a case-insensitive filesystem, so a path that differs only by case is treated as the same file.
+detect:
+  all:
+    - a: fs.case-sensitivity
+      eq: sensitive
+    - b: fs.case-sensitivity
+      eq: insensitive
+severity: high
+provenance:
+  - url: https://git-scm.com/docs/git-config
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: core.ignoreCase
+fixtures:
+  positive:
+    - name: case-sensitive volume against case-insensitive volume
+      a:
+        attrs:
+          fs.case-sensitivity: sensitive
+      b:
+        attrs:
+          fs.case-sensitivity: insensitive
+  negative:
+    - name: case-sensitive volume on both sides
+      a:
+        attrs:
+          fs.case-sensitivity: sensitive
+      b:
+        attrs:
+          fs.case-sensitivity: sensitive
+    - name: case-insensitive volume on both sides
+      a:
+        attrs:
+          fs.case-sensitivity: insensitive
+      b:
+        attrs:
+          fs.case-sensitivity: insensitive
+status: pending-scanner

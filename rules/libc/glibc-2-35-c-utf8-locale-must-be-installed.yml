@@ -1,0 +1,62 @@
+schema: 1
+id: glibc-2-35-c-utf8-locale-must-be-installed
+title: glibc 2.35 adds the C.UTF-8 locale, but it is not built in and must be installed
+applies:
+  - os
+  - locale
+difference: >-
+  a = glibc 2.35 or later with the C.UTF-8 locale installed on the passing side; b = glibc 2.35 or later
+  with the locale missing on the failing side. glibc before 2.35 has no such locale and is outside both sides
+symptoms:
+  - text: >-
+      with LANG set to C.UTF-8 and no installed locale, programs fall back to ASCII output (the exact
+      fallback is not checked)
+    basis: inferred
+mechanism: glibc 2.35 adds the C.UTF-8 locale, but the locale is not built into glibc and must be installed by the distribution.
+detect:
+  all:
+    - a: tool.libc.version
+      ver: '>=2.35'
+    - b: tool.libc.version
+      ver: '>=2.35'
+    - a: libc.c-utf8-present
+      eq: 'true'
+    - b: libc.c-utf8-present
+      eq: 'false'
+severity: low
+provenance:
+  - url: https://raw.githubusercontent.com/bminor/glibc/glibc-2.35/NEWS
+    kind: release-note
+    verified: '2026-10-13'
+    section: Version 2.35
+fixtures:
+  positive:
+    - name: glibc 2.35 with C.UTF-8 installed against glibc 2.35 without it
+      a:
+        attrs:
+          tool.libc.version: '2.35'
+          libc.c-utf8-present: 'true'
+      b:
+        attrs:
+          tool.libc.version: '2.35'
+          libc.c-utf8-present: 'false'
+  negative:
+    - name: glibc 2.35 with C.UTF-8 installed on both sides
+      a:
+        attrs:
+          tool.libc.version: '2.35'
+          libc.c-utf8-present: 'true'
+      b:
+        attrs:
+          tool.libc.version: '2.39'
+          libc.c-utf8-present: 'true'
+    - name: glibc 2.34 has no C.UTF-8 locale to install
+      a:
+        attrs:
+          tool.libc.version: '2.34'
+          libc.c-utf8-present: 'true'
+      b:
+        attrs:
+          tool.libc.version: '2.34'
+          libc.c-utf8-present: 'false'
+status: pending-scanner

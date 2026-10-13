@@ -1,0 +1,48 @@
+schema: 1
+id: requests-connect-timeout-per-address
+title: Requests applies its connect timeout to each address, so a host with several addresses can take about twice the timeout
+applies:
+  - network
+difference: >-
+  b = a host that resolves to both IPv4 and IPv6 addresses (net.dns.aaaa.present true); a = a host with one address (not checked by the rule)
+symptoms:
+  - text: a request with timeout=5 takes about 10 seconds to fail on a dual-stack host whose first address does not answer, so a fixed CI budget is exceeded (inferred; not measured)
+    basis: inferred
+mechanism: Requests applies its connect timeout to each connection attempt to an IP address, so a host with several addresses can take longer than the configured timeout.
+detect:
+  all:
+    - b: net.dns.aaaa.present
+      eq: 'true'
+severity: low
+provenance:
+  - url: https://requests.readthedocs.io/en/latest/user/advanced/
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Timeouts
+fixtures:
+  positive:
+    - name: the failing side resolves an IPv6 address for the host
+      a:
+        attrs:
+          tool.python.version: '3.12.4'
+      b:
+        attrs:
+          tool.python.version: '3.12.4'
+          net.dns.aaaa.present: 'true'
+  negative:
+    - name: the failing side resolves no IPv6 address
+      a:
+        attrs:
+          tool.python.version: '3.12.4'
+      b:
+        attrs:
+          tool.python.version: '3.12.4'
+          net.dns.aaaa.present: 'false'
+    - name: the failing side has no DNS fact captured
+      a:
+        attrs:
+          tool.python.version: '3.12.4'
+      b:
+        attrs:
+          tool.python.version: '3.12.4'
+status: pending-scanner

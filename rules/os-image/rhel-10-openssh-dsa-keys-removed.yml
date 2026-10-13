@@ -1,0 +1,71 @@
+schema: 1
+id: rhel-10-openssh-dsa-keys-removed
+title: RHEL 10 OpenSSH 9.9 removes DSA key support
+applies:
+  - os
+  - userland
+difference: >-
+  the passing side is RHEL 9 with ssh installed and the failing side is RHEL 10 with ssh installed
+symptoms:
+  - text: >-
+      ssh refuses DSA host or user keys on RHEL 10 with an unknown key type error while the same keys work on RHEL 9
+    basis: inferred
+mechanism: >-
+  The RHEL 10.0 release notes state that support for DSA keys has been removed in the OpenSSH version provided with RHEL 10.
+detect:
+  all:
+    - a: os.release.ID
+      eq: rhel
+    - a: os.release.VERSION_ID
+      ver: '>=9,<10'
+    - a: tool.ssh.version
+      present: 'true'
+    - b: os.release.ID
+      eq: rhel
+    - b: os.release.VERSION_ID
+      ver: '>=10,<11'
+    - b: tool.ssh.version
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html-single/10.0_release_notes/index
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Security, OpenSSH provided in version 9.9: "Support for DSA keys has been removed."'
+fixtures:
+  positive:
+    - name: rhel 9.4 openssh to rhel 10.0 openssh
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+          tool.ssh.version: '8.7p1'
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '10.0'
+          tool.ssh.version: '9.9p1'
+  negative:
+    - name: rhel 10.0 on both sides
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '10.0'
+          tool.ssh.version: '9.9p1'
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '10.0'
+          tool.ssh.version: '9.9p1'
+    - name: rhel 9.6 to rhel 9.6 is not a major boundary
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.6'
+          tool.ssh.version: '8.7p1'
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.6'
+          tool.ssh.version: '8.7p1'
+status: active

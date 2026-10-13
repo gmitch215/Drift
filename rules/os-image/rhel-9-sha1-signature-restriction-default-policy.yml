@@ -1,0 +1,66 @@
+schema: 1
+id: rhel-9-sha1-signature-restriction-default-policy
+title: RHEL 9 DEFAULT crypto policy restricts SHA-1 signatures
+applies:
+  - os
+difference: >-
+  the passing side is RHEL 8 or earlier and the failing side is RHEL 9 with the DEFAULT crypto policy
+symptoms:
+  - text: >-
+      TLS, SSH, Kerberos or DNSSEC peers that still sign with SHA-1 fail verification on RHEL 9 after working on RHEL 8
+    basis: inferred
+mechanism: >-
+  The RHEL 9.0 release notes state that the use of SHA-1 for signatures is restricted in the DEFAULT crypto policy.
+detect:
+  all:
+    - a: os.release.ID
+      eq: rhel
+    - a: os.release.VERSION_ID
+      ver: '<9'
+    - b: os.release.ID
+      eq: rhel
+    - b: os.release.VERSION_ID
+      ver: '>=9,<10'
+    - b: crypto.policy
+      eq: DEFAULT
+severity: high
+provenance:
+  - url: https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html-single/9.0_release_notes/index
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Security: "The use of SHA-1 for signatures is restricted in the DEFAULT crypto policy."'
+fixtures:
+  positive:
+    - name: rhel 8.10 to rhel 9.4 with the DEFAULT policy
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '8.10'
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+          crypto.policy: DEFAULT
+  negative:
+    - name: rhel 9.4 on both sides with the DEFAULT policy
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+          crypto.policy: DEFAULT
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+          crypto.policy: DEFAULT
+    - name: rhel 9.4 with the LEGACY policy is not the DEFAULT policy
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '8.10'
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+          crypto.policy: LEGACY
+status: pending-scanner

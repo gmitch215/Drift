@@ -1,0 +1,70 @@
+schema: 1
+id: rhel-10-isc-dhcp-replaced-by-kea
+title: RHEL 10 replaces ISC DHCP with the Kea DHCP server
+applies:
+  - os
+  - userland
+difference: >-
+  the passing side is RHEL 9 with the ISC dhcpd package and the failing side is RHEL 10 with the Kea package
+symptoms:
+  - text: >-
+      a dhcpd.conf file does not start a DHCP service on RHEL 10 until it is rewritten for Kea
+    basis: inferred
+mechanism: >-
+  The RHEL 10.0 release notes state that the Kea DHCP server replaces ISC DHCP.
+detect:
+  all:
+    - a: os.release.ID
+      eq: rhel
+    - a: os.release.VERSION_ID
+      ver: '>=9,<10'
+    - a: pkg.dhcpd.installed
+      present: 'true'
+    - b: os.release.ID
+      eq: rhel
+    - b: os.release.VERSION_ID
+      ver: '>=10,<11'
+    - b: pkg.kea.installed
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html-single/10.0_release_notes/index
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Infrastructure services: "The Kea DHCP server replaces ISC DHCP"'
+fixtures:
+  positive:
+    - name: rhel 9.4 dhcpd to rhel 10.0 kea
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+          pkg.dhcpd.installed: 'true'
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '10.0'
+          pkg.kea.installed: 'true'
+  negative:
+    - name: rhel 10.0 kea on both sides
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '10.0'
+          pkg.kea.installed: 'true'
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '10.0'
+          pkg.kea.installed: 'true'
+    - name: rhel 9.4 without dhcpd on the passing side
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '10.0'
+          pkg.kea.installed: 'true'
+status: pending-scanner

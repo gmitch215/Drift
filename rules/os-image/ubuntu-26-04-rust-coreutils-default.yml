@@ -1,0 +1,61 @@
+schema: 1
+id: ubuntu-26-04-rust-coreutils-default
+title: Ubuntu 26.04 provides the core utilities from rust-coreutils instead of GNU coreutils
+applies:
+  - os
+  - userland
+difference: >-
+  the passing side runs Ubuntu 24.04 with GNU coreutils and the failing side runs Ubuntu 26.04 where the core utilities are not GNU
+symptoms:
+  - text: >-
+      scripts that depend on GNU-specific behaviour of core utilities other than cp, mv and rm can behave differently on Ubuntu 26.04
+    basis: inferred
+mechanism: >-
+  The 26.04 summary states that the core utilities are now provided by rust-coreutils, which is not fully compatible yet, and that cp, mv and rm are still from GNU in rust-coreutils.
+detect:
+  all:
+    - a: os.release.VERSION_ID
+      eq: '24.04'
+    - a: tool.coreutils.flavor
+      eq: gnu
+    - b: os.release.VERSION_ID
+      eq: '26.04'
+    - b: tool.coreutils.flavor
+      eq: other
+severity: low
+provenance:
+  - url: https://documentation.ubuntu.com/release-notes/26.04/summary-for-lts-users/
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'rust-coreutils: "The core utilities of the operating system are now provided by the rust-coreutils package."; "are still from GNU in rust-coreutils"'
+fixtures:
+  positive:
+    - name: ubuntu 24.04 gnu coreutils to 26.04 rust-coreutils
+      a:
+        attrs:
+          os.release.VERSION_ID: '24.04'
+          tool.coreutils.flavor: gnu
+      b:
+        attrs:
+          os.release.VERSION_ID: '26.04'
+          tool.coreutils.flavor: other
+  negative:
+    - name: 26.04 on both sides
+      a:
+        attrs:
+          os.release.VERSION_ID: '26.04'
+          tool.coreutils.flavor: other
+      b:
+        attrs:
+          os.release.VERSION_ID: '26.04'
+          tool.coreutils.flavor: other
+    - name: 24.04 with a non-gnu coreutils on the passing side
+      a:
+        attrs:
+          os.release.VERSION_ID: '24.04'
+          tool.coreutils.flavor: other
+      b:
+        attrs:
+          os.release.VERSION_ID: '26.04'
+          tool.coreutils.flavor: other
+status: active

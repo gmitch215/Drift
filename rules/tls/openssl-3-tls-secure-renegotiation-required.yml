@@ -1,0 +1,49 @@
+schema: 1
+id: openssl-3-tls-secure-renegotiation-required
+title: OpenSSL 3.0 requires RFC 5746 secure renegotiation by default so peers without it fail the handshake
+applies:
+  - runtime
+  - network
+difference: >-
+  a = a process linked against OpenSSL before 3.0 (1.1.1); b = a process linked against OpenSSL 3.0 or later with default settings, talking to a peer that does not implement RFC 5746
+symptoms:
+  - text: TLS connections to old appliances or legacy servers succeed on OpenSSL 1.1.1 and fail with a handshake error on OpenSSL 3.x (error text not checked)
+    basis: inferred
+mechanism: OpenSSL 3.0 requires RFC 5746 secure renegotiation by default for TLS connections to succeed, so a peer without it fails the handshake.
+detect:
+  all:
+    - a: tool.openssl.version
+      ver: '<3.0.0'
+    - b: tool.openssl.version
+      ver: '>=3.0.0'
+severity: medium
+provenance:
+  - url: https://docs.openssl.org/3.0/man7/migration_guide/
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: TLS Changes
+fixtures:
+  positive:
+    - name: the passing side runs OpenSSL 1.1.1 and the failing side runs OpenSSL 3.0.13
+      a:
+        attrs:
+          tool.openssl.version: '1.1.1'
+      b:
+        attrs:
+          tool.openssl.version: '3.0.13'
+  negative:
+    - name: both sides run OpenSSL 3.0.13
+      a:
+        attrs:
+          tool.openssl.version: '3.0.13'
+      b:
+        attrs:
+          tool.openssl.version: '3.0.13'
+    - name: the failing side has no OpenSSL version captured
+      a:
+        attrs:
+          tool.openssl.version: '1.1.1'
+      b:
+        attrs:
+          tool.python.version: '3.12.4'
+status: active

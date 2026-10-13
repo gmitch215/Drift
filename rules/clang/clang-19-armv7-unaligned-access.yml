@@ -1,0 +1,79 @@
+schema: 1
+id: clang-19-armv7-unaligned-access
+title: Clang 19 allows unaligned access by default on ARMv7 and later targets
+applies:
+  - compiler
+difference: >-
+  for an ARMv7 or later target, LLVM Clang 18 or older on the passing side and LLVM Clang 19 or
+  newer on the other side (Apple clang is excluded); Armv6-M and Armv8-M without the Main Extension
+  keep the old default
+symptoms:
+  - text: >-
+      code that relies on alignment faults or a trap for unaligned loads behaves differently on
+      ARMv7 and later builds
+    basis: inferred
+mechanism: >-
+  Clang 19 defaults ARMv7 and later targets to allow unaligned access, except Armv6-M and Armv8-M
+  without the Main Extension.
+detect:
+  all:
+    - a: tool.cc.family
+      eq: clang
+    - b: tool.cc.family
+      eq: clang
+    - a: tool.cc.vendor
+      eq: llvm
+    - b: tool.cc.vendor
+      eq: llvm
+    - a: tool.cc.version
+      ver: '<19'
+    - b: tool.cc.version
+      ver: '>=19'
+    - b: project.build.target.triple
+      has: armv7
+severity: low
+provenance:
+  - url: https://releases.llvm.org/19.1.0/tools/clang/docs/ReleaseNotes.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Arm and AArch64 Support'
+fixtures:
+  positive:
+    - name: LLVM clang 18.1.3 to LLVM clang 19.1.0 for an ARMv7 target
+      a:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: llvm
+          tool.cc.version: '18.1.3'
+      b:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: llvm
+          tool.cc.version: '19.1.0'
+          project.build.target.triple: 'armv7-unknown-linux-gnueabihf'
+  negative:
+    - name: LLVM clang 18.1.3 to LLVM clang 19.1.0 for an AArch64 target
+      a:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: llvm
+          tool.cc.version: '18.1.3'
+      b:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: llvm
+          tool.cc.version: '19.1.0'
+          project.build.target.triple: 'aarch64-unknown-linux-gnu'
+    - name: LLVM clang 19.1.0 to LLVM clang 20.0.0 for an ARMv7 target
+      a:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: llvm
+          tool.cc.version: '19.1.0'
+      b:
+        attrs:
+          tool.cc.family: clang
+          tool.cc.vendor: llvm
+          tool.cc.version: '20.0.0'
+          project.build.target.triple: 'armv7-unknown-linux-gnueabihf'
+status: pending-scanner

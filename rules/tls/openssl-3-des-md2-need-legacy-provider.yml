@@ -1,0 +1,54 @@
+schema: 1
+id: openssl-3-des-md2-need-legacy-provider
+title: OpenSSL 3.0 keeps DES and MD2 out of the default configuration, so they need the legacy provider
+applies:
+  - runtime
+difference: >-
+  a = a process linked against OpenSSL before 3.0 (1.1.1), where DES and MD2 need no configuration; b = a process linked against OpenSSL 3.x with the legacy provider not loaded
+symptoms:
+  - text: code or a library that calls DES or MD2 fails with an unsupported-algorithm error on OpenSSL 3.x (error text not checked)
+    basis: inferred
+mechanism: OpenSSL 3.0 keeps the legacy EVP algorithms MD2 and DES available only through the legacy provider, which is not loaded by default.
+detect:
+  all:
+    - a: tool.openssl.version
+      ver: '<3.0.0'
+    - b: tool.openssl.version
+      ver: '>=3.0.0'
+    - b: runtime.openssl.legacy-provider
+      eq: 'false'
+severity: medium
+provenance:
+  - url: https://docs.openssl.org/3.0/man7/migration_guide/
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Legacy Algorithms
+fixtures:
+  positive:
+    - name: the passing side runs OpenSSL 1.1.1 and the failing side runs OpenSSL 3.0.13 with the legacy provider not loaded
+      a:
+        attrs:
+          tool.openssl.version: '1.1.1'
+      b:
+        attrs:
+          tool.openssl.version: '3.0.13'
+          runtime.openssl.legacy-provider: 'false'
+  negative:
+    - name: the failing side loads the legacy provider
+      a:
+        attrs:
+          tool.openssl.version: '1.1.1'
+      b:
+        attrs:
+          tool.openssl.version: '3.0.13'
+          runtime.openssl.legacy-provider: 'true'
+    - name: both sides run OpenSSL 3.0.13 with the legacy provider not loaded
+      a:
+        attrs:
+          tool.openssl.version: '3.0.13'
+          runtime.openssl.legacy-provider: 'false'
+      b:
+        attrs:
+          tool.openssl.version: '3.0.13'
+          runtime.openssl.legacy-provider: 'false'
+status: active

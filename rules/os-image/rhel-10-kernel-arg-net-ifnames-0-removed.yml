@@ -1,0 +1,71 @@
+schema: 1
+id: rhel-10-kernel-arg-net-ifnames-0-removed
+title: RHEL 10 disk images no longer honour net.ifnames=0 and use predictable interface names
+applies:
+  - kernel
+  - os
+difference: >-
+  the passing side is RHEL 9 booted with net.ifnames=0 and the failing side is RHEL 10 booted with net.ifnames=0 on the command line
+symptoms:
+  - text: >-
+      scripts and configuration that hard-code eth0 do not match the interface names of a RHEL 10 disk image
+    basis: inferred
+mechanism: >-
+  The RHEL 10.0 release notes state that the net.ifnames=0 kernel argument has been removed, which enables the predictable naming scheme in RHEL 10 disk images.
+detect:
+  all:
+    - a: os.release.ID
+      eq: rhel
+    - a: os.release.VERSION_ID
+      ver: '>=9,<10'
+    - a: kernel.cmdline
+      has: net.ifnames=0
+    - b: os.release.ID
+      eq: rhel
+    - b: os.release.VERSION_ID
+      ver: '>=10,<11'
+    - b: kernel.cmdline
+      has: net.ifnames=0
+severity: medium
+provenance:
+  - url: https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html-single/10.0_release_notes/index
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Installer and image creation, "Predictable network interface names in RHEL 10 disk images": "The net.ifnames=0 kernel argument has been removed"'
+fixtures:
+  positive:
+    - name: rhel 9.4 with net.ifnames=0 to rhel 10.0 with net.ifnames=0
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+          kernel.cmdline: ro net.ifnames=0 quiet
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '10.0'
+          kernel.cmdline: ro net.ifnames=0 quiet
+  negative:
+    - name: rhel 10.0 without net.ifnames=0 on the failing side
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+          kernel.cmdline: ro net.ifnames=0 quiet
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '10.0'
+          kernel.cmdline: ro quiet
+    - name: rhel 9.4 without net.ifnames=0 on the passing side
+      a:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '9.4'
+          kernel.cmdline: ro quiet
+      b:
+        attrs:
+          os.release.ID: rhel
+          os.release.VERSION_ID: '10.0'
+          kernel.cmdline: ro net.ifnames=0 quiet
+status: pending-scanner

@@ -1,0 +1,51 @@
+schema: 1
+id: tz-2026e-winnipeg-permanent-est
+title: tzdata 2026e makes Manitoba (America/Winnipeg) permanent UTC-5 with abbreviation EST
+applies:
+  - locale
+difference: >-
+  a = tzdata 2026e or later on the passing side; b = tzdata before 2026e on the failing side. The NEWS
+  gives 2026-10-31 as the legal change date; the 2026-11-01 02:00 transition is a temporary model
+  and is not the legal date
+symptoms:
+  - text: >-
+      Winnipeg times from the 2026-10-31 legal change differ between tzdata before 2026e and tzdata 2026e
+    basis: inferred
+mechanism: tzdata 2026e makes Manitoba (America/Winnipeg) permanent UTC-5 with abbreviation EST from its 2026-10-31 legal change.
+detect:
+  all:
+    - a: tz.database.version
+      ver: '>=2026e'
+    - b: tz.database.version
+      ver: '<2026e'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/eggert/tz/main/NEWS
+    kind: release-note
+    verified: '2026-10-13'
+    section: Release 2026e
+fixtures:
+  positive:
+    - name: tzdata 2026e against 2026d
+      a:
+        attrs:
+          tz.database.version: '2026e'
+      b:
+        attrs:
+          tz.database.version: '2026d'
+  negative:
+    - name: tzdata 2026e against 2026e
+      a:
+        attrs:
+          tz.database.version: '2026e'
+      b:
+        attrs:
+          tz.database.version: '2026e'
+    - name: tzdata 2026d against 2026c
+      a:
+        attrs:
+          tz.database.version: '2026d'
+      b:
+        attrs:
+          tz.database.version: '2026c'
+status: pending-scanner

@@ -1,0 +1,64 @@
+schema: 1
+id: mysql-8-0-query-cache-removed
+title: MySQL 8.0 removes the query cache and the SQL_CACHE modifier with it
+applies:
+  - runtime
+difference: >-
+  side a is MySQL 5.7 with the query cache enabled; side b is MySQL 8.0, where the query cache no longer exists
+symptoms:
+  - text: a SELECT that uses SQL_CACHE fails on 8.0, and code that relied on query cache hits runs uncached
+    basis: inferred
+mechanism: >-
+  The MySQL 8.0 release notes state that the query cache was removed, including the SQL_CACHE modifier, the FLUSH QUERY CACHE and RESET QUERY CACHE statements and the query_cache_* system variables.
+detect:
+  all:
+    - a: runtime.database.server.kind
+      eq: mysql
+    - a: runtime.database.server.version
+      ver: '<8.0.0'
+    - a: runtime.database.server.query-cache-type
+      ne: OFF
+    - b: runtime.database.server.kind
+      eq: mysql
+    - b: runtime.database.server.version
+      ver: '>=8.0.0'
+severity: medium
+provenance:
+  - url: https://dev.mysql.com/doc/refman/8.0/en/mysql-nutshell.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Features Removed in MySQL 8.0'
+fixtures:
+  positive:
+    - name: mysql 5.7.44 with the query cache on to mysql 8.0.36
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '5.7.44'
+          runtime.database.server.query-cache-type: ON
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+  negative:
+    - name: mysql 5.7.44 with the query cache off to mysql 8.0.36
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '5.7.44'
+          runtime.database.server.query-cache-type: OFF
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+    - name: mysql 8.0.36 to mysql 8.0.36 (no version crossing)
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+          runtime.database.server.query-cache-type: ON
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+status: pending-scanner

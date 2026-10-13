@@ -1,0 +1,73 @@
+schema: 1
+id: postgres-17-pg-stat-statements-io-columns-renamed
+title: PostgreSQL 17 renames the pg_stat_statements block I/O timing columns and removes buffers_backend from pg_stat_bgwriter
+applies:
+  - runtime
+difference: >-
+  side a is PostgreSQL 16 or lower (blk_read_time, blk_write_time, buffers_backend); side b is PostgreSQL 17 or higher (shared_blk_read_time, shared_blk_write_time; buffers_backend and buffers_backend_fsync removed)
+symptoms:
+  - text: monitoring queries that select the old column names fail or return no data
+    basis: inferred
+mechanism: >-
+  The PostgreSQL 17 release notes state that blk_read_time and blk_write_time are renamed to shared_blk_read_time and shared_blk_write_time, and that buffers_backend and buffers_backend_fsync are removed from pg_stat_bgwriter.
+detect:
+  all:
+    - a: runtime.database.server.kind
+      eq: postgres
+    - a: runtime.database.server.version
+      ver: '<17.0'
+    - b: runtime.database.server.kind
+      eq: postgres
+    - b: runtime.database.server.version
+      ver: '>=17.0'
+    - b: project.sql.pg-stat-column-refs
+      present: 'true'
+severity: low
+provenance:
+  - url: https://www.postgresql.org/docs/17/release-17.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Migration to Version 17'
+fixtures:
+  positive:
+    - name: postgres 16.4 to postgres 17.0 with old pg_stat column names in the project
+      a:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '16.4'
+      b:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '17.0'
+          project.sql.pg-stat-column-refs: 'true'
+  negative:
+    - name: postgres 16.4 to postgres 17.0 with no old column names in the project
+      a:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '16.4'
+      b:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '17.0'
+    - name: postgres 17.0 to postgres 17.0 (no version crossing)
+      a:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '17.0'
+      b:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '17.0'
+          project.sql.pg-stat-column-refs: 'true'
+    - name: postgres 17.0 to postgres 16.4 (reverse direction)
+      a:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '17.0'
+      b:
+        attrs:
+          runtime.database.server.kind: postgres
+          runtime.database.server.version: '16.4'
+          project.sql.pg-stat-column-refs: 'true'
+status: pending-scanner

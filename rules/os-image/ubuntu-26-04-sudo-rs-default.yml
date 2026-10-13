@@ -1,0 +1,61 @@
+schema: 1
+id: ubuntu-26-04-sudo-rs-default
+title: Ubuntu 26.04 makes sudo-rs the default sudo provider
+applies:
+  - os
+  - userland
+difference: >-
+  the passing side runs Ubuntu 24.04 with sudo.ws and the failing side runs Ubuntu 26.04 with sudo-rs
+symptoms:
+  - text: >-
+      sudo invocations or sudoers rules that depend on sudo.ws-only behaviour can behave differently on Ubuntu 26.04
+    basis: inferred
+mechanism: >-
+  The 26.04 summary states that sudo-rs is now the default sudo provider and points to the documented differences from sudo.ws.
+detect:
+  all:
+    - a: os.release.VERSION_ID
+      eq: '24.04'
+    - a: tool.sudo.flavor
+      present: 'true'
+    - b: os.release.VERSION_ID
+      eq: '26.04'
+    - b: tool.sudo.flavor
+      eq: rs
+severity: medium
+provenance:
+  - url: https://documentation.ubuntu.com/release-notes/26.04/summary-for-lts-users/
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'sudo-rs: "The sudo-rs tool is now the default sudo provider."'
+fixtures:
+  positive:
+    - name: ubuntu 24.04 sudo.ws to 26.04 sudo-rs
+      a:
+        attrs:
+          os.release.VERSION_ID: '24.04'
+          tool.sudo.flavor: ws
+      b:
+        attrs:
+          os.release.VERSION_ID: '26.04'
+          tool.sudo.flavor: rs
+  negative:
+    - name: 26.04 on both sides
+      a:
+        attrs:
+          os.release.VERSION_ID: '26.04'
+          tool.sudo.flavor: rs
+      b:
+        attrs:
+          os.release.VERSION_ID: '26.04'
+          tool.sudo.flavor: rs
+    - name: 22.04 to 26.04 is not the 24.04 boundary
+      a:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          tool.sudo.flavor: ws
+      b:
+        attrs:
+          os.release.VERSION_ID: '26.04'
+          tool.sudo.flavor: rs
+status: active

@@ -1,0 +1,60 @@
+schema: 1
+id: ubuntu-22-04-openldap-bdb-hdb-removed
+title: Ubuntu 22.04 OpenLDAP 2.5 removes the slapd shell, BDB and HDB backends and the nssov module
+applies:
+  - os
+  - userland
+difference: >-
+  the passing side runs Ubuntu 20.04 with slapd installed and the failing side runs Ubuntu 22.04 with slapd installed
+symptoms:
+  - text: >-
+      slapd does not start on Ubuntu 22.04 when its configuration names a BDB or HDB database
+    basis: inferred
+mechanism: >-
+  The 22.04 release notes state that the BDB and HDB backends and the nssov module have been removed in the OpenLDAP 2.5.x series.
+detect:
+  all:
+    - a: os.release.VERSION_ID
+      in: ['20.04']
+    - a: pkg.slapd.installed
+      present: 'true'
+    - b: os.release.VERSION_ID
+      in: ['22.04']
+    - b: pkg.slapd.installed
+      present: 'true'
+severity: low
+provenance:
+  - url: https://discourse.ubuntu.com/t/jammy-jellyfish-release-notes/24668
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'OpenLDAP 2.5.x series: "the BDB and the HDB backends have all been removed"'
+fixtures:
+  positive:
+    - name: slapd on ubuntu 20.04 to 22.04
+      a:
+        attrs:
+          os.release.VERSION_ID: '20.04'
+          pkg.slapd.installed: 'true'
+      b:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          pkg.slapd.installed: 'true'
+  negative:
+    - name: slapd on 22.04 on both sides
+      a:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          pkg.slapd.installed: 'true'
+      b:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          pkg.slapd.installed: 'true'
+    - name: no slapd on the failing side
+      a:
+        attrs:
+          os.release.VERSION_ID: '20.04'
+          pkg.slapd.installed: 'true'
+      b:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+status: pending-scanner

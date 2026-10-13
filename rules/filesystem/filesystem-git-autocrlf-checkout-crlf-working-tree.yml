@@ -1,0 +1,53 @@
+schema: 1
+id: filesystem-git-autocrlf-checkout-crlf-working-tree
+title: With core.autocrlf set to true, git writes CRLF line endings into the working tree
+applies:
+  - userland
+difference: >-
+  a = core.autocrlf is false or input on the passing side (LF working tree); b = core.autocrlf is true on the
+  failing side (CRLF working tree). The core.eol setting is not part of this detect
+symptoms:
+  - text: >-
+      LF-only shell scripts can fail after checkout because the line ending carries a carriage return
+      (shell error text not checked)
+    basis: inferred
+mechanism: Setting core.autocrlf to true makes git write CRLF line endings into the working tree when the repository stores LF.
+detect:
+  all:
+    - a: git.config.core.autocrlf
+      in:
+        - 'false'
+        - input
+    - b: git.config.core.autocrlf
+      eq: 'true'
+severity: medium
+provenance:
+  - url: https://git-scm.com/docs/git-config
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: core.autocrlf
+fixtures:
+  positive:
+    - name: autocrlf false against autocrlf true
+      a:
+        attrs:
+          git.config.core.autocrlf: 'false'
+      b:
+        attrs:
+          git.config.core.autocrlf: 'true'
+  negative:
+    - name: autocrlf true on both sides
+      a:
+        attrs:
+          git.config.core.autocrlf: 'true'
+      b:
+        attrs:
+          git.config.core.autocrlf: 'true'
+    - name: autocrlf input against autocrlf false
+      a:
+        attrs:
+          git.config.core.autocrlf: 'input'
+      b:
+        attrs:
+          git.config.core.autocrlf: 'false'
+status: pending-scanner

@@ -1,0 +1,57 @@
+schema: 1
+id: gitlab-saas-default-image-ruby-3-1
+title: GitLab SaaS hosted Linux runners use the ruby:3.1 image when a job sets no image
+applies:
+  - build
+difference: >-
+  the passing run used a job with an explicit image or a runner with its own default image, and the failing run used the GitLab SaaS hosted Linux runner with no image set, which defaults to ruby:3.1
+symptoms:
+  - text: >-
+      commands that expect Node, Python or another toolchain may fail with command not found on the ruby:3.1 image
+    basis: inferred
+mechanism: >-
+  If no image is set on GitLab SaaS hosted Linux runners, the job default is ruby:3.1, which runs on the docker+machine executor.
+detect:
+  all:
+    - a: ci.runner.image
+      ne: ruby:3.1
+    - b: ci.runner.image
+      eq: ruby:3.1
+    - b: ci.runner.executor
+      eq: docker+machine
+severity: low
+provenance:
+  - url: https://docs.gitlab.com/ci/runners/hosted_runners/linux/
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Container images and Hosted runners on Linux
+fixtures:
+  positive:
+    - name: node image then the SaaS default ruby:3.1
+      a:
+        attrs:
+          ci.runner.image: node:22
+      b:
+        attrs:
+          ci.runner.image: ruby:3.1
+          ci.runner.executor: docker+machine
+  negative:
+    - name: both jobs on ruby:3.1
+      a:
+        attrs:
+          ci.runner.image: ruby:3.1
+          ci.runner.executor: docker+machine
+      b:
+        attrs:
+          ci.runner.image: ruby:3.1
+          ci.runner.executor: docker+machine
+    - name: ruby:3.1 on the passing side
+      a:
+        attrs:
+          ci.runner.image: ruby:3.1
+          ci.runner.executor: docker+machine
+      b:
+        attrs:
+          ci.runner.image: node:22
+          ci.runner.executor: docker+machine
+status: pending-scanner

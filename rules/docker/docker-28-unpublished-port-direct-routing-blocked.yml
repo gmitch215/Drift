@@ -1,0 +1,56 @@
+schema: 1
+id: docker-28-unpublished-port-direct-routing-blocked
+title: Docker Engine 28 blocks direct routed access to container ports that are not published
+applies:
+  - network
+difference: >-
+  the passing run used a Docker Engine before 28.0.0, where a container port not published with -p was reachable by direct routing, and the failing run used Docker Engine 28.0.0 or later with the port not published
+symptoms:
+  - text: >-
+      a service reached by direct routing from another host or a routed network on Docker 27 is unreachable on Docker 28 unless its port is published
+    basis: inferred
+mechanism: >-
+  Docker Engine 28.0.0 blocks direct routed access to container ports that are not exposed with -p/--publish.
+detect:
+  all:
+    - a: tool.docker.version
+      ver: '<28.0.0'
+    - b: tool.docker.version
+      ver: '>=28.0.0'
+    - b: tool.docker.published-ports
+      ne: 'true'
+severity: medium
+provenance:
+  - url: https://docs.docker.com/engine/release-notes/28/
+    kind: release-note
+    verified: '2026-10-13'
+    section: 28.0.0 release notes, networking entries
+fixtures:
+  positive:
+    - name: Docker 27.3.1 then Docker 28.0.0 with the port unpublished
+      a:
+        attrs:
+          tool.docker.version: '27.3.1'
+      b:
+        attrs:
+          tool.docker.version: '28.0.0'
+          tool.docker.published-ports: 'false'
+  negative:
+    - name: Docker 28.0.0 with the port published
+      a:
+        attrs:
+          tool.docker.version: '27.3.1'
+      b:
+        attrs:
+          tool.docker.version: '28.0.0'
+          tool.docker.published-ports: 'true'
+    - name: both runs on Docker 28
+      a:
+        attrs:
+          tool.docker.version: '28.0.0'
+          tool.docker.published-ports: 'false'
+      b:
+        attrs:
+          tool.docker.version: '28.0.1'
+          tool.docker.published-ports: 'false'
+status: pending-scanner

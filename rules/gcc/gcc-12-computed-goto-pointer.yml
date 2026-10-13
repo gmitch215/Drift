@@ -1,0 +1,60 @@
+schema: 1
+id: gcc-12-computed-goto-pointer
+title: GCC 12 rejects a computed goto to a non-pointer address
+applies:
+  - compiler
+difference: >-
+  the C compiler is GCC 12 or newer on the failing side and GCC 11 or older on the passing side
+symptoms:
+  - text: >-
+      goto *10; is no longer accepted and needs a pointer cast such as goto *(void *)10;
+    basis: verified
+mechanism: >-
+  GCC 12 requires the operand of a computed goto to be a pointer type.
+detect:
+  all:
+    - a: tool.cc.family
+      eq: gcc
+    - b: tool.cc.family
+      eq: gcc
+    - a: tool.cc.version
+      ver: '<12'
+    - b: tool.cc.version
+      ver: '>=12'
+severity: low
+provenance:
+  - url: https://gcc.gnu.org/gcc-12/porting_to.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: 'C language issues: Computed goto now requires a pointer type'
+fixtures:
+  positive:
+    - name: gcc 11.2.0 to gcc 12.2.0
+      a:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '11.2.0'
+      b:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '12.2.0'
+  negative:
+    - name: gcc 12.2.0 to gcc 13.2.1
+      a:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '12.2.0'
+      b:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '13.2.1'
+    - name: gcc 10.5.0 to gcc 11.2.0
+      a:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '10.5.0'
+      b:
+        attrs:
+          tool.cc.family: gcc
+          tool.cc.version: '11.2.0'
+status: active

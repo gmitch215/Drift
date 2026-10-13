@@ -1,0 +1,61 @@
+schema: 1
+id: ubuntu-22-04-bind-map-zone-removed
+title: Ubuntu 22.04 BIND 9.18 removes support for the map zone file format
+applies:
+  - os
+  - userland
+difference: >-
+  the passing side runs Ubuntu 20.04 with named installed and the failing side runs Ubuntu 22.04 with named installed
+symptoms:
+  - text: >-
+      named refuses to load a zone stored in the map format on Ubuntu 22.04
+    basis: inferred
+mechanism: >-
+  The 22.04 release notes state that support for the map zone file format has been removed in BIND 9.18.
+detect:
+  all:
+    - a: os.release.VERSION_ID
+      in: ['20.04']
+    - a: tool.named.version
+      present: 'true'
+    - b: os.release.VERSION_ID
+      in: ['22.04']
+    - b: tool.named.version
+      present: 'true'
+severity: low
+provenance:
+  - url: https://discourse.ubuntu.com/t/jammy-jellyfish-release-notes/24668
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'BIND 9.18: "Support for the map zone file format has been removed."'
+fixtures:
+  positive:
+    - name: named on ubuntu 20.04 to 22.04
+      a:
+        attrs:
+          os.release.VERSION_ID: '20.04'
+          tool.named.version: '9.16.1'
+      b:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          tool.named.version: '9.18.1'
+  negative:
+    - name: named on 22.04 on both sides
+      a:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          tool.named.version: '9.18.1'
+      b:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          tool.named.version: '9.18.1'
+    - name: 22.04 to 24.04 is outside this boundary
+      a:
+        attrs:
+          os.release.VERSION_ID: '22.04'
+          tool.named.version: '9.18.1'
+      b:
+        attrs:
+          os.release.VERSION_ID: '24.04'
+          tool.named.version: '9.18.28'
+status: active

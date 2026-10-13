@@ -1,0 +1,68 @@
+schema: 1
+id: windows-latest-moves-to-vs2026
+title: The windows-latest and windows-2025 labels move to the Visual Studio 2026 image from June 8 to June 15, 2026
+applies:
+  - build
+difference: >-
+  the passing run used the Visual Studio 2022 image and the failing run used the Visual Studio 2026 image under the same windows-latest or windows-2025 label
+symptoms:
+  - text: >-
+      a build that worked on the Visual Studio 2022 image may fail on the Visual Studio 2026 image; the changelog does not describe failures
+    basis: inferred
+mechanism: >-
+  The windows-latest and windows-2025 labels move to the Visual Studio 2026 image by default, with the rollout running from June 8, 2026 to June 15, 2026.
+detect:
+  all:
+    - a: ci.runner.label
+      in:
+        - windows-latest
+        - windows-2025
+    - b: ci.runner.label
+      in:
+        - windows-latest
+        - windows-2025
+    - a: ci.runner.image.version
+      ver: '<20260608.0.0'
+    - b: ci.runner.image.version
+      ver: '>=20260608.0.0'
+severity: medium
+provenance:
+  - url: https://github.blog/changelog/2026-05-14-github-actions-upcoming-image-migrations
+    kind: release-note
+    verified: '2026-10-13'
+    section: Windows (windows-latest and windows-2025) Visual Studio 2026 image migration
+  - url: https://github.com/actions/runner-images/issues/14017
+    kind: release-note
+    verified: '2026-10-13'
+    section: issue body, windows-latest and windows-2025 move to Visual Studio 2026 by default
+fixtures:
+  positive:
+    - name: windows-latest image before and after the June 8 rollout
+      a:
+        attrs:
+          ci.runner.label: windows-latest
+          ci.runner.image.version: '20260601.100'
+      b:
+        attrs:
+          ci.runner.label: windows-latest
+          ci.runner.image.version: '20260610.200'
+  negative:
+    - name: both runs after the rollout
+      a:
+        attrs:
+          ci.runner.label: windows-latest
+          ci.runner.image.version: '20260610.200'
+      b:
+        attrs:
+          ci.runner.label: windows-latest
+          ci.runner.image.version: '20260612.201'
+    - name: windows-2022 label is not migrated
+      a:
+        attrs:
+          ci.runner.label: windows-2022
+          ci.runner.image.version: '20260601.100'
+      b:
+        attrs:
+          ci.runner.label: windows-2022
+          ci.runner.image.version: '20260610.200'
+status: pending-scanner

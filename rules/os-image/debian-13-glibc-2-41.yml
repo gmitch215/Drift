@@ -1,0 +1,60 @@
+schema: 1
+id: debian-13-glibc-2-41
+title: Debian 13 (trixie) moves the GNU C library from 2.36 to 2.41
+applies:
+  - os
+difference: >-
+  the passing side is Debian 12 (bookworm) with glibc 2.36 and the failing side is Debian 13 (trixie) with glibc 2.41
+symptoms:
+  - text: >-
+      a binary built on trixie against glibc 2.41 symbols fails to start on bookworm with a GLIBC_ version not found error
+    basis: inferred
+mechanism: >-
+  The trixie release notes list the GNU C library at 2.41 and give bookworm's 2.36 as the earlier version in the package table.
+detect:
+  all:
+    - a: os.release.VERSION_ID
+      eq: '12'
+    - a: tool.libc.version
+      ver: '>=2.36,<2.37'
+    - b: os.release.VERSION_ID
+      eq: '13'
+    - b: tool.libc.version
+      ver: '>=2.41,<2.42'
+severity: medium
+provenance:
+  - url: https://www.debian.org/releases/trixie/release-notes/whats-new.en.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'package table, columns "Version in 12 (bookworm)" and "Version in 13 (trixie)": the GNU C library 2.36 and 2.41'
+fixtures:
+  positive:
+    - name: debian 12 glibc 2.36 to debian 13 glibc 2.41
+      a:
+        attrs:
+          os.release.VERSION_ID: '12'
+          tool.libc.version: '2.36'
+      b:
+        attrs:
+          os.release.VERSION_ID: '13'
+          tool.libc.version: '2.41'
+  negative:
+    - name: debian 13 on both sides
+      a:
+        attrs:
+          os.release.VERSION_ID: '13'
+          tool.libc.version: '2.41'
+      b:
+        attrs:
+          os.release.VERSION_ID: '13'
+          tool.libc.version: '2.41'
+    - name: debian 12 already on glibc 2.41 on the passing side
+      a:
+        attrs:
+          os.release.VERSION_ID: '12'
+          tool.libc.version: '2.41'
+      b:
+        attrs:
+          os.release.VERSION_ID: '13'
+          tool.libc.version: '2.41'
+status: active

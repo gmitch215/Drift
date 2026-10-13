@@ -1,0 +1,54 @@
+schema: 1
+id: curl-env-proxy-lowercase-wins-over-uppercase
+title: curl and Python urllib give the lowercase proxy variable precedence when both http_proxy and HTTP_PROXY are set
+applies:
+  - network
+  - env
+difference: >-
+  b = a process where both http_proxy and HTTP_PROXY are set; the rule does not compare the two values, so equal values also match
+symptoms:
+  - text: a CI step routes curl through one proxy and a Python step through another, or a job behaves differently on the runner than on a laptop (inferred from the precedence rule; not reproduced)
+    basis: inferred
+mechanism: curl and Python urllib give the lowercase proxy variable precedence over the uppercase one, which matters only when the two values differ.
+detect:
+  all:
+    - b: env.http_proxy
+      present: 'true'
+    - b: env.HTTP_PROXY
+      present: 'true'
+severity: low
+provenance:
+  - url: https://curl.se/docs/manpage.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: ENVIRONMENT
+  - url: https://docs.python.org/3/library/urllib.request.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: getproxies
+fixtures:
+  positive:
+    - name: the failing side sets both http_proxy and HTTP_PROXY to different proxies
+      a:
+        attrs:
+          tool.python.version: '3.12.4'
+      b:
+        attrs:
+          env.http_proxy: http://lower.proxy.example:3128
+          env.HTTP_PROXY: http://upper.proxy.example:3128
+  negative:
+    - name: the failing side sets only the uppercase variable
+      a:
+        attrs:
+          tool.python.version: '3.12.4'
+      b:
+        attrs:
+          env.HTTP_PROXY: http://upper.proxy.example:3128
+    - name: the failing side sets neither variable
+      a:
+        attrs:
+          tool.python.version: '3.12.4'
+      b:
+        attrs:
+          tool.python.version: '3.12.4'
+status: active

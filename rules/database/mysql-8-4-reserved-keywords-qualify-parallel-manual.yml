@@ -1,0 +1,73 @@
+schema: 1
+id: mysql-8-4-reserved-keywords-qualify-parallel-manual
+title: MySQL 8.4 marks MANUAL, PARALLEL and QUALIFY as reserved words
+applies:
+  - runtime
+difference: >-
+  side a is MySQL 8.0 (the three words usable as unquoted identifiers); side b is MySQL 8.4 (the words are reserved)
+symptoms:
+  - text: a syntax error on an unquoted column or table named manual, parallel or qualify
+    basis: inferred
+mechanism: >-
+  The MySQL 8.4 release notes list MANUAL, PARALLEL and QUALIFY as new keywords, each marked as reserved.
+detect:
+  all:
+    - a: runtime.database.server.kind
+      eq: mysql
+    - a: runtime.database.server.version
+      ver: '>=8.0.0,<8.4.0'
+    - b: runtime.database.server.kind
+      eq: mysql
+    - b: runtime.database.server.version
+      ver: '>=8.4.0'
+    - b: project.sql.reserved-identifiers
+      present: 'true'
+severity: low
+provenance:
+  - url: https://dev.mysql.com/doc/refman/8.4/en/mysql-nutshell.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Features Added or Changed in MySQL 8.4, New Keywords'
+fixtures:
+  positive:
+    - name: mysql 8.0.36 to mysql 8.4.0 with an unquoted QUALIFY identifier in the project
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.4.0'
+          project.sql.reserved-identifiers: 'true'
+  negative:
+    - name: mysql 8.0.36 to mysql 8.4.0 with no reserved identifier in the project
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.4.0'
+    - name: mysql 8.4.0 to mysql 8.4.0 (no version crossing)
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.4.0'
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.4.0'
+          project.sql.reserved-identifiers: 'true'
+    - name: mysql 8.4.0 to mysql 8.0.36 (reverse direction)
+      a:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.4.0'
+      b:
+        attrs:
+          runtime.database.server.kind: mysql
+          runtime.database.server.version: '8.0.36'
+          project.sql.reserved-identifiers: 'true'
+status: pending-scanner

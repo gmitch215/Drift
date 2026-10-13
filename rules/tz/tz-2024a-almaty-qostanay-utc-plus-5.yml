@@ -1,0 +1,51 @@
+schema: 1
+id: tz-2024a-almaty-qostanay-utc-plus-5
+title: tzdata 2024a moves Kazakhstan's eastern zones (Asia/Almaty, Asia/Qostanay) from UTC+6 to UTC+5
+applies:
+  - locale
+difference: >-
+  a = tzdata 2024a or later on the passing side; b = tzdata before 2024a on the failing side. The change
+  takes effect at 2024-03-01 00:00
+symptoms:
+  - text: >-
+      Almaty and Qostanay times after 2024-03-01 00:00 differ by one hour between tzdata before 2024a and
+      tzdata 2024a
+    basis: inferred
+mechanism: tzdata 2024a moves Asia/Almaty and Asia/Qostanay from UTC+6 to UTC+5 from 2024-03-01 00:00.
+detect:
+  all:
+    - a: tz.database.version
+      ver: '>=2024a'
+    - b: tz.database.version
+      ver: '<2024a'
+severity: low
+provenance:
+  - url: https://raw.githubusercontent.com/eggert/tz/main/NEWS
+    kind: release-note
+    verified: '2026-10-13'
+    section: Release 2024a
+fixtures:
+  positive:
+    - name: tzdata 2024a against 2023d
+      a:
+        attrs:
+          tz.database.version: '2024a'
+      b:
+        attrs:
+          tz.database.version: '2023d'
+  negative:
+    - name: tzdata 2024a against 2024a
+      a:
+        attrs:
+          tz.database.version: '2024a'
+      b:
+        attrs:
+          tz.database.version: '2024a'
+    - name: tzdata 2023d against 2023c
+      a:
+        attrs:
+          tz.database.version: '2023d'
+      b:
+        attrs:
+          tz.database.version: '2023c'
+status: pending-scanner
