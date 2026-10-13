@@ -1,0 +1,52 @@
+schema: 1
+id: python-3-13-copy-replace-added
+title: Python 3.13 adds copy.replace
+applies:
+  - runtime
+difference: >-
+  the Python version is 3.13 or newer on the passing side and older than 3.13 on the failing side
+symptoms:
+  - text: "AttributeError: module 'copy' has no attribute 'replace'"
+    basis: inferred
+mechanism: Python 3.13 adds copy.replace, so a call to it fails on earlier Python versions.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '>=3.13.0'
+    - b: tool.python.version
+      ver: '<3.13.0'
+    - b: project.python.calls.copy.replace
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://docs.python.org/3/library/copy.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: "copy.replace(obj, /, **changes): Added in version 3.13"
+fixtures:
+  positive:
+    - name: python 3.12 target calling copy.replace (3.13.1 to 3.12.8)
+      a:
+        attrs:
+          tool.python.version: '3.13.1'
+      b:
+        attrs:
+          tool.python.version: '3.12.8'
+          project.python.calls.copy.replace: 'true'
+  negative:
+    - name: target without the call
+      a:
+        attrs:
+          tool.python.version: '3.13.1'
+      b:
+        attrs:
+          tool.python.version: '3.12.8'
+    - name: target on a runtime that has the API
+      a:
+        attrs:
+          tool.python.version: '3.13.1'
+      b:
+        attrs:
+          tool.python.version: '3.13.1'
+          project.python.calls.copy.replace: 'true'
+status: active

@@ -1,0 +1,80 @@
+schema: 1
+id: python-3-7-c-locale-coercion
+title: CPython 3.7 and newer coerces the C locale to a UTF-8 locale, so non-ASCII text I/O differs from 3.6
+applies:
+  - runtime
+  - locale
+difference: >-
+  CPython is 3.7 or newer on the passing side and 3.6 or older on the failing side, with LANG or LC_CTYPE set
+  to C or POSIX on the failing side and LC_ALL unset on the passing side
+symptoms:
+  - text: >-
+      on 3.6 in the C locale, writing non-ASCII text or opening non-ASCII file names may fail with an ASCII
+      encoding error
+    basis: inferred
+mechanism: CPython 3.7 and newer switches LC_CTYPE to the first installed locale of C.UTF-8, C.utf8 or UTF-8 when the process runs in the C locale, unless LC_ALL is set (PEP 538).
+probe: resources.locale-env
+detect:
+  all:
+    - a: tool.python.version
+      ver: '>=3.7'
+    - b: tool.python.version
+      ver: '<3.7'
+    - a: env.LC_ALL
+      present: 'false'
+    - any:
+        - b: env.LANG
+          in:
+            - C
+            - POSIX
+        - b: env.LC_CTYPE
+          in:
+            - C
+            - POSIX
+severity: medium
+provenance:
+  - url: https://peps.python.org/pep-0538/
+    kind: spec
+    verified: '2026-10-13'
+    section: Specification
+fixtures:
+  positive:
+    - name: cpython 3.12 with C.UTF-8 against cpython 3.6 in the C locale
+      a:
+        attrs:
+          tool.python.version: '3.12.7'
+          env.LANG: C.UTF-8
+      b:
+        attrs:
+          tool.python.version: '3.6.15'
+          env.LANG: C
+  negative:
+    - name: cpython 3.6 against cpython 3.6, both in the C locale
+      a:
+        attrs:
+          tool.python.version: '3.6.15'
+          env.LANG: C
+      b:
+        attrs:
+          tool.python.version: '3.6.15'
+          env.LANG: C
+    - name: cpython 3.6 in a UTF-8 locale
+      a:
+        attrs:
+          tool.python.version: '3.12.7'
+          env.LANG: C.UTF-8
+      b:
+        attrs:
+          tool.python.version: '3.6.15'
+          env.LANG: en_US.UTF-8
+    - name: cpython 3.12 with LC_ALL set in the C locale
+      a:
+        attrs:
+          tool.python.version: '3.12.7'
+          env.LANG: C.UTF-8
+          env.LC_ALL: C
+      b:
+        attrs:
+          tool.python.version: '3.6.15'
+          env.LANG: C
+status: active

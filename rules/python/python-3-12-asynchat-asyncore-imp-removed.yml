@@ -1,0 +1,58 @@
+schema: 1
+id: python-3-12-asynchat-asyncore-imp-removed
+title: Python 3.12 removes the asynchat, asyncore and imp modules
+applies:
+  - runtime
+difference: the failing side is Python 3.12, where importing asynchat, asyncore or imp fails; on 3.11 and older the same import succeeds
+symptoms:
+  - text: ModuleNotFoundError at import for asynchat, asyncore or imp, typically from an old network library
+    basis: inferred
+mechanism: Python 3.12 removes the asynchat, asyncore and imp modules from the standard library.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '<3.12'
+    - b: tool.python.version
+      ver: '>=3.12'
+    - any:
+        - b: project.python.imports.asynchat
+          present: 'true'
+        - b: project.python.imports.asyncore
+          present: 'true'
+        - b: project.python.imports.imp
+          present: 'true'
+severity: high
+provenance:
+  - url: https://docs.python.org/3.12/whatsnew/3.12.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Summary - Release highlights'
+fixtures:
+  positive:
+    - name: python 3.11.9 to python 3.12.15 importing asyncore
+      a:
+        attrs:
+          tool.python.version: '3.11.9'
+      b:
+        attrs:
+          tool.python.version: '3.12.15'
+          project.python.imports.asyncore: 'true'
+  negative:
+    - name: python 3.11.9 to python 3.12.15 importing os only
+      a:
+        attrs:
+          tool.python.version: '3.11.9'
+      b:
+        attrs:
+          tool.python.version: '3.12.15'
+          project.python.imports.os: 'true'
+    - name: python 3.12.15 to python 3.13.16 importing asyncore (a is not before 3.12)
+      a:
+        attrs:
+          tool.python.version: '3.12.15'
+          project.python.imports.asyncore: 'true'
+      b:
+        attrs:
+          tool.python.version: '3.13.16'
+          project.python.imports.asyncore: 'true'
+status: pending-scanner

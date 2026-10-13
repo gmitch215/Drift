@@ -1,0 +1,52 @@
+schema: 1
+id: python-3-11-datetime-utc-added
+title: Python 3.11 adds datetime.UTC
+applies:
+  - runtime
+difference: >-
+  the Python version is 3.11 or newer on the passing side and older than 3.11 on the failing side
+symptoms:
+  - text: "AttributeError: module 'datetime' has no attribute 'UTC'"
+    basis: inferred
+mechanism: Python 3.11 adds the datetime.UTC alias, so a reference to it fails on earlier Python versions.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '>=3.11.0'
+    - b: tool.python.version
+      ver: '<3.11.0'
+    - b: project.python.calls.datetime.UTC
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://docs.python.org/3/library/datetime.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: "datetime.UTC: Added in version 3.11"
+fixtures:
+  positive:
+    - name: python 3.10 target referencing datetime.UTC (3.11.9 to 3.10.12)
+      a:
+        attrs:
+          tool.python.version: '3.11.9'
+      b:
+        attrs:
+          tool.python.version: '3.10.12'
+          project.python.calls.datetime.UTC: 'true'
+  negative:
+    - name: target without the call
+      a:
+        attrs:
+          tool.python.version: '3.11.9'
+      b:
+        attrs:
+          tool.python.version: '3.10.12'
+    - name: target on a runtime that has the API
+      a:
+        attrs:
+          tool.python.version: '3.11.9'
+      b:
+        attrs:
+          tool.python.version: '3.11.9'
+          project.python.calls.datetime.UTC: 'true'
+status: active

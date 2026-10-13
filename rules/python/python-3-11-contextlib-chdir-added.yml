@@ -1,0 +1,52 @@
+schema: 1
+id: python-3-11-contextlib-chdir-added
+title: Python 3.11 adds contextlib.chdir
+applies:
+  - runtime
+difference: >-
+  the Python version is 3.11 or newer on the passing side and older than 3.11 on the failing side
+symptoms:
+  - text: "AttributeError: module 'contextlib' has no attribute 'chdir'"
+    basis: inferred
+mechanism: Python 3.11 adds the contextlib.chdir context manager, so a call to it fails on earlier Python versions.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '>=3.11.0'
+    - b: tool.python.version
+      ver: '<3.11.0'
+    - b: project.python.calls.contextlib.chdir
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://docs.python.org/3/library/contextlib.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: "contextlib.chdir(path): Added in version 3.11"
+fixtures:
+  positive:
+    - name: "python 3.10.14 target using contextlib.chdir (3.13.1 to 3.10.14)"
+      a:
+        attrs:
+          tool.python.version: '3.13.1'
+      b:
+        attrs:
+          tool.python.version: '3.10.14'
+          project.python.calls.contextlib.chdir: 'true'
+  negative:
+    - name: target without the call
+      a:
+        attrs:
+          tool.python.version: '3.13.1'
+      b:
+        attrs:
+          tool.python.version: '3.10.14'
+    - name: target on a runtime that has the API
+      a:
+        attrs:
+          tool.python.version: '3.13.1'
+      b:
+        attrs:
+          tool.python.version: '3.13.1'
+          project.python.calls.contextlib.chdir: 'true'
+status: active

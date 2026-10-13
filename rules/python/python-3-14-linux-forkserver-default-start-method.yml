@@ -1,0 +1,66 @@
+schema: 1
+id: python-3-14-linux-forkserver-default-start-method
+title: Python 3.14 changes the default multiprocessing start method on Unix other than macOS from fork to forkserver
+applies:
+  - runtime
+  - os
+difference: the failing side is Python 3.14 on Linux, where forkserver is the default start method; on 3.13 the Linux default is fork
+symptoms:
+  - text: child processes no longer inherit parent state set up before the fork, and arguments that cannot be pickled fail
+    basis: inferred
+mechanism: On Unix platforms other than macOS, Python 3.14 makes forkserver the default multiprocessing start method in place of fork.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '<3.14'
+    - b: tool.python.version
+      ver: '>=3.14'
+    - a: os.name
+      eq: linux
+    - b: os.name
+      eq: linux
+    - b: project.python.imports.multiprocessing
+      present: 'true'
+    - b: project.python.calls.multiprocessing-start-method
+      present: 'false'
+severity: high
+provenance:
+  - url: https://docs.python.org/3.14/whatsnew/3.14.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Improved modules > multiprocessing'
+fixtures:
+  positive:
+    - name: python 3.13.9 to python 3.14.0 on Linux importing multiprocessing with no start method set
+      a:
+        attrs:
+          tool.python.version: '3.13.9'
+          os.name: linux
+      b:
+        attrs:
+          tool.python.version: '3.14.0'
+          os.name: linux
+          project.python.imports.multiprocessing: 'true'
+  negative:
+    - name: python 3.13.9 to python 3.14.0 on Linux with a start method set
+      a:
+        attrs:
+          tool.python.version: '3.13.9'
+          os.name: linux
+      b:
+        attrs:
+          tool.python.version: '3.14.0'
+          os.name: linux
+          project.python.imports.multiprocessing: 'true'
+          project.python.calls.multiprocessing-start-method: 'true'
+    - name: python 3.13.9 to python 3.14.0 on Windows importing multiprocessing
+      a:
+        attrs:
+          tool.python.version: '3.13.9'
+          os.name: windows
+      b:
+        attrs:
+          tool.python.version: '3.14.0'
+          os.name: windows
+          project.python.imports.multiprocessing: 'true'
+status: active

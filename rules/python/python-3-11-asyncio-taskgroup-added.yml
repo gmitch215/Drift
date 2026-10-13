@@ -1,0 +1,52 @@
+schema: 1
+id: python-3-11-asyncio-taskgroup-added
+title: Python 3.11 adds asyncio.TaskGroup
+applies:
+  - runtime
+difference: >-
+  the Python version is 3.11 or newer on the passing side and older than 3.11 on the failing side
+symptoms:
+  - text: "AttributeError: module 'asyncio' has no attribute 'TaskGroup'"
+    basis: inferred
+mechanism: Python 3.11 adds the asyncio.TaskGroup class, so a use of it fails on earlier Python versions.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '>=3.11.0'
+    - b: tool.python.version
+      ver: '<3.11.0'
+    - b: project.python.calls.asyncio.TaskGroup
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://docs.python.org/3/library/asyncio-task.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: "class asyncio.TaskGroup: Added in version 3.11"
+fixtures:
+  positive:
+    - name: "python 3.10.14 target using asyncio.TaskGroup (3.13.1 to 3.10.14)"
+      a:
+        attrs:
+          tool.python.version: '3.13.1'
+      b:
+        attrs:
+          tool.python.version: '3.10.14'
+          project.python.calls.asyncio.TaskGroup: 'true'
+  negative:
+    - name: target without the call
+      a:
+        attrs:
+          tool.python.version: '3.13.1'
+      b:
+        attrs:
+          tool.python.version: '3.10.14'
+    - name: target on a runtime that has the API
+      a:
+        attrs:
+          tool.python.version: '3.13.1'
+      b:
+        attrs:
+          tool.python.version: '3.13.1'
+          project.python.calls.asyncio.TaskGroup: 'true'
+status: active

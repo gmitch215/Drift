@@ -1,0 +1,52 @@
+schema: 1
+id: python-3-14-get-event-loop-no-implicit-loop
+title: Python 3.14 makes asyncio.get_event_loop() raise RuntimeError when no loop is current
+applies:
+  - runtime
+difference: the failing side is Python 3.14, where the call raises when no event loop is current; on 3.13 and older the same call creates one
+symptoms:
+  - text: RuntimeError at the get_event_loop() call when no current event loop is set
+    basis: verified
+mechanism: Python 3.14 stops asyncio.get_event_loop() from implicitly creating an event loop, so the call raises RuntimeError when none is current.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '<3.14'
+    - b: tool.python.version
+      ver: '>=3.14'
+    - b: project.python.calls.asyncio.get_event_loop
+      present: 'true'
+severity: high
+provenance:
+  - url: https://docs.python.org/3.14/whatsnew/3.14.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Removed > asyncio'
+fixtures:
+  positive:
+    - name: python 3.13.9 to python 3.14.0 calling asyncio.get_event_loop
+      a:
+        attrs:
+          tool.python.version: '3.13.9'
+      b:
+        attrs:
+          tool.python.version: '3.14.0'
+          project.python.calls.asyncio.get_event_loop: 'true'
+  negative:
+    - name: python 3.13.9 to python 3.14.0 with no get_event_loop call
+      a:
+        attrs:
+          tool.python.version: '3.13.9'
+      b:
+        attrs:
+          tool.python.version: '3.14.0'
+    - name: python 3.14.0 to python 3.14.1 calling get_event_loop (both sides past 3.14)
+      a:
+        attrs:
+          tool.python.version: '3.14.0'
+          project.python.calls.asyncio.get_event_loop: 'true'
+      b:
+        attrs:
+          tool.python.version: '3.14.1'
+          project.python.calls.asyncio.get_event_loop: 'true'
+status: active

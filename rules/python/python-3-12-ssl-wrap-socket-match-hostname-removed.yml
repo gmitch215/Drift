@@ -1,0 +1,56 @@
+schema: 1
+id: python-3-12-ssl-wrap-socket-match-hostname-removed
+title: Python 3.12 removes ssl.wrap_socket() and ssl.match_hostname()
+applies:
+  - runtime
+  - network
+difference: the failing side is Python 3.12, where ssl.wrap_socket() and ssl.match_hostname() are gone; on 3.11 and older both exist, deprecated since Python 3.7
+symptoms:
+  - text: AttributeError at the first call to ssl.wrap_socket or ssl.match_hostname
+    basis: inferred
+mechanism: Python 3.12 removes the ssl.wrap_socket() and ssl.match_hostname() functions, both deprecated since Python 3.7.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '<3.12'
+    - b: tool.python.version
+      ver: '>=3.12'
+    - any:
+        - b: project.python.calls.ssl.wrap_socket
+          present: 'true'
+        - b: project.python.calls.ssl.match_hostname
+          present: 'true'
+severity: high
+provenance:
+  - url: https://docs.python.org/3.12/whatsnew/3.12.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Removed > ssl'
+fixtures:
+  positive:
+    - name: python 3.11.9 to python 3.12.15 calling ssl.wrap_socket
+      a:
+        attrs:
+          tool.python.version: '3.11.9'
+      b:
+        attrs:
+          tool.python.version: '3.12.15'
+          project.python.calls.ssl.wrap_socket: 'true'
+  negative:
+    - name: python 3.11.9 to python 3.12.15 with no removed ssl call
+      a:
+        attrs:
+          tool.python.version: '3.11.9'
+      b:
+        attrs:
+          tool.python.version: '3.12.15'
+    - name: python 3.12.15 to python 3.13.16 calling ssl.wrap_socket (a is not before 3.12)
+      a:
+        attrs:
+          tool.python.version: '3.12.15'
+          project.python.calls.ssl.wrap_socket: 'true'
+      b:
+        attrs:
+          tool.python.version: '3.13.16'
+          project.python.calls.ssl.wrap_socket: 'true'
+status: pending-scanner

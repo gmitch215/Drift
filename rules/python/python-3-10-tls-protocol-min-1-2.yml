@@ -1,0 +1,54 @@
+schema: 1
+id: python-3-10-tls-protocol-min-1-2
+title: Python 3.10 sets TLS 1.2 as the minimum for PROTOCOL_TLS, PROTOCOL_TLS_CLIENT and PROTOCOL_TLS_SERVER
+applies:
+  - runtime
+  - network
+difference: >-
+  a = Python 3.9 or earlier on the passing side; b = Python 3.10 or later on the failing side, with the default context and a peer that offers only TLS 1.0 or 1.1
+symptoms:
+  - text: the script fails with an SSL protocol error against a TLS 1.0 or 1.1 only endpoint (error text not checked)
+    basis: inferred
+mechanism: Python 3.10 makes PROTOCOL_TLS, PROTOCOL_TLS_CLIENT and PROTOCOL_TLS_SERVER use TLS 1.2 as the minimum version.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '<3.10'
+    - b: tool.python.version
+      ver: '>=3.10'
+    - b: network.tls-version-offered
+      has: TLSv1.0
+severity: medium
+provenance:
+  - url: https://docs.python.org/3/library/ssl.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Changed in version 3.10
+fixtures:
+  positive:
+    - name: python 3.9.19 to python 3.10.14 with a TLS 1.0 only endpoint
+      a:
+        attrs:
+          tool.python.version: '3.9.19'
+      b:
+        attrs:
+          tool.python.version: '3.10.14'
+          network.tls-version-offered: TLSv1.0
+  negative:
+    - name: python 3.9.19 to python 3.10.14 with a TLS 1.2 endpoint
+      a:
+        attrs:
+          tool.python.version: '3.9.19'
+      b:
+        attrs:
+          tool.python.version: '3.10.14'
+          network.tls-version-offered: TLSv1.2
+    - name: python 3.11.9 to python 3.12.4 with a TLS 1.0 endpoint (both past the 3.10 default)
+      a:
+        attrs:
+          tool.python.version: '3.11.9'
+      b:
+        attrs:
+          tool.python.version: '3.12.4'
+          network.tls-version-offered: TLSv1.0
+status: pending-scanner

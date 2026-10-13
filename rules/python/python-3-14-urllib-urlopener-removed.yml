@@ -1,0 +1,52 @@
+schema: 1
+id: python-3-14-urllib-urlopener-removed
+title: Python 3.14 removes urllib.request.URLopener and FancyURLopener
+applies:
+  - runtime
+difference: the failing side is Python 3.14, where the two opener classes are gone; on 3.13 they still exist, deprecated since Python 3.3
+symptoms:
+  - text: AttributeError at the first reference to URLopener or FancyURLopener
+    basis: inferred
+mechanism: Python 3.14 removes the URLopener and FancyURLopener classes from urllib.request, which have been deprecated since Python 3.3.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '<3.14'
+    - b: tool.python.version
+      ver: '>=3.14'
+    - b: project.python.calls.urllib-urlopener
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://docs.python.org/3.14/whatsnew/3.14.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Removed > urllib'
+fixtures:
+  positive:
+    - name: python 3.13.9 to python 3.14.0 importing URLopener
+      a:
+        attrs:
+          tool.python.version: '3.13.9'
+      b:
+        attrs:
+          tool.python.version: '3.14.0'
+          project.python.calls.urllib-urlopener: 'true'
+  negative:
+    - name: python 3.13.9 to python 3.14.0 with no opener class
+      a:
+        attrs:
+          tool.python.version: '3.13.9'
+      b:
+        attrs:
+          tool.python.version: '3.14.0'
+    - name: python 3.14.0 to python 3.14.1 importing URLopener (both sides past 3.14)
+      a:
+        attrs:
+          tool.python.version: '3.14.0'
+          project.python.calls.urllib-urlopener: 'true'
+      b:
+        attrs:
+          tool.python.version: '3.14.1'
+          project.python.calls.urllib-urlopener: 'true'
+status: active

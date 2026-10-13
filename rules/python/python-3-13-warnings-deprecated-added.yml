@@ -1,0 +1,52 @@
+schema: 1
+id: python-3-13-warnings-deprecated-added
+title: Python 3.13 adds warnings.deprecated
+applies:
+  - runtime
+difference: >-
+  the Python version is 3.13 or newer on the passing side and older than 3.13 on the failing side
+symptoms:
+  - text: "AttributeError: module 'warnings' has no attribute 'deprecated'"
+    basis: inferred
+mechanism: Python 3.13 adds the warnings.deprecated decorator, so a use of it fails on earlier Python versions.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '>=3.13.0'
+    - b: tool.python.version
+      ver: '<3.13.0'
+    - b: project.python.calls.warnings.deprecated
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://docs.python.org/3/library/warnings.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: "@warnings.deprecated: Added in version 3.13"
+fixtures:
+  positive:
+    - name: "python 3.12.7 target using warnings.deprecated (3.14.0 to 3.12.7)"
+      a:
+        attrs:
+          tool.python.version: '3.14.0'
+      b:
+        attrs:
+          tool.python.version: '3.12.7'
+          project.python.calls.warnings.deprecated: 'true'
+  negative:
+    - name: target without the call
+      a:
+        attrs:
+          tool.python.version: '3.14.0'
+      b:
+        attrs:
+          tool.python.version: '3.12.7'
+    - name: target on a runtime that has the API
+      a:
+        attrs:
+          tool.python.version: '3.14.0'
+      b:
+        attrs:
+          tool.python.version: '3.14.0'
+          project.python.calls.warnings.deprecated: 'true'
+status: active

@@ -1,0 +1,55 @@
+schema: 1
+id: python-3-10-requires-openssl-1-1-1
+title: Python 3.10 ssl module requires OpenSSL 1.1.1 or newer, so a 3.10 build on OpenSSL 1.0.2 is outside the supported set
+applies:
+  - runtime
+  - build
+difference: >-
+  a = Python 3.9 on OpenSSL 1.0.2 (builds and imports ssl); b = Python 3.10 or later linked against OpenSSL 1.0.2
+symptoms:
+  - text: a source build of Python 3.10 against OpenSSL 1.0.2 fails at configure or at import ssl (error text not checked)
+    basis: inferred
+mechanism: Python 3.10 implements PEP 644, under which the ssl module requires OpenSSL 1.1.1 or newer.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '<3.10'
+    - b: tool.python.version
+      ver: '>=3.10'
+    - b: tool.openssl.version
+      ver: '<1.1.1'
+severity: low
+provenance:
+  - url: https://docs.python.org/3/library/ssl.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Changed in version 3.10
+fixtures:
+  positive:
+    - name: the passing side runs Python 3.9.19 and the failing side runs Python 3.10.14 on OpenSSL 1.0.2
+      a:
+        attrs:
+          tool.python.version: '3.9.19'
+      b:
+        attrs:
+          tool.python.version: '3.10.14'
+          tool.openssl.version: '1.0.2'
+  negative:
+    - name: the failing side runs Python 3.10.14 on OpenSSL 3.0.13
+      a:
+        attrs:
+          tool.python.version: '3.9.19'
+      b:
+        attrs:
+          tool.python.version: '3.10.14'
+          tool.openssl.version: '3.0.13'
+    - name: both sides run Python 3.10.14
+      a:
+        attrs:
+          tool.python.version: '3.10.14'
+          tool.openssl.version: '1.0.2'
+      b:
+        attrs:
+          tool.python.version: '3.10.14'
+          tool.openssl.version: '1.0.2'
+status: active

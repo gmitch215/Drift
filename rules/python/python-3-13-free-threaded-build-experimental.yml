@@ -1,0 +1,65 @@
+schema: 1
+id: python-3-13-free-threaded-build-experimental
+title: Python 3.13 ships an experimental free-threaded build that is not the default
+applies:
+  - runtime
+difference: the default GIL build of Python 3.13 on the passing side and the free-threaded 3.13 build on the failing side
+symptoms:
+  - text: the What's New says to expect some bugs and a substantial single-threaded performance hit in the free-threaded mode
+    basis: verified
+mechanism: Python 3.13 has an experimental free-threaded build, usually a separate executable such as python3.13t, that runs with the global interpreter lock disabled and is not the default.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '>=3.13,<3.14'
+    - b: tool.python.version
+      ver: '>=3.13,<3.14'
+    - a: tool.python.gil-disabled
+      eq: 'false'
+    - b: tool.python.gil-disabled
+      eq: 'true'
+severity: medium
+provenance:
+  - url: https://docs.python.org/3.13/whatsnew/3.13.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: Free-threaded CPython
+fixtures:
+  positive:
+    - name: python 3.13.16 default build to free-threaded build
+      a:
+        attrs:
+          tool.python.version: '3.13.16'
+          tool.python.gil-disabled: 'false'
+      b:
+        attrs:
+          tool.python.version: '3.13.16'
+          tool.python.gil-disabled: 'true'
+  negative:
+    - name: both default builds
+      a:
+        attrs:
+          tool.python.version: '3.13.16'
+          tool.python.gil-disabled: 'false'
+      b:
+        attrs:
+          tool.python.version: '3.13.16'
+          tool.python.gil-disabled: 'false'
+    - name: free-threaded build on 3.12 is outside the 3.13 band
+      a:
+        attrs:
+          tool.python.version: '3.12.15'
+          tool.python.gil-disabled: 'false'
+      b:
+        attrs:
+          tool.python.version: '3.12.15'
+          tool.python.gil-disabled: 'true'
+    - name: free-threaded flag not captured on the failing side
+      a:
+        attrs:
+          tool.python.version: '3.13.16'
+          tool.python.gil-disabled: 'false'
+      b:
+        attrs:
+          tool.python.version: '3.13.16'
+status: active

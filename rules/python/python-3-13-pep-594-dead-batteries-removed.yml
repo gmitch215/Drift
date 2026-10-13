@@ -1,0 +1,90 @@
+schema: 1
+id: python-3-13-pep-594-dead-batteries-removed
+title: Python 3.13 removes 19 dead-battery stdlib modules, including cgi and nntplib
+applies:
+  - runtime
+difference: the failing side is Python 3.13, where importing one of the 19 modules fails; on 3.12 and older the same import succeeds
+symptoms:
+  - text: ModuleNotFoundError at import time for the removed module name
+    basis: inferred
+mechanism: Python 3.13 removes the 19 dead-battery stdlib modules listed under PEP 594 from the standard library.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '<3.13'
+    - b: tool.python.version
+      ver: '>=3.13'
+    - any:
+        - b: project.python.imports.aifc
+          present: 'true'
+        - b: project.python.imports.audioop
+          present: 'true'
+        - b: project.python.imports.cgi
+          present: 'true'
+        - b: project.python.imports.cgitb
+          present: 'true'
+        - b: project.python.imports.chunk
+          present: 'true'
+        - b: project.python.imports.crypt
+          present: 'true'
+        - b: project.python.imports.imghdr
+          present: 'true'
+        - b: project.python.imports.mailcap
+          present: 'true'
+        - b: project.python.imports.msilib
+          present: 'true'
+        - b: project.python.imports.nis
+          present: 'true'
+        - b: project.python.imports.nntplib
+          present: 'true'
+        - b: project.python.imports.ossaudiodev
+          present: 'true'
+        - b: project.python.imports.pipes
+          present: 'true'
+        - b: project.python.imports.sndhdr
+          present: 'true'
+        - b: project.python.imports.spwd
+          present: 'true'
+        - b: project.python.imports.sunau
+          present: 'true'
+        - b: project.python.imports.telnetlib
+          present: 'true'
+        - b: project.python.imports.uu
+          present: 'true'
+        - b: project.python.imports.xdrlib
+          present: 'true'
+severity: high
+provenance:
+  - url: https://docs.python.org/3.13/whatsnew/3.13.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: 'Summary, Important removals'
+fixtures:
+  positive:
+    - name: python 3.12.15 to python 3.13.16 importing cgi
+      a:
+        attrs:
+          tool.python.version: '3.12.15'
+      b:
+        attrs:
+          tool.python.version: '3.13.16'
+          project.python.imports.cgi: 'true'
+  negative:
+    - name: python 3.12.15 to python 3.13.16 importing os only
+      a:
+        attrs:
+          tool.python.version: '3.12.15'
+      b:
+        attrs:
+          tool.python.version: '3.13.16'
+          project.python.imports.os: 'true'
+    - name: python 3.13.16 to python 3.14.0 importing cgi (a is not before 3.13)
+      a:
+        attrs:
+          tool.python.version: '3.13.16'
+          project.python.imports.cgi: 'true'
+      b:
+        attrs:
+          tool.python.version: '3.14.0'
+          project.python.imports.cgi: 'true'
+status: pending-scanner

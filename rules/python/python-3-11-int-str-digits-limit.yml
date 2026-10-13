@@ -1,0 +1,62 @@
+schema: 1
+id: python-3-11-int-str-digits-limit
+title: Python 3.11 caps int-to-str and str-to-int conversion at 4300 digits in base 10
+applies:
+  - runtime
+  - env
+difference: Python 3.10 or older on the passing side has no digit cap; Python 3.11 or newer without PYTHONINTMAXSTRDIGITS on the failing side has the cap
+symptoms:
+  - text: ValueError 'Exceeds the limit (4300 digits) for integer string conversion' from a conversion of a decimal int above the limit
+    basis: verified
+mechanism: Python 3.11 limits int-to-str and str-to-int conversion in bases other than powers of two to 4300 digits, and PYTHONINTMAXSTRDIGITS or sys.set_int_max_str_digits() changes the limit.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '<3.11'
+    - b: tool.python.version
+      ver: '>=3.11'
+    - b: env.PYTHONINTMAXSTRDIGITS
+      present: 'false'
+severity: high
+provenance:
+  - url: https://docs.python.org/3.11/library/stdtypes.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Integer string conversion length limitation
+  - url: https://docs.python.org/3.11/whatsnew/3.11.html
+    kind: release-note
+    verified: '2026-10-13'
+    section: Other CPython Implementation Changes
+fixtures:
+  positive:
+    - name: python 3.10.14 to python 3.11.9 without the environment variable
+      a:
+        attrs:
+          tool.python.version: '3.10.14'
+      b:
+        attrs:
+          tool.python.version: '3.11.9'
+  negative:
+    - name: both sides on 3.11 or newer
+      a:
+        attrs:
+          tool.python.version: '3.11.9'
+      b:
+        attrs:
+          tool.python.version: '3.12.15'
+    - name: failing side sets the variable to lift the cap
+      a:
+        attrs:
+          tool.python.version: '3.10.14'
+      b:
+        attrs:
+          tool.python.version: '3.11.9'
+          env.PYTHONINTMAXSTRDIGITS: '0'
+    - name: failing side is on 3.10
+      a:
+        attrs:
+          tool.python.version: '3.9.25'
+      b:
+        attrs:
+          tool.python.version: '3.10.14'
+status: active
