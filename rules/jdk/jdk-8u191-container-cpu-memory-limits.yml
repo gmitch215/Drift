@@ -1,0 +1,64 @@
+schema: 1
+id: jdk-8u191-container-cpu-memory-limits
+title: JDK 8u191 reads container memory and CPU limits on Linux
+applies:
+  - limits
+  - memory
+  - cpu-limit
+  - runtime
+difference: >-
+  a JDK 8 update before 8u191 on the passing side and 8u191 or later on the failing side, both running
+  on Linux in a container with a memory limit
+symptoms:
+  - text: >-
+      the passing side sizes the heap and thread pools from host totals, so the container is OOM-killed
+      or throttled
+    basis: inferred
+mechanism: JDK-8146115 makes the JVM read cgroup memory and CPU limits, and -XX:-UseContainerSupport disables that behavior.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<1.8.0_191'
+    - b: tool.java.version
+      ver: '>=1.8.0_191'
+    - b: os.name
+      eq: linux
+    - b: cgroup.memory.limit
+      present: 'true'
+severity: high
+provenance:
+  - url: https://bugs.openjdk.org/browse/JDK-8146115
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Description
+fixtures:
+  positive:
+    - name: temurin 8u181 to temurin 8u504 in a Linux container with a memory limit
+      a:
+        attrs:
+          tool.java.version: '1.8.0_181'
+      b:
+        attrs:
+          tool.java.version: '1.8.0_504'
+          os.name: linux
+          cgroup.memory.limit: '2147483648'
+  negative:
+    - name: temurin 8u181 to temurin 8u504 on Windows
+      a:
+        attrs:
+          tool.java.version: '1.8.0_181'
+      b:
+        attrs:
+          tool.java.version: '1.8.0_504'
+          os.name: windows
+          cgroup.memory.limit: '2147483648'
+    - name: temurin 8u504 to temurin 8u504 in a Linux container (both 8u191 or later)
+      a:
+        attrs:
+          tool.java.version: '1.8.0_504'
+      b:
+        attrs:
+          tool.java.version: '1.8.0_504'
+          os.name: linux
+          cgroup.memory.limit: '2147483648'
+status: pending-scanner

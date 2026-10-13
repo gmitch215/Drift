@@ -1,0 +1,58 @@
+schema: 1
+id: jdk-dual-stack-prefers-ipv4-by-default
+title: Java prefers IPv4 for hosts with both IPv4 and IPv6 addresses unless java.net.preferIPv6Addresses is set
+applies:
+  - runtime
+  - network
+difference: >-
+  a = a JVM with java.net.preferIPv6Addresses set to true or system; b = a JVM with the property unset, where the default false applies
+symptoms:
+  - text: a Java client reaches a dual-stack host over IPv4 although its IPv6 path works, and the IPv4 path is slow or filtered on the runner (inferred; not measured)
+    basis: inferred
+mechanism: The JDK prefers IPv4 addresses for a host that has both IPv4 and IPv6 addresses unless java.net.preferIPv6Addresses is set to true or system.
+detect:
+  all:
+    - a: java.net.preferIPv6Addresses
+      in: ['true', 'system']
+    - b: java.net.preferIPv6Addresses
+      present: 'false'
+    - b: tool.java.version
+      present: 'true'
+severity: low
+provenance:
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/doc-files/net-properties.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: java.net.preferIPv6Addresses
+fixtures:
+  positive:
+    - name: the passing side sets preferIPv6Addresses to true and the failing side leaves it unset
+      a:
+        attrs:
+          java.net.preferIPv6Addresses: 'true'
+      b:
+        attrs:
+          tool.java.version: '21.0.5'
+  negative:
+    - name: the passing side sets preferIPv6Addresses to false
+      a:
+        attrs:
+          java.net.preferIPv6Addresses: 'false'
+      b:
+        attrs:
+          tool.java.version: '21.0.5'
+    - name: the failing side also sets preferIPv6Addresses to system
+      a:
+        attrs:
+          java.net.preferIPv6Addresses: 'true'
+      b:
+        attrs:
+          java.net.preferIPv6Addresses: 'system'
+    - name: the failing side has no JVM at all
+      a:
+        attrs:
+          java.net.preferIPv6Addresses: 'true'
+      b:
+        attrs:
+          os.name: linux
+status: active

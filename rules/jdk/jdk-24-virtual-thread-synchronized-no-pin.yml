@@ -1,0 +1,53 @@
+schema: 1
+id: jdk-24-virtual-thread-synchronized-no-pin
+title: JDK 24 lets virtual threads unmount inside synchronized blocks
+applies:
+  - runtime
+difference: >-
+  the JDK is 24 or newer on the failing side; code that blocks inside synchronized on a virtual thread
+  pins its carrier thread on the passing side and does not pin it on the failing side
+symptoms:
+  - text: scheduling or throughput of virtual threads that block inside synchronized changes; no error
+    basis: inferred
+mechanism: JEP 491 lets virtual threads unmount when they block inside synchronized, so they no longer pin their carrier thread.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<24'
+    - b: tool.java.version
+      ver: '>=24'
+    - b: project.java.calls.virtual-threads
+      present: 'true'
+severity: low
+provenance:
+  - url: https://openjdk.org/jeps/491
+    kind: spec
+    verified: '2026-10-13'
+    section: Summary
+fixtures:
+  positive:
+    - name: temurin 21 to temurin 24 using virtual threads
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+      b:
+        attrs:
+          tool.java.version: '24.0.1'
+          project.java.calls.virtual-threads: 'true'
+  negative:
+    - name: temurin 21 to temurin 24 without virtual threads
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+      b:
+        attrs:
+          tool.java.version: '24.0.1'
+    - name: temurin 24 to temurin 25 using virtual threads (both 24 or newer)
+      a:
+        attrs:
+          tool.java.version: '24.0.1'
+      b:
+        attrs:
+          tool.java.version: '25.0.4.1'
+          project.java.calls.virtual-threads: 'true'
+status: active

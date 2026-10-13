@@ -1,0 +1,55 @@
+schema: 1
+id: jdk-24-security-manager-disabled
+title: JDK 24 permanently disables the Security Manager
+applies:
+  - runtime
+difference: >-
+  the JDK is 24 or newer on the failing side; code that calls System.setSecurityManager runs on the
+  passing side and throws on the failing side
+symptoms:
+  - text: >-
+      UnsupportedOperationException with the detail message "Setting a Security Manager is not supported."
+    basis: verified
+mechanism: JEP 486 revises the Java Platform specification so developers cannot enable the Security Manager, and the JVM throws when setting it is attempted.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<24'
+    - b: tool.java.version
+      ver: '>=24'
+    - b: project.java.calls.System.setSecurityManager
+      present: 'true'
+severity: high
+provenance:
+  - url: https://openjdk.org/jeps/486
+    kind: spec
+    verified: '2026-10-13'
+    section: Summary
+fixtures:
+  positive:
+    - name: temurin 21 to temurin 24 calling setSecurityManager
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+      b:
+        attrs:
+          tool.java.version: '24.0.1'
+          project.java.calls.System.setSecurityManager: 'true'
+  negative:
+    - name: temurin 21 to temurin 24 without the call
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+      b:
+        attrs:
+          tool.java.version: '24.0.1'
+          project.java.calls.virtual-threads: 'true'
+    - name: temurin 24 to temurin 25 calling setSecurityManager (both 24 or newer)
+      a:
+        attrs:
+          tool.java.version: '24.0.1'
+      b:
+        attrs:
+          tool.java.version: '25.0.4.1'
+          project.java.calls.System.setSecurityManager: 'true'
+status: active

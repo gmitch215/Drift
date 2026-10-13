@@ -1,0 +1,52 @@
+schema: 1
+id: jdk-12-files-mismatch-added
+title: JDK 12 adds Files.mismatch
+applies:
+  - runtime
+difference: >-
+  the JDK is 12 or newer on the passing side and older than 12 on the failing side
+symptoms:
+  - text: "javac reports cannot find symbol for mismatch(Path, Path)"
+    basis: inferred
+mechanism: JDK 12 adds the Files.mismatch method, so a call to it fails on earlier JDKs.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '>=12'
+    - b: tool.java.version
+      ver: '<12'
+    - b: project.java.calls.Files.mismatch
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/Files.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: "mismatch(Path, Path): Since 12"
+fixtures:
+  positive:
+    - name: "java 11.0.23 target using Files.mismatch (21.0.5 to 11.0.23)"
+      a:
+        attrs:
+          tool.java.version: '21.0.5'
+      b:
+        attrs:
+          tool.java.version: '11.0.23'
+          project.java.calls.Files.mismatch: 'true'
+  negative:
+    - name: target without the call
+      a:
+        attrs:
+          tool.java.version: '21.0.5'
+      b:
+        attrs:
+          tool.java.version: '11.0.23'
+    - name: target on a runtime that has the API
+      a:
+        attrs:
+          tool.java.version: '21.0.5'
+      b:
+        attrs:
+          tool.java.version: '21.0.5'
+          project.java.calls.Files.mismatch: 'true'
+status: active

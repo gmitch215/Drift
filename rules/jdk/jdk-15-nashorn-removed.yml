@@ -1,0 +1,54 @@
+schema: 1
+id: jdk-15-nashorn-removed
+title: JDK 15 removes the Nashorn JavaScript engine and the jjs tool
+applies:
+  - runtime
+difference: >-
+  the JDK is 15 or newer on the failing side; code that asks the script engine manager for nashorn works
+  on the passing side only
+symptoms:
+  - text: getEngineByName("nashorn") returns null, or a script step fails with a missing engine error
+    basis: inferred
+mechanism: JEP 372 removes the Nashorn engine, its APIs and the jjs command.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<15'
+    - b: tool.java.version
+      ver: '>=15'
+    - b: project.java.script-engines
+      has: nashorn
+severity: medium
+provenance:
+  - url: https://openjdk.org/jeps/372
+    kind: spec
+    verified: '2026-10-13'
+    section: Summary
+fixtures:
+  positive:
+    - name: temurin 11 to temurin 17 using nashorn
+      a:
+        attrs:
+          tool.java.version: '11.0.11+9'
+      b:
+        attrs:
+          tool.java.version: '17.0.10+7'
+          project.java.script-engines: nashorn
+  negative:
+    - name: temurin 11 to temurin 17 using graal.js
+      a:
+        attrs:
+          tool.java.version: '11.0.11+9'
+      b:
+        attrs:
+          tool.java.version: '17.0.10+7'
+          project.java.script-engines: graal.js
+    - name: temurin 17 to temurin 21 using nashorn (both after 15)
+      a:
+        attrs:
+          tool.java.version: '17.0.10+7'
+      b:
+        attrs:
+          tool.java.version: '21.0.12.1'
+          project.java.script-engines: nashorn
+status: pending-scanner

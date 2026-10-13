@@ -1,0 +1,54 @@
+schema: 1
+id: jdk-24-zgenerational-option-obsolete
+title: JDK 24 makes generational ZGC the only ZGC mode; -XX:ZGenerational is obsolete
+applies:
+  - runtime
+difference: >-
+  the JDK is 24 or newer on the failing side with -XX:ZGenerational in its launch options; the passing
+  side is older
+symptoms:
+  - text: the JVM reports the ZGenerational option as obsolete
+    basis: inferred
+mechanism: JEP 490 removes the non-generational ZGC mode, and -XX:ZGenerational is marked obsolete.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<24'
+    - b: tool.java.version
+      ver: '>=24'
+    - b: runtime.jvm.options
+      has: ZGenerational
+severity: low
+provenance:
+  - url: https://openjdk.org/jeps/490
+    kind: spec
+    verified: '2026-10-13'
+    section: Summary
+fixtures:
+  positive:
+    - name: temurin 21 to temurin 24 with ZGenerational
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+      b:
+        attrs:
+          tool.java.version: '24.0.1'
+          runtime.jvm.options: '-XX:+UseZGC -XX:+ZGenerational'
+  negative:
+    - name: temurin 21 to temurin 24 with ZGC but no ZGenerational
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+      b:
+        attrs:
+          tool.java.version: '24.0.1'
+          runtime.jvm.options: '-XX:+UseZGC'
+    - name: temurin 24 to temurin 25 with ZGenerational (both 24 or newer)
+      a:
+        attrs:
+          tool.java.version: '24.0.1'
+      b:
+        attrs:
+          tool.java.version: '25.0.4.1'
+          runtime.jvm.options: '-XX:+UseZGC -XX:+ZGenerational'
+status: active

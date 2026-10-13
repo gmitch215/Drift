@@ -1,0 +1,52 @@
+schema: 1
+id: jdk-21-math-clamp-added
+title: JDK 21 adds Math.clamp
+applies:
+  - runtime
+difference: >-
+  the JDK is 21 or newer on the passing side and older than 21 on the failing side
+symptoms:
+  - text: "javac reports cannot find symbol for clamp(...)"
+    basis: inferred
+mechanism: JDK 21 adds the Math.clamp methods, so a call to them fails on earlier JDKs.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '>=21'
+    - b: tool.java.version
+      ver: '<21'
+    - b: project.java.calls.Math.clamp
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Math.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: "clamp(long, long, long): Since 21"
+fixtures:
+  positive:
+    - name: jdk 17 target calling Math.clamp (21.0.5 to 17.0.12)
+      a:
+        attrs:
+          tool.java.version: '21.0.5'
+      b:
+        attrs:
+          tool.java.version: '17.0.12'
+          project.java.calls.Math.clamp: 'true'
+  negative:
+    - name: target without the call
+      a:
+        attrs:
+          tool.java.version: '21.0.5'
+      b:
+        attrs:
+          tool.java.version: '17.0.12'
+    - name: target on a runtime that has the API
+      a:
+        attrs:
+          tool.java.version: '21.0.5'
+      b:
+        attrs:
+          tool.java.version: '21.0.5'
+          project.java.calls.Math.clamp: 'true'
+status: active

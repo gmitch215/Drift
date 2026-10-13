@@ -1,0 +1,51 @@
+schema: 1
+id: jdk-16-illegal-access-denied-by-default
+title: JDK 16 denies illegal reflective access to JDK internals by default
+applies:
+  - runtime
+difference: >-
+  the JDK is 16 or newer on the failing side and older than 16 on the passing side; code that reflects
+  into JDK internals works on the passing side and needs --add-opens on the failing side
+symptoms:
+  - text: >-
+      InaccessibleObjectException or IllegalAccessError at run time for reflective access into java.base
+      internals that JDK 9 to 15 allowed
+    basis: inferred
+mechanism: JEP 396 changes the default of --illegal-access from permit to deny, so reflective access into JDK internals fails unless it is opened with --add-opens.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<16'
+    - b: tool.java.version
+      ver: '>=16'
+severity: high
+provenance:
+  - url: https://openjdk.org/jeps/396
+    kind: spec
+    verified: '2026-10-13'
+    section: Description
+fixtures:
+  positive:
+    - name: temurin 11 to temurin 16
+      a:
+        attrs:
+          tool.java.version: '11.0.11+9'
+      b:
+        attrs:
+          tool.java.version: '16.0.2+7'
+  negative:
+    - name: temurin 16 to temurin 21
+      a:
+        attrs:
+          tool.java.version: '16.0.2+7'
+      b:
+        attrs:
+          tool.java.version: '21.0.12.1'
+    - name: temurin 8 to temurin 11 (both before 16)
+      a:
+        attrs:
+          tool.java.version: '1.8.0_504'
+      b:
+        attrs:
+          tool.java.version: '11.0.11+9'
+status: active

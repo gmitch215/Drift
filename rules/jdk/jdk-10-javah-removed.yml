@@ -1,0 +1,54 @@
+schema: 1
+id: jdk-10-javah-removed
+title: JDK 10 removes the javah tool
+applies:
+  - build
+  - runtime
+difference: >-
+  the JDK is 10 or newer on the failing side; a build step that runs javah works on the passing side and
+  fails on the failing side
+symptoms:
+  - text: the build step fails because javah cannot be found
+    basis: inferred
+mechanism: JEP 313 removes the Native-Header Generation Tool (javah), and javac -h replaces it.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<10'
+    - b: tool.java.version
+      ver: '>=10'
+    - b: project.java.javah-invocation
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://openjdk.org/jeps/313
+    kind: spec
+    verified: '2026-10-13'
+    section: Summary
+fixtures:
+  positive:
+    - name: temurin 8 to temurin 11 running javah
+      a:
+        attrs:
+          tool.java.version: '1.8.0_504'
+      b:
+        attrs:
+          tool.java.version: '11.0.11+9'
+          project.java.javah-invocation: javah
+  negative:
+    - name: temurin 8 to temurin 11 without javah
+      a:
+        attrs:
+          tool.java.version: '1.8.0_504'
+      b:
+        attrs:
+          tool.java.version: '11.0.11+9'
+    - name: temurin 11 to temurin 17 running javah (a is not before 10)
+      a:
+        attrs:
+          tool.java.version: '11.0.11+9'
+      b:
+        attrs:
+          tool.java.version: '17.0.10+7'
+          project.java.javah-invocation: javah
+status: pending-scanner

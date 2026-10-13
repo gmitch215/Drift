@@ -1,0 +1,53 @@
+schema: 1
+id: jdk-21-dynamic-agent-load-warning
+title: JDK 21 warns when a Java agent is loaded dynamically into a running JVM
+applies:
+  - runtime
+difference: >-
+  the JDK is 21 or newer on the failing side; a tool that attaches an agent at run time prints a warning
+  there and nothing on the passing side
+symptoms:
+  - text: the JVM prints a warning when an agent is loaded dynamically into the running JVM
+    basis: verified
+mechanism: JEP 451 keeps dynamic agent loading allowed in JDK 21 and issues a warning when it happens.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<21'
+    - b: tool.java.version
+      ver: '>=21'
+    - b: project.java.dynamic-agent-load
+      present: 'true'
+severity: low
+provenance:
+  - url: https://openjdk.org/jeps/451
+    kind: spec
+    verified: '2026-10-13'
+    section: Summary
+fixtures:
+  positive:
+    - name: temurin 17 to temurin 21 with a dynamic agent load
+      a:
+        attrs:
+          tool.java.version: '17.0.10+7'
+      b:
+        attrs:
+          tool.java.version: '21.0.12.1'
+          project.java.dynamic-agent-load: 'true'
+  negative:
+    - name: temurin 17 to temurin 21 without a dynamic agent load
+      a:
+        attrs:
+          tool.java.version: '17.0.10+7'
+      b:
+        attrs:
+          tool.java.version: '21.0.12.1'
+    - name: temurin 21 to temurin 25 with a dynamic agent load (both 21 or newer)
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+      b:
+        attrs:
+          tool.java.version: '25.0.4.1'
+          project.java.dynamic-agent-load: 'true'
+status: pending-scanner

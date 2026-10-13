@@ -1,0 +1,49 @@
+schema: 1
+id: jdk-9-g1-default-collector
+title: JDK 9 makes G1 the default collector on server configurations
+applies:
+  - runtime
+difference: >-
+  the JDK is 9 or newer on the failing side and 8 on the passing side; a JVM that used the old default
+  collector runs G1 on the failing side unless a collector flag is set
+symptoms:
+  - text: garbage collection pause and throughput profile changes with no error
+    basis: inferred
+mechanism: JEP 248 makes G1 the default collector on 32- and 64-bit server configurations, so a JVM that relied on the old default changes collector unless a collector flag is set.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<9'
+    - b: tool.java.version
+      ver: '>=9'
+severity: low
+provenance:
+  - url: https://openjdk.org/jeps/248
+    kind: spec
+    verified: '2026-10-13'
+    section: Summary
+fixtures:
+  positive:
+    - name: temurin 8 to temurin 21
+      a:
+        attrs:
+          tool.java.version: '1.8.0_504'
+      b:
+        attrs:
+          tool.java.version: '21.0.12.1'
+  negative:
+    - name: temurin 8 to temurin 8
+      a:
+        attrs:
+          tool.java.version: '1.8.0_504'
+      b:
+        attrs:
+          tool.java.version: '1.8.0_504'
+    - name: temurin 21 to temurin 25
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+      b:
+        attrs:
+          tool.java.version: '25.0.4.1'
+status: active

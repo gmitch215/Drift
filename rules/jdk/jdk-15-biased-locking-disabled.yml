@@ -1,0 +1,49 @@
+schema: 1
+id: jdk-15-biased-locking-disabled
+title: JDK 15 disables biased locking by default
+applies:
+  - runtime
+difference: >-
+  the JDK is 15 or newer on the failing side and 14 or older on the passing side, where biased locking
+  was on by default
+symptoms:
+  - text: throughput or latency changes in synchronized-heavy code with no error
+    basis: inferred
+mechanism: JEP 374 disables biased locking by default and deprecates its command-line options, so a JVM that relied on the default runs without it.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<15'
+    - b: tool.java.version
+      ver: '>=15'
+severity: low
+provenance:
+  - url: https://openjdk.org/jeps/374
+    kind: spec
+    verified: '2026-10-13'
+    section: Summary
+fixtures:
+  positive:
+    - name: temurin 8 to temurin 15
+      a:
+        attrs:
+          tool.java.version: '1.8.0_504'
+      b:
+        attrs:
+          tool.java.version: '15.0.2+7'
+  negative:
+    - name: temurin 15 to temurin 21
+      a:
+        attrs:
+          tool.java.version: '15.0.2+7'
+      b:
+        attrs:
+          tool.java.version: '21.0.12.1'
+    - name: temurin 8 to temurin 8
+      a:
+        attrs:
+          tool.java.version: '1.8.0_504'
+      b:
+        attrs:
+          tool.java.version: '1.8.0_504'
+status: active

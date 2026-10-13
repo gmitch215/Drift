@@ -1,0 +1,54 @@
+schema: 1
+id: jdk-18-security-manager-default-disallow
+title: JDK 18 sets java.security.manager to disallow by default
+applies:
+  - runtime
+difference: >-
+  the JDK is 18 or newer on the failing side with java.security.manager unset and code that installs a
+  security manager at run time; the passing side is older
+symptoms:
+  - text: System.setSecurityManager fails at run time where JDK 17 and earlier allowed it
+    basis: inferred
+mechanism: JEP 411 deprecates the Security Manager for removal, and from JDK 18 the default value of java.security.manager is disallow.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<18'
+    - b: tool.java.version
+      ver: '>=18'
+    - b: project.java.calls.System.setSecurityManager
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://openjdk.org/jeps/411
+    kind: spec
+    verified: '2026-10-13'
+    section: Summary
+fixtures:
+  positive:
+    - name: temurin 11 to temurin 21 calling setSecurityManager
+      a:
+        attrs:
+          tool.java.version: '11.0.11+9'
+      b:
+        attrs:
+          tool.java.version: '21.0.12.1'
+          project.java.calls.System.setSecurityManager: 'true'
+  negative:
+    - name: temurin 11 to temurin 21 without the call
+      a:
+        attrs:
+          tool.java.version: '11.0.11+9'
+      b:
+        attrs:
+          tool.java.version: '21.0.12.1'
+          project.java.calls.virtual-threads: 'true'
+    - name: temurin 11 to temurin 17 calling setSecurityManager (b before 18)
+      a:
+        attrs:
+          tool.java.version: '11.0.11+9'
+      b:
+        attrs:
+          tool.java.version: '17.0.10+7'
+          project.java.calls.System.setSecurityManager: 'true'
+status: active

@@ -1,0 +1,55 @@
+schema: 1
+id: jdk-11-java-ee-modules-removed
+title: JDK 11 removes the Java EE and CORBA modules
+applies:
+  - runtime
+  - build
+difference: >-
+  the JDK is 11 or newer on the failing side and 8 or 10 on the passing side; code that imports
+  javax.xml.bind works on the passing side and fails on the failing side unless a library supplies it
+symptoms:
+  - text: NoClassDefFoundError or a compile error for javax.xml.bind types
+    basis: inferred
+mechanism: JEP 320 removes nine modules from the JDK in Java SE 11, including java.xml.bind (JAXB) and java.activation.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<11'
+    - b: tool.java.version
+      ver: '>=11'
+    - b: project.java.imports.javax.xml.bind
+      present: 'true'
+severity: high
+provenance:
+  - url: https://openjdk.org/jeps/320
+    kind: spec
+    verified: '2026-10-13'
+    section: Summary
+fixtures:
+  positive:
+    - name: temurin 8 to temurin 11 importing javax.xml.bind
+      a:
+        attrs:
+          tool.java.version: '1.8.0_504'
+      b:
+        attrs:
+          tool.java.version: '11.0.11+9'
+          project.java.imports.javax.xml.bind: 'true'
+  negative:
+    - name: temurin 8 to temurin 11 importing java.util only
+      a:
+        attrs:
+          tool.java.version: '1.8.0_504'
+      b:
+        attrs:
+          tool.java.version: '11.0.11+9'
+          project.java.imports.java.util.List: 'true'
+    - name: temurin 11 to temurin 17 importing javax.xml.bind (a is not before 11)
+      a:
+        attrs:
+          tool.java.version: '11.0.11+9'
+      b:
+        attrs:
+          tool.java.version: '17.0.10+7'
+          project.java.imports.javax.xml.bind: 'true'
+status: active

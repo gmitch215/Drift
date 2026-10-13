@@ -1,0 +1,58 @@
+schema: 1
+id: jdk-9-internal-apis-encapsulated
+title: JDK 9 makes most internal JDK APIs inaccessible at compile time
+applies:
+  - runtime
+  - compiler
+difference: >-
+  the JDK is 9 or newer on the failing side; code that imports sun.* or com.sun.* packages compiles on the
+  passing side and fails on the failing side unless the package stays accessible
+symptoms:
+  - text: compile error that a sun.* or com.sun.* package is not visible
+    basis: inferred
+mechanism: JEP 260 encapsulates most internal JDK APIs by default, keeping a short list of packages accessible through the jdk.unsupported module.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<9'
+    - b: tool.java.version
+      ver: '>=9'
+    - any:
+        - b: project.java.imports.sun
+          present: 'true'
+        - b: project.java.imports.com.sun
+          present: 'true'
+severity: high
+provenance:
+  - url: https://openjdk.org/jeps/260
+    kind: spec
+    verified: '2026-10-13'
+    section: Summary
+fixtures:
+  positive:
+    - name: temurin 8 to temurin 21 importing an internal sun package
+      a:
+        attrs:
+          tool.java.version: '1.8.0_504'
+      b:
+        attrs:
+          tool.java.version: '21.0.12.1'
+          project.java.imports.sun: 'true'
+  negative:
+    - name: temurin 8 to temurin 21 importing java.util only
+      a:
+        attrs:
+          tool.java.version: '1.8.0_504'
+      b:
+        attrs:
+          tool.java.version: '21.0.12.1'
+          project.java.imports.java.util.List: 'true'
+    - name: temurin 21 to temurin 25 importing an internal sun package (a is not before 9)
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+      b:
+        attrs:
+          tool.java.version: '25.0.4.1'
+          project.java.imports.sun: 'true'
+status: active

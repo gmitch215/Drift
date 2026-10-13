@@ -1,0 +1,54 @@
+schema: 1
+id: jdk-17-rmi-activation-removed
+title: JDK 17 removes RMI Activation
+applies:
+  - runtime
+difference: >-
+  the JDK is 17 or newer on the failing side; code that uses java.rmi.activation compiles and loads on
+  the passing side and fails on the failing side
+symptoms:
+  - text: compile error or ClassNotFoundException for java.rmi.activation types
+    basis: inferred
+mechanism: JEP 407 removes the RMI Activation mechanism and keeps the rest of RMI.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<17'
+    - b: tool.java.version
+      ver: '>=17'
+    - b: project.java.imports.java.rmi.activation
+      present: 'true'
+severity: low
+provenance:
+  - url: https://openjdk.org/jeps/407
+    kind: spec
+    verified: '2026-10-13'
+    section: Summary
+fixtures:
+  positive:
+    - name: temurin 11 to temurin 17 importing java.rmi.activation
+      a:
+        attrs:
+          tool.java.version: '11.0.11+9'
+      b:
+        attrs:
+          tool.java.version: '17.0.10+7'
+          project.java.imports.java.rmi.activation: 'true'
+  negative:
+    - name: temurin 11 to temurin 17 importing java.rmi only
+      a:
+        attrs:
+          tool.java.version: '11.0.11+9'
+      b:
+        attrs:
+          tool.java.version: '17.0.10+7'
+          project.java.imports.java.rmi.Remote: 'true'
+    - name: temurin 17 to temurin 21 importing java.rmi.activation (both after 17)
+      a:
+        attrs:
+          tool.java.version: '17.0.10+7'
+      b:
+        attrs:
+          tool.java.version: '21.0.12.1'
+          project.java.imports.java.rmi.activation: 'true'
+status: active

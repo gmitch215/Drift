@@ -1,0 +1,65 @@
+schema: 1
+id: jdk-8u291-tls-1-0-1-1-disabled
+title: TLS 1.0 and 1.1 are disabled by default from JDK 8u291 and 11.0.11
+applies:
+  - runtime
+  - network
+difference: >-
+  an update at or after 8u291 or 11.0.11 on the failing side; a client that negotiated TLS 1.0 or 1.1 with
+  a legacy server on the passing side fails the handshake on the failing side
+symptoms:
+  - text: TLS handshake fails against a server that offers only TLS 1.0 or 1.1 (alert text not checked)
+    basis: inferred
+mechanism: JDK-8256490 disables TLSv1 and TLSv1.1 by default in these updates.
+detect:
+  all:
+    - any:
+        - all:
+            - a: tool.java.version
+              ver: '<1.8.0_291'
+            - b: tool.java.version
+              ver: '>=1.8.0_291,<9'
+        - all:
+            - a: tool.java.version
+              ver: '<11.0.11'
+            - b: tool.java.version
+              ver: '>=11.0.11,<12'
+    - any:
+        - b: network.tls-version-offered
+          has: TLSv1.0
+        - b: network.tls-version-offered
+          has: TLSv1.1
+severity: high
+provenance:
+  - url: https://bugs.openjdk.org/browse/JDK-8256490
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: Release Note
+fixtures:
+  positive:
+    - name: temurin 8u181 to temurin 8u504 with a TLS 1.0 server
+      a:
+        attrs:
+          tool.java.version: '1.8.0_181'
+      b:
+        attrs:
+          tool.java.version: '1.8.0_504'
+          network.tls-version-offered: TLSv1.0 TLSv1.2
+  negative:
+    - name: temurin 8u181 to temurin 8u504 with a TLS 1.2 only server
+      a:
+        attrs:
+          tool.java.version: '1.8.0_181'
+      b:
+        attrs:
+          tool.java.version: '1.8.0_504'
+          network.tls-version-offered: TLSv1.2
+    - name: temurin 8u504 to temurin 8u504 with a TLS 1.0 server (both after 8u291)
+      a:
+        attrs:
+          tool.java.version: '1.8.0_504'
+      b:
+        attrs:
+          tool.java.version: '1.8.0_504'
+          network.tls-version-offered: TLSv1.0
+status: pending-scanner

@@ -1,0 +1,52 @@
+schema: 1
+id: jdk-11-files-read-string-added
+title: JDK 11 adds Files.readString
+applies:
+  - runtime
+difference: >-
+  the JDK is 11 or newer on the passing side and older than 11 on the failing side
+symptoms:
+  - text: "javac reports cannot find symbol for readString(Path)"
+    basis: inferred
+mechanism: JDK 11 adds the Files.readString methods, so a call to them fails on earlier JDKs.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '>=11'
+    - b: tool.java.version
+      ver: '<11'
+    - b: project.java.calls.Files.readString
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/Files.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: "readString(Path): Since 11"
+fixtures:
+  positive:
+    - name: "java 1.8.0_412 target using Files.readString (21.0.5 to 1.8.0_412)"
+      a:
+        attrs:
+          tool.java.version: '21.0.5'
+      b:
+        attrs:
+          tool.java.version: '1.8.0_412'
+          project.java.calls.Files.readString: 'true'
+  negative:
+    - name: target without the call
+      a:
+        attrs:
+          tool.java.version: '21.0.5'
+      b:
+        attrs:
+          tool.java.version: '1.8.0_412'
+    - name: target on a runtime that has the API
+      a:
+        attrs:
+          tool.java.version: '21.0.5'
+      b:
+        attrs:
+          tool.java.version: '21.0.5'
+          project.java.calls.Files.readString: 'true'
+status: active

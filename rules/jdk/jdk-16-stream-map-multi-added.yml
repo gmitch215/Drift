@@ -1,0 +1,52 @@
+schema: 1
+id: jdk-16-stream-map-multi-added
+title: JDK 16 adds Stream.mapMulti
+applies:
+  - runtime
+difference: >-
+  the JDK is 16 or newer on the passing side and older than 16 on the failing side
+symptoms:
+  - text: "javac reports cannot find symbol for mapMulti(BiConsumer)"
+    basis: inferred
+mechanism: JDK 16 adds the Stream.mapMulti method, so a call to it fails on earlier JDKs.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '>=16'
+    - b: tool.java.version
+      ver: '<16'
+    - b: project.java.calls.Stream.mapMulti
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/Stream.html
+    kind: vendor-doc
+    verified: '2026-10-13'
+    section: "mapMulti(BiConsumer): Since 16"
+fixtures:
+  positive:
+    - name: "java 11.0.23 target using Stream.mapMulti (21.0.5 to 11.0.23)"
+      a:
+        attrs:
+          tool.java.version: '21.0.5'
+      b:
+        attrs:
+          tool.java.version: '11.0.23'
+          project.java.calls.Stream.mapMulti: 'true'
+  negative:
+    - name: target without the call
+      a:
+        attrs:
+          tool.java.version: '21.0.5'
+      b:
+        attrs:
+          tool.java.version: '11.0.23'
+    - name: target on a runtime that has the API
+      a:
+        attrs:
+          tool.java.version: '21.0.5'
+      b:
+        attrs:
+          tool.java.version: '21.0.5'
+          project.java.calls.Stream.mapMulti: 'true'
+status: active

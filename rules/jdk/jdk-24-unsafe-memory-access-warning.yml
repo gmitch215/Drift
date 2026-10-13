@@ -1,0 +1,54 @@
+schema: 1
+id: jdk-24-unsafe-memory-access-warning
+title: JDK 24 warns on first use of sun.misc.Unsafe memory-access methods
+applies:
+  - runtime
+difference: >-
+  the JDK is 24 or newer on the failing side; code that imports sun.misc.Unsafe runs silently on the
+  passing side and prints a one-time warning on the failing side
+symptoms:
+  - text: a one-time run-time warning on the first call to a memory-access method of sun.misc.Unsafe
+    basis: verified
+mechanism: JEP 498 issues a run-time warning on the first call to any memory-access method in sun.misc.Unsafe.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<24'
+    - b: tool.java.version
+      ver: '>=24'
+    - b: project.java.imports.sun.misc.Unsafe
+      present: 'true'
+severity: low
+provenance:
+  - url: https://openjdk.org/jeps/498
+    kind: spec
+    verified: '2026-10-13'
+    section: Summary
+fixtures:
+  positive:
+    - name: temurin 21 to temurin 24 importing sun.misc.Unsafe
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+      b:
+        attrs:
+          tool.java.version: '24.0.1'
+          project.java.imports.sun.misc.Unsafe: 'true'
+  negative:
+    - name: temurin 21 to temurin 24 importing java.util only
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+      b:
+        attrs:
+          tool.java.version: '24.0.1'
+          project.java.imports.java.util.List: 'true'
+    - name: temurin 24 to temurin 25 importing sun.misc.Unsafe (both 24 or newer)
+      a:
+        attrs:
+          tool.java.version: '24.0.1'
+      b:
+        attrs:
+          tool.java.version: '25.0.4.1'
+          project.java.imports.sun.misc.Unsafe: 'true'
+status: active

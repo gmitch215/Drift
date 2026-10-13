@@ -1,0 +1,55 @@
+schema: 1
+id: jdk-24-jni-restricted-method-warning
+title: JDK 24 warns about uses of restricted native-access methods
+applies:
+  - runtime
+difference: >-
+  the JDK is 24 or newer on the failing side; code that uses the FFM API runs silently on the passing
+  side and prints warnings about restricted method calls on the failing side unless --enable-native-access
+  is given
+symptoms:
+  - text: warnings about uses of restricted native-access methods are printed
+    basis: verified
+mechanism: JEP 472 prepares to restrict JNI and the FFM API uniformly, and the JVM runs a restricted call but warns about it by default.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<24'
+    - b: tool.java.version
+      ver: '>=24'
+    - b: project.java.imports.java.lang.foreign
+      present: 'true'
+severity: low
+provenance:
+  - url: https://openjdk.org/jeps/472
+    kind: spec
+    verified: '2026-10-13'
+    section: Summary
+fixtures:
+  positive:
+    - name: temurin 21 to temurin 24 importing java.lang.foreign
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+      b:
+        attrs:
+          tool.java.version: '24.0.1'
+          project.java.imports.java.lang.foreign: 'true'
+  negative:
+    - name: temurin 21 to temurin 24 importing java.util only
+      a:
+        attrs:
+          tool.java.version: '21.0.12.1'
+      b:
+        attrs:
+          tool.java.version: '24.0.1'
+          project.java.imports.java.util.List: 'true'
+    - name: temurin 24 to temurin 25 importing java.lang.foreign (both 24 or newer)
+      a:
+        attrs:
+          tool.java.version: '24.0.1'
+      b:
+        attrs:
+          tool.java.version: '25.0.4.1'
+          project.java.imports.java.lang.foreign: 'true'
+status: active

@@ -1,0 +1,56 @@
+schema: 1
+id: jdk-14-cms-collector-removed
+title: JDK 14 removes the CMS garbage collector, so its flag is refused
+applies:
+  - runtime
+difference: >-
+  the JDK is 14 or newer on the failing side with -XX:+UseConcMarkSweepGC in its launch options, and
+  older on the passing side
+symptoms:
+  - text: >-
+      the JVM exits at start with Unrecognized VM option 'UseConcMarkSweepGC' on JDK 25; the message on
+      JDK 14 to 24 is not checked
+    basis: inferred
+mechanism: JEP 363 removes the Concurrent Mark Sweep collector, so the flag that selected it is no longer recognized.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<14'
+    - b: tool.java.version
+      ver: '>=14'
+    - b: runtime.jvm.options
+      has: UseConcMarkSweepGC
+severity: high
+provenance:
+  - url: https://openjdk.org/jeps/363
+    kind: spec
+    verified: '2026-10-13'
+    section: Summary
+fixtures:
+  positive:
+    - name: temurin 11 to temurin 17 with the CMS flag
+      a:
+        attrs:
+          tool.java.version: '11.0.11+9'
+      b:
+        attrs:
+          tool.java.version: '17.0.10+7'
+          runtime.jvm.options: '-Xmx1g -XX:+UseConcMarkSweepGC'
+  negative:
+    - name: temurin 11 to temurin 17 without the CMS flag
+      a:
+        attrs:
+          tool.java.version: '11.0.11+9'
+      b:
+        attrs:
+          tool.java.version: '17.0.10+7'
+          runtime.jvm.options: '-Xmx1g -XX:+UseG1GC'
+    - name: temurin 17 to temurin 21 with the CMS flag (both after 14)
+      a:
+        attrs:
+          tool.java.version: '17.0.10+7'
+      b:
+        attrs:
+          tool.java.version: '21.0.12.1'
+          runtime.jvm.options: '-Xmx1g -XX:+UseConcMarkSweepGC'
+status: active

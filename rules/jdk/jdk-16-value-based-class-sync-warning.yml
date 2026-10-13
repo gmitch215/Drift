@@ -1,0 +1,54 @@
+schema: 1
+id: jdk-16-value-based-class-sync-warning
+title: JDK 16 warns on synchronization on instances of value-based classes
+applies:
+  - compiler
+  - runtime
+difference: >-
+  the JDK is 16 or newer on the failing side; code that synchronizes on a value-based object compiles
+  silently on the passing side and produces a warning on the failing side
+symptoms:
+  - text: a warning is produced for synchronization on instances of value-based classes
+    basis: verified
+mechanism: JEP 390 adds warnings for improper synchronization on instances of value-based classes.
+detect:
+  all:
+    - a: tool.java.version
+      ver: '<16'
+    - b: tool.java.version
+      ver: '>=16'
+    - b: project.java.value-based-sync
+      present: 'true'
+severity: low
+provenance:
+  - url: https://openjdk.org/jeps/390
+    kind: spec
+    verified: '2026-10-13'
+    section: Summary
+fixtures:
+  positive:
+    - name: temurin 11 to temurin 17 with value-based sync
+      a:
+        attrs:
+          tool.java.version: '11.0.11+9'
+      b:
+        attrs:
+          tool.java.version: '17.0.10+7'
+          project.java.value-based-sync: 'true'
+  negative:
+    - name: temurin 11 to temurin 17 without value-based sync
+      a:
+        attrs:
+          tool.java.version: '11.0.11+9'
+      b:
+        attrs:
+          tool.java.version: '17.0.10+7'
+    - name: temurin 17 to temurin 21 with value-based sync (both after 16)
+      a:
+        attrs:
+          tool.java.version: '17.0.10+7'
+      b:
+        attrs:
+          tool.java.version: '21.0.12.1'
+          project.java.value-based-sync: 'true'
+status: pending-scanner
