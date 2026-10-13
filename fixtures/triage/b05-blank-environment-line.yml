@@ -1,0 +1,8 @@
+category: forms-blank
+facts:
+  - 'os.name=windows'
+  - 'os.version=10'
+  - 'tool.java.version=17.0.11'
+rules: []
+claims: []
+draft: false

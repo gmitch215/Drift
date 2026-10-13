@@ -1,0 +1,8 @@
+category: beginner
+facts:
+  - 'tool.node.version=14'
+  - 'os.release.ID=ubuntu'
+  - 'os.name=linux'
+rules: []
+claims: []
+draft: false

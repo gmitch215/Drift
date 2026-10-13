@@ -1,0 +1,11 @@
+category: strict-form
+facts:
+  - 'tool.python.version=3.12.1'
+  - 'tool.python.version=3.11.7@passing'
+  - 'os.release.ID=debian'
+  - 'os.release.VERSION_ID=12'
+  - 'os.name=linux'
+  - 'run:signature=ModuleNotFoundError: No module named ''distutils'''
+rules: [python-3-12-distutils-removed]
+claims: []
+draft: false

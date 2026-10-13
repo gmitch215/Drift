@@ -1,0 +1,11 @@
+category: strict-form
+facts:
+  - 'tool.node.version=20.11.1'
+  - 'os.release.ID=ubuntu'
+  - 'os.release.VERSION_ID=24.04'
+  - 'os.name=linux'
+  - 'os.arch=x86_64'
+  - 'run:signature=Error: Cannot find module ''left-pad'''
+rules: []
+claims: []
+draft: false

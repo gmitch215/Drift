@@ -1,0 +1,7 @@
+category: beginner
+facts:
+  - 'tool.python.version=3.12'
+  - 'os.name=windows'
+rules: []
+claims: []
+draft: false

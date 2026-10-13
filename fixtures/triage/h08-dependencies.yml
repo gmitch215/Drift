@@ -1,0 +1,9 @@
+category: mixed
+facts:
+  - 'project.gradle.org.jetbrains.kotlinx:kotlinx-coroutines-core=1.8.1'
+  - 'project.gradle.com.squareup.okhttp3:okhttp=4.12.0'
+  - 'project.npm.lodash=4.17.21'
+  - 'project.composer.drupal/core=10.3.6'
+rules: []
+claims: []
+draft: false

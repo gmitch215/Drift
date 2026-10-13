@@ -1,0 +1,8 @@
+category: mixed
+facts:
+  - 'os.name=windows'
+  - 'os.version=11'
+  - 'tool.java.version=21.0.3'
+rules: []
+claims: []
+draft: false

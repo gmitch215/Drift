@@ -1,0 +1,6 @@
+category: free-text
+facts:
+  - 'tool.java.version=21'
+rules: [jdk-15-nashorn-removed]
+claims: []
+draft: false

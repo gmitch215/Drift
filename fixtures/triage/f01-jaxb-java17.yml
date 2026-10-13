@@ -1,0 +1,9 @@
+category: free-text
+facts:
+  - 'tool.java.version=17'
+  - 'tool.java.version=8@passing'
+  - 'os.name=windows'
+  - 'os.version=11'
+rules: [jdk-11-java-ee-modules-removed]
+claims: []
+draft: false

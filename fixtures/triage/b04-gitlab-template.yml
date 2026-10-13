@@ -1,0 +1,12 @@
+category: forms-blank
+facts:
+  - 'runtime.container.image=python:3.12-slim'
+  - 'tool.python.version=3.12'
+  - 'os.release.ID=debian'
+  - 'os.release.VERSION_ID=12'
+  - 'os.name=linux'
+  - 'os.arch=aarch64'
+  - 'run:signature=exec /usr/local/bin/python: exec format error'
+rules: []
+claims: []
+draft: false

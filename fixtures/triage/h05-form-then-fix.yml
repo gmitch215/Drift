@@ -1,0 +1,7 @@
+category: mixed
+facts:
+  - 'tool.node.version=18'
+  - 'tool.node.version=20@passing'
+rules: []
+claims: []
+draft: false

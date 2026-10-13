@@ -1,0 +1,9 @@
+category: mixed
+facts:
+  - 'os.release.ID=ubuntu'
+  - 'os.release.VERSION_ID=22.04'
+  - 'os.name=linux'
+  - 'tool.python.version=3.10.12'
+rules: []
+claims: []
+draft: false

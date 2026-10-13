@@ -1,0 +1,11 @@
+category: free-text
+facts:
+  - 'browser.name=chrome@passing'
+  - 'browser.version=125@passing'
+  - 'browser.name=firefox'
+  - 'browser.version=127'
+  - 'os.name=windows'
+  - 'os.version=11'
+rules: []
+claims: []
+draft: false

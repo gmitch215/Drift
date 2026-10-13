@@ -1,0 +1,18 @@
+Triage of issue text e55da05dc5b3
+Author ua6658157f0
+
+Facts (6)
+  os.name                linux                                             failing  0.855  section      7:1
+  os.release.ID          debian                                            failing  0.950  section      7:1
+  os.release.VERSION_ID  12                                                failing  0.950  section      7:8
+  run:signature          ModuleNotFoundError: No module named 'distutils'  failing  0.900  tool-output  16:1
+  tool.python.version    3.12.1                                            failing  0.985  section      3:1
+  tool.python.version    3.11.7                                            passing  0.700  pattern      11:44
+
+Rules (1)
+  demo-distutils  match  plausible  0.700  high
+  demo-distutils: facts tool.python.version; text "ModuleNotFoundError"
+
+Claims (0)
+
+Draft rule: none

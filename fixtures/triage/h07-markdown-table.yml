@@ -1,0 +1,9 @@
+category: mixed
+facts:
+  - 'tool.node.version=22.4.0'
+  - 'tool.npm.version=10.8.1'
+  - 'os.name=macos'
+  - 'os.version=15.0'
+rules: []
+claims: []
+draft: false

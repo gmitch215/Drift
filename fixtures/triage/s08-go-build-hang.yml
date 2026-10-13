@@ -1,0 +1,8 @@
+category: strict-form
+facts:
+  - 'tool.go.version=1.22.4'
+  - 'os.name=linux'
+  - 'os.arch=x86_64'
+rules: []
+claims: []
+draft: false

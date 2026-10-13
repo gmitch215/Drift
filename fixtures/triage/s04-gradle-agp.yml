@@ -1,0 +1,12 @@
+category: strict-form
+facts:
+  - 'tool.kotlin.version=2.0.20'
+  - 'tool.gradle.version=8.9'
+  - 'project.gradle.agp.version=8.5.2'
+  - 'tool.java.version=17'
+  - 'os.name=windows'
+  - 'os.version=11'
+  - 'run:signature=FAILURE: Build failed with an exception.'
+rules: []
+claims: []
+draft: false

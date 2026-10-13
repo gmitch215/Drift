@@ -1,0 +1,9 @@
+category: mixed
+facts:
+  - 'tool.python.version=2.7.18'
+  - 'os.name=macos'
+  - 'os.version=12.7'
+  - 'tool.pip.version=20.3.4'
+rules: []
+claims: []
+draft: false

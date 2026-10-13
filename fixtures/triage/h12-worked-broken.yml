@@ -1,0 +1,9 @@
+category: mixed
+facts:
+  - 'tool.java.version=17.0.8@passing'
+  - 'tool.kotlin.version=1.9.10@passing'
+  - 'tool.java.version=21.0.1'
+  - 'tool.kotlin.version=2.0.0'
+rules: []
+claims: []
+draft: false

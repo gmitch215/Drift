@@ -1,0 +1,12 @@
+category: free-text
+facts:
+  - 'tool.gradle.version=8.7'
+  - 'tool.kotlin.version=2.0.0'
+  - 'tool.java.version=21.0.3'
+  - 'os.name=macos'
+  - 'os.version=14.5'
+  - 'project.gradle.kotlin.version=2.0.0'
+  - 'project.gradle.agp.version=8.4.1'
+rules: []
+claims: []
+draft: false

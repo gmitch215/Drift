@@ -1,0 +1,15 @@
+category: free-text
+facts:
+  - 'os.release.ID=centos'
+  - 'os.release.VERSION_ID=7'
+  - 'os.name=linux'
+  - 'tool.libc.version=2.17'
+  - 'tool.libc.family=glibc'
+  - 'os.release.ID=ubuntu@passing'
+  - 'os.release.VERSION_ID=22.04@passing'
+  - 'os.name=linux@passing'
+  - 'tool.libc.version=2.35@passing'
+  - 'tool.libc.family=glibc@passing'
+rules: []
+claims: []
+draft: false

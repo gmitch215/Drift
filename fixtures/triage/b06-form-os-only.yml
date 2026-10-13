@@ -1,0 +1,9 @@
+category: forms-blank
+facts:
+  - 'os.release.ID=ubuntu'
+  - 'os.release.VERSION_ID=24.04'
+  - 'os.name=linux'
+  - 'os.arch=aarch64'
+rules: []
+claims: []
+draft: false

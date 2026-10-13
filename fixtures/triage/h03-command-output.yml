@@ -1,0 +1,8 @@
+category: mixed
+facts:
+  - 'tool.java.version=11.0.22'
+  - 'os.name=linux'
+  - 'os.arch=x86_64'
+rules: []
+claims: []
+draft: false

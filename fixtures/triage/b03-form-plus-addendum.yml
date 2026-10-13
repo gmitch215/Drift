@@ -1,0 +1,8 @@
+category: forms-blank
+facts:
+  - 'tool.kotlin.version=1.9.24'
+  - 'os.name=macos'
+  - 'tool.gradle.version=8.7'
+rules: []
+claims: []
+draft: false

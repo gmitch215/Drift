@@ -1,0 +1,8 @@
+category: free-text
+facts:
+  - 'tool.python.version=3.11'
+  - 'tool.python.version=3.9@passing'
+  - 'run:signature=ImportError: cannot import name ''Mapping'' from ''collections'''
+rules: []
+claims: []
+draft: true

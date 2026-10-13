@@ -1,0 +1,60 @@
+Triage of issue text 3ba2ef819767
+Author ua6658157f0
+
+Facts (3)
+  run:signature      TypeError: path must be a string  failing  0.700  pattern  1:63
+  tool.node.version  20.11.1                           failing  0.700  pattern  1:49
+  tool.node.version  18.19.0                           passing  0.700  pattern  1:19
+
+Rules (0)
+
+Claims (0)
+
+Draft rule triage-tool-node-version-3ba2ef81: draft (confidence 0.700)
+  note: drafts only: no publish threshold is set
+  note: no --date: the provenance date is not known
+schema: 1
+id: triage-tool-node-version-3ba2ef81
+title: 'Reported: TypeError: path must be a string after tool.node.version 18.19.0 to 20.11.1'
+applies:
+  - runtime
+difference: 'the failing side has tool.node.version 20.11.1 or newer and the passing side has 18.19.0 or older'
+symptoms:
+  - text: 'TypeError: path must be a string'
+    basis: inferred
+mechanism: 'Not established: drafted from one issue report that nobody has reproduced.'
+detect:
+  all:
+    - a: tool.node.version
+      ver: '<=18.19.0'
+    - b: tool.node.version
+      ver: '>=20.11.1'
+    - b: run:signature
+      has: 'TypeError: path must be a string'
+severity: low
+provenance:
+  - url: fixture:triage/3ba2ef81
+    kind: report
+    verified: unverified
+fixtures:
+  positive:
+    - name: reported
+      a:
+        attrs:
+          tool.node.version: '18.19.0'
+      b:
+        attrs:
+          tool.node.version: '20.11.1'
+        run:
+          signature: 'TypeError: path must be a string'
+  negative:
+    - name: 'same version on both sides'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '20.11.1'
+        run:
+          signature: 'TypeError: path must be a string'
+status: draft

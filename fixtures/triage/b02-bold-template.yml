@@ -1,0 +1,12 @@
+category: forms-blank
+facts:
+  - 'ci.provider=github-actions'
+  - 'ci.provider=local@passing'
+  - 'os.release.ID=ubuntu'
+  - 'os.release.VERSION_ID=22.04'
+  - 'os.name=linux'
+  - 'tool.node.version=20.9.0'
+  - 'tool.npm.version=10.1.0'
+rules: []
+claims: []
+draft: false

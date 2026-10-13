@@ -1,0 +1,7 @@
+category: free-text
+facts:
+  - 'runtime.jvm.options=-Xmx4g -XX:+UseG1GC -Dfile.encoding=UTF-8'
+  - 'tool.java.version=21'
+rules: []
+claims: []
+draft: false

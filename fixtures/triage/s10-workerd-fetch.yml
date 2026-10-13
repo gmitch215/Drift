@@ -1,0 +1,7 @@
+category: strict-form
+facts:
+  - 'tool.workerd.version=1.20261001.1'
+  - 'runtime.platform=workerd-local'
+rules: []
+claims: []
+draft: false

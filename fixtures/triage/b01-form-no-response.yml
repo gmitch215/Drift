@@ -1,0 +1,8 @@
+category: forms-blank
+facts:
+  - 'tool.node.version=18.20.4'
+  - 'ci.provider=local'
+  - 'os.name=macos'
+rules: []
+claims: []
+draft: false

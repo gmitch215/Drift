@@ -1,0 +1,8 @@
+category: free-text
+facts:
+  - 'ci.runner.label=windows-latest'
+  - 'ci.runner.label=ubuntu-latest@passing'
+  - 'os.name=windows'
+rules: []
+claims: []
+draft: false

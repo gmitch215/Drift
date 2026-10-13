@@ -1,0 +1,8 @@
+category: free-text
+facts:
+  - 'tool.node.version=20.11.1'
+  - 'tool.node.version=18.19.0@passing'
+  - 'run:signature=TypeError: path must be a string'
+rules: []
+claims: []
+draft: true

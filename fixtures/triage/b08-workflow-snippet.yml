@@ -1,0 +1,10 @@
+category: forms-blank
+facts:
+  - 'ci.runner.label=macos-14'
+  - 'os.name=macos'
+  - 'os.version=14'
+  - 'tool.node.version=20.12.2'
+  - 'run:signature=npm ERR! code ELIFECYCLE'
+rules: []
+claims: []
+draft: false

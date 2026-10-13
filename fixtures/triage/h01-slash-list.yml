@@ -1,0 +1,10 @@
+category: mixed
+facts:
+  - 'tool.node.version=16.20.2'
+  - 'tool.npm.version=8.19.4'
+  - 'os.name=windows'
+  - 'os.version=10'
+  - 'os.arch=x86_64'
+rules: []
+claims: []
+draft: false

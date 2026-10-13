@@ -1,0 +1,9 @@
+category: strict-form
+facts:
+  - 'ci.provider=github-actions'
+  - 'ci.runner.label=ubuntu-24.04'
+  - 'tool.node.version=22.3.0'
+  - 'run:signature=npm ERR! code ERESOLVE'
+rules: []
+claims: []
+draft: false

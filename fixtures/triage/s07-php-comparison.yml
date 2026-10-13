@@ -1,0 +1,9 @@
+category: strict-form
+facts:
+  - 'tool.php.version=8.3.4'
+  - 'os.release.ID=ubuntu'
+  - 'os.release.VERSION_ID=22.04'
+  - 'os.name=linux'
+rules: []
+claims: []
+draft: false

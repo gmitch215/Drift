@@ -1,0 +1,10 @@
+category: strict-form
+facts:
+  - 'tool.java.version=17.0.9'
+  - 'os.name=macos'
+  - 'os.version=14.5'
+  - 'os.arch=aarch64'
+  - 'run:signature=java.lang.reflect.InaccessibleObjectException: Unable to make field private final byte[] java.lang.String.value accessible'
+rules: []
+claims: []
+draft: false

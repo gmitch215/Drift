@@ -1,0 +1,7 @@
+category: forms-blank
+facts:
+  - 'tool.python.version=3.13.0'
+  - 'tool.python.version=3.10@passing'
+rules: []
+claims: []
+draft: false

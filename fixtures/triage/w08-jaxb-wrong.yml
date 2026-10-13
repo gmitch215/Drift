@@ -1,0 +1,9 @@
+category: beginner
+facts:
+  - 'os.name=windows'
+  - 'os.version=10'
+  - 'tool.java.version=11'
+  - 'tool.java.version=8@passing'
+rules: [jdk-11-java-ee-modules-removed]
+claims: [jaxb-in-jdk]
+draft: false

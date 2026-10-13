@@ -1,0 +1,11 @@
+category: strict-form
+facts:
+  - 'browser.name=firefox'
+  - 'browser.version=127.0'
+  - 'os.release.ID=fedora'
+  - 'os.release.VERSION_ID=40'
+  - 'os.name=linux'
+  - 'run:signature=TypeError: undefined is not a function'
+rules: []
+claims: []
+draft: false

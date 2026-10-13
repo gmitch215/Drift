@@ -1,0 +1,9 @@
+category: free-text
+facts:
+  - 'tool.node.version=18'
+  - 'os.release.ID=alpine'
+  - 'os.name=linux'
+  - 'run:signature=Error: getaddrinfo ENOTFOUND registry.internal'
+rules: []
+claims: []
+draft: false

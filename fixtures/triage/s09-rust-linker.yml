@@ -1,0 +1,10 @@
+category: strict-form
+facts:
+  - 'tool.rust.version=1.79.0'
+  - 'os.release.ID=alpine'
+  - 'os.release.VERSION_ID=3.19.1'
+  - 'os.name=linux'
+  - 'run:signature=error: linker `cc` not found'
+rules: []
+claims: []
+draft: false

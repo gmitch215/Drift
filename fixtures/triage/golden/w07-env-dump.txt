@@ -1,0 +1,13 @@
+Triage of issue text e4528e5f96eb
+Author ua6658157f0
+
+Facts (3)
+  env.LANG           en_US.UTF-8    failing  0.490  key-value  6:6
+  env.TZ             Europe/Berlin  failing  0.490  key-value  7:4
+  tool.node.version  20.1.0         failing  0.490  key-value  5:14
+
+Rules (0)
+
+Claims (0)
+
+Draft rule: none

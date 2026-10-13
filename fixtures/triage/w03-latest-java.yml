@@ -1,0 +1,7 @@
+category: beginner
+facts:
+  - 'os.name=windows'
+  - 'os.version=11'
+rules: []
+claims: []
+draft: false
