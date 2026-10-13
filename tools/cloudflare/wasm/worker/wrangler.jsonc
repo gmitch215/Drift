@@ -1,0 +1,7 @@
+{
+    "name": "drift-probe-wasm",
+    "main": "src/index.mjs",
+    "compatibility_date": "2026-08-22",
+    "compatibility_flags": ["no_nodejs_compat", "no_nodejs_compat_v2"],
+    "rules": [{ "type": "Data", "globs": ["**/*.wasm"], "fallthrough": false }]
+}
