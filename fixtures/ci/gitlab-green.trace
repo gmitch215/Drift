@@ -1,0 +1,13 @@
+Running with gitlab-runner 17.4.0 (4a5b6c7d)
+  on example-runner abcdefgh, system ID: s_0123456789ab
+section_start:1790000000:prepare_executor[0K[0K[36;1mPreparing the "docker" executor[0;m[0;m
+Using Docker executor with image ruby:3.2 ...
+Pulling docker image ruby:3.2 ...
+Using docker image sha256:0f1e2d3c4b5a69788796a5b4c3d2e1f00f1e2d3c4b5a69788796a5b4c3d2e1f0 for ruby:3.2 with digest ruby@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ...
+section_end:1790000010:prepare_executor[0K
+section_start:1790000011:step_script[0K[0K[36;1mExecuting "step_script" stage of the job script[0;m[0;m
+[32;1m$ bundle exec rake test[0;m
+Run options: --seed 4242
+12 runs, 30 assertions, 0 failures, 0 errors, 0 skips
+section_end:1790000040:step_script[0K
+[32;1mJob succeeded[0;m

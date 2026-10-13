@@ -1,0 +1,30 @@
+{
+  "conclusion": "failure",
+  "databaseId": 9001,
+  "event": "push",
+  "headSha": "50f0acb76a40e34a4ff304f7347dcc6587da8a14",
+  "jobs": [
+    {
+      "name": "test",
+      "conclusion": "failure",
+      "startedAt": "2026-10-02T10:00:00Z",
+      "completedAt": "2026-10-02T10:00:20Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success",
+          "number": 1,
+          "startedAt": "2026-10-02T10:00:00Z",
+          "completedAt": "2026-10-02T10:00:02Z"
+        },
+        {
+          "name": "Run npm test",
+          "conclusion": "failure",
+          "number": 2,
+          "startedAt": "2026-10-02T10:00:02Z",
+          "completedAt": "2026-10-02T10:00:17Z"
+        }
+      ]
+    }
+  ]
+}

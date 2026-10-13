@@ -1,0 +1,13 @@
+{
+  "id": 4242,
+  "iid": 12,
+  "project_id": 7,
+  "status": "failed",
+  "source": "push",
+  "ref": "main",
+  "sha": "50f0acb76a40e34a4ff304f7347dcc6587da8a14",
+  "started_at": "2026-10-02T10:00:00.000Z",
+  "finished_at": "2026-10-02T10:01:10.000Z",
+  "duration": 70,
+  "queued_duration": 0.25
+}

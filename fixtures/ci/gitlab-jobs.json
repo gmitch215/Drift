@@ -1,0 +1,5 @@
+[
+  {"id": 1, "name": "build", "stage": "build", "status": "success", "duration": 31.512, "queued_duration": 0.023},
+  {"id": 2, "name": "rspec", "stage": "test", "status": "failed", "duration": 0.192, "failure_reason": "script_failure"},
+  {"id": 3, "name": "deploy", "stage": "deploy", "status": "skipped", "duration": null}
+]
