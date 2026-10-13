@@ -21,7 +21,7 @@ provenance:
     kind: spec
     verified: '2026-10-06'
     section: "Conversions: 'n' line separator, the result is the platform-specific line separator"
-  - url: https://github.com/gmitch215/bytebox/blob/master/core/build.gradle.kts
+  - url: https://github.com/gmitch215/bytebox/blob/v1.0.3/core/build.gradle.kts
     kind: measurement
     verified: '2026-10-06'
     section: >-
@@ -43,5 +43,5 @@ fixtures:
           os.name: linux
       b:
         attrs:
-          os.name: mac
+          os.name: macos
 status: active

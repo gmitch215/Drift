@@ -27,11 +27,11 @@ provenance:
     kind: spec
     verified: '2026-10-06'
     section: 'struct Socket: union with http, https and tcp'
-  - url: fixture:memory/drupflare-bastion/workerd-inbound-tcp-udp
-    kind: measurement
-    verified: '2026-10-06'
+  - url: https://developers.cloudflare.com/workers/runtime-apis/tcp-sockets/
+    kind: vendor-doc
+    verified: '2026-10-13'
     section: >-
-      deployed network has no inbound TCP; recorded 2026-09-26, deployed half not re-verified here
+      The Workers runtime provides the connect() API for creating outbound TCP connections from Workers
 fixtures:
   positive:
     - name: self-hosted workerd to deployed Worker

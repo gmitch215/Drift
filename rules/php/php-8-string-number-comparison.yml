@@ -41,4 +41,11 @@ fixtures:
       b:
         attrs:
           tool.php.version: '8.4.26'
+    - name: php 7.1.33 to php 7.4.33 (both sides below 8.0)
+      a:
+        attrs:
+          tool.php.version: '7.1.33'
+      b:
+        attrs:
+          tool.php.version: '7.4.33'
 status: active

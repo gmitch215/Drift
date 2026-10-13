@@ -20,7 +20,7 @@ detect:
       eq: teavm-wasm
 severity: high
 provenance:
-  - url: https://github.com/gmitch215/bytebox/blob/master/TECHNICAL_REPORT.md
+  - url: https://github.com/gmitch215/bytebox/blob/v1.0.3/TECHNICAL_REPORT.md
     kind: measurement
     verified: '2026-10-06'
     section: >-
