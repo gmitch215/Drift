@@ -1,0 +1,224 @@
+schema: 1
+cutoff: 2026-10-13
+cap: 25000
+salt: drift-triage-corpus-v1
+asset:
+  url: https://github.com/gmitch215/Drift/releases/download/triage-corpus-1/corpus.json.zst
+  sha256: 987d2c9b6fa3212a7247802ce52758e5ce0f970edc60984acf039603eea45687
+  bytes: 78765569
+repos:
+  - repo: actions/runner-images
+    host: github
+    stratum: large
+    form_policy: forms-strict
+    why: 'strict issue forms at high volume, actions/* product'
+  - repo: moby/moby
+    host: github
+    stratum: large
+    form_policy: forms-strict
+    why: large strict-form tracker (Docker engine)
+  - repo: docker/cli
+    host: github
+    stratum: large
+    form_policy: forms-strict
+    why: 'strict forms, Docker tooling'
+  - repo: php/php-src
+    host: github
+    stratum: large
+    form_policy: forms-strict
+    why: strict forms, PHP runtime (the main PHP tracker is bugs.php.net and is not in this corpus)
+  - repo: nodejs/node
+    host: github
+    stratum: large
+    form_policy: forms-blank
+    why: 'forms plus blank issues allowed, Node.js product diversity'
+  - repo: python/cpython
+    host: github
+    stratum: large
+    form_policy: forms-blank
+    why: forms plus blank issues, Python runtime (config.yml has no blank_issues_enabled key, so GitHub allows blank)
+  - repo: astral-sh/ruff
+    host: github
+    stratum: large
+    form_policy: forms-blank
+    why: 'forms plus blank issues, Python tooling'
+  - repo: dotnet/runtime
+    host: github
+    stratum: large
+    form_policy: forms-blank
+    why: 'mixed forms and markdown, blank allowed; .NET product diversity'
+  - repo: microsoft/vscode
+    host: github
+    stratum: large
+    form_policy: md-strict
+    why: largest GitHub issue volume with markdown templates and blank disabled; no forms
+  - repo: actions/runner
+    host: github
+    stratum: large
+    form_policy: md-strict
+    why: 'markdown templates, blank disabled, actions/* product'
+  - repo: actions/setup-node
+    host: github
+    stratum: large
+    form_policy: md-strict
+    why: 'markdown templates, blank disabled, actions/* product'
+  - repo: rust-lang/rust
+    host: github
+    stratum: large
+    form_policy: md-blank
+    why: 'large volume, mixed markdown and yaml templates, blank allowed; compiler product'
+  - repo: denoland/deno
+    host: github
+    stratum: large
+    form_policy: md-blank
+    why: 'markdown templates, blank allowed; JavaScript runtime'
+  - repo: github/docs
+    host: github
+    stratum: large
+    form_policy: forms-blank
+    why: 'github/* product; one yaml form only, no config.yml (blank default enabled)'
+  - repo: konsoletyper/teavm
+    host: github
+    stratum: small
+    form_policy: none
+    why: no templates at all; sample of the no-template policy
+  - repo: gitlab-org/gitlab
+    host: gitlab
+    stratum: large
+    form_policy: md-blank
+    why: largest open tracker outside GitHub; markdown templates only; no blank-issue gate
+  - repo: kotlin-telegram-bot/kotlin-telegram-bot
+    host: github
+    stratum: small
+    form_policy: md-blank
+    why: Kotlin/JVM Telegram bot library; hobbyist reporters
+  - repo: JetBrains/markdown
+    host: github
+    stratum: small
+    form_policy: none
+    why: Kotlin/JVM Markdown parser used by JetBrains tools; under 150 issues
+  - repo: halilozercan/compose-richtext
+    host: github
+    stratum: small
+    form_policy: none
+    why: Kotlin Multiplatform Compose rich-text library; under 100 issues
+  - repo: openrndr/openrndr
+    host: github
+    stratum: small
+    form_policy: forms-blank
+    why: Kotlin creative-coding framework; yml forms without config.yml
+  - repo: leonlatsch/Photok
+    host: github
+    stratum: small
+    form_policy: md-blank
+    why: Kotlin Android photo vault app; end-user reporters
+  - repo: jpenilla/MiniMOTD
+    host: github
+    stratum: small
+    form_policy: md-strict
+    why: Java Minecraft server-list MOTD plugin; game-modding stratum
+  - repo: SkinsRestorer/SkinsRestorer
+    host: github
+    stratum: small
+    form_policy: forms-strict
+    why: Java Minecraft skin plugin; server admins with mixed technical depth
+  - repo: EndstoneMC/endstone
+    host: github
+    stratum: small
+    form_policy: md-blank
+    why: C++ core with Python plugin API for Minecraft Bedrock servers; primary language C++
+  - repo: joBr99/nspanel-lovelace-ui
+    host: github
+    stratum: small
+    form_policy: md-strict
+    why: TypeScript Home Assistant panel UI; beginner-heavy smart-home reporters
+  - repo: guopenghui/obsidian-language-learner
+    host: github
+    stratum: small
+    form_policy: none
+    why: TypeScript Obsidian plugin; end-user reporters
+  - repo: javierbrea/eslint-plugin-boundaries
+    host: github
+    stratum: small
+    form_policy: md-blank
+    why: TypeScript ESLint plugin; config-environment reports
+  - repo: fabiospampinato/vscode-todo-plus
+    host: github
+    stratum: small
+    form_policy: none
+    why: TypeScript VS Code extension; no templates
+  - repo: PicGo/PicGo-Core
+    host: github
+    stratum: small
+    form_policy: forms-strict
+    why: TypeScript image-upload CLI; yml forms
+  - repo: mrusse/soularr
+    host: github
+    stratum: small
+    form_policy: md-strict
+    why: Python glue between Lidarr-family tools and Soulseek; home-lab users
+  - repo: RicterZ/doujinshi-dl
+    host: github
+    stratum: small
+    form_policy: none
+    why: Python downloader CLI; no templates
+  - repo: mottosso/Qt.py
+    host: github
+    stratum: small
+    form_policy: none
+    why: Python Qt binding shim; no templates
+  - repo: lovit/soynlp
+    host: github
+    stratum: small
+    form_policy: none
+    why: Python Korean NLP library; no templates
+  - repo: git-bahn/git-graph
+    host: github
+    stratum: small
+    form_policy: none
+    why: Rust Git branch-graph CLI; under 100 issues
+  - repo: autopilot-rs/autopy
+    host: github
+    stratum: small
+    form_policy: none
+    why: Rust desktop-automation crate; under 100 issues
+  - repo: gustavosett/Windows-11-Clipboard-History-For-Linux
+    host: github
+    stratum: small
+    form_policy: md-strict
+    why: Rust Linux clipboard tool; user-facing reporters; under 100 issues
+  - repo: ki-editor/ki-editor
+    host: github
+    stratum: small
+    form_policy: none
+    why: Rust modal code editor; no templates
+  - repo: TasmoAdmin/TasmoAdmin
+    host: github
+    stratum: small
+    form_policy: md-blank
+    why: PHP web admin for Tasmota IoT devices; hobbyist reporters
+  - repo: chevereto/chevereto
+    host: github
+    stratum: small
+    form_policy: none
+    why: PHP image hosting application; under 100 issues
+  - repo: investbrainapp/investbrain
+    host: github
+    stratum: small
+    form_policy: none
+    why: PHP portfolio tracker; under 100 issues
+  - repo: marcantondahmen/automad
+    host: github
+    stratum: small
+    form_policy: none
+    why: PHP flat-file CMS; no templates
+  - repo: gmitch215/MobChip
+    host: github
+    stratum: small
+    form_policy: forms-strict
+    why: the owner's Java entity-AI library for SpigotMC; archived, not a fork, 32 issues
+  - repo: datatags/MobChipLite
+    host: github
+    stratum: small
+    form_policy: forms-strict
+    why: maintained fork of gmitch215/MobChip for current Minecraft versions; same templates, newer reports

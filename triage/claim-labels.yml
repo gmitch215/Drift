@@ -1,0 +1,404 @@
+schema: 1
+threads:
+  - repo: moby/moby
+    issue: 34245
+    comment: 317733310
+    pattern: p1
+    rule: 1
+    verdict: not-correction
+  - repo: moby/moby
+    issue: 43493
+    comment: 1104035685
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: moby/moby
+    issue: 38698
+    comment: 1719231526
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: moby/moby
+    issue: 46823
+    comment: 2009150035
+    pattern: p1
+    rule: 5
+    verdict: unclear
+  - repo: moby/moby
+    issue: 35573
+    comment: 346398160
+    pattern: p1
+    rule: 1
+    verdict: not-correction
+  - repo: nodejs/node
+    issue: 50404
+    comment: 1781221173
+    pattern: p2
+    rule: 4
+    verdict: correction
+  - repo: nodejs/node
+    issue: 12228
+    comment: 551295129
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: nodejs/node
+    issue: 3159
+    comment: 672108584
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: nodejs/node
+    issue: 51292
+    comment: 1932043340
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: nodejs/node
+    issue: 43516
+    comment: 1166756474
+    pattern: p2
+    rule: 4
+    verdict: correction
+  - repo: nodejs/node
+    issue: 26401
+    comment: 478982009
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: nodejs/node
+    issue: 40714
+    comment: 1092918794
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: nodejs/node
+    issue: 30514
+    comment: 555623287
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: astral-sh/ruff
+    issue: 13205
+    comment: 2324189745
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: astral-sh/ruff
+    issue: 6582
+    comment: 1679925387
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: astral-sh/ruff
+    issue: 7361
+    comment: 1718166027
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: astral-sh/ruff
+    issue: 6834
+    comment: 1691202417
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: astral-sh/ruff
+    issue: 11876
+    comment: 2174414698
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: dotnet/runtime
+    issue: 62658
+    comment: 1043796525
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: dotnet/runtime
+    issue: 60231
+    comment: 4284027345
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: dotnet/runtime
+    issue: 32376
+    comment: 591250861
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: dotnet/runtime
+    issue: 120440
+    comment: 3398702345
+    pattern: p1
+    rule: 5
+    verdict: unclear
+  - repo: dotnet/runtime
+    issue: 134031
+    comment: 5696746416
+    pattern: p1
+    rule: 4
+    verdict: correction
+  - repo: dotnet/runtime
+    issue: 114552
+    comment: 2797694753
+    pattern: p3
+    rule: 1
+    verdict: not-correction
+  - repo: dotnet/runtime
+    issue: 128898
+    comment: 4630507100
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: rust-lang/rust
+    issue: 151644
+    comment: 3796912348
+    pattern: p3
+    rule: 2
+    verdict: not-correction
+  - repo: rust-lang/rust
+    issue: 139380
+    comment: 2781345398
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: rust-lang/rust
+    issue: 93740
+    comment: 1031771642
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: microsoft/vscode
+    issue: 297387
+    comment: 3953855425
+    pattern: p3
+    rule: 1
+    verdict: not-correction
+  - repo: microsoft/vscode
+    issue: 85252
+    comment: 631178849
+    pattern: p3
+    rule: 5
+    verdict: unclear
+  - repo: microsoft/vscode
+    issue: 302998
+    comment: 4086081888
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: denoland/deno
+    issue: 30556
+    comment: 4039303171
+    pattern: p3
+    rule: 1
+    verdict: not-correction
+  - repo: denoland/deno
+    issue: 17597
+    comment: 1410837099
+    pattern: p3
+    rule: 1
+    verdict: not-correction
+  - repo: denoland/deno
+    issue: 9865
+    comment: 1009582387
+    pattern: p1
+    rule: 1
+    verdict: not-correction
+  - repo: denoland/deno
+    issue: 32245
+    comment: 3935659721
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: python/cpython
+    issue: 123714
+    comment: 2333855838
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: python/cpython
+    issue: 99442
+    comment: 1979086163
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: python/cpython
+    issue: 90422
+    comment: 1093941495
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: python/cpython
+    issue: 62049
+    comment: 1093615020
+    pattern: p2
+    rule: 5
+    verdict: unclear
+  - repo: python/cpython
+    issue: 139901
+    comment: 3390639137
+    pattern: p1
+    rule: 1
+    verdict: not-correction
+  - repo: python/cpython
+    issue: 130959
+    comment: 2708371294
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: python/cpython
+    issue: 87869
+    comment: 1093908919
+    pattern: p1
+    rule: 2
+    verdict: not-correction
+  - repo: python/cpython
+    issue: 123803
+    comment: 2335182359
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: php/php-src
+    issue: 18486
+    comment: 2846892772
+    pattern: p2
+    rule: 4
+    verdict: correction
+  - repo: php/php-src
+    issue: 19091
+    comment: 3069164252
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: php/php-src
+    issue: 12754
+    comment: 1866055708
+    pattern: p1
+    rule: 2
+    verdict: not-correction
+  - repo: php/php-src
+    issue: 8185
+    comment: 1106806788
+    pattern: p1
+    rule: 1
+    verdict: not-correction
+  - repo: php/php-src
+    issue: 12561
+    comment: 1835818987
+    pattern: p2
+    rule: 5
+    verdict: unclear
+  - repo: php/php-src
+    issue: 8750
+    comment: 1153229969
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: docker/cli
+    issue: 836
+    comment: 767418393
+    pattern: p3
+    rule: 1
+    verdict: not-correction
+  - repo: docker/cli
+    issue: 3741
+    comment: 1221522594
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: docker/cli
+    issue: 4852
+    comment: 1934011596
+    pattern: p2
+    rule: 5
+    verdict: unclear
+  - repo: docker/cli
+    issue: 4028
+    comment: 1429538145
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: docker/cli
+    issue: 2622
+    comment: 656387678
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: konsoletyper/teavm
+    issue: 693
+    comment: 1519780814
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: konsoletyper/teavm
+    issue: 106
+    comment: 98609601
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: konsoletyper/teavm
+    issue: 389
+    comment: 485401771
+    pattern: p2
+    rule: 4
+    verdict: correction
+  - repo: konsoletyper/teavm
+    issue: 174
+    comment: 169773584
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: konsoletyper/teavm
+    issue: 156
+    comment: 147633280
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: konsoletyper/teavm
+    issue: 368
+    comment: 443750042
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: konsoletyper/teavm
+    issue: 1009
+    comment: 2689803198
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: konsoletyper/teavm
+    issue: 151
+    comment: 145358175
+    pattern: p2
+    rule: 2
+    verdict: not-correction
+  - repo: konsoletyper/teavm
+    issue: 673
+    comment: 1459623935
+    pattern: p2
+    rule: 4
+    verdict: correction
+  - repo: konsoletyper/teavm
+    issue: 261
+    comment: 292636939
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: SkinsRestorer/SkinsRestorer
+    issue: 1598
+    comment: 2143551947
+    pattern: p2
+    rule: 1
+    verdict: not-correction
+  - repo: joBr99/nspanel-lovelace-ui
+    issue: 469
+    comment: 1249409051
+    pattern: p1
+    rule: 2
+    verdict: not-correction
+  - repo: joBr99/nspanel-lovelace-ui
+    issue: 1204
+    comment: 2034133075
+    pattern: p2
+    rule: 1
+    verdict: not-correction
