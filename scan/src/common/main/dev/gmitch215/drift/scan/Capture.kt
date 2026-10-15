@@ -59,6 +59,11 @@ object Capture {
         } else {
             add("kernel.release", command("uname", "-r"), "uname")
             add("cpu.count", command("getconf", "_NPROCESSORS_ONLN"), "getconf")
+            if (host.os ==
+                "macos"
+            ) {
+                add("os.version", command("sw_vers", "-productVersion"), "sw_vers")
+            }
         }
 
         host.readText("/etc/os-release")?.lines()?.forEach { line ->

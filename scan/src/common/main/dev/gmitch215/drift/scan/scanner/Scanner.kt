@@ -49,6 +49,21 @@ object Scanners {
         Scanner("named", listOf("named", "-v"), ::parseNamed),
         Scanner("iptables", listOf("iptables", "--version"), ::parseIptables),
         Scanner("curl", listOf("curl", "--version"), ::parseCurl),
+        Scanner("r", listOf("R", "--version"), ::parseR),
+        Scanner("dart", listOf("dart", "--version"), ::parseDart),
+        Scanner("julia", listOf("julia", "--version"), ::parseJulia),
+        Scanner("elixir", listOf("elixir", "--version"), ::parseElixir),
+        Scanner("xcode", listOf("xcodebuild", "-version"), ::parseXcode),
+        Scanner("cocoapods", listOf("pod", "--version"), ::parseCocoapods),
+        Scanner("erlang", listOf("erl", "-noshell", "-eval", OTP_RELEASE), ::parseErlang),
+        Scanner("php-modules", listOf("php", "-m"), ::parsePhpModules, "php"),
+        Scanner(
+            "git-autocrlf",
+            listOf("git", "config", "--get", "core.autocrlf"),
+            ::parseAutocrlf,
+            "core",
+            "git.config",
+        ),
     )
 
     fun attributes(scanner: Scanner, text: String): List<Attribute> {
@@ -89,6 +104,9 @@ object Scanners {
 
     private const val MAX_RAW = 120
 
+    private const val OTP_RELEASE =
+        "io:format(\"~s\",[erlang:system_info(otp_release)]),halt()."
+
     private const val GIL_CHECK =
         "import sysconfig;print(sysconfig.get_config_var(\"Py_GIL_DISABLED\") or 0)"
 
@@ -127,6 +145,25 @@ internal fun parsePhp(text: String): Map<String, String> {
     val result = mutableMapOf("version" to m.groupValues[1], "sapi" to m.groupValues[2])
     first(text, "\\(\\s*(NTS|ZTS)\\s*\\)")?.let { result["thread-safety"] = it.groupValues[1] }
     return result
+}
+
+internal fun parsePhpModules(text: String): Map<String, String> {
+    val modules = text.lineSequence().map { it.trim() }
+        .dropWhile { it != "[PHP Modules]" }.drop(1)
+        .takeWhile { !it.startsWith("[") }
+        .filter { it.isNotEmpty() }.map { it.lowercase() }.distinct().sorted().toList()
+    return if (modules.isEmpty()) emptyMap() else mapOf("extensions" to modules.joinToString(","))
+}
+
+internal fun parseAutocrlf(text: String): Map<String, String> {
+    val value = text.lineSequence().firstOrNull()?.trim()?.lowercase()
+    return if (value in
+        setOf("true", "false", "input")
+    ) {
+        mapOf("autocrlf" to value!!)
+    } else {
+        emptyMap()
+    }
 }
 
 internal fun parseNode(text: String): Map<String, String> {
@@ -249,4 +286,45 @@ internal fun parseIptables(text: String): Map<String, String> {
 internal fun parseCurl(text: String): Map<String, String> {
     val m = first(text, "^curl (\\d+\\.\\d+\\.\\d+\\S*)") ?: return emptyMap()
     return mapOf("version" to m.groupValues[1])
+}
+
+internal fun parseR(text: String): Map<String, String> {
+    val m = first(text, "^R version (\\d+\\.\\d+\\.\\d+\\S*)") ?: return emptyMap()
+    return mapOf("version" to m.groupValues[1])
+}
+
+internal fun parseDart(text: String): Map<String, String> {
+    val m = first(text, "^Dart SDK version: (\\d+\\.\\d+\\.\\d+\\S*) \\((\\w+)\\)")
+        ?: return emptyMap()
+    return mapOf("version" to m.groupValues[1], "channel" to m.groupValues[2])
+}
+
+internal fun parseXcode(text: String): Map<String, String> {
+    val m = first(text, "^Xcode (\\d+(?:\\.\\d+)*)") ?: return emptyMap()
+    return mapOf("version" to m.groupValues[1])
+}
+
+internal fun parseCocoapods(text: String): Map<String, String> {
+    val m = first(text, "^(\\d+\\.\\d+\\.\\d+\\S*)$") ?: return emptyMap()
+    return mapOf("version" to m.groupValues[1])
+}
+
+internal fun parseJulia(text: String): Map<String, String> {
+    val m = first(text, "^julia version (\\d+\\.\\d+\\.\\d+\\S*)") ?: return emptyMap()
+    return mapOf("version" to m.groupValues[1])
+}
+
+internal fun parseElixir(text: String): Map<String, String> {
+    val m = first(
+        text,
+        "^Elixir (\\d+\\.\\d+\\.\\d+\\S*)(?: \\(compiled with Erlang/OTP (\\d+)\\))?",
+    ) ?: return emptyMap()
+    val result = mutableMapOf("version" to m.groupValues[1])
+    if (m.groupValues[2].isNotEmpty()) result["compiled-otp"] = m.groupValues[2]
+    return result
+}
+
+internal fun parseErlang(text: String): Map<String, String> {
+    val m = first(text, "^(\\d+)$") ?: return emptyMap()
+    return mapOf("otp" to m.groupValues[1])
 }

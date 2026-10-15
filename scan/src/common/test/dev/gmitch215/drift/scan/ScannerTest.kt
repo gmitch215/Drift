@@ -384,6 +384,35 @@ class ScannerTest {
     }
 
     @Test
+    fun phpModulesListTheLoadedExtensionsInTheModulesSectionOnly() {
+        val got = emitted("php-modules", "homebrew-macos").getValue("tool.php.extensions")
+        val names = got.split(',')
+        assertTrue("json" in names && "pcre" in names, got)
+        assertTrue(names.none { it.startsWith("[") || it.isEmpty() }, got)
+        assertEquals(names.sorted(), names)
+        val text = "[PHP Modules]\nMcrypt\nCore\n\n[Zend Modules]\nZend OPcache\n"
+        assertEquals(
+            "core,mcrypt",
+            Scanners.attributes(scanner("php-modules"), text).single().value,
+        )
+        assertEquals(emptyList(), Scanners.attributes(scanner("php-modules"), "usage: php\n"))
+    }
+
+    @Test
+    fun gitAutocrlfKeepsOnlyTheThreeDocumentedValues() {
+        assertTranscripts(
+            "git-autocrlf",
+            mapOf(
+                "true" to mapOf("git.config.core.autocrlf" to "true"),
+                "false" to mapOf("git.config.core.autocrlf" to "false"),
+                "input" to mapOf("git.config.core.autocrlf" to "input"),
+            ),
+        )
+        assertEquals(emptyList(), Scanners.attributes(scanner("git-autocrlf"), ""))
+        assertEquals(emptyList(), Scanners.attributes(scanner("git-autocrlf"), "weird\n"))
+    }
+
+    @Test
     fun composerVersionSurvivesDeprecationNoise() {
         assertTranscripts(
             "composer",
@@ -477,9 +506,52 @@ class ScannerTest {
     }
 
     @Test
+    fun rDartJuliaElixirAndErlangReportTheirVersions() {
+        assertTranscripts("r", mapOf("r-base-4.6.1" to mapOf("tool.r.version" to "4.6.1")))
+        assertTranscripts(
+            "dart",
+            mapOf(
+                "dart-3.13.5" to
+                    mapOf("tool.dart.version" to "3.13.5", "tool.dart.channel" to "stable"),
+            ),
+        )
+        assertTranscripts(
+            "julia",
+            mapOf("julia-1.13.1" to mapOf("tool.julia.version" to "1.13.1")),
+        )
+        assertTranscripts(
+            "elixir",
+            mapOf(
+                "elixir-1.20.4-otp-29" to
+                    mapOf("tool.elixir.version" to "1.20.4", "tool.elixir.compiled-otp" to "29"),
+            ),
+        )
+        assertTranscripts("erlang", mapOf("otp-29" to mapOf("tool.erlang.otp" to "29")))
+        assertTranscripts("xcode", mapOf("xcode-26.6" to mapOf("tool.xcode.version" to "26.6")))
+        assertTranscripts(
+            "cocoapods",
+            mapOf("cocoapods-1.16.2" to mapOf("tool.cocoapods.version" to "1.16.2")),
+        )
+        val old = Scanners.attributes(scanner("elixir"), "Elixir 1.14.0\n")
+        assertEquals(
+            mapOf("tool.elixir.version" to "1.14.0"),
+            old.associate {
+                it.path to it.value
+            },
+        )
+        val beta = Scanners.attributes(
+            scanner("dart"),
+            "Dart SDK version: 3.14.0-315.1.beta (beta)",
+        )
+        assertEquals("3.14.0-315.1.beta", beta.first().value)
+    }
+
+    @Test
     fun newToolsDegradeToUnparsedAndStayAbsentWhenMissing() {
-        val tools =
-            listOf("openssl", "ssh", "composer", "sudo", "ruby", "named", "iptables", "curl")
+        val tools = listOf(
+            "openssl", "ssh", "composer", "sudo", "ruby", "named", "iptables", "curl",
+            "r", "dart", "julia", "elixir", "erlang", "xcode", "cocoapods",
+        )
         for (tool in tools) {
             val attrs = Scanners.attributes(scanner(tool), "something else entirely\n")
             val first = attrs.first()

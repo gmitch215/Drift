@@ -95,6 +95,66 @@ class CaptureTest {
     }
 
     @Test
+    fun timeZoneDatabaseVersionComesFromTheZoneinfoFiles() {
+        val key = "tz.database.version"
+        val zi = "/usr/share/zoneinfo/tzdata.zi"
+        assertEquals("2024a", facts(files = mapOf(zi to "# version 2024a\nR x\n"))[key])
+        assertEquals("2026b", facts(files = mapOf(zi to "# version 2026b-rearguard\n"))[key])
+        assertEquals(
+            "2026b",
+            facts(files = mapOf("/usr/share/zoneinfo/+VERSION" to "2026b\n"))[key],
+        )
+        assertNull(facts(files = mapOf(zi to "R x\n"))[key])
+        assertNull(facts()[key])
+    }
+
+    @Test
+    fun kernelAndPolicyFilesGiveOnlyTheSettingsRulesRead() {
+        val got = facts(
+            files = mapOf(
+                "/proc/cmdline" to "BOOT_IMAGE=/vmlinuz root=UUID=abc ro net.ifnames=0 quiet\n",
+                "/proc/sys/kernel/apparmor_restrict_unprivileged_userns" to "1\n",
+                "/etc/crypto-policies/config" to "# comment\nDEFAULT\n",
+            ),
+        )
+        assertEquals("ro net.ifnames=0 quiet", got["kernel.cmdline"])
+        assertEquals("1", got["sysctl.kernel.apparmor_restrict_unprivileged_userns"])
+        assertEquals("DEFAULT", got["crypto.policy"])
+        assertNull(facts()["kernel.cmdline"])
+        assertNull(facts(files = mapOf("/proc/cmdline" to "root=/dev/sda1\n"))["kernel.cmdline"])
+        assertNull(
+            facts(files = mapOf("/etc/crypto-policies/config" to "# only\n"))["crypto.policy"],
+        )
+    }
+
+    @Test
+    fun memoryLimitIsPresentOnlyWhenTheCgroupCapsMemory() {
+        val key = "cgroup.memory.limit"
+        val v2 = "/sys/fs/cgroup/memory.max"
+        val v1 = "/sys/fs/cgroup/memory/memory.limit_in_bytes"
+        assertEquals("true", facts(files = mapOf(v2 to "536870912\n"))[key])
+        assertEquals("true", facts(files = mapOf(v1 to "536870912\n"))[key])
+        assertNull(facts(files = mapOf(v2 to "max\n"))[key])
+        assertNull(facts(files = mapOf(v1 to "9223372036854771712\n"))[key])
+        assertNull(facts()[key])
+    }
+
+    @Test
+    fun macosReportsItsProductVersion() {
+        val host = FakeHost(
+            os = "macos",
+            commands = mapOf(listOf("sw_vers", "-productVersion") to CommandResult(0, "26.5.2\n")),
+        )
+        assertEquals(
+            "26.5.2",
+            Capture.run(host, "t").attributes.single {
+                it.path == "os.version"
+            }.value,
+        )
+        assertNull(facts()["os.version"])
+    }
+
+    @Test
     fun jvmOptionsJoinTheToolAndLauncherVariables() {
         val options = "runtime.jvm.options"
         assertNull(facts()[options])
