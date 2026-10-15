@@ -74,12 +74,40 @@ class Split(val dev: List<String>, val test: List<String>) {
 object SplitRule {
     const val DEV_PERCENT = 60
     const val DESCRIPTION =
-        "dev iff first 4 bytes of sha256(id) as an unsigned integer mod 100 < dev_percent"
+        "dev iff first 4 bytes of sha256(id) as an unsigned integer mod 100 < dev_percent; " +
+            "a template outside LEGACY_TEMPLATES whose own id fails the same test is held out " +
+            "and has only test instances"
+
+    /** The templates that predate the held-out rule; they keep the instance-level split. */
+    val LEGACY_TEMPLATES = setOf(
+        "browser-engine-api", "browser-engine-flaky-std", "build-lockfile-pin",
+        "build-npm-sbom-plain", "compiler-c2x-plain", "control-env-noise",
+        "control-identical-fixed", "control-locale-noise-fixed", "control-runtime-noise",
+        "cpu-count-pool", "cpu-limit-quota-basic", "cpu-limit-quota-decoy", "cpu-model-flag-base",
+        "env-missing-var-plain", "env-pool-size", "env-pool-size-decoy", "env-pythonioencoding",
+        "env-retries-flaky-plain", "kernel-clocksource-flaky-basic", "kernel-release-gate-basic",
+        "limits-fsize", "limits-nofile", "limits-nofile-decoy", "locale-setlocale",
+        "locale-tz-date", "locale-tz-decoy", "memory-oom", "memory-oom-decoy",
+        "migration-jdk-list-getfirst", "migration-node-array-fromasync",
+        "migration-php-json-validate", "migration-python-copy", "network-hosts", "network-proxy",
+        "network-proxy-decoy", "os-distro-family-basic", "os-glibc-floor", "os-version-gate",
+        "runtime-java-virtual-basic", "runtime-node-api", "runtime-python-feature",
+        "userland-cp-update", "userland-shell-bashism",
+    )
 
     fun isDev(id: String): Boolean = Hashing.hash32(id) % 100 < DEV_PERCENT
+
+    fun isHeldOut(template: String): Boolean = template !in LEGACY_TEMPLATES && !isDev(template)
 
     fun split(ids: Collection<String>): Split {
         val sorted = ids.sorted()
         return Split(sorted.filter { isDev(it) }, sorted.filterNot { isDev(it) })
+    }
+
+    fun splitScenarios(scenarios: Collection<Scenario>): Split {
+        val sorted = scenarios.sortedBy { it.id }
+        val dev = sorted.filter { !isHeldOut(it.template) && isDev(it.id) }.map { it.id }
+        val devSet = dev.toSet()
+        return Split(dev, sorted.map { it.id }.filter { it !in devSet })
     }
 }

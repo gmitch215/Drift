@@ -57,14 +57,15 @@ class Observed(
 }
 
 /**
- * The dev scenarios and their capsules. Test ids are refused here, so no fit or evaluation
- * path can reach a sealed scenario.
+ * The dev scenarios and their capsules. Test ids are refused here unless the lab was built with
+ * [Unsealed], so no fit or evaluation path can reach a sealed scenario before the unseal.
  */
 class Lab(
-    private val scenarios: List<Scenario>,
+    val scenarios: List<Scenario>,
     val dev: Set<String>,
     private val capsule: (String) -> String,
     val scenarioListSha256: String,
+    private val open: Set<String> = emptySet(),
 ) {
     val devIds: List<String> = scenarios.map { it.id }.filter { it in dev }.sorted()
 
@@ -89,6 +90,7 @@ class Lab(
             )
         },
         scenarioListSha256,
+        open,
     )
 
     /** The same pairs with every probe dropped, to measure what the probes add. */
@@ -97,10 +99,11 @@ class Lab(
         dev,
         { Capsule.parse(capsule(it)).copy(probes = emptyList()).canonical() },
         scenarioListSha256,
+        open,
     )
 
     fun observe(ids: List<String>): List<Observed> {
-        ids.firstOrNull { it !in dev }?.let { throw SealedException(it) }
+        ids.firstOrNull { it !in dev && it !in open }?.let { throw SealedException(it) }
         val byId = scenarios.associateBy { it.id }
         return ids.map { id ->
             val s = byId[id] ?: throw SealedException(id)
@@ -111,13 +114,30 @@ class Lab(
 
     fun observeDev(): List<Observed> = observe(devIds)
 
+    /** The passing and failing capsules of one scenario; a sealed id is refused. */
+    fun pair(id: String): Pair<Capsule, Capsule> {
+        if (id !in dev && id !in open) throw SealedException(id)
+        return Capsule.parse(capsule("$id.green.json")) to Capsule.parse(capsule("$id.red.json"))
+    }
+
     companion object {
-        fun parse(scenariosText: String, splitText: String, capsule: (String) -> String): Lab {
+        fun parse(
+            scenariosText: String,
+            splitText: String,
+            unsealed: Unsealed? = null,
+            capsule: (String) -> String,
+        ): Lab {
             val scenarios = (CanonicalJson.parse(scenariosText) as JsonArray).items
                 .map { Scenario.fromJson(it) }
             val dev = (CanonicalJson.parse(splitText) as JsonObject).fields.getValue("dev")
                 .array().map { it.string() }.toSet()
-            return Lab(scenarios, dev, capsule, Sha256.hex(scenariosText))
+            return Lab(
+                scenarios,
+                dev,
+                capsule,
+                Sha256.hex(scenariosText),
+                unsealed?.test?.toSet().orEmpty(),
+            )
         }
 
         fun observe(s: Scenario, green: Capsule, red: Capsule): Observed {

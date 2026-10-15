@@ -31,6 +31,36 @@ class HarnessTest {
     }
 
     @Test
+    fun everyRuntimeNamesItsFileAndCommand() {
+        val expected = mapOf(
+            "go" to ("prog.go" to "go run prog.go"),
+            "ruby" to ("prog.rb" to "ruby prog.rb"),
+            "php" to ("prog.php" to "php prog.php"),
+            "dotnet" to (
+                "prog.fsx" to
+                    "sh -c 'dotnet /usr/share/dotnet/sdk/*/FSharp/fsi.dll \"\$@\"' sh prog.fsx"
+                ),
+            "rust" to (
+                "prog.rs" to
+                    "sh -c 'rustc -o /tmp/prog \"\$@\" && /tmp/prog' sh prog.rs"
+                ),
+            "r" to ("prog.R" to "Rscript prog.R"),
+            "dart" to ("prog.dart" to "dart prog.dart"),
+            "julia" to ("prog.jl" to "julia prog.jl"),
+            "elixir" to ("prog.exs" to "elixir prog.exs"),
+        )
+        for ((runtime, want) in expected) {
+            val text = """{"id":"r","dimension":"runtime","runtime":"$runtime","program":"x",
+                |"signature":"s","green":{"image":"a"},"red":{"image":"b"},
+                |"cause":{"dimension":"runtime","path":"tool.x.version","direction":"lower"}}
+            """.trimMargin()
+            val scenario = Template.fromJson(CanonicalJson.parse(text)).build(1, emptyMap(), 1)
+            assertEquals(want.first, Dimensions.runtimes.getValue(runtime).first)
+            assertEquals(want.second, Harness.command(scenario, scenario.green))
+        }
+    }
+
+    @Test
     fun theCommandUsesTheRuntimeOrTheOverride() {
         assertEquals("python3 prog.py", Harness.command(s, s.green))
         assertEquals("python3 prog.py '--flag' 'a b'", Harness.command(s, s.red))
@@ -82,6 +112,27 @@ class HarnessTest {
     }
 
     @Test
+    fun anAlpineArmRunsOnAnImageThatHasGcompat() {
+        val t = scenario(
+            "\"green\":{\"image\":\"node:22-alpine3.20\"},\"red\":{\"image\":\"y\"}",
+        )
+        val script = Harness.script(t, "green", t.green)
+        val tag = "drift-bench-gcompat:node-22-alpine3.20"
+        assertEquals(tag, Harness.gcompatTag("node:22-alpine3.20"))
+        assertTrue(
+            script.contains(
+                "printf 'FROM %s\\nRUN apk add --no-cache gcompat libgcc\\n' " +
+                    "'node:22-alpine3.20' | " +
+                    "docker build --quiet --tag '$tag' - > /dev/null || exit 1",
+            ),
+            script,
+        )
+        assertTrue(script.contains("'$tag' sh /bench/harness.sh green"), script)
+        val plain = Harness.script(t, "red", t.red)
+        assertFalse(plain.contains("docker build") || plain.contains("gcompat"), plain)
+    }
+
+    @Test
     fun aPlainArmHasNoOptionalFlags() {
         val script = Harness.script(s, "green", s.green)
         assertFalse(script.contains("--cpuset-cpus"))
@@ -96,6 +147,24 @@ class HarnessTest {
         val script = Harness.script(t, "red", t.red)
         assertTrue(script.contains("--env 'HOME=/root'"))
         assertFalse(script.contains("HOME=/tmp"))
+    }
+
+    @Test
+    fun theEnvFileHoldsSortedQuotedExports() {
+        assertEquals("export A='it'\\''s'\nexport B='2'\n", Harness.env(s.red))
+        assertEquals("", Harness.env(scenario(GREEN_X + "," + RED_Y).green))
+    }
+
+    @Test
+    fun aScenarioWithContainerSettingsIsRefusedNatively() {
+        assertEquals(
+            "container settings: files, ulimits, cpuset, memory, cpus",
+            Harness.nativeRefusal(s),
+        )
+        val plain = scenario(GREEN_X + "," + RED_Y)
+        assertEquals(null, Harness.nativeRefusal(plain))
+        val net = scenario("\"green\":{\"image\":\"x\",\"network\":\"host\"},$RED_Y")
+        assertEquals("container settings: network", Harness.nativeRefusal(net))
     }
 
     @Test

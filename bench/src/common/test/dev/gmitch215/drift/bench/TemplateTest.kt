@@ -96,7 +96,7 @@ class TemplateTest {
         assertEquals(Problem.MISSING_FIELD, problem("cause" to null))
         assertEquals(Problem.MISSING_FIELD, problem("signature" to null))
         assertEquals(Problem.BAD_DIMENSION, problem("dimension" to "\"cloud\""))
-        assertEquals(Problem.BAD_VALUE, problem("runtime" to "\"ruby\""))
+        assertEquals(Problem.BAD_VALUE, problem("runtime" to "\"cobol\""))
         assertEquals(Problem.BAD_VALUE, problem("signature" to null, "exit" to "\"x\""))
         assertEquals(Problem.BAD_VALUE, problem("trials" to "\"3\""))
         assertEquals(Problem.BAD_VALUE, problem("trials" to "\"many\""))
@@ -247,7 +247,7 @@ class TemplateTest {
 
     @Test
     fun theErrorMessageNamesTheProblemAndThePlace() {
-        val e = assertFailsWith<TemplateException> { scenario("runtime" to "\"ruby\"") }
+        val e = assertFailsWith<TemplateException> { scenario("runtime" to "\"cobol\"") }
         assertTrue(e.message!!.contains("t-1.runtime"))
         assertTrue(e.message!!.contains("BAD_VALUE"))
     }

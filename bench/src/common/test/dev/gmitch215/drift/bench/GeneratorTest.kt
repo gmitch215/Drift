@@ -9,6 +9,7 @@ import dev.gmitch215.drift.json.string
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
@@ -131,5 +132,40 @@ class GeneratorTest {
         assertEquals(Sha256.hex("b\nc\n"), json.fields.getValue("test_sha256").string())
         assertEquals(listOf("b", "c"), json.fields.getValue("test").array().map { it.string() })
         assertEquals(SplitRule.DESCRIPTION, json.fields.getValue("rule").string())
+    }
+
+    @Test
+    fun aHeldOutTemplateHasOnlyTestInstances() {
+        val held = generateSequence(1) { it + 1 }.map { "held-$it" }
+            .first { SplitRule.isHeldOut(it) }
+        val all = Generator.generate(listOf(template(held, 3)), 42)
+        val split = SplitRule.splitScenarios(all)
+        assertEquals(emptyList(), split.dev)
+        assertEquals(all.map { it.id }, split.test)
+    }
+
+    @Test
+    fun aTemplateInTheDevBucketOrOnTheLegacyListKeepsTheInstanceSplit() {
+        val dev = generateSequence(1) { it + 1 }.map { "kept-$it" }
+            .first { SplitRule.isDev(it) && it !in SplitRule.LEGACY_TEMPLATES }
+        val legacy = SplitRule.LEGACY_TEMPLATES.first { !SplitRule.isDev(it) }
+        for (id in listOf(dev, legacy)) {
+            assertFalse(SplitRule.isHeldOut(id), id)
+            val all = Generator.generate(listOf(template(id, 3)), 42)
+            assertEquals(
+                SplitRule.split(all.map { it.id }).dev,
+                SplitRule.splitScenarios(all).dev,
+                id,
+            )
+        }
+    }
+
+    @Test
+    fun theFreezeListsTheHeldOutTemplatesInIdOrder() {
+        val held = generateSequence(1) { it + 1 }.map { "held-$it" }
+            .filter { SplitRule.isHeldOut(it) }.take(2).toList()
+        val kept = SplitRule.LEGACY_TEMPLATES.first()
+        val all = Generator.generate((held.reversed() + kept).map { template(it, 2) }, 42)
+        assertEquals(held.sorted(), Freeze.holdoutTemplates(all))
     }
 }

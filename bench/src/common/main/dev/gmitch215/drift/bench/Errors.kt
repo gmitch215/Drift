@@ -41,6 +41,18 @@ object Dimensions {
         "python3" to ("prog.py" to "python3"),
         "node" to ("prog.js" to "node"),
         "java" to ("Prog.java" to "java"),
+        "go" to ("prog.go" to "go run"),
+        "ruby" to ("prog.rb" to "ruby"),
+        "php" to ("prog.php" to "php"),
+        "dotnet" to (
+            "prog.fsx" to
+                "sh -c 'dotnet /usr/share/dotnet/sdk/*/FSharp/fsi.dll \"\$@\"' sh"
+            ),
+        "rust" to ("prog.rs" to "sh -c 'rustc -o /tmp/prog \"\$@\" && /tmp/prog' sh"),
+        "r" to ("prog.R" to "Rscript"),
+        "dart" to ("prog.dart" to "dart"),
+        "julia" to ("prog.jl" to "julia"),
+        "elixir" to ("prog.exs" to "elixir"),
     )
 
     val directions = listOf("lower", "higher", "changed", "added", "removed")
