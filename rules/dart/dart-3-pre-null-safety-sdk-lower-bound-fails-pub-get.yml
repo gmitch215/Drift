@@ -1,0 +1,62 @@
+schema: 1
+id: dart-3-pre-null-safety-sdk-lower-bound-fails-pub-get
+title: Dart 3 fails dart pub get for a project whose SDK constraint starts below 2.12.0
+applies:
+  - runtime
+  - build
+difference: a = Dart 2.x with a pubspec.lock whose sdks.dart lower bound is below 2.12.0 (no null safety); b = Dart 3.0 or later, where pub requires 2.12.0 or higher
+symptoms:
+  - text: 'dart pub get fails with: The lower bound of "sdk: ''>=2.9.0 <3.0.0''" must be 2.12.0 or higher to enable null safety'
+    basis: verified
+  - text: 'observed on dart 3.13.5: dart pub get exits 65 with: The current Dart SDK (3.13.5) only supports null safety'
+    basis: verified
+mechanism: Dart 3 removes support for code without null safety, and pub rejects an SDK constraint whose lower bound is below 2.12.0.
+detect:
+  all:
+    - a: tool.dart.version
+      ver: '<3.0.0'
+    - b: tool.dart.version
+      ver: '>=3.0.0'
+    - a: project.dart.sdk-min
+      ver: '<2.12.0'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/dart-lang/site-www/main/src/content/resources/dart-3-migration.md
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'Dart 3 backwards compatibility; Symptom for packages without null safety'
+fixtures:
+  positive:
+    - name: dart 2.19.6 with an sdk constraint of >=2.9.0 to dart 3.13.5
+      a:
+        attrs:
+          tool.dart.version: '2.19.6'
+          project.dart.sdk-min: '2.9.0'
+      b:
+        attrs:
+          tool.dart.version: '3.13.5'
+  negative:
+    - name: dart 2.19.6 with an sdk constraint of >=2.14.0 to dart 3.13.5 (null safe)
+      a:
+        attrs:
+          tool.dart.version: '2.19.6'
+          project.dart.sdk-min: '2.14.0'
+      b:
+        attrs:
+          tool.dart.version: '3.13.5'
+    - name: dart 3.13.5 with an sdk constraint of >=2.9.0 to dart 2.19.6 (reverse direction)
+      a:
+        attrs:
+          tool.dart.version: '3.13.5'
+          project.dart.sdk-min: '2.9.0'
+      b:
+        attrs:
+          tool.dart.version: '2.19.6'
+    - name: dart 2.19.6 without a pubspec.lock to dart 3.13.5
+      a:
+        attrs:
+          tool.dart.version: '2.19.6'
+      b:
+        attrs:
+          tool.dart.version: '3.13.5'
+status: active

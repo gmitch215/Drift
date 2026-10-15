@@ -1,0 +1,52 @@
+schema: 1
+id: elixir-1-19-regex-struct-default-raises
+title: Elixir 1.19 raises ArgumentError for a regex used as a struct field default
+applies:
+  - runtime
+  - build
+difference: a = Elixir 1.18 or older, where defstruct accepts a ~r sigil as a field default; b = Elixir 1.19 or newer, where compiling that module raises ArgumentError
+symptoms:
+  - text: 'observed on elixir 1.19.5 with otp 27 and otp 28: ** (ArgumentError) invalid default value for struct field regex, Regex defines custom escaping rules which are not supported in struct defaults'
+    basis: verified
+  - text: 'observed on elixir 1.18.4 with otp 27: the same defstruct module compiles without a message'
+    basis: verified
+mechanism: Elixir 1.19 raises an error for a regex used as a default value in a struct field, because Erlang/OTP 28 changes how compiled regular expressions escape.
+detect:
+  all:
+    - a: tool.elixir.version
+      ver: '<1.19.0'
+    - b: tool.elixir.version
+      ver: '>=1.19.0'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/elixir-lang/elixir/v1.19.0/CHANGELOG.md
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'v1.19.0 1. Enhancements, Elixir (Regex entry); Erlang/OTP 28 support'
+fixtures:
+  positive:
+    - name: elixir 1.18.4 to elixir 1.19.5 on otp 27
+      a:
+        attrs:
+          tool.elixir.version: '1.18.4'
+          tool.erlang.otp: '27'
+      b:
+        attrs:
+          tool.elixir.version: '1.19.5'
+          tool.erlang.otp: '27'
+  negative:
+    - name: elixir 1.19.5 to elixir 1.20.4 (both raise)
+      a:
+        attrs:
+          tool.elixir.version: '1.19.5'
+      b:
+        attrs:
+          tool.elixir.version: '1.20.4'
+    - name: elixir 1.19.5 to elixir 1.18.4 (reverse direction)
+      a:
+        attrs:
+          tool.elixir.version: '1.19.5'
+      b:
+        attrs:
+          tool.elixir.version: '1.18.4'
+status: active

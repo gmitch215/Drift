@@ -1,0 +1,51 @@
+schema: 1
+id: julia-1-12-getfield-raises-fielderror
+title: Julia 1.12 raises FieldError instead of ErrorException when a field does not exist
+applies:
+  - runtime
+difference: a = Julia 1.11 or earlier, where reading a missing field throws ErrorException; b = Julia 1.12 or later, where it throws FieldError, a direct subtype of Exception
+symptoms:
+  - text: a try block or rethrow check that tests isa ErrorException around a field access no longer catches the failure
+    basis: inferred
+mechanism: Julia 1.12 makes errors during getfield raise a new FieldError type that subtypes Exception directly instead of the generic ErrorException.
+detect:
+  all:
+    - a: tool.julia.version
+      ver: '<1.12.0'
+    - b: tool.julia.version
+      ver: '>=1.12.0'
+severity: low
+provenance:
+  - url: https://raw.githubusercontent.com/JuliaLang/julia/v1.13.0/HISTORY.md
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'Julia v1.12 Release Notes, Language changes'
+  - url: https://raw.githubusercontent.com/JuliaLang/julia/v1.12.0/base/boot.jl
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'struct FieldError <: Exception'
+fixtures:
+  positive:
+    - name: julia 1.11.6 to julia 1.12.0
+      a:
+        attrs:
+          tool.julia.version: '1.11.6'
+      b:
+        attrs:
+          tool.julia.version: '1.12.0'
+  negative:
+    - name: julia 1.12.0 to julia 1.13.1 (both raise FieldError)
+      a:
+        attrs:
+          tool.julia.version: '1.12.0'
+      b:
+        attrs:
+          tool.julia.version: '1.13.1'
+    - name: julia 1.12.0 to julia 1.11.6 (reverse direction)
+      a:
+        attrs:
+          tool.julia.version: '1.12.0'
+      b:
+        attrs:
+          tool.julia.version: '1.11.6'
+status: active

@@ -1,0 +1,49 @@
+schema: 1
+id: r-4-0-strings-as-factors-default-false
+title: R 4.0.0 stops converting strings to factors in data.frame() and read.table()
+applies:
+  - runtime
+difference: a = R 3.6 or earlier, where data.frame() and read.table() turn character columns into factors; b = R 4.0.0 or later, where they stay character
+symptoms:
+  - text: code that calls levels() or nlevels() on a column read as text, or relies on factor ordering, gets NULL, 0 or an alphabetical sort of strings instead
+    basis: inferred
+  - text: R NEWS for 4.0.0 says a large number of packages relied on the previous behaviour and needed updating
+    basis: verified
+mechanism: R 4.0.0 changes the default of stringsAsFactors to FALSE, so data.frame() and read.table() no longer convert strings to factors.
+detect:
+  all:
+    - a: tool.r.version
+      ver: '<4.0.0'
+    - b: tool.r.version
+      ver: '>=4.0.0'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/wch/r-source/tags/R-4-0-0/doc/NEWS.Rd
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'CHANGES IN 4.0.0, SIGNIFICANT USER-VISIBLE CHANGES'
+fixtures:
+  positive:
+    - name: r 3.6.3 to r 4.6.1
+      a:
+        attrs:
+          tool.r.version: '3.6.3'
+      b:
+        attrs:
+          tool.r.version: '4.6.1'
+  negative:
+    - name: r 4.1.3 to r 4.6.1 (both past the 4.0.0 default)
+      a:
+        attrs:
+          tool.r.version: '4.1.3'
+      b:
+        attrs:
+          tool.r.version: '4.6.1'
+    - name: r 4.6.1 to r 3.6.3 (reverse direction)
+      a:
+        attrs:
+          tool.r.version: '4.6.1'
+      b:
+        attrs:
+          tool.r.version: '3.6.3'
+status: active
