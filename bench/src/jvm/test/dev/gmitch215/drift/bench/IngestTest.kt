@@ -200,7 +200,7 @@ class IngestTest {
     fun importingProbedCapsulesCopiesTheBaselinesAndRefusesATestId() {
         val committed = Path.of(".")
         val dev = Work(committed).devIds().sorted().first()
-        val test = SplitRule.split(Work(committed).loadScenarios().map { it.id }).test.first()
+        val test = Work(committed).split().test.first()
         val root = Files.createTempDirectory("bench-probed")
         val data = root.resolve("data").createDirectories()
         data.resolve("split.json").writeText(committed.resolve("data/split.json").readText())

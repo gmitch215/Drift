@@ -11,6 +11,18 @@ val embedBenchData = tasks.register<EmbedFixtures>("embedBenchData") {
     outputDir = layout.buildDirectory.dir("generated/benchData")
 }
 
+val embedBenchTriage = tasks.register<EmbedFixtures>("embedBenchTriage") {
+    fixtures = rootProject.layout.projectDirectory.dir("bench/triage")
+    objectName = "BenchTriage"
+    outputDir = layout.buildDirectory.dir("generated/benchTriage")
+}
+
+val embedBenchUpgrade = tasks.register<EmbedFixtures>("embedBenchUpgrade") {
+    fixtures = rootProject.layout.projectDirectory.dir("bench/upgrade")
+    objectName = "BenchUpgrade"
+    outputDir = layout.buildDirectory.dir("generated/benchUpgrade")
+}
+
 kotlin {
     jvm {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -22,6 +34,8 @@ kotlin {
     sourceSets {
         commonTest {
             kotlin.srcDir(embedBenchData)
+            kotlin.srcDir(embedBenchTriage)
+            kotlin.srcDir(embedBenchUpgrade)
         }
         commonMain.dependencies {
             implementation(project(":core"))

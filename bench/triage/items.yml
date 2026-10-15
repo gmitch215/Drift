@@ -1,0 +1,215 @@
+schema: 1
+items:
+  - id: triage-b01-form-no-response
+    source: fixture
+    body: b01-form-no-response
+  - id: triage-b02-bold-template
+    source: fixture
+    body: b02-bold-template
+  - id: triage-b03-form-plus-addendum
+    source: fixture
+    body: b03-form-plus-addendum
+  - id: triage-b04-gitlab-template
+    source: fixture
+    body: b04-gitlab-template
+  - id: triage-b05-blank-environment-line
+    source: fixture
+    body: b05-blank-environment-line
+  - id: triage-b06-form-os-only
+    source: fixture
+    body: b06-form-os-only
+  - id: triage-b07-form-wrong-version
+    source: fixture
+    body: b07-form-wrong-version
+  - id: triage-b08-workflow-snippet
+    source: fixture
+    body: b08-workflow-snippet
+  - id: triage-c01-distutils-not-available
+    source: fixture
+    body: c01-distutils-not-available
+  - id: triage-c02-distutils-no-longer
+    source: fixture
+    body: c02-distutils-no-longer
+  - id: triage-c03-distutils-question
+    source: fixture
+    body: c03-distutils-question
+  - id: triage-c04-distutils-removed-in
+    source: fixture
+    body: c04-distutils-removed-in
+  - id: triage-c05-distutils-mention
+    source: fixture
+    body: c05-distutils-mention
+  - id: triage-c06-distutils-still-available
+    source: fixture
+    body: c06-distutils-still-available
+    correction: 'distutils was removed from the standard library in Python 3.12, so it is not available on 3.12.1.'
+  - id: triage-c07-distutils-deprecation-warning
+    source: fixture
+    body: c07-distutils-deprecation-warning
+  - id: triage-c08-distutils-use-imperative
+    source: fixture
+    body: c08-distutils-use-imperative
+  - id: triage-c09-distutils-would-be-annoyed
+    source: fixture
+    body: c09-distutils-would-be-annoyed
+  - id: triage-c10-hashset-non-deterministic
+    source: fixture
+    body: c10-hashset-non-deterministic
+  - id: triage-f01-jaxb-java17
+    source: fixture
+    body: f01-jaxb-java17
+  - id: triage-f02-workers-jvm-claim
+    source: fixture
+    body: f02-workers-jvm-claim
+    correction: 'Workers does not run the JVM; the TeaVM output is JavaScript or Wasm and HashMap order can differ from the JDK.'
+  - id: triage-f03-wasm-double
+    source: fixture
+    body: f03-wasm-double
+  - id: triage-f04-nashorn-java21
+    source: fixture
+    body: f04-nashorn-java21
+  - id: triage-f05-android-toolchain
+    source: fixture
+    body: f05-android-toolchain
+  - id: triage-f06-alpine-proxy
+    source: fixture
+    body: f06-alpine-proxy
+  - id: triage-f07-two-browsers
+    source: fixture
+    body: f07-two-browsers
+  - id: triage-f08-centos-glibc
+    source: fixture
+    body: f08-centos-glibc
+  - id: triage-f09-runner-labels
+    source: fixture
+    body: f09-runner-labels
+  - id: triage-f10-jvm-flags
+    source: fixture
+    body: f10-jvm-flags
+  - id: triage-f11-node-typeerror
+    source: fixture
+    body: f11-node-typeerror
+  - id: triage-f12-python-collections
+    source: fixture
+    body: f12-python-collections
+  - id: triage-h01-slash-list
+    source: fixture
+    body: h01-slash-list
+  - id: triage-h02-ubuntu-point-release
+    source: fixture
+    body: h02-ubuntu-point-release
+  - id: triage-h03-command-output
+    source: fixture
+    body: h03-command-output
+  - id: triage-h04-windows-pro
+    source: fixture
+    body: h04-windows-pro
+  - id: triage-h05-form-then-fix
+    source: fixture
+    body: h05-form-then-fix
+  - id: triage-h06-version-range
+    source: fixture
+    body: h06-version-range
+  - id: triage-h07-markdown-table
+    source: fixture
+    body: h07-markdown-table
+  - id: triage-h08-dependencies
+    source: fixture
+    body: h08-dependencies
+  - id: triage-h09-system-python
+    source: fixture
+    body: h09-system-python
+  - id: triage-h10-package-json
+    source: fixture
+    body: h10-package-json
+  - id: triage-h11-lookalike-prose
+    source: fixture
+    body: h11-lookalike-prose
+  - id: triage-h12-worked-broken
+    source: fixture
+    body: h12-worked-broken
+  - id: triage-s01-node-missing-module
+    source: fixture
+    body: s01-node-missing-module
+  - id: triage-s02-java-reflection
+    source: fixture
+    body: s02-java-reflection
+  - id: triage-s03-python-distutils
+    source: fixture
+    body: s03-python-distutils
+  - id: triage-s04-gradle-agp
+    source: fixture
+    body: s04-gradle-agp
+  - id: triage-s05-firefox-blank
+    source: fixture
+    body: s05-firefox-blank
+  - id: triage-s06-github-runner
+    source: fixture
+    body: s06-github-runner
+  - id: triage-s07-php-comparison
+    source: fixture
+    body: s07-php-comparison
+  - id: triage-s08-go-build-hang
+    source: fixture
+    body: s08-go-build-hang
+  - id: triage-s09-rust-linker
+    source: fixture
+    body: s09-rust-linker
+  - id: triage-s10-workerd-fetch
+    source: fixture
+    body: s10-workerd-fetch
+  - id: triage-v01-php-fatal-line
+    source: fixture
+    body: v01-php-fatal-line
+  - id: triage-v03-php-port-line
+    source: fixture
+    body: v03-php-port-line
+  - id: triage-v04-php-year-line
+    source: fixture
+    body: v04-php-year-line
+  - id: triage-v05-php-key-value
+    source: fixture
+    body: v05-php-key-value
+  - id: triage-v06-php-version-label
+    source: fixture
+    body: v06-php-version-label
+  - id: triage-v07-php-running-text
+    source: fixture
+    body: v07-php-running-text
+  - id: triage-v08-node-version-word
+    source: fixture
+    body: v08-node-version-word
+  - id: triage-v09-section-name-repeat
+    source: fixture
+    body: v09-section-name-repeat
+  - id: triage-w01-no-detail
+    source: fixture
+    body: w01-no-detail
+  - id: triage-w02-python-3
+    source: fixture
+    body: w02-python-3
+  - id: triage-w03-latest-java
+    source: fixture
+    body: w03-latest-java
+  - id: triage-w04-java-class-version
+    source: fixture
+    body: w04-java-class-version
+  - id: triage-w05-hedged-node
+    source: fixture
+    body: w05-hedged-node
+  - id: triage-w06-store-python
+    source: fixture
+    body: w06-store-python
+  - id: triage-w07-env-dump
+    source: fixture
+    body: w07-env-dump
+  - id: triage-w08-jaxb-wrong
+    source: fixture
+    body: w08-jaxb-wrong
+    correction: 'javax.xml.bind was removed from the JDK in 11; it is a separate dependency there.'
+  - id: triage-w09-lookalike-names
+    source: fixture
+    body: w09-lookalike-names
+  - id: triage-w10-dates-and-ids
+    source: fixture
+    body: w10-dates-and-ids
