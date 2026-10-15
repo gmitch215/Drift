@@ -55,6 +55,7 @@ fun HomeScreen(
     onUpgrade: () -> Unit,
     onContract: () -> Unit,
     onBisect: () -> Unit,
+    onSet: () -> Unit,
 ) {
     val palette = LocalPalette.current
     Box(
@@ -91,6 +92,7 @@ fun HomeScreen(
                 onContract,
             )
             Way("Plan a Bisect", BISECT_ABOUT_HOME, "Open the Bisect Plan", "bisect", onBisect)
+            Way("Compare a Set", SET_ABOUT_HOME, "Open the Set View", "set", onSet)
             Way("Browse the Atlas", ATLAS_ABOUT, "Open the Atlas", "atlas", onAtlas)
             Rule()
             Muted(FOOTER)

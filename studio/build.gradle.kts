@@ -31,6 +31,12 @@ val embedUpgrade = tasks.register<EmbedFixtures>("embedUpgrade") {
     outputDir = layout.buildDirectory.dir("generated/upgrade")
 }
 
+val embedSet = tasks.register<EmbedFixtures>("embedSet") {
+    fixtures = rootProject.layout.projectDirectory.dir("fixtures/set")
+    objectName = "SetFixtures"
+    outputDir = layout.buildDirectory.dir("generated/set")
+}
+
 tasks.withType<AbstractCopyTask>()
     .matching { it.name == "wasmJsBrowserDistribution" }
     .configureEach {
@@ -61,6 +67,7 @@ kotlin {
             kotlin.srcDir(embedFixtures)
             kotlin.srcDir(embedAtlas)
             kotlin.srcDir(embedUpgrade)
+            kotlin.srcDir(embedSet)
         }
 
         commonMain.dependencies {

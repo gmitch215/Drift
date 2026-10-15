@@ -68,6 +68,7 @@ private enum class Tab(val label: String) {
     UPGRADE("Upgrade"),
     CONTRACT("Contract"),
     BISECT("Bisect"),
+    SET("Set"),
 }
 
 /** Lets the app ask the platform for a case file; [onOpened] gets the result, good or not. */
@@ -142,6 +143,7 @@ fun StudioApp(
                         onUpgrade = { tab = Tab.UPGRADE },
                         onContract = { tab = Tab.CONTRACT },
                         onBisect = { tab = Tab.BISECT },
+                        onSet = { tab = Tab.SET },
                     )
 
                     Tab.CASE -> opened?.let { CaseScreen(it) }
@@ -155,6 +157,8 @@ fun StudioApp(
                     Tab.CONTRACT -> ContractScreen(files, samples)
 
                     Tab.BISECT -> BisectScreen(files, samples)
+
+                    Tab.SET -> SetScreen(files)
                 }
             }
         }

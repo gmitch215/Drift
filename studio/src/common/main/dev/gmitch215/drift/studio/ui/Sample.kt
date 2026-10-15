@@ -1,6 +1,7 @@
 package dev.gmitch215.drift.studio.ui
 
 import dev.gmitch215.drift.fixtures.Fixtures
+import dev.gmitch215.drift.fixtures.SetFixtures
 import dev.gmitch215.drift.fixtures.UpgradeFixtures
 import dev.gmitch215.drift.model.Capsule
 import dev.gmitch215.drift.studio.StudioState
@@ -25,3 +26,23 @@ fun sampleState(): StudioState = samples().first().state
 fun upgradeSamples(): List<Load.Ok<Capsule>> = UpgradeFixtures.names.sorted()
     .filter { it.endsWith(Loads.EXTENSION) }
     .map { Load.Ok(it, Capsule.parse(UpgradeFixtures.text(it))) }
+
+class SetSample(val name: String, val entries: List<SetEntry>)
+
+private val setTitles = mapOf(
+    "toolchain" to "Node.js and npm versions",
+    "proxy" to "a proxy setting",
+)
+
+fun setSamples(): List<SetSample> = SetFixtures.names.sorted()
+    .filter { it.endsWith(Loads.EXTENSION) }
+    .groupBy { it.substringBefore('/') }
+    .map { (dir, files) ->
+        SetSample(
+            "Use the Sample Set for ${setTitles[dir] ?: Plain.title(dir).lowercase()}",
+            files.map {
+                val name = it.substringAfter('/').removeSuffix(Loads.EXTENSION)
+                SetEntry(name, name.startsWith("fail"), Capsule.parse(SetFixtures.text(it)))
+            },
+        )
+    }

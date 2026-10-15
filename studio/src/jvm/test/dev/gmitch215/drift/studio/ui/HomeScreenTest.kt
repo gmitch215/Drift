@@ -36,7 +36,13 @@ class HomeScreenTest {
         onNodeWithText(UPGRADE_ABOUT_HOME).assertExists()
         onNodeWithText(CONTRACT_ABOUT_HOME).assertExists()
         onNodeWithText(BISECT_ABOUT_HOME).assertExists()
-        listOf("upgrade" to "Upgrade", "contract" to "Contract", "bisect" to "Bisect")
+        onNodeWithText(SET_ABOUT_HOME).assertExists()
+        listOf(
+            "upgrade" to "Upgrade",
+            "contract" to "Contract",
+            "bisect" to "Bisect",
+            "set" to "Set",
+        )
             .forEach { (tag, tab) ->
                 onNodeWithTag("home:$tag").performScrollTo().performClick()
                 onNodeWithText(tab).assertIsSelected()
