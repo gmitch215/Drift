@@ -295,6 +295,22 @@ jobs:
           --dist ../../studio/build/dist/wasmJs/productionExecutable
           --out ../../build/browsers
           --reference ../../fixtures/atlas/wasm.txt
+      - name: Capture Viewport Layout
+        working-directory: tools/browsers
+        run: >
+          node layout.mjs
+          --dir ../../fixtures/sites/viewport
+          --out ../../build/browsers/layout
+      - name: Check Viewport Capsules
+        run: |
+          value() { jq -r --arg p "$2" '.attributes[] | select(.path == $p) | .value' "build/browsers/layout/$1-1280x800.json"; }
+          test "$(find build/browsers/layout -name '*.json' | wc -l)" -eq 9
+          test "$(value chromium browser.css.supports.interpolate-size)" = true
+          test "$(value firefox browser.css.supports.interpolate-size)" = false
+          test "$(value webkit browser.css.supports.interpolate-size)" = false
+          test "$(value chromium browser.layout.panel.height)" != 0
+          test "$(value firefox browser.layout.panel.height)" = 0
+          test "$(value webkit browser.layout.panel.height)" = 0
       - name: Test Studio in Firefox
         run: ./gradlew :studio:wasmJsBrowserTest -Pdrift.browser=firefox
       - name: Archive Browser Results

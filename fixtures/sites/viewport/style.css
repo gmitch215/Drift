@@ -1,0 +1,82 @@
+:root {
+    interpolate-size: allow-keywords;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font: 16px/24px sans-serif;
+}
+
+header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+}
+
+header .logo {
+    height: 32px;
+}
+
+header nav {
+    display: flex;
+    gap: 8px;
+}
+
+header nav span {
+    width: 64px;
+    height: 32px;
+    background: #888;
+}
+
+@media (min-width: 600px) {
+    header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    padding: 16px;
+}
+
+.cards div {
+    height: 80px;
+    background: #ccc;
+}
+
+.panel {
+    margin: 0 16px;
+    overflow: hidden;
+    background: #eee;
+    animation: grow 1s linear -0.25s paused both;
+}
+
+.panel div {
+    height: 60px;
+    border-bottom: 1px solid #999;
+}
+
+@keyframes grow {
+    from {
+        height: 0;
+    }
+
+    to {
+        height: auto;
+    }
+}
+
+footer {
+    padding: 16px;
+    background: #444;
+    color: #fff;
+}
