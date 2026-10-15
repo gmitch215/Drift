@@ -25,9 +25,17 @@ import dev.gmitch215.drift.model.Capsule
  * - `version-boundary`: the rule matches but every clause that matched reads only a target key,
  *   so the evidence is the version crossing alone; no project fact or other environment key
  *   was read.
+ * - `outside-range`: the rule matches, every fact it reads is known, and every symptom of the
+ *   rule has the basis `range`: the source lists a compatible range and states no failure
+ *   outside it. The group takes the place of `will-break` and `version-boundary`.
  * - `unknown`: the capture lacks the current value of a target key, or the target is not a
  *   version the rule can compare. A rule that matches only because that value is missing is
  *   listed here too, not as `will-break`.
+ *
+ * Locked packages are checked apart from the rules: a package whose recorded runtime constraint
+ * allows the capture's runtime and excludes the target is listed in [UpgradeReport.packages]
+ * (see [PackageConstraints]); a lockfile that records no constraint is listed in
+ * [UpgradeReport.unchecked].
  *
  * Only rules with a condition on side `b` (or a cross or changed condition) that reads a target
  * key and gives another verdict for the target than for the capture itself are reported. A
@@ -47,12 +55,15 @@ object UpgradeCheck {
             val moved = reading.filter { verdict(rule, it, a, b) != verdict(rule, it, a, a) }
             if (moved.isEmpty()) null else finding(rule, leaves, moved, a, b, keys)
         }.sortedWith(order)
+        val (packages, unchecked) = PackageConstraints.check(capsule, targets, a.attrs)
         return UpgradeReport(
             capsule.label,
             targets.map { UpgradeReport.Row(it, a.attrs[it.key]) },
             rules.size,
             touched,
             findings,
+            packages,
+            unchecked,
         )
     }
 
@@ -108,12 +119,13 @@ object UpgradeCheck {
         b: Env,
         keys: Set<String>,
     ): Finding? {
-        val basis = if (rule.symptoms.all { it.basis == Basis.VERIFIED }) {
-            Basis.VERIFIED
-        } else {
-            Basis.INFERRED
+        val basis = when {
+            rule.symptoms.all { it.basis == Basis.VERIFIED } -> Basis.VERIFIED
+            rule.symptoms.all { it.basis == Basis.RANGE } -> Basis.RANGE
+            else -> Basis.INFERRED
         }
-        val crossings = keys.sorted().mapNotNull { crossing(it, leaves, moved, a, b) }
+        val plain = leaves(rule.detect, negated = false)
+        val crossings = keys.sorted().mapNotNull { crossing(it, plain, leaves, moved, a, b) }
         val absent = crossings.filter { it.from == null }.map { it.key }
         return when (verdict(rule, rule.detect, a, b)) {
             Verdict.NO_MATCH -> null
@@ -123,6 +135,7 @@ object UpgradeCheck {
                 val facts = facts(rule, a, b, keys)
                 val group = when {
                     absent.isNotEmpty() -> Group.UNKNOWN
+                    basis == Basis.RANGE -> Group.OUTSIDE_RANGE
                     facts.isEmpty() -> Group.VERSION_BOUNDARY
                     else -> Group.WILL_BREAK
                 }
@@ -167,6 +180,7 @@ object UpgradeCheck {
 
     private fun crossing(
         key: String,
+        plain: List<Node>,
         leaves: List<Node>,
         moved: List<Node>,
         a: Env,
@@ -174,7 +188,7 @@ object UpgradeCheck {
     ): Crossing? {
         val now = moved.filter { path(it)?.let { p -> matches(p, setOf(key)) } == true }
         if (now.isEmpty()) return null
-        val was = leaves.filterIsInstance<Node.On>()
+        val was = plain.filterIsInstance<Node.On>()
             .filter { it.which == Which.A && matches(it.path, setOf(key)) }
         return Crossing(
             key,
@@ -185,10 +199,13 @@ object UpgradeCheck {
         )
     }
 
-    private fun leaves(node: Node): List<Node> = when (node) {
-        is Node.AllOf -> node.nodes.flatMap(::leaves)
-        is Node.AnyOf -> node.nodes.flatMap(::leaves)
-        is Node.Not -> leaves(node.node)
+    private fun leaves(node: Node): List<Node> = leaves(node, negated = true)
+
+    // `was` reads the conditions the rule asks for, not the ones it excludes with `not`
+    private fun leaves(node: Node, negated: Boolean): List<Node> = when (node) {
+        is Node.AllOf -> node.nodes.flatMap { leaves(it, negated) }
+        is Node.AnyOf -> node.nodes.flatMap { leaves(it, negated) }
+        is Node.Not -> if (negated) leaves(node.node, true) else emptyList()
         else -> listOf(node)
     }
 

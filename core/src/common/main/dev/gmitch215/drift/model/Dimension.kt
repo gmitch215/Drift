@@ -44,6 +44,8 @@ enum class Dimension(val id: String) {
             "tool.npm." to BUILD,
             "tool.gradle." to BUILD,
             "tool.pip." to BUILD,
+            "tool.xcode." to BUILD,
+            "tool.cocoapods." to BUILD,
             "ci." to BUILD,
             "deps." to BUILD,
             "project." to BUILD,

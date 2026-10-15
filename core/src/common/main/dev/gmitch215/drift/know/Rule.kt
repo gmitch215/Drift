@@ -29,10 +29,14 @@ internal interface Coded {
     val id: String
 }
 
-/** `verified` means the source states the symptom; `inferred` means only the mechanism is cited. */
+/**
+ * `verified` means the source states the symptom; `inferred` means only the mechanism is cited;
+ * `range` means the source lists a tested or compatible range and states no failure.
+ */
 enum class Basis(override val id: String) : Coded {
     VERIFIED("verified"),
     INFERRED("inferred"),
+    RANGE("range"),
 }
 
 enum class Severity(override val id: String) : Coded {

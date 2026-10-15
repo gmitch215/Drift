@@ -39,12 +39,27 @@ class UpgradeCheckCommandTest {
     private val jdk17 = capsule("jdk-17", "tool.java.version" to "17.0.9")
     private val jdk21 = capsule("jdk-21", "tool.java.version" to "21.0.5")
 
+    private val locked = Capsule(
+        "locked-php-74",
+        listOf(
+            Attribute("tool.php.version", "7.4.33", "tool"),
+            Attribute("project.composer.phpspec/prophecy", "1.12.2", "project:composer.lock"),
+            Attribute(
+                "project.composer.phpspec/prophecy.requires.php",
+                "^7.2 || ~8.0, <8.1",
+                "project:composer.lock",
+            ),
+            Attribute("project.npm.left-pad", "1.3.0", "project:yarn.lock"),
+        ),
+    ).canonical()
+
     private val host = FakeHost(
         canRun = false,
         files = mapOf(
             "composer.json" to composer,
             "gradle.json" to gradle,
             "python.json" to python,
+            "locked.json" to locked,
             "jdk17.json" to jdk17,
             "jdk21.json" to jdk21,
             "stack.yml" to "php: '8.3'\n# the rest\ndrupal: 11\n",
@@ -195,5 +210,29 @@ class UpgradeCheckCommandTest {
             assertTrue(result.statusCode != 0, args)
             assertTrue(message in result.stderr, "$args: ${result.stderr}")
         }
+    }
+
+    @Test
+    fun aLockedPackageThatExcludesTheTargetIsListedWithItsConstraint() {
+        val text = drift("upgrade-check locked.json --to php=8.3,node=22").stdout
+        val block = text.substringAfter("Will break: locked packages (1)\n")
+            .substringBefore("\nUnchecked")
+        assertTrue("1. phpspec/prophecy 1.12.2 (composer, composer.lock)\n" in block, block)
+        assertTrue("requires php ^7.2 || ~8.0, <8.1; php 8.3 is outside it\n" in block, block)
+        assertTrue("Unchecked package constraints (1)\n" in text, text)
+        assertTrue("1. yarn.lock, node: " in text, text)
+        val out = drift("upgrade-check locked.json --to php=8.3 --json").stdout
+        val root = CanonicalJson.parse(out) as JsonObject
+        val row = root.require("will-break-packages").array().single() as JsonObject
+        assertEquals("phpspec/prophecy", row.require("package").string())
+        assertEquals("^7.2 || ~8.0, <8.1", row.require("constraint").string())
+        assertEquals(emptyList(), root.require("unchecked-packages").array())
+    }
+
+    @Test
+    fun aTargetInsideTheConstraintListsNoPackage() {
+        val out = drift("upgrade-check locked.json --to php=8.0 --json").stdout
+        val root = CanonicalJson.parse(out) as JsonObject
+        assertEquals(emptyList(), root.require("will-break-packages").array())
     }
 }

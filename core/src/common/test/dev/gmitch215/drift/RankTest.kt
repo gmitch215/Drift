@@ -618,9 +618,9 @@ class RankTest {
             }
         }
         assertTrue(checked >= 30, "checked $checked")
-        val withInferred = Rules.all.filter { r -> r.symptoms.any { it.basis == Basis.INFERRED } }
+        val unverified = Rules.all.filter { r -> r.symptoms.any { it.basis != Basis.VERIFIED } }
         assertTrue(inferredRules.isNotEmpty())
-        assertTrue(withInferred.map { it.id }.containsAll(inferredRules))
+        assertTrue(unverified.map { it.id }.containsAll(inferredRules))
     }
     // #endregion
 

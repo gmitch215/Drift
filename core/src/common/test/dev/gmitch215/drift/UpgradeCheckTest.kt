@@ -265,6 +265,62 @@ class UpgradeCheckTest {
     }
 
     @Test
+    fun aRuleWhoseSymptomsAreAllRangeLandsInOutsideRangeAndKeepsItsEvidence() {
+        val range = rule(
+            "r-range",
+            phpFact,
+            "symptoms" to """[{"text":"t","basis":"range"}]""",
+        )
+        val result = UpgradeCheck.run(today, targets("php=8.3"), listOf(range, rules[2]))
+        assertEquals(listOf("r-range"), result.of(Group.OUTSIDE_RANGE).map { it.rule.id })
+        assertEquals(emptyList(), result.of(Group.WILL_BREAK))
+        val finding = result.of(Group.OUTSIDE_RANGE).single()
+        assertEquals("range", finding.basis.id)
+        assertEquals(listOf("os.arch"), finding.evidence)
+        val text = result.text()
+        assertTrue("Outside the tested range (1)\n${UpgradeReport.RANGE_NOTE}\n" in text, text)
+        assertTrue("evidence: os.arch" in text, text)
+        val json = CanonicalJson.parse(result.json()) as JsonObject
+        val entry = json.require("outside-range").array().single() as JsonObject
+        assertEquals(JsonString("range"), entry.require("basis"))
+        assertEquals(JsonInt(2), json.require("schema"))
+        val plain = UpgradeCheck.run(today, targets("php=8.3"), rules).text()
+        assertTrue("Outside the tested range" !in plain, plain)
+    }
+
+    @Test
+    fun aMoveOutOfTheKotlinCompatibilityTableIsOutsideTheTestedRangeNotWillBreak() {
+        val capture = capsule(
+            "project.gradle.kotlin.version" to "2.4.20",
+            "project.gradle.agp.version" to "9.3.1",
+            "project.gradle.wrapper" to "9.6.0",
+            "project.gradle.android.compile-sdk" to "37",
+        )
+        val result = UpgradeCheck.run(capture, targets("agp=9.4.0,gradle=9.5.0"))
+        val range = result.of(Group.OUTSIDE_RANGE).map { it.rule.id }
+        val agp = "kgp-2-4-20-to-2-4-21-agp-outside-compatibility-table"
+        assertTrue(agp in range, range.toString())
+        assertTrue(
+            result.of(Group.WILL_BREAK).none { it.rule.id.startsWith("kgp-") },
+            result.of(Group.WILL_BREAK).toString(),
+        )
+        assertTrue(result.of(Group.OUTSIDE_RANGE).all { it.basis.id == "range" })
+        val inside = UpgradeCheck.run(capture, targets("agp=9.2.0,gradle=9.7.0"))
+        assertEquals(emptyList(), inside.of(Group.OUTSIDE_RANGE).map { it.rule.id })
+        val sdk = UpgradeCheck.run(
+            capsule(
+                "project.gradle.agp.version" to "8.6.0",
+                "project.gradle.android.compile-sdk" to "35",
+            ),
+            targets("agp=8.5.0"),
+        )
+        assertEquals(
+            listOf("agp-8-2-to-8-5-compile-sdk-above-34"),
+            sdk.of(Group.OUTSIDE_RANGE).map { it.rule.id },
+        )
+    }
+
+    @Test
     fun theCatalogFlagsWhatAPhpAndDrupalMoveBreaks() {
         val capture = capsule(
             "tool.php.version" to "8.1.27",
@@ -366,4 +422,122 @@ class UpgradeCheckTest {
         assertEquals(1, Targets.resolve(Targets.parseList("java=21,jdk=21")).size)
         assertEquals(emptyList(), Targets.parseList(""))
     }
+
+    // #region package constraints
+    private fun locked(vararg attrs: Triple<String, String, String>) = Capsule(
+        "locked",
+        attrs.map { Attribute(it.first, it.second, "project:${it.third}") },
+    )
+
+    private val prophecy = "^7.2 || ~8.0, <8.1"
+
+    private val composerLock = locked(
+        Triple("tool.php.version", "7.4.33", "tool"),
+        Triple("project.composer.phpspec/prophecy", "1.12.2", "composer.lock"),
+        Triple("project.composer.phpspec/prophecy.requires.php", prophecy, "composer.lock"),
+        Triple("project.composer.sebastian/diff", "4.0.4", "composer.lock"),
+        Triple("project.composer.sebastian/diff.requires.php", ">=7.3", "composer.lock"),
+        Triple("project.composer.old/pkg", "1.0.0", "composer.lock"),
+        Triple("project.composer.old/pkg.requires.php", "^5.6", "composer.lock"),
+        Triple("project.composer.odd/pkg", "1.0.0", "composer.lock"),
+        Triple("project.composer.odd/pkg.requires.php", "dev-master", "composer.lock"),
+    )
+
+    @Test
+    fun aLockedPackageWhoseConstraintExcludesTheTargetWillBreak() {
+        val result = UpgradeCheck.run(composerLock, targets("php=8.3"), emptyList())
+        val broken = result.packages.single()
+        assertEquals("phpspec/prophecy", broken.name)
+        assertEquals("1.12.2", broken.version)
+        assertEquals(prophecy, broken.constraint)
+        assertEquals("composer", broken.ecosystem)
+        assertEquals("composer.lock", broken.file)
+        assertEquals("7.4.33", broken.from)
+        assertEquals("8.3", broken.to)
+    }
+
+    @Test
+    fun aPackageThatAlreadyExcludedTheCurrentRuntimeIsNotReported() {
+        val names = UpgradeCheck.run(composerLock, targets("php=8.3"), emptyList())
+            .packages.map { it.name }
+        assertTrue("old/pkg" !in names, names.toString())
+    }
+
+    @Test
+    fun aConstraintTheParserDoesNotReadIsUncheckedNotBroken() {
+        val result = UpgradeCheck.run(composerLock, targets("php=8.3"), emptyList())
+        val unread = result.unchecked.single()
+        assertEquals("composer.lock", unread.file)
+        assertEquals(listOf("odd/pkg dev-master"), unread.packages)
+    }
+
+    @Test
+    fun noPackageIsCheckedWithoutATargetOnItsRuntime() {
+        val result = UpgradeCheck.run(composerLock, targets("node=22"), emptyList())
+        assertEquals(emptyList(), result.packages)
+        assertEquals(emptyList(), result.unchecked)
+    }
+
+    @Test
+    fun aCaptureWithoutTheCurrentRuntimeCannotTellBrokenFromAlreadyBroken() {
+        val kept = composerLock.attributes.filter { it.path != "tool.php.version" }
+        val noPhp = Capsule("no-php", kept)
+        val result = UpgradeCheck.run(noPhp, targets("php=8.3"), emptyList())
+        assertEquals(emptyList(), result.packages)
+        val names = result.unchecked.flatMap { it.packages }
+        assertTrue("phpspec/prophecy" in names && "old/pkg" in names, names.toString())
+    }
+
+    @Test
+    fun npmAndPythonLocksAreCheckedAndRegistryOnlyLocksAreListedUnchecked() {
+        val node = UpgradeCheck.run(
+            locked(
+                Triple("tool.node.version", "18.19.0", "tool"),
+                Triple("project.npm.left-pad", "1.3.0", "package-lock.json"),
+                Triple("project.npm.left-pad.requires.node", ">=14 <20", "package-lock.json"),
+                Triple("project.npm.yarned", "1.0.0", "yarn.lock"),
+            ),
+            targets("node=22"),
+            emptyList(),
+        )
+        assertEquals(listOf("left-pad"), node.packages.map { it.name })
+        assertEquals(listOf("yarn.lock"), node.unchecked.map { it.file })
+        val python = UpgradeCheck.run(
+            locked(
+                Triple("tool.python.version", "3.11.4", "tool"),
+                Triple("project.python.numpy", "1.24.0", "poetry.lock"),
+                Triple("project.python.numpy.requires.python", ">=3.8,<3.12", "poetry.lock"),
+                Triple("project.python.flask", "3.0.3", "requirements.txt"),
+            ),
+            targets("python=3.12"),
+            emptyList(),
+        )
+        assertEquals(listOf("numpy"), python.packages.map { it.name })
+        assertEquals(listOf("requirements.txt"), python.unchecked.map { it.file })
+        val jvm = UpgradeCheck.run(
+            locked(
+                Triple("tool.java.version", "17.0.9", "tool"),
+                Triple("project.gradle.org.jetbrains:annotations", "24.0.0", "build.gradle.kts"),
+            ),
+            targets("java=21"),
+            emptyList(),
+        )
+        assertEquals(listOf("build.gradle.kts"), jvm.unchecked.map { it.file })
+    }
+
+    @Test
+    fun packagesAppearInTextAndJson() {
+        val result = UpgradeCheck.run(composerLock, targets("php=8.3"), emptyList())
+        val text = result.text()
+        assertTrue("Will break: locked packages (1)" in text, text)
+        assertTrue("phpspec/prophecy 1.12.2 (composer, composer.lock)" in text, text)
+        assertTrue("requires php $prophecy; php 8.3 is outside it" in text, text)
+        assertTrue("Unchecked package constraints (1)" in text, text)
+        val json = CanonicalJson.parse(result.json()) as JsonObject
+        val row = json.require("will-break-packages").array().single() as JsonObject
+        assertEquals("phpspec/prophecy", row.require("package").string())
+        assertEquals(prophecy, row.require("constraint").string())
+        assertEquals(1, json.require("unchecked-packages").array().size)
+    }
+    // #endregion
 }
