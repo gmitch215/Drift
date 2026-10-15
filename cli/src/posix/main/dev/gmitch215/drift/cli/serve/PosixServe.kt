@@ -2,6 +2,8 @@
 
 package dev.gmitch215.drift.cli.serve
 
+import dev.gmitch215.drift.cli.isPosixDirectory
+import dev.gmitch215.drift.cli.pathPrefixes
 import dev.gmitch215.drift.cli.readBinaryFile
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointerVar
@@ -10,7 +12,6 @@ import kotlinx.cinterop.StableRef
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.allocArray
-import kotlinx.cinterop.asStableRef
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.cstr
 import kotlinx.cinterop.get
@@ -29,7 +30,6 @@ import platform.posix.AF_INET6
 import platform.posix.AF_UNSPEC
 import platform.posix.IPV6_V6ONLY
 import platform.posix.POLLIN
-import platform.posix.SIGINT
 import platform.posix.SIGPIPE
 import platform.posix.SIGTERM
 import platform.posix.SIG_IGN
@@ -41,7 +41,6 @@ import platform.posix.accept
 import platform.posix.addrinfo
 import platform.posix.bind
 import platform.posix.close
-import platform.posix.closedir
 import platform.posix.errno
 import platform.posix.free
 import platform.posix.freeaddrinfo
@@ -49,7 +48,6 @@ import platform.posix.getaddrinfo
 import platform.posix.getsockname
 import platform.posix.listen
 import platform.posix.mkdir
-import platform.posix.opendir
 import platform.posix.poll
 import platform.posix.pollfd
 import platform.posix.pthread_create
@@ -69,14 +67,11 @@ import platform.posix.stat
 import platform.posix.strerror
 import platform.posix.timeval
 import platform.posix.usleep
-import kotlin.concurrent.AtomicInt
 
 private const val IO_SECONDS = 5
 private const val BACKLOG = 128
 private const val SOCK_STREAM_ID = 1
 private const val IPPROTO_IPV6_ID = 41
-
-private val interrupt = AtomicInt(0)
 
 private fun reason() = strerror(errno)?.toKString() ?: "error $errno"
 
@@ -121,16 +116,12 @@ private class FdConnection(private val fd: Int, private val tls: TlsHandshake?) 
     override fun write(buffer: ByteArray, offset: Int, length: Int): Boolean {
         val ssl = session()
         if (tls != null && ssl == null) return false
-        var at = 0
-        while (at < length) {
-            val n = buffer.usePinned {
-                ssl?.write(it.addressOf(offset + at), length - at)
-                    ?: send(fd, it.addressOf(offset + at), (length - at).convert(), 0).toInt()
+        return sendAll(length) { at, left ->
+            buffer.usePinned {
+                ssl?.write(it.addressOf(offset + at), left)
+                    ?: send(fd, it.addressOf(offset + at), left.convert(), 0).toInt()
             }
-            if (n <= 0) return false
-            at += n
         }
-        return true
     }
 
     override fun close() {
@@ -220,11 +211,7 @@ private object PosixFiles : SiteFiles {
         }
     }
 
-    override fun isDirectory(path: String): Boolean {
-        val dir = opendir(path) ?: return false
-        closedir(dir)
-        return true
-    }
+    override fun isDirectory(path: String) = isPosixDirectory(path)
 
     override fun read(path: String): ByteArray? {
         if (isDirectory(path)) return null
@@ -236,7 +223,7 @@ private object PosixFiles : SiteFiles {
 internal fun processAlive(pid: Int): Boolean {
     if (platform.posix.kill(pid, 0) != 0) return false
     val stat = readBinaryFile("/proc/$pid/stat")?.decodeToString() ?: return true
-    return stat.substringAfterLast(") ").firstOrNull() != 'Z'
+    return !isZombie(stat)
 }
 
 private class PosixChild(private val pid: Int) : Child {
@@ -249,8 +236,6 @@ private class PosixChild(private val pid: Int) : Child {
         platform.posix.kill(pid, platform.posix.SIGKILL)
     }
 }
-
-private fun quoted(text: String) = "'" + text.replace("'", "'\\''") + "'"
 
 private object PosixServe : ServeSystem {
     override val files = PosixFiles
@@ -265,26 +250,8 @@ private object PosixServe : ServeSystem {
     override fun listen(bind: Bind, port: Int, tls: TlsFiles?): Acceptor {
         signal(SIGPIPE, SIG_IGN)
         val handshake = tls?.let { openSsl().context(it) }
-        val all = bind == Bind.ALL
-        val fds = mutableListOf<Int>()
-        val addresses = mutableListOf<String>()
-        val first = try {
-            listener(false, all, port)
-        } catch (e: ServeFailure) {
-            throw ServeFailure(
-                "cannot listen on port $port: ${e.message}; pass --port 0 to take a free port",
-            )
-        }
-        val real = localPort(first)
-        fds += first
-        addresses += (if (all) "0.0.0.0" else "127.0.0.1") + ":$real"
-        try {
-            fds += listener(true, all, real)
-            addresses += (if (all) "[::]" else "[::1]") + ":$real"
-        } catch (_: ServeFailure) {
-            // no IPv6 loopback here; IPv4 alone still serves localhost
-        }
-        return PosixAcceptor(fds, addresses, real, handshake)
+        val listeners = openListeners(bind, port, ::listener, ::localPort)
+        return PosixAcceptor(listeners.sockets, listeners.addresses, listeners.port, handshake)
     }
 
     override fun spawn(block: () -> Unit): Boolean {
@@ -295,12 +262,7 @@ private object PosixServe : ServeSystem {
                 thread.ptr,
                 null,
                 staticCFunction { arg ->
-                    val holder = arg!!.asStableRef<() -> Unit>()
-                    try {
-                        holder.get().invoke()
-                    } finally {
-                        holder.dispose()
-                    }
+                    runBlock(arg)
                     null
                 },
                 ref.asCPointer(),
@@ -319,14 +281,11 @@ private object PosixServe : ServeSystem {
     }
 
     override fun trapInterrupt() {
-        interrupt.value = 0
-        val handler = staticCFunction<Int, Unit> { interrupt.value = 1 }
-        signal(SIGINT, handler)
-        signal(SIGTERM, handler)
+        trapInterruptSignals()
         signal(SIGPIPE, SIG_IGN)
     }
 
-    override fun interrupted() = interrupt.value != 0
+    override fun interrupted() = interruptSignalled()
 
     override fun resolve(name: String): List<String> = memScoped {
         val hints = alloc<addrinfo>()
@@ -361,17 +320,14 @@ private object PosixServe : ServeSystem {
     }
 
     override fun makePrivateDirectory(path: String): Boolean {
-        val parts = path.split('/')
-        for (i in 1..parts.size) {
-            val prefix = parts.take(i).joinToString("/")
+        for (prefix in pathPrefixes(path, '/', 1)) {
             if (prefix.isNotEmpty()) mkdir(prefix, 448.convert())
         }
         return PosixFiles.isDirectory(path)
     }
 
     override fun start(argv: List<String>): Child? {
-        val line = argv.joinToString(" ") { quoted(it) } + " >/dev/null 2>&1 & echo \$!"
-        val pipe = platform.posix.popen(line, "r") ?: return null
+        val pipe = platform.posix.popen(backgroundLine(argv), "r") ?: return null
         val pid = memScoped {
             val text = allocArray<ByteVar>(32)
             val read = platform.posix.fgets(text, 32, pipe)?.toKString()?.trim()?.toIntOrNull()

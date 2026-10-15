@@ -18,7 +18,6 @@ import java.security.Signature
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 import java.security.spec.PKCS8EncodedKeySpec
-import java.util.Base64
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -140,16 +139,6 @@ private fun matches(key: PrivateKey, cert: X509Certificate): Boolean = try {
     }
 } catch (_: GeneralSecurityException) {
     false
-}
-
-private fun pemBlock(text: String, label: String): ByteArray? {
-    val begin = "-----BEGIN $label-----"
-    val start = text.indexOf(begin)
-    if (start < 0) return null
-    val end = text.indexOf("-----END $label-----", start)
-    if (end < 0) return null
-    val body = text.substring(start + begin.length, end).filterNot { it.isWhitespace() }
-    return Base64.getDecoder().decode(body)
 }
 
 internal fun sslContext(tls: TlsFiles): SSLContext {

@@ -2,6 +2,7 @@
 
 package dev.gmitch215.drift.cli
 
+import dev.gmitch215.drift.host.readAllBytes
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.convert
@@ -17,9 +18,7 @@ internal fun posixWriteText(path: String, text: String, mkdir: (String) -> Unit)
     posixWriteBytes(path, text.encodeToByteArray(), mkdir)
 
 internal fun posixWriteBytes(path: String, bytes: ByteArray, mkdir: (String) -> Unit): Boolean {
-    val parts = path.split('/')
-    for (i in 1 until parts.size) {
-        val dir = parts.take(i).joinToString("/")
+    for (dir in pathPrefixes(path, '/', 1, parentsOnly = true)) {
         if (dir.isNotEmpty()) mkdir(dir)
     }
     val file = fopen(path, "wb") ?: return false
@@ -33,26 +32,15 @@ internal fun posixWriteBytes(path: String, bytes: ByteArray, mkdir: (String) -> 
 
 actual fun readBinaryFile(path: String): ByteArray? {
     val file = fopen(path, "rb") ?: return null
-    val chunks = ArrayList<ByteArray>()
-    val buffer = ByteArray(65536)
     try {
-        while (true) {
-            val n = buffer.usePinned {
+        return readAllBytes(65536) { buffer ->
+            buffer.usePinned {
                 fread(it.addressOf(0), 1.convert(), buffer.size.convert(), file).toInt()
             }
-            if (n <= 0) break
-            chunks += buffer.copyOf(n)
         }
     } finally {
         fclose(file)
     }
-    val all = ByteArray(chunks.sumOf { it.size })
-    var at = 0
-    for (c in chunks) {
-        c.copyInto(all, at)
-        at += c.size
-    }
-    return all
 }
 
 actual fun writeStdout(text: String) {

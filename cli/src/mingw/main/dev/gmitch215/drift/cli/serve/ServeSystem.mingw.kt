@@ -2,7 +2,11 @@
 
 package dev.gmitch215.drift.cli.serve
 
+import dev.gmitch215.drift.cli.PATH_BUFFER
+import dev.gmitch215.drift.cli.isWindowsDirectory
+import dev.gmitch215.drift.cli.pathPrefixes
 import dev.gmitch215.drift.cli.readBinaryFile
+import dev.gmitch215.drift.cli.wideString
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointerVar
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -12,7 +16,6 @@ import kotlinx.cinterop.UShortVar
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.allocArray
-import kotlinx.cinterop.asStableRef
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.get
 import kotlinx.cinterop.memScoped
@@ -29,8 +32,6 @@ import platform.posix.AF_INET
 import platform.posix.AF_INET6
 import platform.posix.AF_UNSPEC
 import platform.posix.INVALID_SOCKET
-import platform.posix.SIGINT
-import platform.posix.SIGTERM
 import platform.posix.SOCKET
 import platform.posix.WSADATA
 import platform.posix.WSAGetLastError
@@ -44,7 +45,6 @@ import platform.posix.listen
 import platform.posix.recv
 import platform.posix.send
 import platform.posix.setsockopt
-import platform.posix.signal
 import platform.posix.sockaddr_in
 import platform.posix.socket
 import platform.posix.timeval
@@ -52,7 +52,6 @@ import platform.windows.CloseHandle
 import platform.windows.CreateDirectoryW
 import platform.windows.CreateFileW
 import platform.windows.CreateThread
-import platform.windows.GetFileAttributesW
 import platform.windows.GetFinalPathNameByHandleW
 import platform.windows.OPEN_EXISTING
 import platform.windows.Sleep
@@ -60,7 +59,6 @@ import platform.windows.addrinfo
 import platform.windows.freeaddrinfo
 import platform.windows.getaddrinfo
 import platform.windows.select
-import kotlin.concurrent.AtomicInt
 
 private const val IO_MILLIS = 5000
 private const val BACKLOG = 128
@@ -73,13 +71,9 @@ private const val SOL_SOCKET_ID = 0xffff
 private const val SO_REUSEADDR_ID = 4
 private const val SO_RCVTIMEO_ID = 0x1006
 private const val SO_SNDTIMEO_ID = 0x1005
-private const val INVALID_ATTRIBUTES = 0xFFFFFFFFu
-private const val DIRECTORY = 0x10u
 private const val FILE_SHARE_ALL = 7u
 private const val BACKUP_SEMANTICS = 0x02000000u
-private const val PATH_BUFFER = 32768
 
-private val interrupt = AtomicInt(0)
 private var started = false
 
 private fun startup() {
@@ -101,14 +95,11 @@ private class SocketConnection(private val fd: SOCKET) : Connection {
         return if (n <= 0) -1 else n
     }
 
-    override fun write(buffer: ByteArray, offset: Int, length: Int): Boolean {
-        var at = 0
-        while (at < length) {
-            val n = buffer.usePinned { send(fd, it.addressOf(offset + at), length - at, 0) }
-            if (n <= 0) return false
-            at += n
-        }
-        return true
+    override fun write(buffer: ByteArray, offset: Int, length: Int): Boolean = sendAll(length) {
+            at,
+            left,
+        ->
+        buffer.usePinned { send(fd, it.addressOf(offset + at), left, 0) }
     }
 
     override fun close() {
@@ -186,16 +177,9 @@ private fun localPort(fd: SOCKET): Int = memScoped {
     swap(address.sin_port.toInt())
 }
 
-private fun wide(buffer: kotlinx.cinterop.CPointer<UShortVar>, length: Int) =
-    CharArray(length) { buffer[it].toInt().toChar() }.concatToString()
-
 private object MingwFiles : SiteFiles {
     override val separator = '\\'
     override val ignoreCase = true
-
-    private fun attributes(path: String): UInt = memScoped {
-        GetFileAttributesW(path.wcstr.ptr.reinterpret()).convert()
-    }
 
     override fun canonical(path: String): String? = memScoped {
         val handle = CreateFileW(
@@ -213,7 +197,7 @@ private object MingwFiles : SiteFiles {
         val n = GetFinalPathNameByHandleW(handle, buffer.reinterpret(), size, 0u).toInt()
         CloseHandle(handle)
         if (n <= 0 || n >= PATH_BUFFER) return null
-        val text = wide(buffer, n)
+        val text = wideString(buffer, n)
         when {
             text.startsWith("\\\\?\\UNC\\") -> "\\\\" + text.removePrefix("\\\\?\\UNC\\")
             text.startsWith("\\\\?\\") -> text.removePrefix("\\\\?\\")
@@ -221,10 +205,7 @@ private object MingwFiles : SiteFiles {
         }
     }
 
-    override fun isDirectory(path: String): Boolean {
-        val a = attributes(path)
-        return a != INVALID_ATTRIBUTES && a and DIRECTORY != 0u
-    }
+    override fun isDirectory(path: String) = isWindowsDirectory(path)
 
     override fun read(path: String): ByteArray? {
         if (isDirectory(path)) return null
@@ -238,24 +219,8 @@ private object MingwServe : ServeSystem {
 
     override fun listen(bind: Bind, port: Int, tls: TlsFiles?): Acceptor {
         if (tls != null) throw ServeFailure(tlsUnavailable)
-        val all = bind == Bind.ALL
-        val first = try {
-            listener(false, all, port)
-        } catch (e: ServeFailure) {
-            throw ServeFailure(
-                "cannot listen on port $port: ${e.message}; pass --port 0 to take a free port",
-            )
-        }
-        val real = localPort(first)
-        val sockets = mutableListOf(first)
-        val addresses = mutableListOf((if (all) "0.0.0.0" else "127.0.0.1") + ":$real")
-        try {
-            sockets += listener(true, all, real)
-            addresses += (if (all) "[::]" else "[::1]") + ":$real"
-        } catch (_: ServeFailure) {
-            // no IPv6 loopback here; IPv4 alone still serves localhost
-        }
-        return SocketAcceptor(sockets, addresses, real)
+        val listeners = openListeners(bind, port, ::listener, ::localPort)
+        return SocketAcceptor(listeners.sockets, listeners.addresses, listeners.port)
     }
 
     override fun spawn(block: () -> Unit): Boolean {
@@ -264,12 +229,7 @@ private object MingwServe : ServeSystem {
             null,
             0u,
             staticCFunction { arg ->
-                val holder = arg!!.asStableRef<() -> Unit>()
-                try {
-                    holder.get().invoke()
-                } finally {
-                    holder.dispose()
-                }
+                runBlock(arg)
                 0u
             },
             ref.asCPointer(),
@@ -282,14 +242,9 @@ private object MingwServe : ServeSystem {
 
     override fun sleep(millis: Int) = Sleep(millis.convert())
 
-    override fun trapInterrupt() {
-        interrupt.value = 0
-        val handler = staticCFunction<Int, Unit> { interrupt.value = 1 }
-        signal(SIGINT, handler)
-        signal(SIGTERM, handler)
-    }
+    override fun trapInterrupt() = trapInterruptSignals()
 
-    override fun interrupted() = interrupt.value != 0
+    override fun interrupted() = interruptSignalled()
 
     override fun resolve(name: String): List<String> = memScoped {
         startup()
@@ -321,9 +276,7 @@ private object MingwServe : ServeSystem {
     override fun mode(path: String): Int? = null
 
     override fun makePrivateDirectory(path: String): Boolean {
-        val parts = path.split('\\')
-        for (i in 2..parts.size) {
-            val prefix = parts.take(i).joinToString("\\")
+        for (prefix in pathPrefixes(path, '\\', 2)) {
             memScoped { CreateDirectoryW(prefix.wcstr.ptr.reinterpret(), null) }
         }
         return MingwFiles.isDirectory(path)

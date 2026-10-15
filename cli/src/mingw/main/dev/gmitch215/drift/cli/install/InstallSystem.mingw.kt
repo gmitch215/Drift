@@ -2,6 +2,11 @@
 
 package dev.gmitch215.drift.cli.install
 
+import dev.gmitch215.drift.cli.INVALID_ATTRIBUTES
+import dev.gmitch215.drift.cli.PATH_BUFFER
+import dev.gmitch215.drift.cli.fileAttributes
+import dev.gmitch215.drift.cli.isWindowsDirectory
+import dev.gmitch215.drift.cli.wideString
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ShortVar
@@ -28,7 +33,6 @@ import platform.windows.DETACHED_PROCESS
 import platform.windows.DWORDVar
 import platform.windows.DeleteFileW
 import platform.windows.GetCurrentProcess
-import platform.windows.GetFileAttributesW
 import platform.windows.GetModuleFileNameW
 import platform.windows.GetTokenInformation
 import platform.windows.HANDLEVar
@@ -45,8 +49,6 @@ import platform.windows.RemoveDirectoryW
 import platform.windows.STARTUPINFOW
 import platform.windows.SendMessageTimeoutW
 
-private const val INVALID_ATTRIBUTES = 0xFFFFFFFFu
-private const val DIRECTORY = 0x10u
 private const val READ_ONLY = 0x01u
 private const val MOVE_REPLACE = 1u
 private const val TOKEN_QUERY = 0x0008u
@@ -55,7 +57,6 @@ private const val KEY_READ_WRITE = 0x000F003Fu
 private const val SETTING_CHANGE = 0x001Au
 private const val ABORT_IF_HUNG = 2u
 private const val NOT_FOUND = 2
-private const val PATH_BUFFER = 32768
 
 private val userRoot get() = (0x80000001.toInt().toLong()).toCPointer<platform.windows.HKEY__>()
 private val machineRoot get() = (0x80000002.toInt().toLong()).toCPointer<platform.windows.HKEY__>()
@@ -71,7 +72,7 @@ private object MingwInstall : NativeInstall({ path, mode ->
     override fun selfPath(): String? = memScoped {
         val buffer = allocArray<UShortVar>(PATH_BUFFER)
         val n = GetModuleFileNameW(null, buffer.reinterpret(), PATH_BUFFER.convert()).toInt()
-        if (n <= 0 || n >= PATH_BUFFER) null else text(buffer, n)
+        if (n <= 0 || n >= PATH_BUFFER) null else wideString(buffer, n)
     }
 
     override fun isPrivileged(): Boolean = memScoped {
@@ -92,19 +93,12 @@ private object MingwInstall : NativeInstall({ path, mode ->
         ok != 0 && elevated.value != 0u
     }
 
-    private fun attributes(path: String): UInt = memScoped {
-        GetFileAttributesW(path.wcstr.ptr.reinterpret()).convert()
-    }
+    override fun exists(path: String) = fileAttributes(path) != INVALID_ATTRIBUTES
 
-    override fun exists(path: String) = attributes(path) != INVALID_ATTRIBUTES
-
-    override fun isDirectory(path: String): Boolean {
-        val a = attributes(path)
-        return a != INVALID_ATTRIBUTES && a and DIRECTORY != 0u
-    }
+    override fun isDirectory(path: String) = isWindowsDirectory(path)
 
     override fun canWrite(directory: String): Boolean {
-        val a = attributes(directory)
+        val a = fileAttributes(directory)
         return a != INVALID_ATTRIBUTES && a and READ_ONLY == 0u
     }
 
@@ -153,7 +147,7 @@ private object MingwInstall : NativeInstall({ path, mode ->
             if (got != 0) return null
             val chars = size.value.toInt() / 2
             val end = if (chars > 0 && data[chars - 1] == 0.toUShort()) chars - 1 else chars
-            RegistryValue(type.value.toInt(), text(data, end))
+            RegistryValue(type.value.toInt(), wideString(data, end))
         } finally {
             RegCloseKey(key.value)
         }
@@ -198,13 +192,11 @@ private object MingwInstall : NativeInstall({ path, mode ->
     }
 
     override fun removeAfterExit(paths: List<String>, directories: List<String>): Boolean {
-        if ((paths + directories).any { it.contains('%') || it.contains('"') }) return false
-        return spawnCleanup(paths, directories)
+        val line = cleanupCommand(paths, directories) ?: return false
+        return spawnCleanup(line)
     }
 
-    private fun spawnCleanup(paths: List<String>, directories: List<String>): Boolean = memScoped {
-        val commands = paths.map { "del /f /q \"$it\"" } + directories.map { "rmdir \"$it\"" }
-        val line = "cmd.exe /d /s /c \"ping -n 3 127.0.0.1 >nul & ${commands.joinToString(" & ")}\""
+    private fun spawnCleanup(line: String): Boolean = memScoped {
         val startup = alloc<STARTUPINFOW>()
         startup.cb = sizeOf<STARTUPINFOW>().convert()
         val process = alloc<PROCESS_INFORMATION>()
@@ -237,9 +229,6 @@ private object MingwInstall : NativeInstall({ path, mode ->
             out,
         ).convert()
     }
-
-    private fun text(buffer: CPointer<UShortVar>, length: Int): String =
-        CharArray(length) { buffer[it].toInt().toChar() }.concatToString()
 }
 
 actual fun systemInstall(): InstallSystem = MingwInstall

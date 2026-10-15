@@ -2,14 +2,11 @@
 
 package dev.gmitch215.drift.cli.install
 
-import kotlinx.cinterop.ByteVar
+import dev.gmitch215.drift.host.readAllBytes
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.allocArray
 import kotlinx.cinterop.convert
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.readBytes
 import kotlinx.cinterop.usePinned
 import platform.posix.FILE
 import platform.posix.fclose
@@ -24,29 +21,16 @@ internal abstract class NativeInstall(private val open: (String, String) -> CPoi
 
     override fun read(path: String): ByteArray? {
         val file = open(path, "rb") ?: return null
-        val chunks = ArrayList<ByteArray>()
-        val failed: Boolean
         try {
-            memScoped {
-                val buffer = allocArray<ByteVar>(CHUNK)
-                while (true) {
-                    val n = fread(buffer, 1.convert(), CHUNK.convert(), file).toInt()
-                    if (n <= 0) break
-                    chunks += buffer.readBytes(n)
+            val bytes = readAllBytes(CHUNK) { buffer ->
+                buffer.usePinned {
+                    fread(it.addressOf(0), 1.convert(), buffer.size.convert(), file).toInt()
                 }
             }
-            failed = ferror(file) != 0
+            return if (ferror(file) != 0) null else bytes
         } finally {
             fclose(file)
         }
-        if (failed) return null
-        val all = ByteArray(chunks.sumOf { it.size })
-        var at = 0
-        for (chunk in chunks) {
-            chunk.copyInto(all, at)
-            at += chunk.size
-        }
-        return all
     }
 
     override fun write(path: String, bytes: ByteArray, executable: Boolean): Boolean {

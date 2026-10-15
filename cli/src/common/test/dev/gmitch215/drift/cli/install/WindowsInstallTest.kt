@@ -256,4 +256,19 @@ class WindowsInstallTest {
         assertEquals(0, result.statusCode, result.stderr)
         assertEquals("DRIFT-BINARY", system.text("C:\\tools\\drift\\drift.exe"))
     }
+
+    @Test
+    fun cleanupCommandDeletesFilesThenDirectoriesAfterAPause() {
+        assertEquals(
+            "cmd.exe /d /s /c \"ping -n 3 127.0.0.1 >nul & del /f /q \"C:\\a\\drift.exe\" & " +
+                "rmdir \"C:\\a\"\"",
+            cleanupCommand(listOf("C:\\a\\drift.exe"), listOf("C:\\a")),
+        )
+    }
+
+    @Test
+    fun cleanupCommandRefusesNamesThatCmdWouldExpandOrUnquote() {
+        assertNull(cleanupCommand(listOf("C:\\100%\\drift.exe"), emptyList()))
+        assertNull(cleanupCommand(emptyList(), listOf("C:\\a\"b")))
+    }
 }

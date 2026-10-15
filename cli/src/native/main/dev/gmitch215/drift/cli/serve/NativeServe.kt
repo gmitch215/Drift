@@ -1,29 +1,33 @@
+@file:OptIn(ExperimentalForeignApi::class)
+
 package dev.gmitch215.drift.cli.serve
 
-internal fun swap(value: Int) = ((value and 0xff) shl 8) or ((value shr 8) and 0xff)
+import kotlinx.cinterop.COpaquePointer
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.asStableRef
+import kotlinx.cinterop.staticCFunction
+import platform.posix.SIGINT
+import platform.posix.SIGTERM
+import platform.posix.signal
+import kotlin.concurrent.AtomicInt
 
-/** Text for 4 (IPv4) or 16 (IPv6) address bytes, with the longest zero run folded to `::`. */
-internal fun addressText(bytes: List<Int>): String {
-    if (bytes.size == 4) return bytes.joinToString(".")
-    val groups = (0 until 8).map { (bytes[it * 2] shl 8) or bytes[it * 2 + 1] }
-    var best = -1
-    var bestLength = 1
-    var at = 0
-    while (at < 8) {
-        if (groups[at] != 0) {
-            at++
-            continue
-        }
-        var end = at
-        while (end < 8 && groups[end] == 0) end++
-        if (end - at > bestLength) {
-            best = at
-            bestLength = end - at
-        }
-        at = end
+private val interrupt = AtomicInt(0)
+
+internal fun trapInterruptSignals() {
+    interrupt.value = 0
+    val handler = staticCFunction<Int, Unit> { interrupt.value = 1 }
+    signal(SIGINT, handler)
+    signal(SIGTERM, handler)
+}
+
+internal fun interruptSignalled() = interrupt.value != 0
+
+/** Runs the block behind a [kotlinx.cinterop.StableRef] a new thread was started with. */
+internal fun runBlock(arg: COpaquePointer?) {
+    val holder = arg!!.asStableRef<() -> Unit>()
+    try {
+        holder.get().invoke()
+    } finally {
+        holder.dispose()
     }
-    if (best < 0) return groups.joinToString(":") { it.toString(16) }
-    val head = groups.take(best).joinToString(":") { it.toString(16) }
-    val tail = groups.drop(best + bestLength).joinToString(":") { it.toString(16) }
-    return "$head::$tail"
 }
