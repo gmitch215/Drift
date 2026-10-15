@@ -43,4 +43,11 @@ class EnvBlockTest {
         val env = parseEnvBlock("A=1\u0000\u0000B=2\u0000\u0000".toCharArray())
         assertEquals(mapOf("A" to "1"), env)
     }
+
+    @Test
+    fun parsesTheOutputOfEnvAndSetAndTrimsCarriageReturns() {
+        val env = parseEnvOutput("A=1\r\nB=x=y\nnoise\nC=\n")
+        assertEquals(mapOf("A" to "1", "B" to "x=y", "C" to ""), env)
+        assertEquals(emptyMap(), parseEnvOutput(""))
+    }
 }

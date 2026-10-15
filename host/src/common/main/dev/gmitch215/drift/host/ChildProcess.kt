@@ -18,6 +18,17 @@ internal interface ChildProcess {
 /** Exit code of a child killed at its deadline (the `timeout(1)` convention). */
 const val TIMED_OUT_EXIT_CODE = 124
 
+/** The exit code of a `waitpid` status: the exit byte, or 128 plus the signal. */
+internal fun waitStatusCode(status: Int): Int =
+    if (status and 0x7f == 0) (status shr 8) and 0xff else 128 + (status and 0x7f)
+
+/** Whether [program] names an executable, directly or in one of the `:`-separated [path]. */
+internal fun findProgram(program: String?, path: String, executable: (String) -> Boolean): Boolean {
+    if (program.isNullOrEmpty()) return false
+    if ('/' in program) return executable(program)
+    return path.split(':').any { executable("${it.ifEmpty { "." }}/$program") }
+}
+
 private const val POLL_MILLIS = 20
 private const val CHUNK = 8192
 

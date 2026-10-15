@@ -150,3 +150,8 @@ internal fun windowsFacts(host: Host): List<Attribute> {
     f.put("hw.cpu.max-freq-mhz", value("~MHz", "REG_DWORD")?.removePrefix("0x")?.toLongOrNull(16))
     return f.list
 }
+
+internal fun windowsMemory(total: ULong, available: ULong): List<Attribute> = listOf(
+    Attribute("hw.memory.total", total.toString(), "windows"),
+    Attribute("hw.memory.available", available.toString(), "windows", Stability.VOLATILE),
+)

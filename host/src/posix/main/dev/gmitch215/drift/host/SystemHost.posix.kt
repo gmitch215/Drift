@@ -7,4 +7,4 @@ import kotlin.native.OsFamily
 import kotlin.native.Platform
 
 actual fun systemHost(): Host =
-    NativeHost(if (Platform.osFamily == OsFamily.MACOSX) "macos" else "linux", ::posixRunner)
+    nativeHost(if (Platform.osFamily == OsFamily.MACOSX) "macos" else "linux", ::posixRunner)

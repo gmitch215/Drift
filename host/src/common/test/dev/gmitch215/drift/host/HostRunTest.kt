@@ -77,4 +77,32 @@ class HostRunTest {
         lines.flush()
         assertEquals(listOf("caf\u00e9\n", "tail"), seen)
     }
+
+    @Test
+    fun waitStatusCodeReadsTheExitByteOrAddsTheSignalTo128() {
+        assertEquals(0, waitStatusCode(0))
+        assertEquals(7, waitStatusCode(7 shl 8))
+        assertEquals(255, waitStatusCode(255 shl 8))
+        assertEquals(137, waitStatusCode(9))
+        assertEquals(139, waitStatusCode(11))
+    }
+
+    @Test
+    fun findProgramChecksADirectPathOrEveryPathEntry() {
+        val seen = mutableListOf<String>()
+        val executable = { name: String ->
+            seen.add(name)
+            name == "/b/tool"
+        }
+        assertTrue(findProgram("tool", "/a:/b", executable))
+        assertEquals(listOf("/a/tool", "/b/tool"), seen)
+        assertTrue(findProgram("/b/tool", "", executable))
+        assertTrue(!findProgram("/c/tool", "/b", executable))
+        assertTrue(!findProgram("tool", "/a:/c", executable))
+        assertTrue(!findProgram(null, "/b", executable))
+        assertTrue(!findProgram("", "/b", executable))
+        seen.clear()
+        assertTrue(!findProgram("tool", ":/c", executable))
+        assertEquals(listOf("./tool", "/c/tool"), seen)
+    }
 }

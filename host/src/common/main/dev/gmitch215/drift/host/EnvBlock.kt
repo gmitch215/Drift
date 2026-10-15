@@ -15,3 +15,8 @@ internal fun parseEnvBlock(block: CharArray): Map<String, String> {
     }
     return result.entries.sortedBy { it.key }.associate { it.key to it.value }
 }
+
+internal fun parseEnvOutput(output: String): Map<String, String> =
+    output.lines().filter { '=' in it }.associate {
+        it.substringBefore('=') to it.substringAfter('=').trimEnd('\r')
+    }

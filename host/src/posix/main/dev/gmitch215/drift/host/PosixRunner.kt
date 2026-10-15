@@ -70,12 +70,10 @@ internal fun posixRunner(
     pumpUntilExit(PosixChild(pid, fds[0]), timeoutMillis, onOutput)
 }
 
-private fun resolves(program: String?): Boolean {
-    if (program.isNullOrEmpty()) return false
-    if ('/' in program) return access(program, X_OK) == 0
-    val path = getenv("PATH")?.toKString() ?: "/usr/bin:/bin"
-    return path.split(':').any { access("${it.ifEmpty { "." }}/$program", X_OK) == 0 }
-}
+private fun resolves(program: String?): Boolean =
+    findProgram(program, getenv("PATH")?.toKString() ?: "/usr/bin:/bin") {
+        access(it, X_OK) == 0
+    }
 
 private class PosixChild(private val pid: Int, private val fd: Int) : ChildProcess {
     private var reaped: Int? = null
@@ -94,11 +92,7 @@ private class PosixChild(private val pid: Int, private val fd: Int) : ChildProce
             val r = waitpid(pid, status.ptr, WNOHANG)
             if (r == 0) return null
             val s = status.value
-            reaped = when {
-                r < 0 -> -1
-                s and 0x7f == 0 -> (s shr 8) and 0xff
-                else -> 128 + (s and 0x7f)
-            }
+            reaped = if (r < 0) -1 else waitStatusCode(s)
         }
         return reaped
     }

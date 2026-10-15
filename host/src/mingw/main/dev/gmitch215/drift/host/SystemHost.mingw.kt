@@ -3,7 +3,6 @@
 package dev.gmitch215.drift.host
 
 import dev.gmitch215.drift.model.Attribute
-import dev.gmitch215.drift.model.Stability
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.UShortVar
 import kotlinx.cinterop.addressOf
@@ -57,28 +56,16 @@ private fun memory(): List<Attribute> = memScoped {
     if (GlobalMemoryStatusEx(status.ptr) == 0) {
         emptyList()
     } else {
-        listOf(
-            Attribute("hw.memory.total", status.ullTotalPhys.toString(), "windows"),
-            Attribute(
-                "hw.memory.available",
-                status.ullAvailPhys.toString(),
-                "windows",
-                Stability.VOLATILE,
-            ),
-        )
+        windowsMemory(status.ullTotalPhys, status.ullAvailPhys)
     }
 }
 
 private fun environment(): Map<String, String>? {
     val block = GetEnvironmentStringsW() ?: return null
     try {
-        val chars = ArrayList<Char>()
-        var i = 0
-        while (!(block[i] == 0.toUShort() && block[i + 1] == 0.toUShort())) {
-            chars += block[i].toInt().toChar()
-            i++
-        }
-        return parseEnvBlock(chars.toCharArray())
+        var n = 0
+        while (!(block[n] == 0.toUShort() && block[n + 1] == 0.toUShort())) n++
+        return parseEnvBlock(CharArray(n) { block[it].toInt().toChar() })
     } finally {
         FreeEnvironmentStringsW(block)
     }
@@ -191,4 +178,4 @@ private fun createProcessRun(
     )
 }
 
-actual fun systemHost(): Host = NativeHost("mingw", ::createProcessRun, ::memory, ::environment)
+actual fun systemHost(): Host = nativeHost("mingw", ::createProcessRun, ::memory, ::environment)

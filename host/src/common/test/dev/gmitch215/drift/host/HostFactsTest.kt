@@ -172,4 +172,12 @@ class HostFactsTest {
         assertTrue(FakeHost().facts().isEmpty())
         assertTrue(systemHost().facts().all { it.path.isNotBlank() && it.value.isNotBlank() })
     }
+
+    @Test
+    fun windowsMemoryReportsTotalAndVolatileAvailable() {
+        val facts = windowsMemory(16UL, 5UL).associateBy { it.path }
+        assertEquals("16", facts.getValue("hw.memory.total").value)
+        assertEquals("5", facts.getValue("hw.memory.available").value)
+        assertEquals(Stability.VOLATILE, facts.getValue("hw.memory.available").stability)
+    }
 }

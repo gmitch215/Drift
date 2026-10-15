@@ -3,88 +3,40 @@
 package dev.gmitch215.drift.host
 
 import dev.gmitch215.drift.model.Attribute
-import kotlinx.cinterop.ByteVar
-import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.allocArray
+import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.convert
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.readBytes
+import kotlinx.cinterop.usePinned
 import platform.posix.fclose
 import platform.posix.fopen
 import platform.posix.fread
 import kotlin.experimental.ExperimentalNativeApi
-import kotlin.native.OsFamily
 import kotlin.native.Platform
 
-internal class NativeHost(
-    override val platform: String,
-    private val runCommand: (List<String>, Long?, (String) -> Unit) -> CommandResult?,
-    private val extraFacts: () -> List<Attribute> = { emptyList() },
-    private val nativeEnv: () -> Map<String, String>? = { null },
-) : Host {
-    private val windows = Platform.osFamily == OsFamily.WINDOWS
+private const val CHUNK = 8192
 
-    override val capabilities = Capability.entries.toSet()
-    override val os = normalizeOs(Platform.osFamily.name)
-    override val arch = Platform.cpuArchitecture.name.lowercase()
-
-    override fun env(): Map<String, String> {
-        nativeEnv()?.let { return it }
-        val result =
-            run(if (windows) listOf("cmd", "/c", "set") else listOf("env")) ?: return emptyMap()
-        return result.output.lines().filter { '=' in it }.associate {
-            it.substringBefore('=') to it.substringAfter('=').trimEnd('\r')
-        }
-    }
-
-    override fun facts(): List<Attribute> = when (platform) {
-        "linux" -> linuxFacts(this)
-        "macos" -> macosFacts(this)
-        "mingw" -> windowsFacts(this) + extraFacts()
-        else -> emptyList()
-    }
-
-    override fun readText(path: String): String? {
-        val file = fopen(path, "rb") ?: return null
-        val bytes = try {
-            readAll { buf, size -> fread(buf, 1.convert(), size.convert(), file).toInt() }
-        } finally {
-            fclose(file)
-        }
-        return bytes.decodeToString()
-    }
-
-    override fun run(argv: List<String>): CommandResult? = collect(argv)
-
-    override fun run(
-        argv: List<String>,
-        timeoutMillis: Long?,
-        onOutput: (String) -> Unit,
-    ): CommandResult? = runCommand(argv, timeoutMillis, onOutput)
-
-    private fun readAll(read: (CPointer<ByteVar>, Int) -> Int): ByteArray {
-        val out = ArrayList<ByteArray>()
-        var total = 0
-        memScoped {
-            val buf = allocArray<ByteVar>(CHUNK)
-            while (true) {
-                val n = read(buf, CHUNK)
-                if (n <= 0) break
-                out += buf.readBytes(n)
-                total += n
-            }
-        }
-        val all = ByteArray(total)
-        var at = 0
-        for (part in out) {
-            part.copyInto(all, at)
-            at += part.size
-        }
-        return all
-    }
-
-    private companion object {
-        const val CHUNK = 8192
+private fun readFile(path: String): String? {
+    val file = fopen(path, "rb") ?: return null
+    try {
+        return readAllBytes(CHUNK) { buf ->
+            buf.usePinned { fread(it.addressOf(0), 1.convert(), buf.size.convert(), file).toInt() }
+        }.decodeToString()
+    } finally {
+        fclose(file)
     }
 }
+
+internal fun nativeHost(
+    platform: String,
+    runCommand: (List<String>, Long?, (String) -> Unit) -> CommandResult?,
+    extraFacts: () -> List<Attribute> = { emptyList() },
+    nativeEnv: () -> Map<String, String>? = { null },
+): Host = ProcessHost(
+    platform,
+    normalizeOs(Platform.osFamily.name),
+    Platform.cpuArchitecture.name.lowercase(),
+    ::readFile,
+    runCommand,
+    extraFacts,
+    nativeEnv,
+)
