@@ -78,3 +78,173 @@ templates:
         path: cgroup.cpu.max
       - dimension: env
         path: env.MALLOC_ARENA_MAX
+
+  - id: memory-jvm-heap-default
+    title: The default JVM heap is a quarter of the container limit and a 256 KB block list outgrows it
+    dimension: memory
+    instances: 3
+    variants:
+      - mb: "120"
+        red_memory: 400m
+      - mb: "150"
+        red_memory: 512m
+      - mb: "140"
+        red_memory: 256m
+    runtime: java
+    program: |
+      import java.util.ArrayList;
+      import java.util.List;
+
+      public class Prog {
+          public static void main(String[] args) {
+              if (!"1".equals(System.getenv("BENCH_FLAKE"))) {
+                  System.out.println("ok");
+                  return;
+              }
+              List<byte[]> blocks = new ArrayList<>();
+              for (int i = 0; i < {{mb}} * 4; i++) {
+                  blocks.add(new byte[256 * 1024]);
+              }
+              System.out.println("held " + blocks.size());
+          }
+      }
+    signature: "OutOfMemoryError"
+    base:
+      image: "eclipse-temurin:17"
+    green:
+      memory: 1g
+    red:
+      memory: "{{red_memory}}"
+    cause:
+      dimension: memory
+      path: cgroup.memory.max
+      attribute: memory limit
+      direction: lower
+
+  - id: memory-jvm-heap-decoy
+    title: The same JVM heap load with a CPU limit and a log level changed beside the memory limit
+    dimension: memory
+    instances: 2
+    variants:
+      - red_cpus: "1"
+        red_level: debug
+      - red_cpus: "1.5"
+        red_level: trace
+    runtime: java
+    program: |
+      import java.util.ArrayList;
+      import java.util.List;
+
+      public class Prog {
+          public static void main(String[] args) {
+              if (!"1".equals(System.getenv("BENCH_FLAKE"))) {
+                  System.out.println("ok");
+                  return;
+              }
+              List<byte[]> blocks = new ArrayList<>();
+              for (int i = 0; i < 150 * 4; i++) {
+                  blocks.add(new byte[256 * 1024]);
+              }
+              System.out.println("held " + blocks.size());
+          }
+      }
+    signature: "OutOfMemoryError"
+    base:
+      image: "eclipse-temurin:17"
+    green:
+      memory: 1g
+      cpus: "2"
+      env:
+        LOG_LEVEL: info
+    red:
+      memory: 512m
+      cpus: "{{red_cpus}}"
+      env:
+        LOG_LEVEL: "{{red_level}}"
+    cause:
+      dimension: memory
+      path: cgroup.memory.max
+      attribute: memory limit
+      direction: lower
+    decoys:
+      - dimension: cpu-limit
+        path: cgroup.cpu.max
+      - dimension: env
+        path: env.LOG_LEVEL
+
+  - id: memory-jvm-xmx-env
+    title: A maximum heap option in JAVA_TOOL_OPTIONS is smaller than the block list the program holds
+    dimension: memory
+    instances: 2
+    variants:
+      - red_xmx: 64m
+      - red_xmx: 96m
+      - red_xmx: 48m
+    runtime: java
+    program: |
+      import java.util.ArrayList;
+      import java.util.List;
+
+      public class Prog {
+          public static void main(String[] args) {
+              if (!"1".equals(System.getenv("BENCH_FLAKE"))) {
+                  System.out.println("ok");
+                  return;
+              }
+              List<byte[]> blocks = new ArrayList<>();
+              for (int i = 0; i < 150 * 4; i++) {
+                  blocks.add(new byte[256 * 1024]);
+              }
+              System.out.println("held " + blocks.size());
+          }
+      }
+    signature: "OutOfMemoryError"
+    base:
+      image: "eclipse-temurin:17"
+      memory: 1g
+    green:
+      env:
+        JAVA_TOOL_OPTIONS: "-Xmx512m"
+    red:
+      env:
+        JAVA_TOOL_OPTIONS: "-Xmx{{red_xmx}}"
+    cause:
+      dimension: memory
+      path: env.JAVA_TOOL_OPTIONS
+      attribute: JAVA_TOOL_OPTIONS
+      direction: lower
+
+  - id: memory-node-old-space
+    title: A node option caps the old space below the arrays the program holds
+    dimension: memory
+    instances: 2
+    variants:
+      - red_mb: "64"
+      - red_mb: "96"
+      - red_mb: "48"
+    runtime: node
+    program: |
+      if (process.env.BENCH_FLAKE !== "1") {
+        console.log("ok");
+        process.exit(0);
+      }
+      const held = [];
+      for (let i = 0; i < 160; i++) {
+        held.push(new Array(131072).fill(i + 0.5));
+      }
+      console.log("held", held.length);
+    signature: "heap out of memory"
+    base:
+      image: "node:24-bookworm-slim"
+      memory: 1g
+    green:
+      env:
+        NODE_OPTIONS: "--max-old-space-size=1024"
+    red:
+      env:
+        NODE_OPTIONS: "--max-old-space-size={{red_mb}}"
+    cause:
+      dimension: memory
+      path: env.NODE_OPTIONS
+      attribute: NODE_OPTIONS
+      direction: lower

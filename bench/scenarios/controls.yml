@@ -126,3 +126,227 @@ templates:
     green:
       gate: 0
     cause: none
+
+  - id: control-limits-noise
+    title: Only the descriptor limit differs, the program opens nothing, and the red runs fail on their own
+    dimension: limits
+    instances: 2
+    variants:
+      - red_limit: "512:512"
+        gate: "400"
+      - red_limit: "256:256"
+        gate: "650"
+    gate: "{{gate}}"
+    trials: 50
+    runtime: python3
+    program: |
+      import os
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      raise RuntimeError("worker lost its lease on shard 7")
+    signature: "worker lost its lease on shard 7"
+    base:
+      image: "python:3.12-slim"
+    green:
+      gate: 0
+      ulimits:
+        nofile: "1024:1024"
+    red:
+      ulimits:
+        nofile: "{{red_limit}}"
+    cause: none
+    decoys:
+      - dimension: limits
+        path: limits.nofile
+
+  - id: control-memory-noise
+    title: Only the memory limit differs, the program holds almost nothing, and the red runs fail on their own
+    dimension: memory
+    instances: 2
+    variants:
+      - red_memory: 384m
+        gate: "450"
+      - red_memory: 320m
+        gate: "600"
+    gate: "{{gate}}"
+    trials: 50
+    runtime: python3
+    program: |
+      import os
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      raise RuntimeError("connection pool exhausted: all 8 slots busy")
+    signature: "connection pool exhausted"
+    base:
+      image: "python:3.12-slim"
+    green:
+      gate: 0
+      memory: 512m
+    red:
+      memory: "{{red_memory}}"
+    cause: none
+    decoys:
+      - dimension: memory
+        path: cgroup.memory.max
+
+  - id: control-cpu-limit-noise
+    title: Only the CPU quota differs, the program reads no CPU setting, and the red runs fail on their own
+    dimension: cpu-limit
+    instances: 2
+    variants:
+      - red_cpus: "1.5"
+        gate: "400"
+      - red_cpus: "1"
+        gate: "550"
+    gate: "{{gate}}"
+    trials: 50
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      echo "scheduler: lease expired before the heartbeat"
+      exit 1
+    signature: "lease expired before the heartbeat"
+    base:
+      image: "debian:12-slim"
+    green:
+      gate: 0
+      cpus: "2"
+    red:
+      cpus: "{{red_cpus}}"
+    cause: none
+    decoys:
+      - dimension: cpu-limit
+        path: cgroup.cpu.max
+
+  - id: control-proxy-noise
+    title: Only a no-proxy list differs, the program makes no request, and the red runs fail on their own
+    dimension: network
+    instances: 2
+    variants:
+      - red_no_proxy: internal.example
+        gate: "450"
+      - red_no_proxy: "corp.example,10.0.0.0/8"
+        gate: "600"
+    gate: "{{gate}}"
+    trials: 50
+    runtime: python3
+    program: |
+      import os
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      raise RuntimeError("registry: 502 bad gateway from the mirror")
+    signature: "502 bad gateway from the mirror"
+    base:
+      image: "python:3.12-slim"
+    green:
+      gate: 0
+      env:
+        NO_PROXY: "other.example"
+    red:
+      env:
+        NO_PROXY: "{{red_no_proxy}}"
+    cause: none
+    decoys:
+      - dimension: network
+        path: env.NO_PROXY
+
+  - id: control-jvm-flag-noise
+    title: Only a JVM stack size option differs, the program does not recurse, and the red runs fail on their own
+    dimension: runtime
+    instances: 2
+    variants:
+      - red_xss: 1m
+        gate: "400"
+      - red_xss: 2m
+        gate: "600"
+    gate: "{{gate}}"
+    trials: 40
+    runtime: java
+    program: |
+      public class Prog {
+          public static void main(String[] args) {
+              if (!"1".equals(System.getenv("BENCH_FLAKE"))) {
+                  System.out.println("ok");
+                  return;
+              }
+              throw new IllegalStateException("leader election timed out");
+          }
+      }
+    signature: "leader election timed out"
+    base:
+      image: "eclipse-temurin:17"
+    green:
+      gate: 0
+      env:
+        JAVA_TOOL_OPTIONS: "-Xss512k"
+    red:
+      env:
+        JAVA_TOOL_OPTIONS: "-Xss{{red_xss}}"
+    cause: none
+    decoys:
+      - dimension: env
+        path: env.JAVA_TOOL_OPTIONS
+
+  - id: control-mixed-noise
+    title: A memory limit, a CPU quota, a descriptor limit and a log level all differ and none is read
+    dimension: env
+    instances: 2
+    variants:
+      - red_memory: 384m
+        red_cpus: "1.5"
+        red_limit: "512:512"
+        red_level: debug
+        gate: "400"
+      - red_memory: 320m
+        red_cpus: "1"
+        red_limit: "256:256"
+        red_level: trace
+        gate: "650"
+    gate: "{{gate}}"
+    trials: 50
+    runtime: python3
+    program: |
+      import os
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      raise RuntimeError("scheduler: shard map is stale, retry later")
+    signature: "shard map is stale"
+    base:
+      image: "python:3.12-slim"
+    green:
+      gate: 0
+      memory: 512m
+      cpus: "2"
+      env:
+        LOG_LEVEL: info
+      ulimits:
+        nofile: "1024:1024"
+    red:
+      memory: "{{red_memory}}"
+      cpus: "{{red_cpus}}"
+      env:
+        LOG_LEVEL: "{{red_level}}"
+      ulimits:
+        nofile: "{{red_limit}}"
+    cause: none
+    decoys:
+      - dimension: memory
+        path: cgroup.memory.max
+      - dimension: cpu-limit
+        path: cgroup.cpu.max
+      - dimension: limits
+        path: limits.nofile
+      - dimension: env
+        path: env.LOG_LEVEL

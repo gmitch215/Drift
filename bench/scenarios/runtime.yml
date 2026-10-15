@@ -108,3 +108,438 @@ templates:
     bundle:
       - dimension: runtime
         path: env.JAVA_VERSION
+
+  - id: runtime-go-loopvar
+    title: The program relies on per-iteration loop variables that the red Go predates
+    dimension: runtime
+    instances: 2
+    variants:
+      - loop: "for i := 0; i < 3; i++ {"
+        gate: "1000"
+        trials: "10"
+      - loop: "for _, i := range []int{0, 1, 2} {"
+        gate: "500"
+        trials: "30"
+    gate: "{{gate}}"
+    trials: "{{trials}}"
+    runtime: go
+    program: |
+      package main
+
+      import (
+      	"fmt"
+      	"os"
+      )
+
+      func main() {
+      	if os.Getenv("BENCH_FLAKE") != "1" {
+      		fmt.Println("ok")
+      		return
+      	}
+      	var fns []func() int
+      	{{loop}}
+      		fns = append(fns, func() int { return i })
+      	}
+      	sum := 0
+      	for _, fn := range fns {
+      		sum += fn()
+      	}
+      	if sum != 3 {
+      		fmt.Printf("loop variable shared across iterations: sum %d\n", sum)
+      		os.Exit(1)
+      	}
+      	fmt.Println("ok")
+      }
+    signature: "loop variable shared across iterations"
+    base:
+      env:
+        GOCACHE: /tmp/gocache
+        GOPATH: /tmp/go
+    green:
+      image: "golang:1.23"
+    red:
+      image: "golang:1.21"
+    cause:
+      dimension: runtime
+      path: tool.go.version
+      attribute: go version
+      direction: lower
+    bundle:
+      - dimension: runtime
+        path: env.GOLANG_VERSION
+
+  - id: runtime-go-toolchain-line
+    title: A go.mod names a newer Go than the red toolchain and it refuses to load the module
+    dimension: runtime
+    instances: 2
+    variants:
+      - line: "1.22"
+        green_image: "golang:1.22"
+        red_image: "golang:1.21"
+      - line: "1.24"
+        green_image: "golang:1.24"
+        red_image: "golang:1.23"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      set -e
+      mkdir -p /tmp/m
+      cd /tmp/m
+      printf 'module app\n\ngo {{line}}\n' > go.mod
+      printf 'package main\n\nfunc main() {}\n' > main.go
+      go build -o /tmp/m/app .
+      echo ok
+    signature: "requires go >="
+    base:
+      env:
+        GOCACHE: /tmp/gocache
+        GOPATH: /tmp/go
+        GOTOOLCHAIN: local
+    green:
+      image: "{{green_image}}"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: runtime
+      path: tool.go.version
+      attribute: go version
+      direction: lower
+    bundle:
+      - dimension: runtime
+        path: env.GOLANG_VERSION
+
+  - id: runtime-ruby-newer-core
+    title: The program calls a Ruby core feature the red Ruby does not have
+    dimension: runtime
+    instances: 2
+    variants:
+      - src: |
+          Point = Data.define(:x, :y)
+          puts Point.new(x: 1, y: 2).x
+        red_image: "ruby:3.1-slim"
+        sig: "uninitialized constant Data"
+      - src: |
+          puts [1, 2].intersect?([2, 3])
+        red_image: "ruby:3.0-slim"
+        sig: NoMethodError
+    runtime: ruby
+    program: |
+      if ENV["BENCH_FLAKE"] != "1"
+        puts "ok"
+        exit 0
+      end
+      {{src}}
+      puts "ok"
+    signature: "{{sig}}"
+    green:
+      image: "ruby:3.3-slim"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: runtime
+      path: tool.ruby.version
+      attribute: ruby version
+      direction: lower
+    bundle:
+      - dimension: runtime
+        path: env.RUBY_VERSION
+      - dimension: runtime
+        path: env.RUBY_DOWNLOAD_SHA256
+
+  - id: runtime-php-newer-function
+    title: The program calls a PHP function the red PHP does not have
+    dimension: runtime
+    instances: 2
+    variants:
+      - src: "var_dump(str_contains('haystack', 'hay'));"
+        sig: "Call to undefined function str_contains()"
+        red_image: "php:7.4-cli"
+        green_image: "php:8.0-cli"
+      - src: "var_dump(array_is_list([1, 2]));"
+        sig: "Call to undefined function array_is_list()"
+        red_image: "php:8.0-cli"
+        green_image: "php:8.1-cli"
+    runtime: php
+    program: |
+      <?php
+      if (getenv('BENCH_FLAKE') !== '1') {
+          echo "ok\n";
+          exit(0);
+      }
+      {{src}}
+      echo "ok\n";
+    signature: "{{sig}}"
+    green:
+      image: "{{green_image}}"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: runtime
+      path: tool.php.version
+      attribute: php version
+      direction: lower
+    bundle:
+      - dimension: runtime
+        path: env.PHP_VERSION
+      - dimension: runtime
+        path: env.PHP_SHA256
+
+  - id: runtime-dotnet-9-behavior
+    title: The program relies on a runtime behavior that .NET 9 changed
+    dimension: runtime
+    instances: 2
+    variants:
+      - src: |
+          Environment.SetEnvironmentVariable("TEST", "")
+          match Environment.GetEnvironmentVariable("TEST") with
+          | null -> printfn "ok"
+          | _ ->
+              printfn "empty environment variable kept"
+              exit 1
+        sig: "empty environment variable kept"
+        gate: "1000"
+        trials: "10"
+      - src: |
+          AppContext.SetSwitch("System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization", true)
+          let formatter = System.Runtime.Serialization.Formatters.Binary.BinaryFormatter()
+          let stream = new MemoryStream()
+          formatter.Serialize(stream, [| 1; 2; 3 |])
+          printfn "ok"
+        sig: NotSupportedException
+        gate: "500"
+        trials: "20"
+    gate: "{{gate}}"
+    trials: "{{trials}}"
+    runtime: dotnet
+    program: |
+      #nowarn "44"
+      open System
+      open System.IO
+
+      if Environment.GetEnvironmentVariable("BENCH_FLAKE") <> "1" then
+          printfn "ok"
+          exit 0
+
+      {{src}}
+    signature: "{{sig}}"
+    base:
+      memory: 1g
+    green:
+      image: "mcr.microsoft.com/dotnet/sdk:8.0"
+    red:
+      image: "mcr.microsoft.com/dotnet/sdk:9.0"
+    cause:
+      dimension: runtime
+      path: env.DOTNET_VERSION
+      attribute: dotnet runtime version
+      direction: higher
+    bundle:
+      - dimension: runtime
+        path: env.DOTNET_SDK_VERSION
+      - dimension: runtime
+        path: env.ASPNET_VERSION
+
+  - id: runtime-rust-newer-std
+    title: The program uses a Rust standard library item the red toolchain does not have
+    dimension: runtime
+    instances: 2
+    variants:
+      - src: |
+          use std::sync::LazyLock;
+
+          static GREETING: LazyLock<String> = LazyLock::new(|| String::from("ok"));
+
+          fn main() {
+              println!("{}", *GREETING);
+          }
+        sig: LazyLock
+        red_image: "rust:1.79-slim"
+      - src: |
+          fn main() {
+              let value: Option<u32> = Some(3);
+              println!("{}", value.is_none_or(|v| v > 1));
+          }
+        sig: is_none_or
+        red_image: "rust:1.81-slim"
+    trials: "10"
+    runtime: rust
+    program: "{{src}}"
+    signature: "{{sig}}"
+    base:
+      env:
+        CARGO_HOME: /tmp/cargo
+    green:
+      image: "rust:1.85-slim"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: runtime
+      path: tool.rust.version
+      attribute: rustc version
+      direction: lower
+    bundle:
+      - dimension: runtime
+        path: env.RUST_VERSION
+
+  - id: runtime-jvm-add-opens
+    title: The program reflects into java.base and the red JVM has no --add-opens flag
+    dimension: runtime
+    instances: 2
+    variants:
+      - cls: String
+        field: value
+        pkg: java.lang
+      - cls: java.util.ArrayList
+        field: elementData
+        pkg: java.util
+    trials: "10"
+    runtime: java
+    program: |
+      public class Prog {
+        public static void main(String[] args) throws Exception {
+          if (!"1".equals(System.getenv("BENCH_FLAKE"))) {
+            System.out.println("ok");
+            return;
+          }
+          java.lang.reflect.Field f = {{cls}}.class.getDeclaredField("{{field}}");
+          f.setAccessible(true);
+          System.out.println("ok " + f.getName());
+        }
+      }
+    signature: InaccessibleObjectException
+    base:
+      image: "eclipse-temurin:17-jdk"
+    green:
+      env:
+        JAVA_TOOL_OPTIONS: "--add-opens=java.base/{{pkg}}=ALL-UNNAMED"
+    cause:
+      dimension: runtime
+      path: env.JAVA_TOOL_OPTIONS
+      attribute: JVM options
+      direction: added
+
+  - id: runtime-r-newer-base
+    title: The program uses an R feature the red R does not have
+    dimension: runtime
+    instances: 2
+    variants:
+      - src: "x <- NULL %||% 1"
+        red_image: "mirror.gcr.io/library/r-base:4.3.3"
+        sig: 'could not find function "%||%"'
+      - src: "x <- 1:3 |> sum()"
+        red_image: "mirror.gcr.io/library/r-base:4.0.5"
+        sig: unexpected
+    runtime: r
+    program: |
+      if (Sys.getenv("BENCH_FLAKE") != "1") {
+        cat("ok\n")
+        quit(status = 0)
+      }
+      eval(parse(text = "{{src}}"))
+      cat("ok\n")
+    signature: "{{sig}}"
+    green:
+      image: "mirror.gcr.io/library/r-base:4.6.1"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: runtime
+      path: env.R_BASE_VERSION
+      attribute: r version
+      direction: lower
+
+  - id: runtime-dart-newer-language
+    title: The program uses Dart 3 syntax the red Dart does not parse
+    dimension: runtime
+    instances: 2
+    variants:
+      - src: "void main() { var (a, b) = (1, 2); print(a + b); }"
+      - src: "void main() { print(switch (1) { 1 => 'one', _ => 'other' }); }"
+    trials: "10"
+    runtime: dart
+    program: |
+      import 'dart:io';
+
+      void main() {
+        if (Platform.environment['BENCH_FLAKE'] != '1') {
+          print('ok');
+          return;
+        }
+        final file = File('/tmp/inner.dart');
+        file.writeAsStringSync("{{src}}");
+        final result = Process.runSync(Platform.resolvedExecutable, [file.path]);
+        stdout.write(result.stdout);
+        stderr.write(result.stderr);
+        if (result.exitCode != 0) {
+          exit(result.exitCode);
+        }
+        print('ok');
+      }
+    signature: "Error:"
+    green:
+      image: "mirror.gcr.io/library/dart:3.13.5-sdk"
+    red:
+      image: "mirror.gcr.io/library/dart:2.19.6"
+    cause:
+      dimension: runtime
+      path: tool.dart.version
+      attribute: dart version
+      direction: lower
+    visible: false
+    note: The capsule has no dart attribute and the image sets no version variable.
+
+  - id: runtime-julia-newer-base
+    title: The program calls a Julia function the red Julia does not have
+    dimension: runtime
+    instances: 1
+    runtime: julia
+    program: |
+      if get(ENV, "BENCH_FLAKE", "") != "1"
+          println("ok")
+          exit(0)
+      end
+      mem = Memory{Int}(undef, 3)
+      println(length(mem))
+      println("ok")
+    signature: UndefVarError
+    green:
+      image: "mirror.gcr.io/library/julia:1.13.1"
+    red:
+      image: "mirror.gcr.io/library/julia:1.10"
+    cause:
+      dimension: runtime
+      path: env.JULIA_VERSION
+      attribute: julia version
+      direction: lower
+
+  - id: runtime-elixir-newer-stdlib
+    title: The program calls an Elixir function the red Elixir does not have
+    dimension: runtime
+    instances: 2
+    variants:
+      - src: "IO.inspect(Keyword.validate!([a: 1], a: 2))"
+        red_image: "mirror.gcr.io/library/elixir:1.12"
+      - src: "IO.inspect(Date.shift(~D[2024-01-31], month: 1))"
+        red_image: "mirror.gcr.io/library/elixir:1.16"
+    runtime: elixir
+    program: |
+      if System.get_env("BENCH_FLAKE") != "1" do
+        IO.puts("ok")
+        System.halt(0)
+      end
+
+      {{src}}
+      IO.puts("ok")
+    signature: UndefinedFunctionError
+    green:
+      image: "mirror.gcr.io/library/elixir:1.20.4-otp-29"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: runtime
+      path: env.ELIXIR_VERSION
+      attribute: elixir version
+      direction: lower
+    bundle:
+      - dimension: runtime
+        path: env.OTP_VERSION

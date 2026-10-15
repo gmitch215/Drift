@@ -65,3 +65,143 @@ templates:
       - path: browser.engine.name
         green: chromium
         red: "{{red_name}}"
+
+  - id: browser-css-support
+    title: A page relies on a CSS property the red engine lacks (no browser runs in these containers)
+    dimension: browser
+    instances: 2
+    draw:
+      red_name: [firefox, webkit]
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      echo "Layout: the expanding panel stays collapsed, interpolate-size is not supported"
+      exit 1
+    signature: "interpolate-size is not supported"
+    controllable: false
+    base:
+      image: "debian:12-slim"
+    green:
+      gate: 0
+    red:
+      gate: 1000
+    cause:
+      dimension: browser
+      path: browser.css.interpolate-size
+      attribute: CSS.supports interpolate-size
+      direction: changed
+    decoys:
+      - dimension: browser
+        path: browser.engine.name
+    capsule-overrides:
+      - path: browser.css.interpolate-size
+        green: "true"
+        red: "false"
+      - path: browser.engine.name
+        green: chromium
+        red: "{{red_name}}"
+    note: Manual class. Values follow a measured CSS.supports run on the Playwright 1.63.0 engines (research/browsers/viewport.md).
+
+  - id: browser-viewport-width
+    title: A layout breaks below a width breakpoint, with the pixel ratio changed beside it
+    dimension: browser
+    instances: 2
+    draw:
+      red_width: ["375", "414", "360", "390"]
+      red_dpr: ["2", "3"]
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      echo "Layout: the sidebar overlaps the main column below 768px"
+      exit 1
+    signature: "overlaps the main column"
+    controllable: false
+    base:
+      image: "debian:12-slim"
+    green:
+      gate: 0
+    red:
+      gate: 1000
+    cause:
+      dimension: browser
+      path: browser.viewport.width
+      attribute: viewport width
+      direction: lower
+    decoys:
+      - dimension: browser
+        path: browser.viewport.dpr
+    capsule-overrides:
+      - path: browser.viewport.width
+        green: "1280"
+        red: "{{red_width}}"
+      - path: browser.viewport.dpr
+        green: "1"
+        red: "{{red_dpr}}"
+    note: Manual class. The key names follow the layout capture planned in P3-VIEWPORT and are not read by a scanner yet.
+
+  - id: browser-engine-string-method
+    title: A page script calls a string method that the red engine release predates
+    dimension: browser
+    instances: 2
+    draw:
+      red_version: ["79.0.3945.130", "81.0.4044.138", "83.0.4103.116"]
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      echo "TypeError: replaceAll is not a function"
+      exit 1
+    signature: "replaceAll is not a function"
+    controllable: false
+    base:
+      image: "debian:12-slim"
+    green:
+      gate: 0
+    red:
+      gate: 1000
+    cause:
+      dimension: browser
+      path: browser.engine.version
+      attribute: browser engine version
+      direction: lower
+    capsule-overrides:
+      - path: browser.engine.version
+        green: "120.0.6099.109"
+        red: "{{red_version}}"
+    note: Manual class. The red versions are by construction; the release that added String.prototype.replaceAll is UNVERIFIED against BCD.
+
+  - id: browser-engine-user-agent-data
+    title: A page script reads an API that only Chromium engines expose, with the engine version changed beside it
+    dimension: browser
+    instances: 2
+    draw:
+      red_name: [firefox, safari]
+      red_version: ["155.0", "26.6", "18.4"]
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      echo "TypeError: navigator.userAgentData is undefined"
+      exit 1
+    signature: "userAgentData is undefined"
+    controllable: false
+    base:
+      image: "debian:12-slim"
+    green:
+      gate: 0
+    red:
+      gate: 1000
+    cause:
+      dimension: browser
+      path: browser.engine.name
+      attribute: browser engine
+      direction: changed
+    decoys:
+      - dimension: browser
+        path: browser.engine.version
+    capsule-overrides:
+      - path: browser.engine.name
+        green: chromium
+        red: "{{red_name}}"
+      - path: browser.engine.version
+        green: "120.0.6099.109"
+        red: "{{red_version}}"
+    note: Manual class. That only Chromium engines expose userAgentData is UNVERIFIED against BCD.

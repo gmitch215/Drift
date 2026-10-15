@@ -60,3 +60,102 @@ templates:
       - path: cpu.model
         green: "AMD EPYC 7B13"
         red: "{{red_model}}"
+
+  - id: cpu-count-jvm-flag
+    title: A JVM flag pins the processor count to one and a pool size divides by workers minus one
+    dimension: cpu
+    instances: 2
+    variants:
+      - green_n: "4"
+      - green_n: "2"
+      - green_n: "3"
+    runtime: java
+    program: |
+      public class Prog {
+          public static void main(String[] args) {
+              if (!"1".equals(System.getenv("BENCH_FLAKE"))) {
+                  System.out.println("ok");
+                  return;
+              }
+              int workers = Runtime.getRuntime().availableProcessors() - 1;
+              System.out.println("chunk " + 100 / workers);
+          }
+      }
+    signature: "/ by zero"
+    base:
+      image: "eclipse-temurin:17"
+    green:
+      env:
+        JAVA_TOOL_OPTIONS: "-XX:ActiveProcessorCount={{green_n}}"
+    red:
+      env:
+        JAVA_TOOL_OPTIONS: "-XX:ActiveProcessorCount=1"
+    cause:
+      dimension: cpu
+      path: env.JAVA_TOOL_OPTIONS
+      attribute: JAVA_TOOL_OPTIONS
+      direction: changed
+
+  - id: cpu-count-node-parallelism
+    title: A node worker pool sizes itself from the available parallelism and gets none on one CPU
+    dimension: cpu
+    instances: 2
+    variants:
+      - green_cpuset: "0-1"
+      - green_cpuset: "0-2"
+    runtime: node
+    program: |
+      const os = require("os");
+      if (process.env.BENCH_FLAKE !== "1") {
+        console.log("ok");
+        process.exit(0);
+      }
+      const workers = os.availableParallelism() - 1;
+      if (workers < 1) {
+        throw new RangeError("worker pool size is " + workers);
+      }
+      console.log("workers", workers);
+    signature: "worker pool size is 0"
+    base:
+      image: "node:24-bookworm-slim"
+    green:
+      cpuset: "{{green_cpuset}}"
+    red:
+      cpuset: "0"
+    cause:
+      dimension: cpu
+      path: cpu.count
+      attribute: CPUs the process may run on
+      direction: lower
+    visible: false
+    note: The capsule reads the host CPU count, so a cpuset is not visible in it.
+
+  - id: cpu-arch-wheel
+    title: A prebuilt package has no build for the red architecture (a container cannot vary it)
+    dimension: cpu
+    instances: 2
+    draw:
+      red_arch: ["aarch64", "armv7l", "riscv64"]
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      echo "ERROR: No matching distribution found for fastcodec (no wheel for this architecture)"
+      exit 1
+    signature: "No matching distribution found"
+    controllable: false
+    base:
+      image: "debian:12-slim"
+    green:
+      gate: 0
+    red:
+      gate: 1000
+    cause:
+      dimension: cpu
+      path: os.arch
+      attribute: CPU architecture
+      direction: changed
+    capsule-overrides:
+      - path: os.arch
+        green: "x86_64"
+        red: "{{red_arch}}"
+    note: Manual class. The architecture is the host's; the capsule values are written in.

@@ -120,3 +120,260 @@ templates:
         path: tool.libc.version
       - dimension: userland
         path: tool.coreutils.version
+
+  - id: os-alpine-missing-interpreter
+    title: An installer needs an interpreter that the Alpine image does not ship
+    dimension: os
+    instances: 3
+    variants:
+      - tool: bash
+        red_image: "alpine:3.21"
+      - tool: perl
+        red_image: "alpine:3.22"
+      - tool: bash
+        red_image: "alpine:3.22"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      command -v {{tool}} > /dev/null || { echo "installer: {{tool}} not found"; exit 1; }
+      echo ok
+    signature: "installer: {{tool}} not found"
+    green:
+      image: "debian:12-slim"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: os
+      path: os.release.ID
+      attribute: distribution id
+      direction: changed
+    bundle:
+      - dimension: os
+        path: os.release.VERSION_ID
+      - dimension: os
+        path: os.release.PRETTY_NAME
+      - dimension: os
+        path: tool.libc.family
+      - dimension: os
+        path: tool.libc.version
+      - dimension: userland
+        path: tool.coreutils.flavor
+      - dimension: userland
+        path: tool.coreutils.version
+    note: An image change moves the OS release, libc and userland together.
+
+  - id: os-package-manager
+    title: A setup script calls a package manager that the red distribution does not have
+    dimension: os
+    instances: 3
+    variants:
+      - pm: apt-get
+        green_image: "debian:12-slim"
+        red_image: "alpine:3.21"
+      - pm: apk
+        green_image: "alpine:3.22"
+        red_image: "ubuntu:22.04"
+      - pm: apt-get
+        green_image: "ubuntu:22.04"
+        red_image: "alpine:3.22"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      command -v {{pm}} > /dev/null || { echo "setup: {{pm}}: command not found"; exit 1; }
+      echo ok
+    signature: "setup: {{pm}}: command not found"
+    green:
+      image: "{{green_image}}"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: os
+      path: os.release.ID
+      attribute: distribution id
+      direction: changed
+    bundle:
+      - dimension: os
+        path: os.release.VERSION_ID
+      - dimension: os
+        path: os.release.PRETTY_NAME
+      - dimension: os
+        path: tool.libc.version
+    note: An image change moves the OS release and libc together.
+
+  - id: os-libc-probe
+    title: A script probes for the GNU C library and the red image carries musl
+    dimension: os
+    instances: 3
+    variants:
+      - probe: 'getconf GNU_LIBC_VERSION > /dev/null 2>&1'
+        green_image: "debian:12-slim"
+        red_image: "alpine:3.21"
+      - probe: 'ldd --version 2>&1 | grep -q GLIBC'
+        green_image: "ubuntu:22.04"
+        red_image: "alpine:3.22"
+      - probe: 'getconf GNU_LIBC_VERSION > /dev/null 2>&1'
+        green_image: "ubuntu:22.04"
+        red_image: "alpine:3.22"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      {{probe}} || { echo "installer: this is not a glibc system"; exit 1; }
+      echo ok
+    signature: "installer: this is not a glibc system"
+    green:
+      image: "{{green_image}}"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: os
+      path: tool.libc.family
+      attribute: libc family
+      direction: changed
+    bundle:
+      - dimension: os
+        path: os.release.ID
+      - dimension: os
+        path: os.release.VERSION_ID
+      - dimension: os
+        path: os.release.PRETTY_NAME
+      - dimension: os
+        path: tool.libc.version
+      - dimension: userland
+        path: tool.coreutils.flavor
+    note: An image change moves the OS release, libc and userland together.
+
+  - id: os-admin-group
+    title: A provisioning script adds a user to the administrator group of another distribution family
+    dimension: os
+    instances: 2
+    variants:
+      - grp: sudo
+        green_image: "ubuntu:22.04"
+        red_image: "alpine:3.21"
+      - grp: wheel
+        green_image: "alpine:3.22"
+        red_image: "debian:12-slim"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      getent group {{grp}} > /dev/null || { echo "provision: group {{grp}} does not exist"; exit 1; }
+      echo ok
+    signature: "provision: group {{grp}} does not exist"
+    green:
+      image: "{{green_image}}"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: os
+      path: os.release.ID
+      attribute: distribution id
+      direction: changed
+    bundle:
+      - dimension: os
+        path: os.release.VERSION_ID
+      - dimension: os
+        path: os.release.PRETTY_NAME
+      - dimension: os
+        path: tool.libc.version
+
+  - id: os-sh-dash-vs-ash
+    title: A script uses a bashism that the Debian family shell rejects and the Alpine shell accepts
+    dimension: os
+    instances: 2
+    variants:
+      - stmt: 'v=banana; [ "${v//a/o}" = bonono ]'
+        sig: "Bad substitution"
+        red_image: "debian:12-slim"
+      - stmt: 'v=banana; [ "${v//a/o}" = bonono ]'
+        sig: "Bad substitution"
+        red_image: "ubuntu:22.04"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      {{stmt}}
+      echo ok
+    signature: "{{sig}}"
+    green:
+      image: "alpine:3.21"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: os
+      path: os.release.ID
+      attribute: distribution id
+      direction: changed
+    bundle:
+      - dimension: os
+        path: os.release.VERSION_ID
+      - dimension: os
+        path: os.release.PRETTY_NAME
+      - dimension: os
+        path: tool.libc.family
+      - dimension: os
+        path: tool.libc.version
+      - dimension: userland
+        path: tool.coreutils.flavor
+
+  - id: os-ca-bundle-path
+    title: A client reads the CA bundle from the path of another distribution family
+    dimension: os
+    instances: 2
+    variants:
+      - bundle_path: /etc/ssl/certs/ca-certificates.crt
+        green_image: "alpine:3.21"
+        red_image: "debian:12-slim"
+      - bundle_path: /etc/ssl/certs/ca-certificates.crt
+        green_image: "alpine:3.22"
+        red_image: "ubuntu:22.04"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      [ -s {{bundle_path}} ] || { echo "tls: CA bundle {{bundle_path}} is missing"; exit 1; }
+      echo ok
+    signature: "tls: CA bundle {{bundle_path}} is missing"
+    green:
+      image: "{{green_image}}"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: os
+      path: os.release.ID
+      attribute: distribution id
+      direction: changed
+    bundle:
+      - dimension: os
+        path: os.release.VERSION_ID
+      - dimension: os
+        path: os.release.PRETTY_NAME
+      - dimension: os
+        path: tool.libc.version
+
+  - id: os-usr-merge
+    title: A packaging script expects a merged /usr and the red image keeps /bin as a directory
+    dimension: os
+    instances: 2
+    variants:
+      - green_image: "debian:12-slim"
+      - green_image: "ubuntu:22.04"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      [ -L /bin ] || { echo "package: /bin is not a symlink to usr/bin"; exit 1; }
+      echo ok
+    signature: "package: /bin is not a symlink"
+    green:
+      image: "{{green_image}}"
+    red:
+      image: "debian:bullseye-slim"
+    cause:
+      dimension: os
+      path: os.release.VERSION_ID
+      attribute: os release version
+      direction: lower
+    bundle:
+      - dimension: os
+        path: os.release.PRETTY_NAME
+      - dimension: os
+        path: tool.libc.version
+      - dimension: userland
+        path: tool.coreutils.version

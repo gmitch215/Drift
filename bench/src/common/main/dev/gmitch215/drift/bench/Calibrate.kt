@@ -96,7 +96,9 @@ object Calibrate {
         )
         return Calibration(
             encode(fit(obs, chosen, verdicts, provenance)),
-            encode(evaluation(obs, stripped, original, lab.reversed().observeDev(), provenance)),
+            encode(
+                evaluation(obs, stripped, original, lab.reversed().observeDev(), provenance, seed),
+            ),
             chosen,
         )
     }
@@ -185,8 +187,9 @@ object Calibrate {
         original: List<Observed>,
         reversed: List<Observed>,
         provenance: JsonObject,
+        seed: Long,
     ): JsonObject = obj(
-        "schema" to JsonInt(2),
+        "schema" to JsonInt(3),
         "synthetic" to JsonBool(true),
         "provenance" to provenance,
         "fold_of" to JsonObject(
@@ -196,6 +199,7 @@ object Calibrate {
         "probes_removed" to section(stripped),
         "original" to section(original),
         "probe_sweep" to Evaluate.probeSweep(obs),
+        "analysis" to Analysis.run(obs, seed),
         "reversed" to obj(
             "note" to JsonString(
                 "the same pairs with green and red swapped; labels mean nothing here, so only " +

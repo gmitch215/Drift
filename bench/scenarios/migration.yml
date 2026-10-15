@@ -115,3 +115,294 @@ templates:
         path: env.PYTHON_VERSION
       - dimension: os
         path: os.release.PRETTY_NAME
+
+  - id: migration-python-313-removed-module
+    title: A Python project imports a standard library module that Python 3.13 removed
+    dimension: runtime
+    instances: 2
+    variants:
+      - module: imghdr
+        gate: "1000"
+        trials: "20"
+      - module: cgi
+        gate: "500"
+        trials: "40"
+    gate: "{{gate}}"
+    trials: "{{trials}}"
+    runtime: python3
+    program: |
+      import os
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      import {{module}}
+      print("ok")
+    signature: "No module named '{{module}}'"
+    green:
+      image: "python:3.12-slim-bookworm"
+    red:
+      image: "python:3.13-slim-bookworm"
+    cause:
+      dimension: runtime
+      path: tool.python.version
+      attribute: python version
+      direction: higher
+    bundle:
+      - dimension: runtime
+        path: env.PYTHON_VERSION
+      - dimension: runtime
+        path: env.PYTHON_SHA256
+
+  - id: migration-python-312-removed-module
+    title: A Python project imports a module that Python 3.12 removed
+    dimension: runtime
+    instances: 2
+    variants:
+      - module: distutils.core
+        sig: "No module named 'distutils'"
+      - module: imp
+        sig: "No module named 'imp'"
+    runtime: python3
+    program: |
+      import os
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      import {{module}}
+      print("ok")
+    signature: "{{sig}}"
+    green:
+      image: "python:3.11-slim-bookworm"
+    red:
+      image: "python:3.12-slim-bookworm"
+    cause:
+      dimension: runtime
+      path: tool.python.version
+      attribute: python version
+      direction: higher
+    bundle:
+      - dimension: runtime
+        path: env.PYTHON_VERSION
+      - dimension: runtime
+        path: env.PYTHON_SHA256
+
+  - id: migration-php-80-removed-function
+    title: A PHP project calls a function that PHP 8.0 removed
+    dimension: runtime
+    instances: 2
+    variants:
+      - src: '$list = [1]; var_dump(each($list));'
+        sig: "Call to undefined function each()"
+      - src: "$f = create_function('$x', 'return $x;'); echo $f(1);"
+        sig: "Call to undefined function create_function()"
+    runtime: php
+    program: |
+      <?php
+      if (getenv('BENCH_FLAKE') !== '1') {
+          echo "ok\n";
+          exit(0);
+      }
+      {{src}}
+      echo "ok\n";
+    signature: "{{sig}}"
+    green:
+      image: "php:7.4-cli"
+    red:
+      image: "php:8.0-cli"
+    cause:
+      dimension: runtime
+      path: tool.php.version
+      attribute: php version
+      direction: higher
+    bundle:
+      - dimension: runtime
+        path: env.PHP_VERSION
+      - dimension: runtime
+        path: env.PHP_SHA256
+
+  - id: migration-drupal-php-floor
+    title: A Drupal 10 codebase moves to Drupal 11 and Composer rejects the PHP 8.1 it runs on
+    dimension: runtime
+    instances: 1
+    runtime: php
+    program: |
+      <?php
+      if (getenv('BENCH_FLAKE') !== '1') {
+          echo "ok\n";
+          exit(0);
+      }
+      if (PHP_VERSION_ID < 80300) {
+          fwrite(STDERR, "Composer detected issues in your platform:\n\n");
+          fwrite(STDERR, "Your Composer dependencies require a PHP version \">= 8.3.0\". ");
+          fwrite(STDERR, "You are running " . PHP_VERSION . ".\n");
+          exit(1);
+      }
+      echo "ok\n";
+    signature: 'Your Composer dependencies require a PHP version ">= 8.3.0"'
+    green:
+      image: "php:8.3-cli"
+    red:
+      image: "php:8.1-cli"
+    cause:
+      dimension: runtime
+      path: tool.php.version
+      attribute: php version
+      direction: lower
+    bundle:
+      - dimension: runtime
+        path: env.PHP_VERSION
+      - dimension: runtime
+        path: env.PHP_SHA256
+    note: The platform check is written out in the program; Drupal is not installed.
+
+  - id: migration-gradle-9-removed-api
+    title: A Gradle build uses an API that Gradle 9 removed
+    dimension: build
+    instances: 2
+    variants:
+      - write: 'printf "repositories {\n    jcenter()\n}\n" > build.gradle'
+        task: help
+        sig: "Could not find method jcenter()"
+      - write: 'printf "tasks.register(\"t\") {\n  doLast {\n    exec {\n      commandLine \"true\"\n    }\n  }\n}\n" > build.gradle'
+        task: t
+        sig: "Could not find method exec()"
+    trials: "10"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      set -e
+      mkdir -p /tmp/p
+      cd /tmp/p
+      : > settings.gradle
+      {{write}}
+      gradle --no-daemon --offline -q {{task}}
+      echo ok
+    signature: "{{sig}}"
+    base:
+      memory: 1g
+    green:
+      image: "gradle:8.14-jdk17"
+    red:
+      image: "gradle:9.0-jdk17"
+    cause:
+      dimension: build
+      path: env.GRADLE_VERSION
+      attribute: gradle version
+      direction: higher
+    bundle:
+      - dimension: runtime
+        path: env.JAVA_VERSION
+
+  - id: migration-spring-boot-3-class-version
+    title: A Spring Boot 3 jar holds class files the JDK 11 it still pins cannot load
+    dimension: runtime
+    instances: 1
+    trials: 10
+    runtime: java
+    program: |
+      import java.util.Base64;
+
+      public class Prog {
+        static class Loader extends ClassLoader {
+          Class<?> define(String name, byte[] bytes) {
+            return defineClass(name, bytes, 0, bytes.length);
+          }
+        }
+
+        public static void main(String[] args) throws Exception {
+          if (!"1".equals(System.getenv("BENCH_FLAKE"))) {
+            System.out.println("ok");
+            return;
+          }
+          byte[] bytes = Base64.getDecoder().decode(
+              "yv66vgAAAD0ACgoAAgADBwAEDAAFAAYBABBqYXZhL2xhbmcvT2JqZWN0AQAGPGluaXQ+AQADKClWBwAIAQAFQm9vdDMBAARDb2RlACEABwACAAAAAAABAAEABQAGAAEACQAAABEAAQABAAAABSq3AAGxAAAAAAAA");
+          System.out.println("ok " + new Loader().define("Boot3", bytes).getName());
+        }
+      }
+    signature: UnsupportedClassVersionError
+    green:
+      image: "eclipse-temurin:17-jdk"
+    red:
+      image: "eclipse-temurin:11-jdk"
+    cause:
+      dimension: runtime
+      path: tool.java.version
+      attribute: java version
+      direction: lower
+    bundle:
+      - dimension: runtime
+        path: env.JAVA_VERSION
+    note: The class bytes are a class file of major version 61 (Java 17), the baseline of Spring Boot 3.
+
+  - id: migration-node-23-removed-util
+    title: A Node project calls a util helper that Node 23 removed
+    dimension: runtime
+    instances: 2
+    variants:
+      - fn: isString
+      - fn: isFunction
+    runtime: node
+    program: |
+      if (process.env.BENCH_FLAKE !== '1') {
+        console.log('ok');
+        process.exit(0);
+      }
+      const util = require('util');
+      console.log(util.{{fn}}('a'));
+      console.log('ok');
+    signature: "util.{{fn}} is not a function"
+    green:
+      image: "node:22-slim"
+    red:
+      image: "node:23-slim"
+    cause:
+      dimension: runtime
+      path: tool.node.version
+      attribute: node version
+      direction: higher
+    bundle:
+      - dimension: runtime
+        path: env.NODE_VERSION
+
+  - id: migration-ruby-34-removed-api
+    title: A Ruby project uses an API that Ruby 3.4 removed or tightened
+    dimension: runtime
+    instances: 2
+    variants:
+      - src: |
+          Module.new do
+            r = refine(String) { }
+            puts r.refined_class
+          end
+        sig: NoMethodError
+      - src: |
+          require "timeout"
+          Timeout.timeout(-1) { 1 }
+        sig: ArgumentError
+    runtime: ruby
+    program: |
+      if ENV["BENCH_FLAKE"] != "1"
+        puts "ok"
+        exit 0
+      end
+      {{src}}
+      puts "ok"
+    signature: "{{sig}}"
+    green:
+      image: "ruby:3.3-slim"
+    red:
+      image: "ruby:3.4-slim"
+    cause:
+      dimension: runtime
+      path: tool.ruby.version
+      attribute: ruby version
+      direction: higher
+    bundle:
+      - dimension: runtime
+        path: env.RUBY_VERSION
+      - dimension: runtime
+        path: env.RUBY_DOWNLOAD_SHA256

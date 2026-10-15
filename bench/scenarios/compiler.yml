@@ -49,3 +49,189 @@ templates:
         path: tool.python.version
       - dimension: runtime
         path: tool.python.externally-managed
+
+  - id: compiler-gcc14-implicit-declaration
+    title: The source calls a function without declaring it and the red gcc rejects that
+    dimension: compiler
+    instances: 2
+    variants:
+      - body: |
+          int main(void) {
+            return (int)strlen("a") - 1;
+          }
+        sig: "implicit declaration of function 'strlen'"
+        gate: "1000"
+        trials: "10"
+      - body: |
+          int main(void) {
+            puts("a");
+            return 0;
+          }
+        sig: "implicit declaration of function 'puts'"
+        gate: "500"
+        trials: "30"
+    gate: "{{gate}}"
+    trials: "{{trials}}"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      set -e
+      cd /tmp
+      cat > app.c <<'EOF'
+      {{body}}
+      EOF
+      gcc -o app app.c
+      echo ok
+    signature: "{{sig}}"
+    green:
+      image: "gcc:13"
+    red:
+      image: "gcc:14"
+    cause:
+      dimension: compiler
+      path: tool.cc.version
+      attribute: gcc version
+      direction: higher
+    bundle:
+      - dimension: compiler
+        path: env.GCC_VERSION
+
+  - id: compiler-gcc14-int-conversion
+    title: The source assigns an integer to a pointer and the red gcc rejects that
+    dimension: compiler
+    instances: 1
+    trials: "10"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      set -e
+      cd /tmp
+      cat > app.c <<'EOF'
+      int main(void) {
+        int n = 3;
+        char *p = n;
+        return p == 0;
+      }
+      EOF
+      gcc -o app app.c
+      echo ok
+    signature: "makes pointer from integer without a cast"
+    green:
+      image: "gcc:13"
+    red:
+      image: "gcc:14"
+    cause:
+      dimension: compiler
+      path: tool.cc.version
+      attribute: gcc version
+      direction: higher
+    bundle:
+      - dimension: compiler
+        path: env.GCC_VERSION
+
+  - id: compiler-gcc15-bool-typedef
+    title: The source typedefs bool and the red gcc treats it as a C23 keyword
+    dimension: compiler
+    instances: 1
+    trials: "10"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      set -e
+      cd /tmp
+      cat > app.c <<'EOF'
+      typedef int bool;
+      int main(void) {
+        bool b = 1;
+        return !b;
+      }
+      EOF
+      gcc -o app app.c
+      echo ok
+    signature: "cannot be defined via 'typedef'"
+    green:
+      image: "gcc:14"
+    red:
+      image: "gcc:15"
+    cause:
+      dimension: compiler
+      path: tool.cc.version
+      attribute: gcc version
+      direction: higher
+    bundle:
+      - dimension: compiler
+        path: env.GCC_VERSION
+
+  - id: compiler-gcc15-unprototyped
+    title: The source calls an unprototyped function with arguments and the red gcc reads it as (void)
+    dimension: compiler
+    instances: 1
+    trials: "10"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      set -e
+      cd /tmp
+      cat > app.c <<'EOF'
+      int f();
+      int main(void) {
+        return f(1);
+      }
+      int f(int x) {
+        return x - 1;
+      }
+      EOF
+      gcc -o app app.c
+      echo ok
+    signature: "error:"
+    green:
+      image: "gcc:14"
+    red:
+      image: "gcc:15"
+    cause:
+      dimension: compiler
+      path: tool.cc.version
+      attribute: gcc version
+      direction: higher
+    bundle:
+      - dimension: compiler
+        path: env.GCC_VERSION
+
+  - id: compiler-cxx23-header
+    title: The C++ source includes a C++23 header the red libstdc++ does not ship
+    dimension: compiler
+    instances: 2
+    variants:
+      - header: print
+        stmt: 'std::print("ok\n");'
+        red_image: "gcc:13"
+        green_image: "gcc:14"
+      - header: flat_map
+        stmt: "std::flat_map<int, int> m; m[1] = 2; return m.size() == 1 ? 0 : 1;"
+        red_image: "gcc:14"
+        green_image: "gcc:15"
+    trials: "10"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      set -e
+      cd /tmp
+      cat > app.cc <<'EOF'
+      #include <{{header}}>
+      int main() { {{stmt}} }
+      EOF
+      g++ -std=c++23 -o app app.cc
+      echo ok
+    signature: "{{header}}: No such file or directory"
+    green:
+      image: "{{green_image}}"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: compiler
+      path: tool.cc.version
+      attribute: gcc version
+      direction: lower
+    bundle:
+      - dimension: compiler
+        path: env.GCC_VERSION

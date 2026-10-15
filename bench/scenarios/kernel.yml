@@ -65,3 +65,139 @@ templates:
         green: "6.8.0-45-generic"
         red: "6.8.0-48-generic"
     note: Manual class and intermittent; the kernel patch level is a decoy.
+
+  - id: kernel-max-map-count
+    title: A bootstrap check fails on the default memory map limit, with a kernel patch-level decoy
+    dimension: kernel
+    instances: 2
+    draw:
+      green_limit: ["262144", "524288", "1048576"]
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      echo "bootstrap check failed: max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]"
+      exit 1
+    signature: "vm.max_map_count [65530] is too low"
+    controllable: false
+    base:
+      image: "debian:12-slim"
+    green:
+      gate: 0
+    red:
+      gate: 1000
+    cause:
+      dimension: kernel
+      path: sysctl.vm.max_map_count
+      attribute: memory map limit
+      direction: lower
+    decoys:
+      - dimension: kernel
+        path: kernel.release
+    capsule-overrides:
+      - path: sysctl.vm.max_map_count
+        green: "{{green_limit}}"
+        red: "65530"
+      - path: kernel.release
+        green: "6.8.0-45-generic"
+        red: "6.8.0-48-generic"
+    note: Manual class. Both arms run one configuration; the red failure is by construction and the capsule values are written in.
+
+  - id: kernel-inotify-watches
+    title: A file watcher runs out of inotify watches
+    dimension: kernel
+    instances: 2
+    variants:
+      - green_limit: "524288"
+        red_limit: "8192"
+      - green_limit: "65536"
+        red_limit: "8192"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      echo "Error: ENOSPC: System limit for number of file watchers reached, watch '/work/src'"
+      exit 1
+    signature: "System limit for number of file watchers reached"
+    controllable: false
+    base:
+      image: "debian:12-slim"
+    green:
+      gate: 0
+    red:
+      gate: 1000
+    cause:
+      dimension: kernel
+      path: sysctl.fs.inotify.max_user_watches
+      attribute: inotify watch limit
+      direction: lower
+    capsule-overrides:
+      - path: sysctl.fs.inotify.max_user_watches
+        green: "{{green_limit}}"
+        red: "{{red_limit}}"
+    note: Manual class. Both arms run one configuration; the red failure is by construction and the capsule values are written in.
+
+  - id: kernel-ptrace-scope
+    title: A debugger cannot attach to a sibling process under the Yama restriction
+    dimension: kernel
+    instances: 2
+    variants:
+      - red_scope: "1"
+      - red_scope: "2"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      echo "strace: attach: ptrace(PTRACE_SEIZE, 4242): Operation not permitted"
+      exit 1
+    signature: "ptrace(PTRACE_SEIZE"
+    controllable: false
+    base:
+      image: "debian:12-slim"
+    green:
+      gate: 0
+    red:
+      gate: 1000
+    cause:
+      dimension: kernel
+      path: sysctl.kernel.yama.ptrace_scope
+      attribute: ptrace scope
+      direction: higher
+    capsule-overrides:
+      - path: sysctl.kernel.yama.ptrace_scope
+        green: "0"
+        red: "{{red_scope}}"
+    note: Manual class. Both arms run one configuration; the red failure is by construction and the capsule values are written in.
+
+  - id: kernel-overcommit-flaky
+    title: A background save fails on part of the runs under strict memory overcommit, with a kernel patch-level decoy
+    dimension: kernel
+    instances: 2
+    draw:
+      green_policy: ["0", "1"]
+    gate: 350
+    trials: 40
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      echo "Can't save in background: fork: Cannot allocate memory"
+      exit 1
+    signature: "Can't save in background"
+    controllable: false
+    base:
+      image: "debian:12-slim"
+    green:
+      gate: 0
+    cause:
+      dimension: kernel
+      path: sysctl.vm.overcommit_memory
+      attribute: memory overcommit policy
+      direction: higher
+    decoys:
+      - dimension: kernel
+        path: kernel.release
+    capsule-overrides:
+      - path: sysctl.vm.overcommit_memory
+        green: "{{green_policy}}"
+        red: "2"
+      - path: kernel.release
+        green: "6.8.0-45-generic"
+        red: "6.8.0-48-generic"
+    note: Manual class and intermittent; the kernel patch level is a decoy.

@@ -7,6 +7,7 @@ import dev.gmitch215.drift.json.JsonString
 import dev.gmitch215.drift.json.JsonValue
 import dev.gmitch215.drift.json.obj
 import dev.gmitch215.drift.math.FixedPoint
+import dev.gmitch215.drift.model.Dimension
 import dev.gmitch215.drift.rank.Tier
 
 /** A candidate as one model ordered it, with the probability that model gave it. */
@@ -129,6 +130,59 @@ object Models {
                 val decoys = o.scenario.decoys.map { it.path }.toSet()
                 val p = if (o.changed.isEmpty()) 0 else Metrics.MICRO / o.changed.size
                 Pred(o, o.changed.map { Entry(it, it == cause, it in decoys, null, false, p) })
+            }
+        },
+    )
+
+    val diffDimensionOrder = Model(
+        "diff-dimension-order",
+        "every changed attribute in the order `drift diff` prints them: dimension, then path",
+        false,
+        Learner {
+            { o ->
+                val cause = o.scenario.cause?.path
+                val decoys = o.scenario.decoys.map { it.path }.toSet()
+                val p = if (o.changed.isEmpty()) 0 else Metrics.MICRO / o.changed.size
+                val printed = o.changed.sortedWith(
+                    compareBy({ Dimension.of(it)?.ordinal ?: Int.MAX_VALUE }, { it }),
+                )
+                Pred(o, printed.map { Entry(it, it == cause, it in decoys, null, false, p) })
+            }
+        },
+    )
+
+    val dimensionPrior = Model(
+        "dimension-prior",
+        "every changed attribute, largest hand-set dimension prior first, then path",
+        false,
+        Learner {
+            { o ->
+                val cause = o.scenario.cause?.path
+                val decoys = o.scenario.decoys.map { it.path }.toSet()
+                val p = if (o.changed.isEmpty()) 0 else Metrics.MICRO / o.changed.size
+                val prior = { path: String ->
+                    Dimension.of(path)?.let { Table.handSet.dimensions[it] } ?: 0L
+                }
+                val byPrior = o.changed.sortedWith(compareBy({ -prior(it) }, { it }))
+                Pred(o, byPrior.map { Entry(it, it == cause, it in decoys, null, false, p) })
+            }
+        },
+    )
+
+    private val flat = Table(
+        Table.handSet.dimensions.mapValues { Metrics.MICRO },
+        Metrics.MICRO,
+        Table.handSet.rules,
+    )
+
+    val rulesOnly = Model(
+        "rules-only",
+        "ranker candidates ordered by matched rule weight alone, then path",
+        false,
+        Learner {
+            { o ->
+                val p = if (o.ranked.isEmpty()) 0 else Metrics.MICRO / o.ranked.size
+                Pred(o, ordered(o, flat, false).map { (c, _) -> entry(c, p) })
             }
         },
     )
@@ -296,7 +350,15 @@ object Models {
         fullIso,
     )
 
-    val everything = listOf(random, diffOrder, handSet, scoreOrder) + all
+    val everything = listOf(
+        random,
+        diffOrder,
+        diffDimensionOrder,
+        dimensionPrior,
+        rulesOnly,
+        handSet,
+        scoreOrder,
+    ) + all
 }
 
 object Evaluate {
@@ -338,7 +400,7 @@ object Evaluate {
     private fun mean(values: List<Long>): JsonInt =
         JsonInt(if (values.isEmpty()) 0 else Metrics.divRound(values.sum(), values.size.toLong()))
 
-    private fun count(n: Int, total: Int): JsonObject = rateJson(Rate(n, total))
+    internal fun count(n: Int, total: Int): JsonObject = rateJson(Rate(n, total))
 
     private fun confident(t: Tier?) = t != null && t.ordinal >= Tier.PLAUSIBLE.ordinal
 

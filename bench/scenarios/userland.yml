@@ -33,8 +33,6 @@ templates:
         path: os.release.PRETTY_NAME
       - dimension: os
         path: tool.libc.version
-      - dimension: os
-        path: "{{id_path}}"
 
   - id: userland-shell-bashism
     title: A script written for bash is started with sh
@@ -62,3 +60,229 @@ templates:
       attribute: shell that runs the script
       direction: changed
     visible: false
+
+  - id: userland-grep-perl
+    title: A script uses a grep option that BusyBox does not implement
+    dimension: userland
+    instances: 2
+    variants:
+      - cmd: "printf 'item 42\\n' | grep -oP '\\d+'"
+        red_image: "alpine:3.21"
+      - cmd: "printf 'id=7\\n' | grep -oP '(?<=id=)\\d+'"
+        red_image: "alpine:3.22"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      {{cmd}} > /dev/null || { echo "extract: grep rejected the pattern flags"; exit 1; }
+      echo ok
+    signature: "extract: grep rejected the pattern flags"
+    green:
+      image: "debian:12-slim"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: userland
+      path: tool.coreutils.flavor
+      attribute: userland flavor
+      direction: changed
+    bundle:
+      - dimension: userland
+        path: tool.coreutils.version
+      - dimension: os
+        path: os.release.ID
+      - dimension: os
+        path: os.release.VERSION_ID
+      - dimension: os
+        path: os.release.PRETTY_NAME
+      - dimension: os
+        path: tool.libc.family
+      - dimension: os
+        path: tool.libc.version
+
+  - id: userland-date-relative
+    title: A script asks date for a relative day and the red userland only reads absolute times
+    dimension: userland
+    instances: 3
+    variants:
+      - when: yesterday
+        red_image: "alpine:3.21"
+      - when: tomorrow
+        red_image: "alpine:3.22"
+      - when: "last monday"
+        red_image: "alpine:3.21"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      date -d '{{when}}' +%F > /dev/null || { echo "report: date could not read '{{when}}'"; exit 1; }
+      echo ok
+    signature: "report: date could not read '{{when}}'"
+    green:
+      image: "debian:12-slim"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: userland
+      path: tool.coreutils.flavor
+      attribute: userland flavor
+      direction: changed
+    bundle:
+      - dimension: userland
+        path: tool.coreutils.version
+      - dimension: os
+        path: os.release.ID
+      - dimension: os
+        path: os.release.VERSION_ID
+      - dimension: os
+        path: os.release.PRETTY_NAME
+      - dimension: os
+        path: tool.libc.family
+      - dimension: os
+        path: tool.libc.version
+
+  - id: userland-find-printf
+    title: A script formats find output with printf and the red userland is BusyBox
+    dimension: userland
+    instances: 2
+    variants:
+      - fmt: '%f\n'
+        red_image: "alpine:3.21"
+      - fmt: '%s %p\n'
+        red_image: "alpine:3.22"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      find /etc -maxdepth 1 -name hostname -printf '{{fmt}}' > /dev/null || { echo "inventory: find does not know -printf"; exit 1; }
+      echo ok
+    signature: "inventory: find does not know -printf"
+    green:
+      image: "debian:12-slim"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: userland
+      path: tool.coreutils.flavor
+      attribute: userland flavor
+      direction: changed
+    bundle:
+      - dimension: userland
+        path: tool.coreutils.version
+      - dimension: os
+        path: os.release.ID
+      - dimension: os
+        path: os.release.VERSION_ID
+      - dimension: os
+        path: os.release.PRETTY_NAME
+      - dimension: os
+        path: tool.libc.family
+      - dimension: os
+        path: tool.libc.version
+
+  - id: userland-coreutils-new-flag
+    title: A script uses a coreutils option added in release 9 and the red image has release 8
+    dimension: userland
+    instances: 3
+    variants:
+      - cmd: "cksum -a sha256 /etc/hostname"
+        sig: "invalid option"
+        green_image: "debian:12-slim"
+        red_image: "debian:bullseye-slim"
+      - cmd: "ls --zero /etc"
+        sig: "unrecognized option"
+        green_image: "debian:12-slim"
+        red_image: "debian:bullseye-slim"
+      - cmd: "ls --zero /etc"
+        sig: "unrecognized option"
+        green_image: "debian:12-slim"
+        red_image: "ubuntu:22.04"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      {{cmd}} > /dev/null
+    signature: "{{sig}}"
+    green:
+      image: "{{green_image}}"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: userland
+      path: tool.coreutils.version
+      attribute: coreutils version
+      direction: lower
+    bundle:
+      - dimension: os
+        path: os.release.VERSION_ID
+      - dimension: os
+        path: os.release.PRETTY_NAME
+      - dimension: os
+        path: tool.libc.version
+
+  - id: userland-bash-only-builtins
+    title: A script written for bash uses a builtin that the POSIX shell lacks
+    dimension: userland
+    instances: 3
+    variants:
+      - stmt: 'echo -e "a\tb" | grep -q "^a.b$"'
+        sig: "setup: builtin missing"
+      - stmt: 'printf "1 2\n" | { read -a parts; [ "${parts[1]}" = 2 ]; }'
+        sig: "Bad substitution"
+      - stmt: 'cat <(echo ok) > /dev/null'
+        sig: "Syntax error"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      {{stmt}} || { echo "setup: builtin missing"; exit 1; }
+      echo ok
+    signature: "{{sig}}"
+    base:
+      image: "debian:12-slim"
+    green:
+      interpreter: bash
+    red:
+      interpreter: sh
+    cause:
+      dimension: userland
+      path: tool.shell.flavor
+      attribute: shell that runs the script
+      direction: changed
+    visible: false
+
+  - id: userland-gnu-long-options
+    title: A script passes a GNU long option that BusyBox does not know
+    dimension: userland
+    instances: 3
+    variants:
+      - cmd: "echo a:b:c | cut -d: --complement -f2"
+        red_image: "alpine:3.21"
+      - cmd: "stat --printf='%s\\n' /etc/hostname"
+        red_image: "alpine:3.22"
+      - cmd: "ls --time-style=+%s -l /etc/hostname"
+        red_image: "alpine:3.22"
+      - cmd: "echo a b | xargs -d ' ' echo"
+        red_image: "alpine:3.21"
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      {{cmd}} > /dev/null
+    signature: "unrecognized option"
+    green:
+      image: "debian:12-slim"
+    red:
+      image: "{{red_image}}"
+    cause:
+      dimension: userland
+      path: tool.coreutils.flavor
+      attribute: userland flavor
+      direction: changed
+    bundle:
+      - dimension: userland
+        path: tool.coreutils.version
+      - dimension: os
+        path: os.release.ID
+      - dimension: os
+        path: os.release.VERSION_ID
+      - dimension: os
+        path: os.release.PRETTY_NAME
+      - dimension: os
+        path: tool.libc.family
+      - dimension: os
+        path: tool.libc.version

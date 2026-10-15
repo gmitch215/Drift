@@ -104,3 +104,260 @@ templates:
     decoys:
       - dimension: locale
         path: env.LANG
+
+  - id: locale-node-tr-case
+    title: A Turkish or Azeri language setting maps the letter i to a dotted capital
+    dimension: locale
+    instances: 2
+    draw:
+      lang: [tr_TR.UTF-8, az_AZ.UTF-8, tr_CY.UTF-8]
+    runtime: node
+    program: |
+      if (process.env.BENCH_FLAKE !== "1") {
+        console.log("ok");
+        process.exit(0);
+      }
+      const tag = Intl.DateTimeFormat().resolvedOptions().locale;
+      const up = "title".toLocaleUpperCase(tag);
+      if (up !== "TITLE") {
+        console.log("report: toLocaleUpperCase(" + tag + ") gave " + up + ", expected TITLE");
+        process.exit(1);
+      }
+      console.log("ok");
+    signature: ", expected TITLE"
+    base:
+      image: "node:24-bookworm-slim"
+    green:
+      env:
+        LANG: C.UTF-8
+    red:
+      env:
+        LANG: "{{lang}}"
+    cause:
+      dimension: locale
+      path: env.LANG
+      attribute: LANG
+      direction: changed
+
+  - id: locale-node-collation-decoy
+    title: Sorting accented words flips under a Swedish or Finnish setting, with the timezone changed beside it
+    dimension: locale
+    instances: 2
+    variants:
+      - red_lang: sv_SE.UTF-8
+        red_tz: Asia/Tokyo
+      - red_lang: fi_FI.UTF-8
+        red_tz: America/Chicago
+    runtime: node
+    program: |
+      if (process.env.BENCH_FLAKE !== "1") {
+        console.log("ok");
+        process.exit(0);
+      }
+      const order = ["z", "\u00e4", "a"].sort(new Intl.Collator().compare).join("");
+      if (order !== "a\u00e4z") {
+        console.log("sorted list " + order + " differs from the expected a\u00e4z");
+        process.exit(1);
+      }
+      console.log("ok");
+    signature: "differs from the expected"
+    base:
+      image: "node:24-bookworm-slim"
+    green:
+      env:
+        LANG: de_DE.UTF-8
+        TZ: UTC
+    red:
+      env:
+        LANG: "{{red_lang}}"
+        TZ: "{{red_tz}}"
+    cause:
+      dimension: locale
+      path: env.LANG
+      attribute: LANG
+      direction: changed
+    decoys:
+      - dimension: locale
+        path: env.TZ
+
+  - id: locale-node-number-format
+    title: A total formatted with the default locale cannot be parsed back
+    dimension: locale
+    instances: 3
+    draw:
+      lang: [de_DE.UTF-8, fr_FR.UTF-8, es_ES.UTF-8]
+    runtime: node
+    program: |
+      if (process.env.BENCH_FLAKE !== "1") {
+        console.log("ok");
+        process.exit(0);
+      }
+      const text = (1234567.5).toLocaleString();
+      if (Number(text.replace(/,/g, "")) !== 1234567.5) {
+        console.log("cannot parse the total " + text);
+        process.exit(1);
+      }
+      console.log("ok");
+    signature: "cannot parse the total"
+    base:
+      image: "node:24-bookworm-slim"
+    green:
+      env:
+        LANG: en_US.UTF-8
+    red:
+      env:
+        LANG: "{{lang}}"
+    cause:
+      dimension: locale
+      path: env.LANG
+      attribute: LANG
+      direction: changed
+
+  - id: locale-lcall-precedence
+    title: A forced LC_ALL wins over the language setting that the program was tested with
+    dimension: locale
+    instances: 2
+    variants:
+      - forced: sv_SE.UTF-8
+      - forced: fi_FI.UTF-8
+    runtime: node
+    program: |
+      if (process.env.BENCH_FLAKE !== "1") {
+        console.log("ok");
+        process.exit(0);
+      }
+      const order = ["z", "\u00e4", "a"].sort(new Intl.Collator().compare).join("");
+      if (order !== "a\u00e4z") {
+        console.log("sorted list " + order + " differs from the expected a\u00e4z");
+        process.exit(1);
+      }
+      console.log("ok");
+    signature: "differs from the expected"
+    base:
+      image: "node:24-bookworm-slim"
+      env:
+        LANG: de_DE.UTF-8
+    red:
+      env:
+        LC_ALL: "{{forced}}"
+    cause:
+      dimension: locale
+      path: env.LC_ALL
+      attribute: LC_ALL
+      direction: added
+
+  - id: locale-wc-multibyte
+    title: A character count treats a multibyte letter as several in the C locale
+    dimension: locale
+    instances: 3
+    variants:
+      - check: |
+          n=$(printf 'caf\303\251' | wc -m)
+          [ "$n" = 4 ] || { echo "wc counted $n characters in a 4 character word"; exit 1; }
+        sig: "wc counted"
+        red_lang: C
+      - check: |
+          printf 'caf\303\251\n' | grep -q '^....$' || { echo "grep dots matched bytes, not letters"; exit 1; }
+        sig: "grep dots matched bytes"
+        red_lang: POSIX
+      - check: |
+          n=$(printf 'caf\303\251' | wc -m)
+          [ "$n" = 4 ] || { echo "wc counted $n characters in a 4 character word"; exit 1; }
+        sig: "wc counted"
+        red_lang: POSIX
+    runtime: sh
+    program: |
+      if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
+      {{check}}
+      echo ok
+    signature: "{{sig}}"
+    base:
+      image: "debian:12-slim"
+    green:
+      env:
+        LANG: C.UTF-8
+    red:
+      env:
+        LANG: "{{red_lang}}"
+    cause:
+      dimension: locale
+      path: env.LANG
+      attribute: LANG
+      direction: changed
+
+  - id: locale-java-default-charset
+    title: A JDK 17 program writes a letter with the default charset and the locale is the C locale
+    dimension: locale
+    instances: 2
+    variants:
+      - red_lang: C
+      - red_lang: POSIX
+    runtime: java
+    program: |
+      public class Prog {
+          public static void main(String[] args) {
+              if (!"1".equals(System.getenv("BENCH_FLAKE"))) {
+                  System.out.println("ok");
+                  return;
+              }
+              int n = String.valueOf((char) 0xE9).getBytes().length;
+              if (n != 2) {
+                  System.out.println("default charset encoded the letter in " + n + " bytes");
+                  System.exit(1);
+              }
+              System.out.println("ok");
+          }
+      }
+    signature: "default charset encoded the letter"
+    base:
+      image: "eclipse-temurin:17"
+    green:
+      env:
+        LC_ALL: C.UTF-8
+    red:
+      env:
+        LC_ALL: "{{red_lang}}"
+    cause:
+      dimension: locale
+      path: env.LC_ALL
+      attribute: LC_ALL
+      direction: changed
+
+  - id: locale-python-coercion-bundle
+    title: The C locale with Python locale coercion and UTF-8 mode switched off
+    dimension: locale
+    instances: 2
+    variants:
+      - red_lc: C
+      - red_lc: POSIX
+    runtime: python3
+    program: |
+      import os
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      print("caf\u00e9")
+    signature: UnicodeEncodeError
+    base:
+      image: "python:3.12-slim"
+    green:
+      env:
+        LANG: C.UTF-8
+    red:
+      env:
+        LANG: C.UTF-8
+        LC_ALL: "{{red_lc}}"
+        PYTHONCOERCECLOCALE: "0"
+        PYTHONUTF8: "0"
+    cause:
+      dimension: locale
+      path: env.LC_ALL
+      attribute: LC_ALL
+      direction: added
+    bundle:
+      - dimension: env
+        path: env.PYTHONCOERCECLOCALE
+      - dimension: env
+        path: env.PYTHONUTF8

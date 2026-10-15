@@ -16,6 +16,7 @@ import dev.gmitch215.drift.know.Severity
 import dev.gmitch215.drift.model.Dimension
 import dev.gmitch215.drift.rank.Tier
 import dev.gmitch215.drift.rank.Weights
+import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -49,6 +50,11 @@ class CalibrationTest {
 
     private fun arm() = Arm(
         "img", emptyMap(), "1g", "1", null, emptyMap(), "none", emptyMap(), null, emptyList(), 0, 0,
+    )
+
+    private fun failing() = Arm(
+        "img", emptyMap(), "1g", "1", null, emptyMap(), "none", emptyMap(), null, emptyList(), 0,
+        1000,
     )
 
     private fun observed(id: String, vararg cands: Cand) = Observed(
@@ -181,9 +187,9 @@ class CalibrationTest {
     fun noFitOrEvaluationPathReachesATestScenario() {
         val seen = mutableListOf<String>()
         val lab = lab("probed") { seen += it }
-        val test = SplitRule.split(
+        val test = SplitRule.splitScenarios(
             (CanonicalJson.parse(BenchData.text("scenarios.json")) as JsonArray).items
-                .map { it.obj().require("id").string() },
+                .map { Scenario.fromJson(it) },
         ).test
         assertTrue(test.isNotEmpty())
         assertTrue(lab.devIds.none { it in test })
@@ -472,12 +478,152 @@ class CalibrationTest {
     }
     // #endregion
 
+    // #region analysis
+    private fun withCause(id: String, template: String, vararg cands: Cand) = Observed(
+        Scenario(
+            id, template, "t", "env", 1, "sh", "", "", null, 20, arm(), arm(),
+            Cause("env", "x.env", "a", "lower"), emptyList(), emptyList(), true, true,
+            emptyList(), "",
+        ),
+        emptyList(),
+        cands.toList(),
+    )
+
+    private fun interval(bootstrap: JsonObject, model: Int, metric: String) =
+        ((bootstrap.require("models") as JsonArray).items[model] as JsonObject).obj(metric)
+
+    @Test
+    fun theBootstrapDrawsWholeTemplatesSoSiblingsMoveTogether() {
+        fun pred(id: String, template: String, hit: Boolean) = Pred(
+            withCause(id, template, cand(Dimension.ENV, hit)),
+            listOf(Entry("x.env", hit, false, null, false, 0)),
+        )
+        val allHit = (1..3).map { pred("a$it", "a", true) } + pred("b1", "b", true)
+        val same = Analysis.bootstrap(allHit, emptyList(), 7)
+        assertEquals(1_000_000L, interval(same, 0, "top1").require("low").long())
+        assertEquals(4L, same.require("scenarios").long())
+        assertEquals(2L, same.require("templates").long())
+        val split = listOf(pred("a1", "a", true), pred("a2", "a", true), pred("b1", "b", false))
+        val top1 = interval(Analysis.bootstrap(split, emptyList(), 7), 0, "top1")
+        assertEquals(667_000L, Metrics.divRound(top1.require("micro").long(), 1000) * 1000)
+        assertEquals(0L, top1.require("low").long())
+        assertEquals(1_000_000L, top1.require("high").long())
+        assertEquals(
+            CanonicalJson.encode(Analysis.bootstrap(split, emptyList(), 7)),
+            CanonicalJson.encode(Analysis.bootstrap(split, emptyList(), 7)),
+        )
+    }
+
+    @Test
+    fun theShippedIntervalsAreTemplateClusteredAndBracketThePointEstimate() {
+        val analysis = analysis()
+        val boot = analysis.obj("bootstrap")
+        assertEquals(Analysis.RESAMPLES.toLong(), boot.require("resamples").long())
+        assertEquals("template", boot.require("unit").string())
+        for (metric in listOf("top1", "top3", "mrr")) {
+            val i = interval(boot, 0, metric)
+            val point = i.require("micro").long()
+            assertTrue(i.require("low").long() <= point, metric)
+            assertTrue(point <= i.require("high").long(), metric)
+        }
+        assertEquals(
+            listOf("hand-set") + Analysis.BASELINE_IDS,
+            (boot.require("models") as JsonArray).items.map {
+                (it as JsonObject).require("id").string()
+            },
+        )
+    }
+
+    @Test
+    fun theSampleSizeFormulasReproduceTheGapsTable() {
+        fun rounded(micro: Long) = Metrics.divRound(micro, 1_000_000L)
+        val z = Analysis.Z_ONE_SIDED to Analysis.Z_POWER
+        assertEquals(
+            77L,
+            rounded(Analysis.sampleSize(362_000, 500_000, z.first, z.second)),
+        )
+        assertEquals(
+            311L,
+            rounded(Analysis.sampleSize(575_000, 644_000, z.first, z.second)),
+        )
+        assertEquals(
+            191L,
+            rounded(Analysis.twoSample(470_000, 330_000, Analysis.Z_TWO_SIDED, z.second)),
+        )
+        assertEquals(
+            64L,
+            rounded(Analysis.twoSample(440_000, 210_000, Analysis.Z_TWO_SIDED, z.second)),
+        )
+        assertEquals(
+            61L,
+            rounded(Analysis.halfWidth(800_000, Analysis.Z_TWO_SIDED, 100_000)),
+        )
+        assertEquals(384L, rounded(Analysis.halfWidth(500_000, Analysis.Z_TWO_SIDED, 50_000)))
+        assertFailsWith<IllegalArgumentException> {
+            Analysis.sampleSize(500_000, 500_000, z.first, z.second)
+        }
+    }
+
+    @Test
+    fun thePowerTableIsGeneratedFromTheCurrentCounts() {
+        val rows = (analysis().obj("power").require("rows") as JsonArray).items
+            .associate { (it as JsonObject).let { r -> r.require("id").string() to r } }
+        assertEquals(77L, rows.getValue("top1_vs_random").require("needed").long())
+        assertEquals(303L, rows.getValue("top3_vs_random").require("needed").long())
+        assertEquals(211L, rows.getValue("top1_vs_alphabetical").require("needed").long())
+        assertEquals(45L, rows.getValue("top3_vs_random").require("now").long())
+        assertEquals(62L, rows.getValue("bundle_honesty").require("needed").long())
+        assertEquals(383L, rows.getValue("stuck_rate").require("needed").long())
+    }
+
+    @Test
+    fun theFalseConfirmedBoundsAreLabelledPerVerdictAndPerRun() {
+        assertTrue(abs(Analysis.zeroEventBound(59) - 49_508L) <= 2)
+        assertTrue(abs(Analysis.zeroEventBound(180) - 16_505L) <= 2)
+        assertEquals(299L, Analysis.zeroEventSample(10_000))
+        assertFailsWith<IllegalArgumentException> { Analysis.zeroEventBound(0) }
+        val f = Analysis.falseConfirmed()
+        assertTrue(f.obj("per_confirmed_verdict").require("label").string().contains("CONFIRMED"))
+        assertTrue(f.obj("per_run").require("label").string().contains("runs"))
+        assertEquals(913L, f.obj("per_run").require("runs_needed_for_1_percent").long())
+    }
+
+    @Test
+    fun bundleHonestyIsScoredAgainstTheDeclaredMembers() {
+        val bundled = Cand(
+            "x.a", Dimension.ENV, false, emptyList(), Tier.DIFFERENCE, true, 0, null, true, false,
+        )
+        val member = Cand(
+            "x.b", Dimension.ENV, false, emptyList(), Tier.DIFFERENCE, true, 0, null, false, false,
+        )
+        val other = Cand(
+            "x.c", Dimension.ENV, false, emptyList(), Tier.DIFFERENCE, true, 0, null, false, false,
+        )
+        val s = withCause("b1", "t", bundled, member, other).scenario
+        val declared = Scenario(
+            s.id, s.template, "t", "env", 1, "sh", "", "", null, 20, arm(), failing(),
+            Cause("env", "x.a", "a", "lower"), listOf(Attr("env", "x.b"), Attr("env", "x.d")),
+            emptyList(), true, true, emptyList(), "",
+        )
+        val o = Observed(declared, emptyList(), listOf(bundled, member, other))
+        val pred = Pred(o, o.ranked.map { Entry(it.path, it.label, false, it.tier, true, 0) })
+        val h = Analysis.bundleHonesty(listOf(pred))
+        assertEquals(1L, h.obj("cause_in_bundle").require("count").long())
+        assertEquals(3_000_000L, h.require("mean_bundle_size_micro").long())
+        assertEquals(666_666L, h.require("declared_member_precision_micro").long())
+        assertEquals(666_666L, h.require("declared_member_recall_micro").long())
+    }
+
+    private fun analysis() = CanonicalJson.parse(BenchData.text("calibration/evaluation.json"))
+        .obj().obj("analysis")
+    // #endregion
+
     private companion object {
         const val SEED = 20261006L
         const val PINNED_FIT_SHA256 =
             "fbbb6f45b04e77b495b5d42bc37d695d91f69dc54f250154e65bd3094624a31c"
         const val PINNED_EVALUATION_SHA256 =
-            "4effe497e388cf3ce83cb540971e8bd7f767ee11d41226681b4a9a2eea9ee374"
+            "b55ca827569c59cc0cdb620474adce9093b601a5a82df5e7d2f9155d5cd4d507"
 
         val OBSERVED: List<Observed> by lazy {
             Lab.parse(

@@ -138,3 +138,211 @@ templates:
     decoys:
       - dimension: network
         path: env.NO_PROXY
+
+  - id: network-proxy-lowercase
+    title: A lowercase proxy variable points at a closed port and a loopback call goes through it
+    dimension: network
+    instances: 2
+    draw:
+      port: ["9", "1", "7"]
+    runtime: python3
+    program: |
+      import os
+      import sys
+      import threading
+      import urllib.request
+      from http.server import BaseHTTPRequestHandler, HTTPServer
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+
+
+      class Handler(BaseHTTPRequestHandler):
+          def do_GET(self):
+              self.send_response(200)
+              self.end_headers()
+              self.wfile.write(b"pong")
+
+          def log_message(self, *args):
+              pass
+
+
+      server = HTTPServer(("127.0.0.1", 0), Handler)
+      threading.Thread(target=server.serve_forever, daemon=True).start()
+      url = "http://127.0.0.1:%d/" % server.server_port
+      print(urllib.request.urlopen(url, timeout=5).read())
+    signature: "Connection refused"
+    base:
+      image: "python:3.12-slim"
+    red:
+      env:
+        http_proxy: "http://127.0.0.1:{{port}}"
+    cause:
+      dimension: network
+      path: env.http_proxy
+      attribute: http_proxy
+      direction: added
+
+  - id: network-no-proxy-removed
+    title: The red container lacks the no-proxy entry that lets a loopback call skip a dead proxy
+    dimension: network
+    instances: 2
+    variants:
+      - bypass: "127.0.0.1"
+      - bypass: "localhost,127.0.0.1"
+    runtime: python3
+    program: |
+      import os
+      import sys
+      import threading
+      import urllib.request
+      from http.server import BaseHTTPRequestHandler, HTTPServer
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+
+
+      class Handler(BaseHTTPRequestHandler):
+          def do_GET(self):
+              self.send_response(200)
+              self.end_headers()
+              self.wfile.write(b"pong")
+
+          def log_message(self, *args):
+              pass
+
+
+      server = HTTPServer(("127.0.0.1", 0), Handler)
+      threading.Thread(target=server.serve_forever, daemon=True).start()
+      url = "http://127.0.0.1:%d/" % server.server_port
+      print(urllib.request.urlopen(url, timeout=5).read())
+    signature: "Connection refused"
+    base:
+      image: "python:3.12-slim"
+      env:
+        HTTP_PROXY: "http://127.0.0.1:9"
+    green:
+      env:
+        NO_PROXY: "{{bypass}}"
+    cause:
+      dimension: network
+      path: env.NO_PROXY
+      attribute: NO_PROXY
+      direction: removed
+
+  - id: network-hosts-stale
+    title: A service name maps to a stale address in the red hosts file and the connection is refused
+    dimension: network
+    instances: 2
+    variants:
+      - host: cache.internal
+      - host: queue.internal
+    runtime: python3
+    program: |
+      import os
+      import socket
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      server = socket.socket()
+      server.bind(("127.0.0.1", 0))
+      server.listen(1)
+      port = server.getsockname()[1]
+      socket.create_connection(("{{host}}", port), timeout=5)
+      print("connected")
+    signature: "Connection refused"
+    base:
+      image: "python:3.12-slim"
+    green:
+      files:
+        /etc/hosts: "127.0.0.1 localhost\n127.0.0.1 {{host}}\n"
+    red:
+      files:
+        /etc/hosts: "127.0.0.1 localhost\n127.0.0.2 {{host}}\n"
+    cause:
+      dimension: network
+      path: network.hosts
+      attribute: hosts file
+      direction: changed
+    visible: false
+    note: The capsule does not read /etc/hosts yet.
+
+  - id: network-nsswitch-order
+    title: The red name service switch drops the files source, so a hosts entry no longer resolves
+    dimension: network
+    instances: 2
+    variants:
+      - host: registry.internal
+      - host: vault.internal
+    runtime: python3
+    program: |
+      import os
+      import socket
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      print(socket.gethostbyname("{{host}}"))
+    signature: gaierror
+    base:
+      image: "python:3.12-slim"
+      files:
+        /etc/hosts: "127.0.0.1 localhost\n127.0.0.1 {{host}}\n"
+    green:
+      files:
+        /etc/nsswitch.conf: "passwd: files\ngroup: files\nhosts: files dns\n"
+    red:
+      files:
+        /etc/nsswitch.conf: "passwd: files\ngroup: files\nhosts: dns\n"
+    cause:
+      dimension: network
+      path: network.nsswitch
+      attribute: name service switch
+      direction: changed
+    visible: false
+    note: The capsule does not read /etc/nsswitch.conf yet.
+
+  - id: network-interface-missing
+    title: The red container has no network interface that is up besides loopback
+    dimension: network
+    instances: 2
+    variants:
+      - svc: metrics
+      - svc: agent
+    runtime: python3
+    program: |
+      import os
+      import socket
+      import sys
+
+      if os.environ.get("BENCH_FLAKE") != "1":
+          print("ok")
+          sys.exit(0)
+      names = [
+          name
+          for _, name in socket.if_nameindex()
+          if name != "lo" and open("/sys/class/net/%s/operstate" % name).read().strip() == "up"
+      ]
+      if not names:
+          print("{{svc}}: no usable network interface besides lo")
+          sys.exit(1)
+      print("ok", names)
+    signature: "no usable network interface"
+    base:
+      image: "python:3.12-slim"
+    green:
+      network: bridge
+    red:
+      network: none
+    cause:
+      dimension: network
+      path: network.mode
+      attribute: container network mode
+      direction: changed
+    visible: false
+    note: The capsule does not read network interfaces yet.
