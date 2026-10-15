@@ -14,12 +14,21 @@ val coverageModules = CoverageModules.all
 val coverageRoots = coverageModules.flatMap { listOf("$it/src/common/main", "$it/src/jvm/main") }
 val sourceTrees = files(coverageModules.map { fileTree("$it/src") { include("*/main/**/*.kt") } })
 
-val sharedRatio = tasks.register<SharedRatioTask>("sharedRatio") {
+fun SharedRatioTask.configure(rewrite: Boolean) {
     root = layout.projectDirectory
     sources.from(sourceTrees)
     modules = moduleNames
     floor = 80.0
-    hostBudget = 630
+    hostBudget = 545
+    readme = layout.projectDirectory.file("README.md")
+    rewriteReadme = rewrite
+}
+
+val sharedRatio = tasks.register<SharedRatioTask>("sharedRatio") { configure(false) }
+
+tasks.register<SharedRatioTask>("sharedRatioReadme") {
+    configure(true)
+    outputs.upToDateWhen { false }
 }
 
 val checkLineLength = tasks.register<LineLengthTask>("checkLineLength") {

@@ -78,4 +78,32 @@ class SharedRatioTest {
         assertTrue(table.lines().any { it.startsWith("core") && it.endsWith("90.0%") })
         assertTrue(table.lines().any { it.startsWith("total") })
     }
+
+    private val sample = mapOf(
+        "host" to SharedRatio.Lines(2, 2),
+        "core" to SharedRatio.Lines(8, 0),
+    )
+
+    @Test
+    fun readmeLineNamesEveryModuleAndTheTotal() {
+        val line = SharedRatio.readmeLine(sample)
+        assertTrue("Shared code 83.3%: host 50.0%, core 100.0%" in line, line)
+        assertTrue(SharedRatio.README_MARKER in line)
+    }
+
+    @Test
+    fun withReadmeLineReplacesOnlyTheMarkedLineAndKeepsItsIndent() {
+        val text = "# Title\n    <p data-shared-ratio>old</p>\ntail\n"
+        val updated = SharedRatio.withReadmeLine(text, sample)!!
+        val lines = updated.lines()
+        assertEquals("# Title", lines[0])
+        assertEquals("    " + SharedRatio.readmeLine(sample), lines[1])
+        assertEquals("tail", lines[2])
+        assertEquals(updated, SharedRatio.withReadmeLine(updated, sample))
+    }
+
+    @Test
+    fun withReadmeLineIsNullWithoutAMarker() {
+        assertEquals(null, SharedRatio.withReadmeLine("no marker\n", sample))
+    }
 }

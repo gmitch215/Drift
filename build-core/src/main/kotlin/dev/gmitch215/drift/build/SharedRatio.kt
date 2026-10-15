@@ -4,9 +4,11 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.PathSensitive
@@ -68,6 +70,26 @@ object SharedRatio {
         return out.toString()
     }
 
+    const val README_MARKER = "data-shared-ratio"
+
+    fun readmeLine(result: Map<String, Lines>): String {
+        val shared = result.values.sumOf { it.shared }
+        val platform = result.values.sumOf { it.platform }
+        val modules = result.entries.joinToString(", ") {
+            "%s %.1f%%".format(it.key, percent(it.value.shared, it.value.platform))
+        }
+        val total = "%.1f%%".format(percent(shared, platform))
+        return "<p style=\"text-align: center;\" $README_MARKER>Shared code $total: $modules</p>"
+    }
+
+    fun withReadmeLine(text: String, result: Map<String, Lines>): String? {
+        val lines = text.split("\n").toMutableList()
+        val at = lines.indexOfFirst { README_MARKER in it }
+        if (at < 0) return null
+        lines[at] = lines[at].takeWhile { it == ' ' } + readmeLine(result)
+        return lines.joinToString("\n")
+    }
+
     fun violations(
         result: Map<String, Lines>,
         floor: Double,
@@ -114,11 +136,32 @@ abstract class SharedRatioTask : DefaultTask() {
     @get:Input
     abstract val hostBudget: Property<Int>
 
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val readme: RegularFileProperty
+
+    @get:Input
+    abstract val rewriteReadme: Property<Boolean>
+
     @TaskAction
     fun check() {
         val result = SharedRatio.measure(root.get().asFile, modules.get())
         print(SharedRatio.table(result))
-        val problems = SharedRatio.violations(result, floor.get(), hostBudget.get())
+        val problems =
+            SharedRatio.violations(result, floor.get(), hostBudget.get()).toMutableList()
+        val file = readme.get().asFile
+        val text = file.readText()
+        val current = SharedRatio.withReadmeLine(text, result)
+        if (current == null) {
+            problems += "${file.name} has no line marked ${SharedRatio.README_MARKER}"
+        } else if (current != text) {
+            if (rewriteReadme.get()) {
+                file.writeText(current)
+            } else {
+                problems += "${file.name} shared-ratio line is stale; " +
+                    "run ./gradlew sharedRatioReadme"
+            }
+        }
         if (problems.isNotEmpty()) throw GradleException(problems.joinToString("\n"))
     }
 }

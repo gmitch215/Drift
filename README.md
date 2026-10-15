@@ -9,6 +9,7 @@
         <img src="https://img.shields.io/github/stars/gmitch215/Drift?style=flat" alt="stars">
         <img src="https://img.shields.io/github/commit-activity/t/gmitch215/Drift?color=violet" alt="commit activity">
     </div>
+    <p style="text-align: center;" data-shared-ratio>Shared code 91.8%: host 43.7%, core 100.0%, scan 100.0%, cli 72.5%, studio 95.3%, bench 81.6%</p>
 </div>
 
 ---
@@ -56,9 +57,10 @@ can. The full command reference is in [ADVANCED_USAGE.md](./ADVANCED_USAGE.md).
 
 In CI, `drift run -- COMMAND` runs a command and keeps its environment, exit code and log tail as a
 capsule directory. `drift import` builds the same directory from a saved GitHub Actions or GitLab CI
-log. `drift diagnose --against BASELINE` compares a saved passing run with the current one, and
-`drift bisect plan` and `drift bisect apply` narrow a green and red pair one test at a time. None of
-them opens a network connection.
+log. `drift diagnose --against BASELINE` compares a saved passing run with the current one.
+`drift diagnose --set` ranks the attribute values that split several passing runs from several
+failing ones, and `drift bisect plan` and `drift bisect apply` narrow a green and red pair one test
+at a time. None of them opens a network connection.
 
 `drift capture --project` adds the dependency versions, imports and call sites of the working directory to a capsule. `drift upgrade-check --to php=8.3,drupal=11` lists what a move to other versions breaks, from one capsule and the rule catalog (298 rules). `drift triage` reads an issue body offline and says which environment facts and rules it names. `drift contract` writes what a program needs from an environment and checks other capsules against it. Studio has a screen for each of the last three.
 
@@ -79,8 +81,8 @@ are recorded on Kotlin 2.5.0-Beta1, and a ladder of 14 compiler versions from 1.
 covers the JVM, macOS, Linux and Kotlin/JS targets that have a standalone compiler.
 
 32 probes differ between targets on 2.4.20, and 18 on 2.5.0-Beta1. Every probe carries a
-classification from primary sources: 10 are `documented` (a Kotlin page states the behavior), 3 are
-`platform-defined` (a JDK or ECMAScript page does) and 25 are `unclassified`, with the search that
+classification from primary sources: 10 are `documented` (a Kotlin page states the behavior), 4 are
+`platform-defined` (a JDK or ECMAScript page does) and 24 are `unclassified`, with the search that
 found no explanation. A divergence is data, not a verdict that something is a bug. `drift atlas diff`
 lists what changed between two compiler versions.
 
@@ -222,10 +224,12 @@ tests under Node.
 ### Command Line
 
 Executables land in `cli/build/bin/<target>/releaseExecutable/`. The macOS executable is `drift.kexe`
-and the Windows one is `drift.exe`.
+and the Windows one is `drift.exe`. On Linux, link `linkReleaseExecutableLinuxX64` (or `LinuxArm64`) and
+point the alias at `linuxX64/releaseExecutable/drift.kexe` instead.
 
 ```sh
-alias drift=cli/build/bin/macosArm64/releaseExecutable/drift.kexe
+./gradlew :cli:linkReleaseExecutableMacosArm64
+alias drift=$PWD/cli/build/bin/macosArm64/releaseExecutable/drift.kexe
 drift --version
 ```
 
@@ -235,7 +239,8 @@ drift version 1.0.0 (macos)
 
 On the JVM, `./gradlew :cli:jvmRun --args=--version` prints `drift version 1.0.0 (jvm)`, and any other
 command goes in `--args`. The macOS executable and the JVM build were run. The Linux arm64 and x64
-executables ran inside Debian containers. The Windows executable ran under Wine, not on Windows.
+executables ran inside Debian containers. The `mingwX64` tests run on GitHub's `windows-2025` runner; the
+Windows commands quoted in the usage guide ran under Wine.
 
 The default path runs offline: `drift capture` and `drift diagnose` complete under `docker run --network none`.
 
@@ -262,8 +267,8 @@ Open `http://localhost:8080/`, or `http://localhost:8080/#atlas` to start on the
 title is "Drift Studio". `--port 0` takes a free port, `--cert` and `--key` (or `--mkcert` with an
 existing mkcert CA) serve HTTPS on the JVM, macOS and Linux builds, and `--domain` adds names such
 as `drift.local`. Any static server works too: serve `studio/build/dist/wasmJs/productionExecutable`
-after `./gradlew :studio:wasmJsBrowserDistribution`. Nothing hosts the site until `docs.yml` has
-run.
+after `./gradlew :studio:wasmJsBrowserDistribution`. The documentation site serves the same build at
+<https://drift.gmitch215.dev/atlas/#atlas>, published by `docs.yml`.
 
 ### Android
 
@@ -442,16 +447,16 @@ lines per module and fails the build if a floor or budget is broken:
 
 ```
 module     common  platform  shared
-host          344       622   35.6%
-core        13526         0  100.0%
-scan         4920         0  100.0%
-cli          3605      1555   69.9%
-studio       2950       155   95.0%
-bench        1996       466   81.1%
-total       27341      2798   90.7%
+host          423       545   43.7%
+core        13540         0  100.0%
+scan         4928         0  100.0%
+cli          3697      1431   72.1%
+studio       2959       159   94.9%
+bench        2079       562   78.7%
+total       27626      2697   91.1%
 ```
 
-`host` is about a third common code and its platform lines are the process runners (POSIX, Windows and JVM) and the file and environment access; its budget is 630 lines. The platform lines of `cli` are the file and socket code behind `install` and `serve`. The
+`host` is about two fifths common code and its platform lines are the process runners (POSIX, Windows and JVM) and the file and environment access; its budget is 545 lines. The platform lines of `cli` are the file and socket code behind `install` and `serve`. The
 ratio counts the default targets: JVM, Linux, macOS, Windows and Wasm. `core` and the common code of
 `bench` use no `Double` or `Float`, so their results are the same on every target.
 
@@ -479,14 +484,18 @@ What a result does and does not show:
   some math functions differ between CPUs, and a Linux executable linked on Ubuntu prints different
   digits for three math probes than one linked on macOS. Each column is one run.
 - Coverage covers JVM code only. Kotlin/Native and Wasm have no coverage tool.
+- The build uses Gradle 9.8.0 and AGP 9.4.1, newer than the Gradle 7.6.3 to 9.7.0 and AGP 8.5.2 to 9.3.1
+  that the [Kotlin Multiplatform compatibility guide](https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html) lists for Kotlin 2.4.20. The workflows
+  build and test on it without a failure.
 
 What has not been run:
 
-- Windows. The Windows executable ran under Wine only, the `.msi` and `.exe` installers have not been
-  built, and `install.ps1` ran under PowerShell 7 on Linux, not on Windows.
+- Windows installers. The JVM and `mingwX64` tests run on GitHub's `windows-2025` runner in
+  `build.yml`, but the `.msi` and `.exe` installers have not been built, and `install.ps1` ran under
+  PowerShell 7 on Linux, not on Windows.
 - Safari. Studio loads in Chromium, Firefox and WebKit through Playwright, and not in Safari.
-- The workflows `build.yml`, `atlas.yml`, `docs.yml` and `release.yml`, so the badges above show no
-  status and the Homebrew and Chocolatey packages have never been installed from a published release.
+- `release.yml`. `build.yml`, `atlas.yml` and `docs.yml` run on every push, but no release has been
+  published, so the Homebrew and Chocolatey packages have never been installed from one.
 
 The measurements and their instruments are in the
 [Evaluation and Limits](./TECHNICAL_REPORT.md#evaluation-and-limits) section of the report.
