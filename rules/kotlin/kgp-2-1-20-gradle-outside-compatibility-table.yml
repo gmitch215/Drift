@@ -1,0 +1,95 @@
+schema: 1
+id: kgp-2-1-20-gradle-outside-compatibility-table
+title: Kotlin Multiplatform plugin 2.1.20 lists Gradle 7.6.3 through 8.11; a version outside it is untested
+applies:
+  - build
+difference: >-
+  side a is Gradle inside 7.6.3 through 8.11 or a Kotlin outside 2.1.20; side b is Kotlin 2.1.20 with Gradle outside 7.6.3 through 8.11
+symptoms:
+  - text: >-
+      none is quoted; the compatibility guide lists Gradle 7.6.3 through 8.11 for this plugin version and says nothing about versions outside it
+    basis: range
+mechanism: >-
+  The Kotlin Multiplatform compatibility guide lists Gradle 7.6.3 through 8.11 for Kotlin 2.1.20.
+detect:
+  all:
+    - b: project.gradle.kotlin.version
+      present: 'true'
+    - b: project.gradle.wrapper
+      present: 'true'
+    - b: project.gradle.kotlin.version
+      ver: '>=2.1.20,<=2.1.20'
+    - b: project.gradle.wrapper
+      ver:
+          - '<7.6.3'
+          - '>8.11'
+    - not:
+        all:
+          - a: project.gradle.kotlin.version
+            ver: '>=2.1.20,<=2.1.20'
+          - a: project.gradle.wrapper
+            ver:
+                - '<7.6.3'
+                - '>8.11'
+severity: medium
+provenance:
+  - url: https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'Version compatibility; row "2.1.20", cells "7.6.3-8.11" and "7.4.2-8.7.2"'
+fixtures:
+  positive:
+    - name: gradle 8.11 to 7.6.2 with kotlin 2.1.20
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.1.20'
+          project.gradle.wrapper: '7.6.3'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.1.20'
+          project.gradle.wrapper: '7.6.2'
+    - name: gradle 8.11 to 8.11.1 with kotlin 2.1.20
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.1.20'
+          project.gradle.wrapper: '8.11'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.1.20'
+          project.gradle.wrapper: '8.11.1'
+  negative:
+    - name: gradle 7.6.3 to 8.11 is inside the table
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.1.20'
+          project.gradle.wrapper: '7.6.3'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.1.20'
+          project.gradle.wrapper: '8.11'
+    - name: gradle 7.6.2 with kotlin 2.1.20 on both sides is not new
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.1.20'
+          project.gradle.wrapper: '7.6.2'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.1.20'
+          project.gradle.wrapper: '7.6.2'
+    - name: gradle 7.6.2 with kotlin 1.0.0 is outside this row
+      a:
+        attrs:
+          project.gradle.kotlin.version: '1.0.0'
+          project.gradle.wrapper: '7.6.3'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '1.0.0'
+          project.gradle.wrapper: '7.6.2'
+    - name: gradle 7.6.2 without a kotlin version
+      a:
+        attrs:
+          project.gradle.wrapper: '7.6.3'
+      b:
+        attrs:
+          project.gradle.wrapper: '7.6.2'
+status: active

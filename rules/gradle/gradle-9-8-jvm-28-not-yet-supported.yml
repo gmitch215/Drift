@@ -1,0 +1,78 @@
+schema: 1
+id: gradle-9-8-jvm-28-not-yet-supported
+title: Gradle 9.8.1 and earlier run on JVM 17 to 27; the compatibility page lists JVM 28 as not yet supported
+applies:
+  - build
+difference: >-
+  side a is a JVM below 28 with a Gradle wrapper at 9.8.1 or earlier; side b is JVM 28 or later with that wrapper
+symptoms:
+  - text: >-
+      none is quoted; the page says versions from 28 are not yet supported and names no failure
+    basis: range
+mechanism: >-
+  The Gradle compatibility page for 9.8.1 requires a JVM between 17 and 27 to execute Gradle and lists JVM 28 and later as not yet supported.
+detect:
+  all:
+    - b: tool.java.version
+      present: 'true'
+    - b: project.gradle.wrapper
+      present: 'true'
+    - a: tool.java.version
+      ver: '<28'
+    - b: tool.java.version
+      ver: '>=28'
+    - b: project.gradle.wrapper
+      ver: '<=9.8.1'
+severity: medium
+provenance:
+  - url: https://docs.gradle.org/current/userguide/compatibility.html
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'Java Runtime; "A JVM version between 17 and 27 is required to execute Gradle. JVM 28 and later versions are not yet supported." (page version 9.8.1)'
+fixtures:
+  positive:
+    - name: jdk 25.0.4 to jdk 28.0.1 with gradle 9.8.1
+      a:
+        attrs:
+          tool.java.version: '25.0.4'
+          project.gradle.wrapper: '9.8.1'
+      b:
+        attrs:
+          tool.java.version: '28.0.1'
+          project.gradle.wrapper: '9.8.1'
+  negative:
+    - name: jdk 25.0.4 to jdk 27.0.1 is inside the range
+      a:
+        attrs:
+          tool.java.version: '25.0.4'
+          project.gradle.wrapper: '9.8.1'
+      b:
+        attrs:
+          tool.java.version: '27.0.1'
+          project.gradle.wrapper: '9.8.1'
+    - name: jdk 28.0.1 on both sides is not new
+      a:
+        attrs:
+          tool.java.version: '28.0.1'
+          project.gradle.wrapper: '9.8.1'
+      b:
+        attrs:
+          tool.java.version: '28.0.1'
+          project.gradle.wrapper: '9.8.1'
+    - name: jdk 25.0.4 to jdk 28.0.1 with gradle 9.9.0 is newer than the page
+      a:
+        attrs:
+          tool.java.version: '25.0.4'
+          project.gradle.wrapper: '9.9.0'
+      b:
+        attrs:
+          tool.java.version: '28.0.1'
+          project.gradle.wrapper: '9.9.0'
+    - name: jdk 28.0.1 without a gradle wrapper
+      a:
+        attrs:
+          tool.java.version: '25.0.4'
+      b:
+        attrs:
+          tool.java.version: '28.0.1'
+status: active

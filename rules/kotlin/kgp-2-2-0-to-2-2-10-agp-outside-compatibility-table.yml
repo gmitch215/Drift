@@ -1,0 +1,95 @@
+schema: 1
+id: kgp-2-2-0-to-2-2-10-agp-outside-compatibility-table
+title: Kotlin Multiplatform plugin 2.2.0 to 2.2.10 lists Android Gradle plugin 7.3.1 through 8.10.0; a version outside it is untested
+applies:
+  - build
+difference: >-
+  side a is Android Gradle plugin inside 7.3.1 through 8.10.0 or a Kotlin outside 2.2.0 to 2.2.10; side b is Kotlin 2.2.0 to 2.2.10 with Android Gradle plugin outside 7.3.1 through 8.10.0
+symptoms:
+  - text: >-
+      none is quoted; the compatibility guide lists Android Gradle plugin 7.3.1 through 8.10.0 for this plugin version and says nothing about versions outside it
+    basis: range
+mechanism: >-
+  The Kotlin Multiplatform compatibility guide lists Android Gradle plugin 7.3.1 through 8.10.0 for Kotlin 2.2.0 to 2.2.10.
+detect:
+  all:
+    - b: project.gradle.kotlin.version
+      present: 'true'
+    - b: project.gradle.agp.version
+      present: 'true'
+    - b: project.gradle.kotlin.version
+      ver: '>=2.2.0,<=2.2.10'
+    - b: project.gradle.agp.version
+      ver:
+          - '<7.3.1'
+          - '>8.10.0'
+    - not:
+        all:
+          - a: project.gradle.kotlin.version
+            ver: '>=2.2.0,<=2.2.10'
+          - a: project.gradle.agp.version
+            ver:
+                - '<7.3.1'
+                - '>8.10.0'
+severity: medium
+provenance:
+  - url: https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'Version compatibility; row "2.2.0-2.2.10", cells "7.6.3-8.14" and "7.3.1-8.10.0"'
+fixtures:
+  positive:
+    - name: android gradle plugin 8.10.0 to 7.3.0 with kotlin 2.2.0
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.2.0'
+          project.gradle.agp.version: '7.3.1'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.2.0'
+          project.gradle.agp.version: '7.3.0'
+    - name: android gradle plugin 8.10.0 to 8.10.0.1 with kotlin 2.2.0
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.2.0'
+          project.gradle.agp.version: '8.10.0'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.2.0'
+          project.gradle.agp.version: '8.10.0.1'
+  negative:
+    - name: android gradle plugin 7.3.1 to 8.10.0 is inside the table
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.2.0'
+          project.gradle.agp.version: '7.3.1'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.2.0'
+          project.gradle.agp.version: '8.10.0'
+    - name: android gradle plugin 7.3.0 with kotlin 2.2.10 on both sides is not new
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.2.10'
+          project.gradle.agp.version: '7.3.0'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.2.10'
+          project.gradle.agp.version: '7.3.0'
+    - name: android gradle plugin 7.3.0 with kotlin 1.0.0 is outside this row
+      a:
+        attrs:
+          project.gradle.kotlin.version: '1.0.0'
+          project.gradle.agp.version: '7.3.1'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '1.0.0'
+          project.gradle.agp.version: '7.3.0'
+    - name: android gradle plugin 7.3.0 without a kotlin version
+      a:
+        attrs:
+          project.gradle.agp.version: '7.3.1'
+      b:
+        attrs:
+          project.gradle.agp.version: '7.3.0'
+status: active

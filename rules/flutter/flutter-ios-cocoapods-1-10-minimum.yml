@@ -1,0 +1,67 @@
+schema: 1
+id: flutter-ios-cocoapods-1-10-minimum
+title: Flutter 3.47 skips pod install on CocoaPods below 1.10.0
+applies:
+  - build
+difference: >-
+  side a is CocoaPods 1.10.0 or later with a Flutter project; side b is CocoaPods below 1.10.0 with the same project
+symptoms:
+  - text: >-
+      flutter prints "Warning: CocoaPods minimum required version 1.10.0 or greater not installed. Skipping pod install." and the iOS or macOS build has no plugins
+    basis: verified
+mechanism: >-
+  CocoaPods.processPods returns false without running pod install when the installed version is below cocoaPodsMinimumVersion, which is 1.10.0.
+detect:
+  all:
+    - b: project.dart.sdks.flutter
+      present: 'true'
+    - b: tool.cocoapods.version
+      present: 'true'
+    - a: tool.cocoapods.version
+      ver: '>=1.10.0'
+    - b: tool.cocoapods.version
+      ver: '<1.10.0'
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/flutter/flutter/3.47.7/packages/flutter_tools/lib/src/macos/cocoapods.dart
+    kind: spec
+    verified: '2026-10-15'
+    section: "cocoaPodsMinimumVersion = Version.withText(1, 10, 0, '1.10.0'); CocoaPodsStatus.belowMinimumVersion"
+fixtures:
+  positive:
+    - name: cocoapods 1.16.2 to 1.9.3 with a flutter project
+      a:
+        attrs:
+          tool.cocoapods.version: '1.16.2'
+          project.dart.sdks.flutter: '>=3.16.0'
+      b:
+        attrs:
+          tool.cocoapods.version: '1.9.3'
+          project.dart.sdks.flutter: '>=3.16.0'
+  negative:
+    - name: cocoapods 1.16.2 to 1.10.0 meets the minimum
+      a:
+        attrs:
+          tool.cocoapods.version: '1.16.2'
+          project.dart.sdks.flutter: '>=3.16.0'
+      b:
+        attrs:
+          tool.cocoapods.version: '1.10.0'
+          project.dart.sdks.flutter: '>=3.16.0'
+    - name: cocoapods 1.9.3 on both sides is not new
+      a:
+        attrs:
+          tool.cocoapods.version: '1.9.3'
+          project.dart.sdks.flutter: '>=3.16.0'
+      b:
+        attrs:
+          tool.cocoapods.version: '1.9.3'
+          project.dart.sdks.flutter: '>=3.16.0'
+    - name: cocoapods 1.16.2 to 1.9.3 without a flutter project
+      a:
+        attrs:
+          tool.cocoapods.version: '1.16.2'
+      b:
+        attrs:
+          tool.cocoapods.version: '1.9.3'
+status: active

@@ -1,0 +1,15 @@
+image gradle:8.14-jdk17 (Gradle wrapper downloads the Gradle under test); kotlin("multiplatform") version "2.4.20" with kotlin { jvm() }, Gradle 7.5; ./gradlew help --no-daemon
+observed 2026-10-15, exit code 1
+
+FAILURE: Build failed with an exception.
+
+* Where:
+Build file 'build.gradle.kts' line: 1
+
+* What went wrong:
+An exception occurred applying plugin request [id: 'org.jetbrains.kotlin.multiplatform', version: '2.4.20']
+> Failed to apply plugin 'org.jetbrains.kotlin.multiplatform'.
+   > Gradle Version Incompatible with Kotlin Gradle Plugin
+     Kotlin Gradle Plugin <-> Gradle compatibility issue:
+     The applied Kotlin Gradle is not compatible with the used Gradle version (Gradle 7.5).
+     Solution: Please update the Gradle version to at least Gradle 7.6.3.

@@ -1,0 +1,71 @@
+schema: 1
+id: flutter-ios-xcode-15-minimum
+title: Flutter 3.47 reports Xcode below 15 as outdated
+applies:
+  - build
+difference: >-
+  side a is Xcode 15 or later with a Flutter project; side b is Xcode below 15 with the same project
+symptoms:
+  - text: >-
+      flutter doctor prints "Flutter requires Xcode 15 or higher." followed by "Download the latest version or update via the Mac App Store."
+    basis: verified
+mechanism: >-
+  XcodeValidator marks Xcode partial with the outdated error when the installed version is below xcodeRequiredVersion, which is 15.
+detect:
+  all:
+    - b: project.dart.sdks.flutter
+      present: 'true'
+    - b: tool.xcode.version
+      present: 'true'
+    - a: tool.xcode.version
+      ver: '>=15'
+    - b: tool.xcode.version
+      ver: '<15'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/flutter/flutter/3.47.7/packages/flutter_tools/lib/src/macos/xcode.dart
+    kind: spec
+    verified: '2026-10-15'
+    section: 'xcodeRequiredVersion = Version(15, null, null)'
+  - url: https://raw.githubusercontent.com/flutter/flutter/3.47.7/packages/flutter_tools/lib/src/macos/xcode_validator.dart
+    kind: spec
+    verified: '2026-10-15'
+    section: '_xcodeOutdated'
+fixtures:
+  positive:
+    - name: xcode 26.6 to 14.3.1 with a flutter project
+      a:
+        attrs:
+          tool.xcode.version: '26.6'
+          project.dart.sdks.flutter: '>=3.16.0'
+      b:
+        attrs:
+          tool.xcode.version: '14.3.1'
+          project.dart.sdks.flutter: '>=3.16.0'
+  negative:
+    - name: xcode 26.6 to 15.0 meets the minimum
+      a:
+        attrs:
+          tool.xcode.version: '26.6'
+          project.dart.sdks.flutter: '>=3.16.0'
+      b:
+        attrs:
+          tool.xcode.version: '15.0'
+          project.dart.sdks.flutter: '>=3.16.0'
+    - name: xcode 14.3.1 on both sides is not new
+      a:
+        attrs:
+          tool.xcode.version: '14.3.1'
+          project.dart.sdks.flutter: '>=3.16.0'
+      b:
+        attrs:
+          tool.xcode.version: '14.3.1'
+          project.dart.sdks.flutter: '>=3.16.0'
+    - name: xcode 26.6 to 14.3.1 without a flutter project
+      a:
+        attrs:
+          tool.xcode.version: '26.6'
+      b:
+        attrs:
+          tool.xcode.version: '14.3.1'
+status: active

@@ -1,0 +1,85 @@
+schema: 1
+id: agp-9-3-gradle-below-documented-minimum
+title: AGP 9.3 fails to apply on Gradle below 9.5.0
+applies:
+  - build
+difference: >-
+  side a is AGP 9.3 with Gradle 9.5.0 or later; side b is the same AGP with Gradle below 9.5.0
+symptoms:
+  - text: >-
+      applying the plugin fails with "Failed to apply plugin 'com.android.internal.version-check'. Minimum supported Gradle version is 9.5.0. Current version is 9.4.1."
+    basis: verified
+mechanism: >-
+  The Android Gradle plugin 9.3 release notes list Gradle 9.5.0 as the minimum version.
+detect:
+  all:
+    - b: project.gradle.agp.version
+      present: 'true'
+    - b: project.gradle.wrapper
+      present: 'true'
+    - b: project.gradle.agp.version
+      ver: '>=9.3.0,<9.4.0'
+    - b: project.gradle.wrapper
+      ver: '<9.5.0'
+    - not:
+        all:
+          - a: project.gradle.agp.version
+            ver: '>=9.3.0,<9.4.0'
+          - a: project.gradle.wrapper
+            ver: '<9.5.0'
+severity: high
+provenance:
+  - url: https://developer.android.com/build/releases/past-releases/agp-9-3-0-release-notes
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'Compatibility; Gradle row, minimum version "9.5.0"'
+  - url: fixture:observed/gradle/agp-9-3-0-gradle-9-4-1.txt
+    kind: measurement
+    verified: '2026-10-15'
+fixtures:
+  positive:
+    - name: agp 9.3.0 with gradle 9.5.0 to gradle 9.4
+      a:
+        attrs:
+          project.gradle.agp.version: '9.3.0'
+          project.gradle.wrapper: '9.5.0'
+      b:
+        attrs:
+          project.gradle.agp.version: '9.3.0'
+          project.gradle.wrapper: '9.4'
+  negative:
+    - name: agp 9.3.0 with gradle 9.5.0 meets the minimum
+      a:
+        attrs:
+          project.gradle.agp.version: '9.3.0'
+          project.gradle.wrapper: '9.5.0'
+      b:
+        attrs:
+          project.gradle.agp.version: '9.3.0'
+          project.gradle.wrapper: '9.5.0.1'
+    - name: agp 9.3.0 with gradle 9.4 on both sides is not new
+      a:
+        attrs:
+          project.gradle.agp.version: '9.3.0'
+          project.gradle.wrapper: '9.4'
+      b:
+        attrs:
+          project.gradle.agp.version: '9.3.0'
+          project.gradle.wrapper: '9.4'
+    - name: agp 9.8.0 with gradle 9.4 is another line
+      a:
+        attrs:
+          project.gradle.agp.version: '9.8.0'
+          project.gradle.wrapper: '9.5.0'
+      b:
+        attrs:
+          project.gradle.agp.version: '9.8.0'
+          project.gradle.wrapper: '9.4'
+    - name: gradle 9.4 without an agp version
+      a:
+        attrs:
+          project.gradle.wrapper: '9.5.0'
+      b:
+        attrs:
+          project.gradle.wrapper: '9.4'
+status: active

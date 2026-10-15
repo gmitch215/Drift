@@ -1,0 +1,12 @@
+image gradle:8.14-jdk17 (Gradle wrapper downloads the Gradle under test); com.android.library 8.5.2, Gradle 8.6; ./gradlew help --no-daemon
+observed 2026-10-15, exit code 1
+
+FAILURE: Build failed with an exception.
+
+* Where:
+Build file 'build.gradle.kts' line: 1
+
+* What went wrong:
+An exception occurred applying plugin request [id: 'com.android.library', version: '8.5.2']
+> Failed to apply plugin 'com.android.internal.version-check'.
+   > Minimum supported Gradle version is 8.7. Current version is 8.6. If using the gradle wrapper, try editing the distributionUrl in gradle/wrapper/gradle-wrapper.properties to gradle-8.7-all.zip

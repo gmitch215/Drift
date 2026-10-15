@@ -1,0 +1,95 @@
+schema: 1
+id: kgp-2-0-20-gradle-outside-compatibility-table
+title: Kotlin Multiplatform plugin 2.0.20 lists Gradle 7.5 through 8.8; a version outside it is untested
+applies:
+  - build
+difference: >-
+  side a is Gradle inside 7.5 through 8.8 or a Kotlin outside 2.0.20; side b is Kotlin 2.0.20 with Gradle outside 7.5 through 8.8
+symptoms:
+  - text: >-
+      none is quoted; the compatibility guide lists Gradle 7.5 through 8.8 for this plugin version and says nothing about versions outside it
+    basis: range
+mechanism: >-
+  The Kotlin Multiplatform compatibility guide lists Gradle 7.5 through 8.8 for Kotlin 2.0.20.
+detect:
+  all:
+    - b: project.gradle.kotlin.version
+      present: 'true'
+    - b: project.gradle.wrapper
+      present: 'true'
+    - b: project.gradle.kotlin.version
+      ver: '>=2.0.20,<=2.0.20'
+    - b: project.gradle.wrapper
+      ver:
+          - '<7.5'
+          - '>8.8'
+    - not:
+        all:
+          - a: project.gradle.kotlin.version
+            ver: '>=2.0.20,<=2.0.20'
+          - a: project.gradle.wrapper
+            ver:
+                - '<7.5'
+                - '>8.8'
+severity: medium
+provenance:
+  - url: https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'Version compatibility; row "2.0.20", cells "7.5-8.8" and "7.4.2-8.5"'
+fixtures:
+  positive:
+    - name: gradle 8.8 to 7.4 with kotlin 2.0.20
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.0.20'
+          project.gradle.wrapper: '7.5'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.0.20'
+          project.gradle.wrapper: '7.4'
+    - name: gradle 8.8 to 8.8.1 with kotlin 2.0.20
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.0.20'
+          project.gradle.wrapper: '8.8'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.0.20'
+          project.gradle.wrapper: '8.8.1'
+  negative:
+    - name: gradle 7.5 to 8.8 is inside the table
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.0.20'
+          project.gradle.wrapper: '7.5'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.0.20'
+          project.gradle.wrapper: '8.8'
+    - name: gradle 7.4 with kotlin 2.0.20 on both sides is not new
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.0.20'
+          project.gradle.wrapper: '7.4'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.0.20'
+          project.gradle.wrapper: '7.4'
+    - name: gradle 7.4 with kotlin 1.0.0 is outside this row
+      a:
+        attrs:
+          project.gradle.kotlin.version: '1.0.0'
+          project.gradle.wrapper: '7.5'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '1.0.0'
+          project.gradle.wrapper: '7.4'
+    - name: gradle 7.4 without a kotlin version
+      a:
+        attrs:
+          project.gradle.wrapper: '7.5'
+      b:
+        attrs:
+          project.gradle.wrapper: '7.4'
+status: active

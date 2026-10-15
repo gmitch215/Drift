@@ -1,0 +1,71 @@
+schema: 1
+id: flutter-android-java-17-minimum
+title: Flutter 3.47 stops an Android build on a Java below 17
+applies:
+  - build
+difference: >-
+  side a is Java 17 or later with a Flutter project; side b is Java below 17 with the same project
+symptoms:
+  - text: >-
+      the Flutter Gradle plugin fails the build with "Error: Your project's Java version (X) is lower than Flutter's minimum supported version of 17. Please upgrade your Java version."
+    basis: verified
+mechanism: >-
+  DependencyVersionChecker.checkJavaVersion in the Flutter Gradle plugin throws when the Java version is below errorJavaVersion, which is Java 17.
+detect:
+  all:
+    - b: project.dart.sdks.flutter
+      present: 'true'
+    - b: tool.java.version
+      present: 'true'
+    - a: tool.java.version
+      ver: '>=17'
+    - b: tool.java.version
+      ver: '<17'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/flutter/flutter/3.47.7/packages/flutter_tools/gradle/src/main/kotlin/DependencyVersionChecker.kt
+    kind: spec
+    verified: '2026-10-15'
+    section: 'errorJavaVersion = JavaVersion.VERSION_17; getErrorMessage'
+  - url: https://raw.githubusercontent.com/flutter/flutter/3.47.7/packages/flutter_tools/lib/src/android/gradle_utils.dart
+    kind: spec
+    verified: '2026-10-15'
+    section: 'errorJavaMinVersionAndroid = Version(17, 0, 0)'
+fixtures:
+  positive:
+    - name: java 21.0.12 to 11.0.24 with a flutter project
+      a:
+        attrs:
+          tool.java.version: '21.0.12'
+          project.dart.sdks.flutter: '>=3.16.0'
+      b:
+        attrs:
+          tool.java.version: '11.0.24'
+          project.dart.sdks.flutter: '>=3.16.0'
+  negative:
+    - name: java 21.0.12 to 17.0.12 meets the minimum
+      a:
+        attrs:
+          tool.java.version: '21.0.12'
+          project.dart.sdks.flutter: '>=3.16.0'
+      b:
+        attrs:
+          tool.java.version: '17.0.12'
+          project.dart.sdks.flutter: '>=3.16.0'
+    - name: java 11.0.24 on both sides is not new
+      a:
+        attrs:
+          tool.java.version: '11.0.24'
+          project.dart.sdks.flutter: '>=3.16.0'
+      b:
+        attrs:
+          tool.java.version: '11.0.24'
+          project.dart.sdks.flutter: '>=3.16.0'
+    - name: java 21.0.12 to 11.0.24 without a flutter project
+      a:
+        attrs:
+          tool.java.version: '21.0.12'
+      b:
+        attrs:
+          tool.java.version: '11.0.24'
+status: active

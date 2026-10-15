@@ -8,7 +8,7 @@ difference: >-
 symptoms:
   - text: >-
       deprecation warnings, or new features that do not work, on Gradle above the fully supported maximum
-    basis: verified
+    basis: range
 mechanism: >-
   KGP 2.4.20 and 2.4.21 fully support Gradle 7.6.3 through 9.7.0 and AGP 8.5.2 through 9.3.1, and newer Gradle versions may show deprecation warnings.
 detect:

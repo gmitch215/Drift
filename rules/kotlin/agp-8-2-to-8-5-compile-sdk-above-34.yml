@@ -1,0 +1,94 @@
+schema: 1
+id: agp-8-2-to-8-5-compile-sdk-above-34
+title: AGP 8.2 to 8.5 lists API level 34 as its maximum, so a higher compileSdk is untested
+applies:
+  - build
+difference: >-
+  side a is a project on an AGP outside 8.2 to 8.5; side b is the same project on that AGP with compileSdk above 34
+symptoms:
+  - text: >-
+      none is quoted for these releases; the release notes name the maximum API level and no failure above it
+    basis: range
+mechanism: >-
+  The Android Gradle plugin 8.2 to 8.5 release notes name API level 34 as the maximum the plugin supports.
+detect:
+  all:
+    - b: project.gradle.agp.version
+      present: 'true'
+    - b: project.gradle.android.compile-sdk
+      present: 'true'
+    - b: project.gradle.agp.version
+      ver: '>=8.2.0,<8.6.0'
+    - b: project.gradle.android.compile-sdk
+      ver: '>34'
+    - not:
+        all:
+          - a: project.gradle.agp.version
+            ver: '>=8.2.0,<8.6.0'
+          - a: project.gradle.android.compile-sdk
+            ver: '>34'
+severity: low
+provenance:
+  - url: https://developer.android.com/build/releases/past-releases/agp-8-2-0-release-notes
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'Compatibility; "The maximum API level that Android Gradle plugin 8.2 supports is API level 34."'
+  - url: https://developer.android.com/build/releases/past-releases/agp-8-3-0-release-notes
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'Compatibility; "The maximum API level that Android Gradle plugin 8.3 supports is API level 34."'
+  - url: https://developer.android.com/build/releases/past-releases/agp-8-4-0-release-notes
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'Compatibility; "The maximum API level that Android Gradle plugin 8.4 supports is API level 34."'
+  - url: https://developer.android.com/build/releases/past-releases/agp-8-5-0-release-notes
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'Compatibility; "The maximum API level that Android Gradle plugin 8.5 supports is API level 34."'
+fixtures:
+  positive:
+    - name: agp 8.2.0 with compileSdk 35
+      a:
+        attrs:
+          project.gradle.agp.version: '7.4.2'
+          project.gradle.android.compile-sdk: '35'
+      b:
+        attrs:
+          project.gradle.agp.version: '8.2.0'
+          project.gradle.android.compile-sdk: '35'
+  negative:
+    - name: agp 8.2.0 with compileSdk 34 is inside the maximum
+      a:
+        attrs:
+          project.gradle.agp.version: '7.4.2'
+          project.gradle.android.compile-sdk: '34'
+      b:
+        attrs:
+          project.gradle.agp.version: '8.2.0'
+          project.gradle.android.compile-sdk: '34'
+    - name: agp 8.2.0 with compileSdk 35 on both sides is not new
+      a:
+        attrs:
+          project.gradle.agp.version: '8.2.0'
+          project.gradle.android.compile-sdk: '35'
+      b:
+        attrs:
+          project.gradle.agp.version: '8.2.0'
+          project.gradle.android.compile-sdk: '35'
+    - name: agp 7.4.2 with compileSdk 35 is another line
+      a:
+        attrs:
+          project.gradle.agp.version: '7.3.1'
+          project.gradle.android.compile-sdk: '35'
+      b:
+        attrs:
+          project.gradle.agp.version: '7.4.2'
+          project.gradle.android.compile-sdk: '35'
+    - name: agp 8.2.0 without a compileSdk
+      a:
+        attrs:
+          project.gradle.agp.version: '7.4.2'
+      b:
+        attrs:
+          project.gradle.agp.version: '8.2.0'
+status: active

@@ -1,0 +1,95 @@
+schema: 1
+id: kgp-2-3-20-to-2-3-21-gradle-outside-compatibility-table
+title: Kotlin Multiplatform plugin 2.3.20 to 2.3.21 lists Gradle 7.6.3 through 9.3.0; a version outside it is untested
+applies:
+  - build
+difference: >-
+  side a is Gradle inside 7.6.3 through 9.3.0 or a Kotlin outside 2.3.20 to 2.3.21; side b is Kotlin 2.3.20 to 2.3.21 with Gradle outside 7.6.3 through 9.3.0
+symptoms:
+  - text: >-
+      none is quoted; the compatibility guide lists Gradle 7.6.3 through 9.3.0 for this plugin version and says nothing about versions outside it
+    basis: range
+mechanism: >-
+  The Kotlin Multiplatform compatibility guide lists Gradle 7.6.3 through 9.3.0 for Kotlin 2.3.20 to 2.3.21.
+detect:
+  all:
+    - b: project.gradle.kotlin.version
+      present: 'true'
+    - b: project.gradle.wrapper
+      present: 'true'
+    - b: project.gradle.kotlin.version
+      ver: '>=2.3.20,<=2.3.21'
+    - b: project.gradle.wrapper
+      ver:
+          - '<7.6.3'
+          - '>9.3.0'
+    - not:
+        all:
+          - a: project.gradle.kotlin.version
+            ver: '>=2.3.20,<=2.3.21'
+          - a: project.gradle.wrapper
+            ver:
+                - '<7.6.3'
+                - '>9.3.0'
+severity: medium
+provenance:
+  - url: https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'Version compatibility; row "2.3.20-2.3.21", cells "7.6.3-9.3.0" and "8.2.2-9.0.0"'
+fixtures:
+  positive:
+    - name: gradle 9.3.0 to 7.6.2 with kotlin 2.3.20
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.3.20'
+          project.gradle.wrapper: '7.6.3'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.3.20'
+          project.gradle.wrapper: '7.6.2'
+    - name: gradle 9.3.0 to 9.3.0.1 with kotlin 2.3.20
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.3.20'
+          project.gradle.wrapper: '9.3.0'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.3.20'
+          project.gradle.wrapper: '9.3.0.1'
+  negative:
+    - name: gradle 7.6.3 to 9.3.0 is inside the table
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.3.20'
+          project.gradle.wrapper: '7.6.3'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.3.20'
+          project.gradle.wrapper: '9.3.0'
+    - name: gradle 7.6.2 with kotlin 2.3.21 on both sides is not new
+      a:
+        attrs:
+          project.gradle.kotlin.version: '2.3.21'
+          project.gradle.wrapper: '7.6.2'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '2.3.21'
+          project.gradle.wrapper: '7.6.2'
+    - name: gradle 7.6.2 with kotlin 1.0.0 is outside this row
+      a:
+        attrs:
+          project.gradle.kotlin.version: '1.0.0'
+          project.gradle.wrapper: '7.6.3'
+      b:
+        attrs:
+          project.gradle.kotlin.version: '1.0.0'
+          project.gradle.wrapper: '7.6.2'
+    - name: gradle 7.6.2 without a kotlin version
+      a:
+        attrs:
+          project.gradle.wrapper: '7.6.3'
+      b:
+        attrs:
+          project.gradle.wrapper: '7.6.2'
+status: active

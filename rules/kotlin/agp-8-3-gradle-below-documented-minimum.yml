@@ -1,0 +1,82 @@
+schema: 1
+id: agp-8-3-gradle-below-documented-minimum
+title: AGP 8.3 lists Gradle 8.4 as its minimum version
+applies:
+  - build
+difference: >-
+  side a is AGP 8.3 with Gradle 8.4 or later; side b is the same AGP with Gradle below 8.4
+symptoms:
+  - text: >-
+      none is quoted; the release notes list the minimum Gradle version and name no failure
+    basis: range
+mechanism: >-
+  The Android Gradle plugin 8.3 release notes list Gradle 8.4 as the minimum version.
+detect:
+  all:
+    - b: project.gradle.agp.version
+      present: 'true'
+    - b: project.gradle.wrapper
+      present: 'true'
+    - b: project.gradle.agp.version
+      ver: '>=8.3.0,<8.4.0'
+    - b: project.gradle.wrapper
+      ver: '<8.4'
+    - not:
+        all:
+          - a: project.gradle.agp.version
+            ver: '>=8.3.0,<8.4.0'
+          - a: project.gradle.wrapper
+            ver: '<8.4'
+severity: medium
+provenance:
+  - url: https://developer.android.com/build/releases/past-releases/agp-8-3-0-release-notes
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'Compatibility; Gradle row, minimum version "8.4"'
+fixtures:
+  positive:
+    - name: agp 8.3.0 with gradle 8.4 to gradle 8.3
+      a:
+        attrs:
+          project.gradle.agp.version: '8.3.0'
+          project.gradle.wrapper: '8.4'
+      b:
+        attrs:
+          project.gradle.agp.version: '8.3.0'
+          project.gradle.wrapper: '8.3'
+  negative:
+    - name: agp 8.3.0 with gradle 8.4 meets the minimum
+      a:
+        attrs:
+          project.gradle.agp.version: '8.3.0'
+          project.gradle.wrapper: '8.4'
+      b:
+        attrs:
+          project.gradle.agp.version: '8.3.0'
+          project.gradle.wrapper: '8.4.1'
+    - name: agp 8.3.0 with gradle 8.3 on both sides is not new
+      a:
+        attrs:
+          project.gradle.agp.version: '8.3.0'
+          project.gradle.wrapper: '8.3'
+      b:
+        attrs:
+          project.gradle.agp.version: '8.3.0'
+          project.gradle.wrapper: '8.3'
+    - name: agp 8.8.0 with gradle 8.3 is another line
+      a:
+        attrs:
+          project.gradle.agp.version: '8.8.0'
+          project.gradle.wrapper: '8.4'
+      b:
+        attrs:
+          project.gradle.agp.version: '8.8.0'
+          project.gradle.wrapper: '8.3'
+    - name: gradle 8.3 without an agp version
+      a:
+        attrs:
+          project.gradle.wrapper: '8.4'
+      b:
+        attrs:
+          project.gradle.wrapper: '8.3'
+status: active
