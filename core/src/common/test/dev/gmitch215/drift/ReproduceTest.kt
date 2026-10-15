@@ -10,6 +10,11 @@ import dev.gmitch215.drift.json.array
 import dev.gmitch215.drift.json.obj
 import dev.gmitch215.drift.json.require
 import dev.gmitch215.drift.json.string
+import dev.gmitch215.drift.lab.ImageDistro
+import dev.gmitch215.drift.lab.ImageTable
+import dev.gmitch215.drift.lab.ImageTags
+import dev.gmitch215.drift.lab.NpmEngines
+import dev.gmitch215.drift.lab.Pick
 import dev.gmitch215.drift.lab.Reproduce
 import dev.gmitch215.drift.lab.ReproduceProblem
 import dev.gmitch215.drift.lab.ReproduceRender
@@ -25,6 +30,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ReproduceTest {
@@ -121,10 +127,10 @@ class ReproduceTest {
             "the command names a node tool",
         ),
         Base(
-            "node without a distribution",
+            "node without a distribution takes the nearest Debian that has the tag",
             listOf("tool.node.version" to "18.0.0"),
             "npm test",
-            "node:18.0.0-bookworm-slim",
+            "node:18.0.0-bullseye-slim",
             "the command names a node tool",
         ),
         Base(
@@ -178,10 +184,10 @@ class ReproduceTest {
             "the command names a php tool",
         ),
         Base(
-            "php with a distribution suffix",
+            "php with a distribution suffix and no tag on the default debian",
             listOf("tool.php.version" to "8.1.2-1ubuntu2.14"),
             "phpunit",
-            "php:8.1.2-cli-bookworm",
+            "php:8.1.2-cli-bullseye",
             "the command names a php tool",
         ),
         Base(
@@ -276,10 +282,10 @@ class ReproduceTest {
             "the command names a node tool",
         ),
         Base(
-            "node 18 on debian 10 has no buster tag and takes bookworm",
+            "node 18 on debian 10 has no buster tag and takes bullseye",
             debian10 + ("tool.node.version" to "18.20.4"),
             "node x.js",
-            "node:18.20.4-bookworm-slim",
+            "node:18.20.4-bullseye-slim",
             "the command names a node tool",
         ),
         Base(
@@ -319,8 +325,18 @@ class ReproduceTest {
             "java -version",
         )
         assertTrue(
-            "published for linux/amd64 only" in alpine.entry("tool.java.version").detail,
+            "JDK 17 are published for linux/amd64 only" in
+                alpine.entry("tool.java.version").detail,
         )
+        val alpine21 = build(
+            capsule(
+                "os.release.ID" to "alpine",
+                "os.release.VERSION_ID" to "3.20.3",
+                "tool.java.version" to "21.0.5",
+            ),
+            "java -version",
+        )
+        assertFalse("amd64 only" in alpine21.entry("tool.java.version").detail)
         val go = build(capsule("tool.go.version" to "1.21"), "go test")
         assertEquals(Status.PARTIAL, go.status("tool.go.version"))
         val php = build(capsule("tool.php.version" to "8.1.2-1ubuntu2.14"), "php -v")
@@ -420,6 +436,93 @@ class ReproduceTest {
         assertEquals(Status.MIRRORED, gcc.status("tool.cc.family"))
         assertEquals(Status.PARTIAL, gcc.status("tool.cc.version"))
         assertTrue("pins 13.2 only" in gcc.entry("tool.cc.version").detail)
+    }
+
+    @Test
+    fun aTagTheRegistryLacksIsReplacedByTheNearestPublishedOne() {
+        val debian12 = ImageDistro("debian", "12")
+
+        fun pick(tag: String, note: String? = null) = ImageTable.resolve(Pick(tag, note, debian12))
+
+        val kept = pick("node:22.12.0-bookworm-slim")
+        assertEquals("node:22.12.0-bookworm-slim", kept.tag)
+        assertNull(kept.note)
+
+        val sibling = pick("php:8.3.35-cli-bullseye", "pins the line")
+        assertEquals("php:8.3.35-cli-bookworm", sibling.tag)
+        assertEquals(ImageDistro("debian", "12"), sibling.image)
+        assertEquals(
+            "pins the line; php:8.3.35-cli-bullseye is not published; " +
+                "php:8.3.35-cli-bookworm has the same version on Debian 12",
+            sibling.note,
+        )
+
+        val older = pick("node:16.13.0-bookworm-slim")
+        assertEquals("node:16.13.0-bullseye-slim", older.tag)
+        assertEquals(ImageDistro("debian", "11"), older.image)
+
+        val patch = pick("gcc:13.2.1")
+        assertEquals("gcc:13.2.0", patch.tag)
+        assertTrue("the nearest published version is 13.2.0" in patch.note.orEmpty())
+
+        assertEquals("golang:1.22.12-bookworm", pick("golang:1.22.99-bookworm").tag)
+
+        val unknownShape = pick("python:3.12.4-slimline")
+        assertEquals("python:3.12.4-slimline", unknownShape.tag)
+        assertTrue("no tag of this form" in unknownShape.note.orEmpty())
+
+        assertEquals("ruby:3.3.6", pick("ruby:3.3.6").tag)
+        assertNull(pick("ruby:3.3.6").note)
+    }
+
+    @Test
+    fun everyTagOfTheFormulaRowsExistsOnTheList() {
+        val capsules = listOf(
+            listOf("tool.node.version" to "16.13.0") + debian10,
+            listOf("tool.python.version" to "3.12.4") + alpine320,
+            listOf("tool.rust.version" to "1.80.0") + debian12,
+            listOf("tool.php.version" to "8.1.2") + debian12,
+            listOf("tool.go.version" to "1.22") + debian12,
+            listOf("tool.java.version" to "21.0.5") + alpine320,
+            listOf("tool.cc.family" to "gcc", "tool.cc.version" to "13.2.1"),
+        )
+        for (pairs in capsules) {
+            val tag = build(capsule(*pairs.toTypedArray()), "x").imageTag
+            val repository = tag.substringBefore(':')
+            val version = tag.substringAfter(':').substringBefore('-')
+            val rest = tag.substringAfter(':').removePrefix(version)
+            assertTrue(
+                ImageTags.repositories.getValue(repository).getValue(rest).contains(version),
+                tag,
+            )
+        }
+    }
+
+    @Test
+    fun anNpmThatItsNodeCannotRunIsNotPinned() {
+        val old = build(capsule("tool.node.version" to "18.16.0", "tool.npm.version" to "10.9.0"))
+        assertFalse("npm install" in old.dockerfile)
+        assertEquals(Status.NOT_MIRRORED, old.status("tool.npm.version"))
+        assertTrue("does not run on node 18.16.0" in old.entry("tool.npm.version").detail)
+        val fine = build(capsule("tool.node.version" to "18.17.0", "tool.npm.version" to "10.9.0"))
+        assertTrue("RUN npm install -g npm@10.9.0\n" in fine.dockerfile)
+    }
+
+    @Test
+    fun theNpmEngineRangesFollowTheReleasedPackages() {
+        assertTrue(NpmEngines.supports("9.5.1", "14.17.0"))
+        assertFalse(NpmEngines.supports("9.5.1", "14.16.9"))
+        assertTrue(NpmEngines.supports("9.5.1", "16.13.0"))
+        assertFalse(NpmEngines.supports("9.5.1", "15.0.0"))
+        assertTrue(NpmEngines.supports("10.2.0", "20.5.0"))
+        assertFalse(NpmEngines.supports("10.2.0", "20.4.9"))
+        assertFalse(NpmEngines.supports("10.2.0", "19.0.0"))
+        assertTrue(NpmEngines.supports("11.0.0", "22.9.0"))
+        assertFalse(NpmEngines.supports("11.0.0", "21.7.3"))
+        assertTrue(NpmEngines.supports("12.0.0", "24.15.0"))
+        assertFalse(NpmEngines.supports("12.0.0", "24.14.9"))
+        assertTrue(NpmEngines.supports("6.14.0", "8.0.0"), "an unknown major is not refused")
+        assertTrue(NpmEngines.supports("10.9.0", "lts"), "an unreadable node is not refused")
     }
 
     @Test

@@ -3,7 +3,8 @@ package dev.gmitch215.drift.tools
 import java.nio.file.Path
 import kotlin.system.exitProcess
 
-private const val USAGE = "usage: freeze <raw-dir> <fixtures-dir> | capsules <fixtures-dir>"
+private const val USAGE =
+    "usage: freeze <raw-dir> <fixtures-dir> | capsules <fixtures-dir> | image-tags <out.kt>"
 
 fun main(args: Array<String>) {
     when (args.firstOrNull()) {
@@ -20,6 +21,8 @@ fun main(args: Array<String>) {
         } else {
             usage()
         }
+
+        "image-tags" -> if (args.size == 2) ImageTagList.write(Path.of(args[1])) else usage()
 
         else -> usage()
     }

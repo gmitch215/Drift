@@ -13,6 +13,7 @@ The executable is `cli/build/bin/macosArm64/releaseExecutable/drift.kexe`; the R
 | [`capture`](#capture) | this machine | a capsule on standard output | no |
 | [`diagnose`](#diagnose) | two capsules | JSON or text, optionally a case directory | no |
 | [`diagnose --against`](#against-a-baseline) | a baseline and a capsule, or this machine | JSON or text, optionally a case directory | no |
+| [`diagnose --set`](#over-a-set-of-capsules) | two or more capsules, each passing or failing | JSON or text | no |
 | [`run`](#run) | this machine, a command | a capsule directory | no |
 | [`import`](#import) | a saved GitHub Actions or GitLab CI log | a capsule directory | no |
 | [`bisect plan`](#bisect) | two capsules | a plan file | no |
@@ -166,10 +167,14 @@ Exit codes: 0 on success; 1 for a usage error such as an unknown flag (`Error: n
 | --- | --- | --- |
 | Composer | `composer.json`, `composer.lock` | `project.composer.require.php`, `.require.ext-*` and `.require.lib-*` (the `require` constraint as written, such as `^8.1`), `project.composer.platform.php` and the other `.platform.*` keys (a concrete version from `config.platform`, absent when that is unset or a constraint), `project.composer.<vendor>/<package>` (locked version), `project.composer.json.config.policy` (`true` when `config.policy` exists), `project.composer.json.plugins.unlisted` (comma-separated `composer-plugin` packages in the lock that no `config.allow-plugins` entry matches; absent when none, when `allow-plugins` is `true`, or without both files) |
 | npm | `package.json` and the first of `package-lock.json`, `npm-shrinkwrap.json`, `pnpm-lock.yaml`, `yarn.lock`, `bun.lock` | `project.npm.engines.node`, `project.npm.engines.npm`, `project.npm.<name>` (scoped names keep `@scope/name`), `project.npm.lockfile-version` (`lockfileVersion` of `package-lock.json` or `npm-shrinkwrap.json`), `project.npm.ts-entry` (`true` when `main` or a `bin` entry is a `.ts`, `.mts` or `.cts` file, or a script runs `node` on one) |
-| Gradle | `gradle/libs.versions.toml`, `settings.gradle(.kts)`, `build.gradle(.kts)` of the root and of each included module (50 at most), `gradle.properties`, `gradle/wrapper/gradle-wrapper.properties`, `gradle/gradle-daemon-jvm.properties` | `project.gradle.<group>:<artifact>`, `project.gradle.plugin.<id>`, `project.gradle.wrapper`, `project.gradle.jdk.version`, `project.gradle.properties.<key>`, `project.gradle.kotlin.version`, `project.gradle.agp.version`, `project.gradle.kotlin.target.<name>`, `project.gradle.kotlin.jvm-target`, `.toolchain`, `.language-version`, `.annotation-default-target`, `project.gradle.kmp-android-module`, `project.gradle.dsl` (`kotlin` or `groovy`, from the first build file), `project.gradle.calls.<name>` (see below) |
+| Gradle | `gradle/libs.versions.toml`, `settings.gradle(.kts)`, `build.gradle(.kts)` of the root and of each included module (50 at most), `gradle.properties`, `gradle/wrapper/gradle-wrapper.properties`, `gradle/gradle-daemon-jvm.properties` | `project.gradle.<group>:<artifact>`, `project.gradle.plugin.<id>`, `project.gradle.wrapper`, `project.gradle.jdk.version`, `project.gradle.properties.<key>`, `project.gradle.kotlin.version`, `project.gradle.agp.version`, `project.gradle.kotlin.target.<name>`, `project.gradle.android.compile-sdk`, `.min-sdk` and `.target-sdk` (a number, `release(36)` forms and a `libs.versions` reference are read; `flutter.compileSdkVersion` and other expressions are not), `project.gradle.kotlin.jvm-target`, `.toolchain`, `.language-version`, `.annotation-default-target`, `project.gradle.kmp-android-module`, `project.gradle.dsl` (`kotlin` or `groovy`, from the first build file), `project.gradle.calls.<name>` (see below) |
 | Maven | `pom.xml` | `project.maven.<group>:<artifact>` for the parent and the direct dependencies, `project.maven.property.<name>` for `java.version` and the `maven.compiler.*` properties |
 | Python | `pyproject.toml`, then `uv.lock` or `poetry.lock`, then `requirements.txt` | `project.python.<name>` (lowercase, runs of `-`, `_` and `.` as one `-`), `project.python.requires-python` |
 | Go | `go.mod` | `project.go.version` (the `go` line), `project.go.toolchain`, `project.go.<module path>` |
+| R | `renv.lock` | `project.r.r-version` (`R.Version`), `project.r.<package>` (every entry under `Packages`; renv records only packages the project code uses) |
+| Dart | `pubspec.lock` | `project.dart.<package>` (not `sdk` packages), `project.dart.sdks.dart` and `.sdks.flutter` (the constraint as written), `project.dart.sdk-min` (the lower bound of `sdks.dart`); direct dependencies come first |
+| Julia | `Manifest.toml`, `Project.toml` | `project.julia.julia-version`, `project.julia.manifest-format`, `project.julia.<package>` (entries with a `version`, so not standard libraries); `[deps]` of `Project.toml` come first |
+| Elixir | `mix.lock` | `project.elixir.<package>` (`:hex` entries only; `:git` entries have no version) |
 
 Each ecosystem adds at most 200 package keys: packages a rule reads first, then direct dependencies, then the rest by name; `project.<ecosystem>.omitted` holds the number left out. Only versions the files state literally are recorded. A dynamic range, a version from a BOM or a Maven parent, and a `requirements.txt` line that is not pinned with `==` add nothing. A lockfile that lists a package twice gives the version that the root project resolves for a direct dependency and the first listed version otherwise.
 
@@ -218,6 +223,13 @@ The caps are fixed: 500 files per ecosystem (the first 500 by sorted path; `proj
 | BIND | `named -v` | `tool.named.version` (the whole token, such as `9.18.39-0ubuntu0.22.04.6-Ubuntu`) |
 | iptables | `iptables --version` | `tool.iptables.version`, `tool.iptables.backend` (`nft` or `legacy`, only when the version line names it) |
 | curl | `curl --version` | `tool.curl.version` |
+| R | `R --version` | `tool.r.version` |
+| Dart | `dart --version` | `tool.dart.version`, `tool.dart.channel` (`stable`, `beta`, `dev`) |
+| Julia | `julia --version` | `tool.julia.version` |
+| Xcode | `xcodebuild -version` | `tool.xcode.version` (macOS with Xcode installed) |
+| CocoaPods | `pod --version` | `tool.cocoapods.version` |
+| Elixir | `elixir --version` | `tool.elixir.version`, `tool.elixir.compiled-otp` (the OTP release Elixir was compiled with, when printed) |
+| Erlang/OTP | `erl -noshell -eval 'io:format("~s",[erlang:system_info(otp_release)]),halt().'` | `tool.erlang.otp` (the major release, such as `29`; the one the runtime reports, which can differ from `compiled-otp`) |
 
 `tool.openssl.version` orders by the OpenSSL scheme: `1.1.1 < 1.1.1a < 1.1.1w < 3.0.0`, so a `ver` range on it can mix letter releases and numbered ones.
 
@@ -369,6 +381,70 @@ env.TZ differs most (tier difference); this ranks differences and does not confi
 The two `drift:` lines go to standard error. The comparison reads the capsules only; the symptoms and steps stored beside them are not part of the ranking. Compare like with like: a capsule from `run` or `capture` holds attributes such as `os.name` and `kernel.release`, and a capsule from `import` holds the attributes a CI log prints (`ci.runner.image.version`), so a baseline from one and a current run from the other differ in most paths.
 
 `--against` with two capsules fails with `--against takes at most one capsule`. Without `--against`, `diagnose` still takes exactly two capsules, and each may now be a directory.
+
+### Over a Set of Capsules
+
+`drift diagnose --set CAPSULE...` takes any number of capsules, some from passing runs and some from failing runs, and ranks the attribute values that split the two groups. It scores each value with the Ochiai spectrum that ranks a CI history, with the failing capsules as the failing runs. Only static attributes count, and a value that every capsule holds is left out because it splits nothing.
+
+A capsule is labelled in one of two ways. End its path with `#pass` or `#fail`, or pass a capsule directory whose `run.json` records a pass or a fail (or whose `result.json` records the exit code of `drift run`). A `#pass` or `#fail` selector wins over a recorded outcome. `case.driftcase#passing` and `case.driftcase#failing` select an archive member and label it. Quote the selectors, since `#` starts a comment in most shells.
+
+```sh
+drift diagnose --set 'fixtures/set/toolchain/pass-1.json#pass' 'fixtures/set/toolchain/pass-2.json#pass' \
+  'fixtures/set/toolchain/fail-1.json#fail' 'fixtures/set/toolchain/fail-2.json#fail' --detail detail
+```
+
+```
+set: 2 failing, 2 passing, 1 separating
+1. tool.node.version = 22.4.0  failing 2/2  passing 0/2  score 1.000000  separates
+2. cpu.count = 16  failing 1/2  passing 0/2  score 0.707106
+3. tool.npm.version = 10.8.1  failing 1/2  passing 0/2  score 0.707106
+4. cpu.count = 8  failing 1/2  passing 1/2  score 0.500000
+5. env.TZ = Asia/Tokyo  failing 1/2  passing 1/2  score 0.500000
+6. env.TZ = UTC  failing 1/2  passing 1/2  score 0.500000
+7. tool.npm.version = 10.2.4  failing 1/2  passing 2/2  score 0.408248
+```
+
+A value separates when every failing capsule holds it and no passing capsule does; its score is 1.000000. The other rows are partial splits, with the number of capsules on each side that hold the value. The default output is canonical JSON with the capsule names and outcomes, the two counts and one object per split. `--detail summary` prints the first five rows, and `detail` and `full` print every row.
+
+Only the failing side is scored. When the failing capsules disagree on a key, each of their values ranks as a partial split, even if no passing capsule shares any of them. With two repeats of one benchmark scenario, `network-proxy-decoy`, the proxy variable that the failing runs add ranks above the `NO_PROXY` decoy whose value differs in each failing run:
+
+```
+set: 2 failing, 2 passing, 1 separating
+1. env.HTTP_PROXY = http://127.0.0.1:9  failing 2/2  passing 0/2  score 1.000000  separates
+2. env.NO_PROXY = corp.example,10.0.0.0/8  failing 1/2  passing 0/2  score 0.707106
+3. env.NO_PROXY = internal.example  failing 1/2  passing 0/2  score 0.707106
+```
+
+The set needs at least two capsules, one passing and one failing. `--set` cannot be combined with `--against` or `--case`, and a capsule with no selector and no recorded outcome fails with `has no recorded outcome; end it with #pass or #fail`. The command opens no network connection. Studio has a Set tab that does the same with capsules chosen from files or from two sample sets.
+
+### Browser Layout Capsules
+
+`tools/browsers/layout.mjs` loads a page in Playwright's Chromium, Firefox and WebKit at several viewports and writes one capsule per engine and viewport, which `diagnose` compares like any other pair. It is a Node script and needs `npm ci` in `tools/browsers` and the Playwright browsers.
+
+```sh
+cd tools/browsers
+node layout.mjs --dir ../../fixtures/sites/viewport --out ../../build/layout
+```
+
+`--dir` serves a directory and `--url` captures a page that is already served. `--engine` (repeatable) picks engines, `--viewport WxH[@DPR]` (repeatable) replaces the default 390x844, 768x1024 and 1280x800, and `--select ID=SELECTOR` (repeatable) replaces the default of every element with a `data-drift` attribute. The files are named `<engine>-<width>x<height>.json`.
+
+Each capsule holds static attributes in the browser dimension: `browser.engine.name` and `browser.engine.version`, `browser.playwright.version`, `browser.viewport.width` and `.height`, `browser.dpr`, `browser.css.supports.<feature>` (the result of `CSS.supports` for five declarations, `true` or `false`), `browser.media.<name>` (`matchMedia` for seven queries) and `browser.layout.<id>.x`, `.y`, `.width` and `.height` for each selected element, from `getBoundingClientRect` in CSS pixels rounded to two decimals. An id with no matching element gets `missing`.
+
+Two rules explain a pair of these capsules: `browser-css-interpolate-size-support-divergence` matches when `browser.css.supports.interpolate-size` differs, and `browser-viewport-width-changes-layout` matches when `browser.viewport.width` differs. On the fixture page, Chromium's `panel` is 45 px tall and Firefox's is 0 px at 1280x800, and the footer below it sits at `y` 221 and 176:
+
+```sh
+drift diagnose fixtures/sites/viewport/capsules/firefox-1280x800.json \
+  fixtures/sites/viewport/capsules/chromium-1280x800.json --detail summary
+```
+
+```
+browser.css.supports.interpolate-size differs most (tier known); this ranks differences and does not
+confirm a cause.
+```
+
+Before the two rules existed, the same pair printed `6 changes differ with the same support, and browser.css.supports.corner-shape ranks first only by hand-set weights, so the data does not name one cause.` Firefox against WebKit at one viewport has identical boxes, and `diagnose` still says it does not name a cause. Of the 72 ordered pairs of the nine fixture capsules, the candidates in tier `known` were exactly the expected causes in all 72 (see `ViewportDiagnosisTest` and the Browser layout paragraph of the Technical Report).
+
+The scripts capture the engines Playwright ships. Playwright's WebKit is not a Safari release: it supports `corner-shape`, which Browser Compat Data marks `preview` for Safari. Treat `CSS.supports` and the boxes as the measurement and Browser Compat Data as a citation for the property.
 
 ## Run
 
@@ -705,6 +781,8 @@ tool.python.version 3.11.2; the command names a python tool
 
 If `sh test.sh` really runs Python, name it: `--run "python3 test.py"`.
 
+**Tags that do not exist.** The tag is composed from the capsule, and `core` carries the tags that Docker Hub publishes for the images it composes (`ImageTags.kt`, written by `./gradlew :tools:imageTags` and committed). When the composed tag is not on the list, the base is the same version on the nearest Debian release that has it, or else the nearest published version with the same suffix, and the toolchain version entry in `manifest.json` is `PARTIAL` with the replaced tag in its detail. An npm that its Node cannot run (for example npm 10.9.0 on Node 18.16.0) is not pinned; the image keeps its bundled npm.
+
 **What is mirrored.** `--detail detail` lists every attribute that is not mirrored, by reason.
 
 ```sh
@@ -791,6 +869,7 @@ The digest in this example is zeros and does not exist; use a digest from your r
 | `--trial-minutes N` | planner's minutes per trial (default 1) |
 | `--timeout N` | seconds before one trial is cut off (default 120) |
 | `--max-memory`, `--max-cpus` | `docker --memory` and `--cpus` for arms whose capsule sets no limit |
+| `--gate permille=N,salt=S,env=NAME` | set `NAME` to 1 on `N` of every 1000 trials and to 0 on the rest, in every arm, so a command that fails only when it reads 1 fails intermittently; `salt` defaults to 0 and `env` to `DRIFT_GATE` |
 | `--name TEXT` | case name |
 | `--exit-status` | exit 0 `CONFIRMED`, 10 `CONFIRMED EFFECT (bundle)`, 11 `NARROWED`, 12 `STUCK` (default: 0 for every verdict) |
 | `--detail summary\|detail\|full` | how much to print |
@@ -1252,7 +1331,7 @@ Exit codes: `contract create` exits 0 when it wrote a contract and 3 when no set
 
 ## Upgrade Check
 
-`drift upgrade-check` answers "what breaks if we move to these versions" from one capsule of today's environment. It sets the target versions on the matching attributes, evaluates every rule with the capsule as side `a` and the changed copy as side `b`, and prints the rules the move triggers in four groups. It runs offline with no model, and the same capsule and targets give the same bytes on the JVM and Native builds.
+`drift upgrade-check` answers "what breaks if we move to these versions" from one capsule of today's environment. It sets the target versions on the matching attributes, evaluates every rule with the capsule as side `a` and the changed copy as side `b`, and prints the rules the move triggers in groups. It runs offline with no model, and the same capsule and targets give the same bytes on the JVM and Native builds.
 
 ```sh
 drift upgrade-check [--json] [--to <name=version,...>] [--to-file <file>] [<capsule>]
@@ -1272,18 +1351,22 @@ At least one target is required. A name is an alias from the table, or an attrib
 | --- | --- |
 | `agp` | `project.gradle.agp.version` |
 | `composer` | `tool.composer.version` |
+| `dart` | `tool.dart.version` |
 | `docker` | `tool.docker.version` |
 | `drupal` | `project.composer.drupal/core` |
+| `elixir` | `tool.elixir.version` |
 | `git` | `tool.git.version` |
 | `go` | `tool.go.version` |
 | `gradle` | `project.gradle.wrapper` |
 | `java`, `jdk` | `tool.java.version` |
+| `julia` | `tool.julia.version` |
 | `kotlin` | `project.gradle.kotlin.version` |
 | `node` | `tool.node.version` |
 | `npm` | `tool.npm.version` |
 | `openssl` | `tool.openssl.version` |
 | `php` | `tool.php.version` |
 | `python` | `tool.python.version` |
+| `r` | `tool.r.version` |
 | `ruby` | `tool.ruby.version` |
 | `symfony` | `project.composer.symfony/http-kernel` |
 | `twig` | `project.composer.twig/twig` |
@@ -1340,11 +1423,23 @@ The groups come from the three-valued verdict of the rule engine, not from a sco
 | Will break | the rule matches, every fact it reads is known, the capsule alone does not already match it, and at least one clause that matched reads a project fact or an environment key that is not a target; the finding lists those keys under `evidence` |
 | May break | the targets satisfy the rule's version condition, and the verdict is unknown because another fact it reads is missing from the capsule or is one no scanner emits yet (the output says which, and marks a `pending-scanner` rule) |
 | Version boundary crossed | the rule matches, but every clause that matched reads only a target key, so the evidence is the version crossing and nothing about the project; the change applies to those versions and the project may not use the affected feature |
+| Outside the tested range | the rule matches and every symptom of the rule has the basis `range`: a compatibility table or release note lists the supported versions and states no failure outside them (the Kotlin Multiplatform compatibility table, the AGP maximum API level and minimum Gradle version, the Gradle JVM range); the group is printed only when it has findings |
 | Unknown | the capsule has no current value for a target key, or the target is not a version the rule can compare, so the boundary cannot be judged |
 
 Only rules that read a target key on side `b` and give a different verdict for the targets than for the capsule alone are listed. The line `73 of 298 rules read a target key` counts the rules that read one before that filter. Probe results and run facts describe today's environment, so side `b` has none, and a rule that reads one is unknown.
 
-`--json` prints the same findings. A finding holds `rule`, `title`, `severity`, `basis`, `status`, `mechanism`, `crossings` (`key`, `from`, `to`, `was`, `now`), `missing`, `evidence` and `sources`, under the keys `will-break`, `may-break`, `version-boundary` and `unknown`, next to `targets`, `rules` and `touched`:
+Locked packages are checked apart from the rules. When a target is `php`, `node` or `python`, `upgrade-check` reads the runtime constraint each locked package records and lists a package whose constraint allows today's runtime and excludes the target under "Will break: locked packages", with the package, its version, the lockfile and the constraint. `drift capture --project` records the constraint as `project.<ecosystem>.<package>.requires.<runtime>` for the formats that carry one, and no rule names the package:
+
+| Lockfile | Constraint read | Key |
+| --- | --- | --- |
+| `composer.lock` | `require.php` of each package | `project.composer.<package>.requires.php` |
+| `package-lock.json` | `engines.node` of each top-level `node_modules` entry | `project.npm.<package>.requires.node` |
+| `pnpm-lock.yaml` | `engines: {node: ...}` of each `packages` entry | `project.npm.<package>.requires.node` |
+| `poetry.lock` | `python-versions` of each package | `project.python.<package>.requires.python` |
+
+`yarn.lock`, `bun.lock`, `uv.lock`, `requirements.txt` and the Gradle and Maven files record no per-package constraint, so a move to a Node, Python or Java target lists them under "Unchecked package constraints"; the registry or the artifact would have the value and Drift does not fetch it. A constraint that is not a range Drift reads (`dev-master`) is listed there too, and so is every excluding package when the capture lacks today's runtime version. A constraint of `*` adds no key, and the keys of at most 200 packages per ecosystem are kept, like the version keys.
+
+`--json` prints the same findings, with `will-break-packages` (`ecosystem`, `package`, `version`, `runtime`, `constraint`, `from`, `to`, `file`) and `unchecked-packages` (`file`, `runtime`, `reason`, `packages`). A finding holds `rule`, `title`, `severity`, `basis`, `status`, `mechanism`, `crossings` (`key`, `from`, `to`, `was`, `now`), `missing`, `evidence` and `sources`, under the keys `will-break`, `may-break`, `version-boundary`, `outside-range` and `unknown`, next to `targets`, `rules` and `touched`:
 
 ```sh
 drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=8.3,drupal=11,symfony=7.1 --json \
@@ -1500,8 +1595,8 @@ drift atlas build fixtures/atlas/*.txt fixtures/atlas/2.5.0-beta1/*.txt --out at
 ```
 
 ```
-dataset: 38 probes, 3 columns, 23 divergent, sha256 18e154bf26aba9464760e3e5ed1b8e02307e33f1c07fe3565bc20906c0c3d3e7
-dataset: 38 probes, 21 columns, 32 divergent, sha256 2d7e84b9b90a560a26301f77215ad15d9671c43a44273eaa24bda45369fad3af
+dataset: 38 probes, 3 columns, 23 divergent, sha256 c69fd560a487f6084b1e1296ed478aac18b58265c47e96e6a10fa3e1503e5ea4
+dataset: 38 probes, 21 columns, 32 divergent, sha256 8364183f0ffda6face1da93bd71142ac66761d85cc145818533eebffa574aae5
 ```
 
 The summary goes to standard error. The sha256 is the hash of the dataset body; the file on disk has one more trailing newline. Building twice gives identical files, and the order of the arguments does not change the bytes. `--out` is required. `build` refuses a transcript that lacks a probe of the catalog, names an unknown probe, lacks a header (`bad transcript header in badt.txt: missing kotlin.target`) or duplicates a column (`fixtures/atlas/jvm.txt and fixtures/atlas/jvm.txt both record jvm@2.4.20`).
@@ -1522,9 +1617,9 @@ kotlin.char.bmp-categories                platform-defined  A           B       
 kotlin.char.case-special                  unclassified      A           A             A
 a letter repeated on a row marks a byte-identical transcript
 divergent probes: 23 of 38
-  documented: 3 of 11
-  platform-defined: 3 of 3
-  unclassified: 17 of 24
+  documented: 3 of 10
+  platform-defined: 2 of 4
+  unclassified: 18 of 24
 ```
 
 With more than one Kotlin version in the dataset the summary adds a line per version:
@@ -1535,7 +1630,7 @@ drift atlas show atlas-all.json | tail -3
 
 ```
 divergent probes per kotlin version:
-  2.4.20: 29
+  2.4.20: 32
   2.5.0-Beta1: 18
 ```
 
@@ -1543,11 +1638,11 @@ divergent probes per kotlin version:
 
 | Label | Meaning | Probes |
 | --- | --- | --- |
-| `documented` | a Kotlin documentation page states the behavior | 11 |
-| `platform-defined` | a JDK or ECMAScript page does | 3 |
+| `documented` | a Kotlin documentation page states the behavior | 10 |
+| `platform-defined` | a JDK or ECMAScript page does | 4 |
 | `unclassified` | no explanation was found; the entry records what was searched | 24 |
 
-Each entry also has a `basis` (`verified` when the cited page states the contract, `inferred` when the page implies it), the references with a short quote, and the linked issue ids with the state read on the research date. `unclassified` is not a finding. The 13 divergent unclassified probes each have a repro draft under [`atlas/repros/`](./atlas/repros/).
+Each entry also has a `basis` (`verified` when the cited page states the contract, `inferred` when the page implies it), the references with a short quote, and the linked issue ids with the state read on the research date. `unclassified` is not a finding. The 24 divergent unclassified probes each have a repro draft under [`atlas/repros/`](./atlas/repros/).
 
 **Compare.** `atlas compare DATASET TRANSCRIPT` places this device against each recorded column. `--detail summary` prints counts; `detail` adds the probes that differ.
 
@@ -1653,10 +1748,11 @@ drift atlas show atlas-all.json --probe kotlin.double.nan-bits | sed -n 8,17p | 
 
 ```
 classification: unclassified
-basis: inferred
+basis: verified
 reference: https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.2.3 "IEEE 754 allows multiple d
 reference: https://webassembly.github.io/spec/core/exec/numerics.html "Some operators are non-deterministic, b
 reference: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/to-raw-bits.html "preserving NaN values exact 
+reference: https://tc39.es/ecma262/#sec-ecmascript-language-types-number-type "are represented in ECMAScript a
 linked issues: KT-53258 (In Progress when read)
   searched: YouTrack: "NaN toRawBits", "Double toBits NaN canonical", "NaN unaryMinus sign Native",
   "Double.NaN raw bits negative", "unaryMinus NaN", "NaN sign bit", "toRawBits". Pages read in full:
@@ -1686,7 +1782,7 @@ curl -s -o /dev/null -w '%{http_code} %{content_type}\n' http://localhost:PORT/p
 
 `./gradlew docsSite` runs `dokkaGenerate` and `atlasSite` first, then assembles `build/site` (3,089 files): `README.md` as `index.html`, `ADVANCED_USAGE.md` as `advanced-usage.html` and `TECHNICAL_REPORT.md` as `technical-report.html`, each rendered into `assets/site-template.html`, the Atlas site under `atlas/`, the Dokka site under `engine/`, the icons from `assets/`, `CNAME` and `.nojekyll`. A relative link in the three Markdown files to a repository path that does not exist fails the render, and a link to one that does exist becomes a GitHub URL on `master`. `checkSiteLinks` runs after it and fails on a relative `href` or `src` that does not resolve inside `build/site`. It scanned 73,286 links and found none unresolved outside `engine/`, where Dokka leaves 14 unresolved; those are counted and printed and do not fail it.
 
-The `docs.yml` workflow runs `./gradlew dokkaGenerate atlasSite docsSite` and pushes `build/site` to the `gh-pages` branch. It builds on pushes to `master`, `ver/*`, `feat/*` and `renovate/*` and deploys only from `master`, with a `CNAME` file for `drift.gmitch215.dev`. It has not run yet.
+The `docs.yml` workflow runs `./gradlew dokkaGenerate atlasSite docsSite` and pushes `build/site` to the `gh-pages` branch. It builds on pushes to `master`, `ver/*`, `feat/*` and `renovate/*` and deploys only from `master`, with a `CNAME` file for `drift.gmitch215.dev`, where the site is live.
 
 ## Probe
 
@@ -1733,7 +1829,7 @@ Both runs used wrangler 4.146.0 and workerd 1.20261001.1 on macOS arm64. `cloudf
 | --- | --- |
 | `kotlin.exceptions.messages`, `kotlin.int.overflow` | the compiled module traps on integer division (`divide by zero`, `divide result unrepresentable`) and a trap aborts the whole request, so the Worker skips both probes and records the reason |
 | `kotlin.exceptions.tostring-cause` | the probe fails with a `NullPointerException`; the cause inside TeaVM's class library was not isolated |
-| `kotlin.regex.anchors-lines` | the build refuses `java.util.regex.Matcher.useAnchoringBounds`, which `Regex.matchAt` calls, so the `matchAt` lines are replaced by a thrown exception in the Worker's copy of the source |
+| `kotlin.regex.anchors-lines` | the build refuses `java.util.regex.Matcher.useAnchoringBounds`, which `Regex.matchAt` calls, so the `matchAt` lines are replaced by a thrown exception in the Worker's copy of the source; TeaVM 0.15.0 declares that method in `TMatcher`, so the cause of the refusal is not confirmed |
 
 kotlinx-coroutines does not build through bytebox, and the Kotlin probe family has no probe that needs it, so none is refused for that reason.
 
@@ -2620,10 +2716,10 @@ The inputs are `command` (required), `stage` (`test`), `image` (`ubuntu:24.04`),
 Error: unexpected timezone Asia/Tokyo
 drift: exit 3 after 0 ms; capsule in drift-capsule
 drift: baseline is the latest green drift on master
-env.TZ differs most (tier difference); this this ranks differences and does not confirm a cause.
+env.TZ differs most (tier difference); this ranks differences and does not confirm a cause.
 ```
 
-The component path above assumes the repository is mirrored to gitlab.com as `gmitch215/drift`; the mirror does not exist yet, and the component has not run on gitlab.com.
+`.github/workflows/gitlab.yml` mirrors the repository to gitlab.com/gmitch215/Drift on every push. The component has not run on gitlab.com and is not published to the CI/CD catalog.
 
 ### Checking the Scripts
 

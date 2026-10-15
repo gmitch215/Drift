@@ -66,3 +66,16 @@ tasks.register<JavaExec>("evalTriage") {
         corpusDir.get().file("claims.tsv").asFile.absolutePath,
     )
 }
+
+tasks.register<JavaExec>("imageTags") {
+    group = "tools"
+    description = "Fetches Docker Hub tags into core's ImageTags.kt; run by hand, not part of build"
+    classpath = files(corpusMain.output.allOutputs, corpusMain.runtimeDependencyFiles)
+    mainClass = "dev.gmitch215.drift.tools.MainKt"
+    dependsOn("jvmMainClasses")
+    args = listOf(
+        "image-tags",
+        rootProject.layout.projectDirectory
+            .file("core/src/common/main/dev/gmitch215/drift/lab/ImageTags.kt").asFile.absolutePath,
+    )
+}

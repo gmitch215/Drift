@@ -1,5 +1,7 @@
 package dev.gmitch215.drift.lab
 
+import kotlin.math.abs
+
 /** What an image provides; [release] is null when its tag does not pin one. */
 internal data class ImageDistro(val id: String, val release: String?) {
     val alpine: Boolean get() = id == "alpine"
@@ -39,13 +41,20 @@ internal class Row(
     val commands: Set<String>,
     val prefixes: List<String>,
     val others: List<String>,
-    val pick: (Map<String, String>, Distro) -> Pick?,
+    private val formula: (Map<String, String>, Distro) -> Pick?,
 ) {
     val versionPath: String get() = "tool.$tool.version"
+
+    /** The formula's tag, or the nearest published one when the formula's tag does not exist. */
+    fun pick(attrs: Map<String, String>, distro: Distro): Pick? =
+        formula(attrs, distro)?.let(ImageTable::resolve)
 }
 
 internal object ImageTable {
-    private val debian = mapOf("11" to "bullseye", "12" to "bookworm", "13" to "trixie")
+    private val debian =
+        mapOf("10" to "buster", "11" to "bullseye", "12" to "bookworm", "13" to "trixie")
+    private val tagForm = Regex("^(\\d+(?:\\.\\d+)*)(.*)$")
+    private const val ALPINE_ARM64_FROM = 21
     private val ubuntu = mapOf("20.04" to "focal", "22.04" to "jammy", "24.04" to "noble")
     private val exact = Regex("^\\d+\\.\\d+\\.\\d+$")
     private val minor = Regex("^\\d+\\.\\d+(\\.\\d+)?$")
@@ -103,6 +112,63 @@ internal object ImageTable {
         return Pick("$repository:$tag", null, f.image)
     }
 
+    /** Replaces a tag the registry does not carry; [Pick.note] says what changed. */
+    internal fun resolve(pick: Pick): Pick {
+        val repository = pick.tag.substringBefore(':')
+        val known = ImageTags.repositories[repository] ?: return pick
+        val (version, rest) = tagForm.matchEntire(pick.tag.substringAfter(':'))?.destructured
+            ?: return pick
+        if (known[rest]?.contains(version) == true) return pick
+        val own = debian.entries.firstOrNull { it.value in rest }
+        val sibling = own?.let { mine ->
+            debian.entries.filter { it.key != mine.key }
+                .filter { known[rest.replace(mine.value, it.value)]?.contains(version) == true }
+                .minWithOrNull(
+                    compareBy<Map.Entry<String, String>> {
+                        abs(it.key.toInt() - mine.key.toInt())
+                    }.thenBy { it.key.toInt() },
+                )?.let { mine.value to it }
+        }
+        if (sibling != null) {
+            val (was, now) = sibling
+            val fixed = "$repository:$version${rest.replace(was, now.value)}"
+            val why = "${pick.tag} is not published; $fixed has the same version on Debian " +
+                now.key
+            return Pick(fixed, joinNotes(pick.note, why), ImageDistro("debian", now.key))
+        }
+        val near = nearest(known[rest].orEmpty(), version)
+            ?: return Pick(
+                pick.tag,
+                joinNotes(pick.note, "no tag of this form is in the pinned tag list"),
+                pick.image,
+            )
+        val why = "${pick.tag} is not published; the nearest published version is $near"
+        return Pick("$repository:$near$rest", joinNotes(pick.note, why), pick.image)
+    }
+
+    private fun joinNotes(first: String?, second: String): String =
+        if (first == null) second else "$first; $second"
+
+    private fun parts(version: String): List<Int> = version.split('.').map { it.toInt() }
+
+    private fun nearest(versions: Set<String>, wanted: String): String? {
+        val want = parts(wanted)
+        fun gap(v: String, i: Int) = abs(parts(v).getOrElse(i) { 0 } - want.getOrElse(i) { 0 })
+        val pool = versions.filter { parts(it).size == want.size }.ifEmpty { versions.toList() }
+        return pool.minWithOrNull(
+            compareBy<String>({ gap(it, 0) }, { gap(it, 1) }, { gap(it, 2) })
+                .thenComparator { a, b -> compareParts(parts(a), parts(b)) },
+        )
+    }
+
+    private fun compareParts(x: List<Int>, y: List<Int>): Int {
+        for (i in 0 until maxOf(x.size, y.size)) {
+            val c = x.getOrElse(i) { 0 }.compareTo(y.getOrElse(i) { 0 })
+            if (c != 0) return c
+        }
+        return 0
+    }
+
     val rows: List<Row> = listOf(
         Row(
             "java",
@@ -126,9 +192,9 @@ internal object ImageTable {
             }
             val pins = "the tag pins major version $major only; the patch level is whatever the " +
                 "tag points to when it is pulled"
-            val note = if (d.id == "alpine") {
-                "$pins; the alpine images are published for linux/amd64 only, so the build " +
-                    "fails on another platform"
+            val note = if (d.id == "alpine" && major.toInt() < ALPINE_ARM64_FROM) {
+                "$pins; the alpine images of JDK $major are published for linux/amd64 only, so " +
+                    "the build fails on another platform"
             } else {
                 pins
             }
@@ -141,10 +207,7 @@ internal object ImageTable {
             listOf("bundled npm", "bundled OpenSSL", "corepack"),
         ) { attrs, d ->
             val v = versioned(attrs, "tool.node.version", exact) ?: return@Row null
-            // buster-slim tags are verified for node 16 and 17; 18.20.4 and 20.18.0 have none
-            val buster = d.id == "debian" && d.release == "10" &&
-                v.substringBefore('.').toInt() <= 17
-            val f = if (buster) Flavor("buster", ImageDistro("debian", "10")) else flavor(d)
+            val f = flavor(d)
             val tag = if (f.image.alpine) "$v-${f.suffix}" else "$v-${f.suffix}-slim"
             Pick("node:$tag", null, f.image)
         },

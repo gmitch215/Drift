@@ -6,6 +6,7 @@ import dev.gmitch215.drift.lab.ArmBase
 import dev.gmitch215.drift.lab.Arms
 import dev.gmitch215.drift.lab.ConfigResult
 import dev.gmitch215.drift.lab.RunConfig
+import dev.gmitch215.drift.lab.TrialGate
 import dev.gmitch215.drift.model.Capsule
 import dev.gmitch215.drift.plan.Environment
 import kotlin.test.Test
@@ -55,6 +56,18 @@ class DockerExecutorTest {
         assertTrue(text.contains("--memory 512m"), "the capsule's own limit is kept")
         assertFalse("--memory '" in text, "the cap does not override the capsule's limit")
         assertTrue(a.reproduction!!.tag in text)
+    }
+
+    @Test
+    fun aGateSetsItsVariableIn1OrOnEachTrialAndNoGateSetsNone() {
+        val gate = TrialGate(500, 987, "BENCH_FLAKE")
+        val a = arm(node)
+        val gated = DockerExecutor(FakeHost(), "/work", gate = gate)
+        val armed = (0 until 20).first { gate.armed(it) }
+        val idle = (0 until 20).first { !gate.armed(it) }
+        assertTrue("--env BENCH_FLAKE=1" in script(gated, a, armed))
+        assertTrue("--env BENCH_FLAKE=0" in script(gated, a, idle))
+        assertFalse("BENCH_FLAKE" in script(executor(emptyMap()).first, a, armed))
     }
 
     @Test

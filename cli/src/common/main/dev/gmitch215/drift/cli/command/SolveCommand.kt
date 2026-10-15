@@ -24,6 +24,7 @@ import dev.gmitch215.drift.lab.FailWhen
 import dev.gmitch215.drift.lab.SolveOptions
 import dev.gmitch215.drift.lab.SolveRender
 import dev.gmitch215.drift.lab.Solver
+import dev.gmitch215.drift.lab.TrialGate
 
 class SolveCommand(
     private val host: Host,
@@ -62,6 +63,11 @@ class SolveCommand(
         .long().default(120)
     private val maxMemory by option("--max-memory", help = "docker --memory for arms with no limit")
     private val maxCpus by option("--max-cpus", help = "docker --cpus for arms with no limit")
+    private val gate by option(
+        "--gate",
+        metavar = "permille=N,salt=S,env=NAME",
+        help = "set NAME to 1 on N of every 1000 trials and to 0 on the rest, in every arm",
+    )
     private val exitStatus by option(
         "--exit-status",
         help = "exit 0 CONFIRMED, 10 CONFIRMED EFFECT (bundle), 11 NARROWED, 12 STUCK",
@@ -96,6 +102,11 @@ class SolveCommand(
         }
         val passing = loadCapsule(host, green)
         val failing = loadCapsule(host, red)
+        val trialGate = try {
+            gate?.let(TrialGate::parse)
+        } catch (e: IllegalArgumentException) {
+            throw CliktError(e.message ?: "bad --gate")
+        }
         val runner = executor ?: DockerExecutor(
             host,
             workspace,
@@ -103,6 +114,7 @@ class SolveCommand(
             timeout,
             maxMemory,
             maxCpus,
+            trialGate,
         )
         val result = Solver(runner, files, dir, options).solve(passing, failing)
         when (val written = CaseStore.write(files, dir, result.case)) {

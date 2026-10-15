@@ -6,6 +6,7 @@ import dev.gmitch215.drift.lab.Executor
 import dev.gmitch215.drift.lab.RawTrial
 import dev.gmitch215.drift.lab.Reproduction
 import dev.gmitch215.drift.lab.RunConfig
+import dev.gmitch215.drift.lab.TrialGate
 import dev.gmitch215.drift.model.Capsule
 import kotlin.time.TimeSource
 
@@ -13,7 +14,9 @@ import kotlin.time.TimeSource
  * Runs arms with `docker` through the host's process runner. Each trial is one `docker run --rm`
  * with the flags `reproduce` derived from the capsule; output is cut to its last [OUTPUT_BYTES]
  * bytes and one trial is cut off after `timeoutSeconds`. `maxMemory`
- * and `maxCpus` apply only to an arm whose capsule sets no limit of its own.
+ * and `maxCpus` apply only to an arm whose capsule sets no limit of its own. A `gate` sets its
+ * variable to 1 or 0 in each trial, so a command that fails only when it reads 1 fails on a
+ * fixed share of trials.
  */
 class DockerExecutor(
     private val host: Host,
@@ -22,6 +25,7 @@ class DockerExecutor(
     private val timeoutSeconds: Long = 120,
     private val maxMemory: String? = null,
     private val maxCpus: String? = null,
+    private val gate: TrialGate? = null,
 ) : Executor {
     private val built = mutableSetOf<String>()
 
@@ -86,6 +90,7 @@ class DockerExecutor(
         val extra = limits(repro) + listOf(
             "--hostname drift",
             "--env DRIFT_TRIAL=$index",
+        ) + listOfNotNull(gate?.let { "--env ${it.env(index)}" }) + listOf(
             "--name drift-solve-${repro.tag.substringAfter(':')}-$index-\$\$",
         )
         val run = repro.runLine(extra)

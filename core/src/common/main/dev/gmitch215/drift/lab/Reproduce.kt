@@ -591,13 +591,7 @@ object Reproduce {
                     Status.NOT_MIRRORED to
                         "the base image ships its own git, or none; the version is not pinned"
 
-                group == "npm" && key == "version" && row?.tool == "node" ->
-                    if (NPM_VERSION.matches(a.value)) {
-                        npm = a.value
-                        Status.MIRRORED to "RUN npm install -g npm@${a.value} at build"
-                    } else {
-                        Status.NOT_MIRRORED to "not a plain version, so it is not pinned"
-                    }
+                group == "npm" && key == "version" && row?.tool == "node" -> npmPin(a.value)
 
                 group == "npm" -> Status.NOT_MIRRORED to "no node base image to install it into"
 
@@ -611,6 +605,23 @@ object Reproduce {
                         Status.NOT_MIRRORED to "second toolchain: one base image per container, " +
                             "and it is ${base.tag}"
                     }
+                }
+            }
+        }
+
+        fun npmPin(version: String): Pair<Status, String> {
+            val node = attrs["tool.node.version"]
+            return when {
+                !NPM_VERSION.matches(version) ->
+                    Status.NOT_MIRRORED to "not a plain version, so it is not pinned"
+
+                node != null && !NpmEngines.supports(version, node) ->
+                    Status.NOT_MIRRORED to "npm $version does not run on node $node, so the " +
+                        "image keeps its bundled npm"
+
+                else -> {
+                    npm = version
+                    Status.MIRRORED to "RUN npm install -g npm@$version at build"
                 }
             }
         }

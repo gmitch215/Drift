@@ -108,6 +108,7 @@ class SolveCommandTest {
             solve("--budget trials=x", ran).stderr.contains("bad --budget item: trials=x"),
         )
         assertTrue(solve("--budget runs=5", ran).stderr.contains("--budget takes trials=N"))
+        assertTrue(solve("--gate salt=1", ran).stderr.contains("--gate needs permille=N"))
         val badPattern = SolveCommand(host, disk, ran).test(
             "--run t --fail-when \"(\" --case other green.json red.json",
         )
