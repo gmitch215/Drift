@@ -55,4 +55,4 @@ fixtures:
         attrs:
           tool.python.version: '3.13.16'
           project.python.imports.asyncore: 'true'
-status: pending-scanner
+status: active

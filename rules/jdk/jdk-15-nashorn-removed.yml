@@ -51,4 +51,4 @@ fixtures:
         attrs:
           tool.java.version: '21.0.12.1'
           project.java.script-engines: nashorn
-status: pending-scanner
+status: active

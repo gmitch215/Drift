@@ -61,4 +61,4 @@ fixtures:
       b:
         attrs:
           tool.php.version: '8.3.35'
-status: pending-scanner
+status: active

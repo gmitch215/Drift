@@ -37,4 +37,4 @@ fixtures:
     - name: drupal 9.5.0 with a plain prefix string to drupal 10.3.6
       a: {attrs: {project.composer.drupal/core: '9.5.0'}}
       b: {attrs: {project.composer.drupal/core: '10.3.6'}}
-status: pending-scanner
+status: active

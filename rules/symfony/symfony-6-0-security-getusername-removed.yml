@@ -35,4 +35,4 @@ fixtures:
     - name: symfony 5.4.0 to symfony 6.0.0 without a getUsername() call site
       a: {attrs: {project.composer.symfony/http-kernel: '5.4.0'}}
       b: {attrs: {project.composer.symfony/http-kernel: '6.0.0'}}
-status: pending-scanner
+status: active

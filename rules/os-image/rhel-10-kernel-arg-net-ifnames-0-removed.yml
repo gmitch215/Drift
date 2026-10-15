@@ -68,4 +68,4 @@ fixtures:
           os.release.ID: rhel
           os.release.VERSION_ID: '10.0'
           kernel.cmdline: ro net.ifnames=0 quiet
-status: pending-scanner
+status: active

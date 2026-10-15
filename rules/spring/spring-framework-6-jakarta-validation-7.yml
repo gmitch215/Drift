@@ -52,4 +52,4 @@ fixtures:
       b:
         attrs:
           project.spring-framework.version: '6.2.0'
-status: pending-scanner
+status: active

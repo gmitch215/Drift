@@ -35,4 +35,4 @@ fixtures:
     - name: symfony 5.4.0 to symfony 6.0.0 with framework.router.utf8 set to true
       a: {attrs: {project.composer.symfony/http-kernel: '5.4.0'}}
       b: {attrs: {project.composer.symfony/http-kernel: '6.0.0', project.symfony.config.framework-router-utf8: 'true'}}
-status: pending-scanner
+status: active

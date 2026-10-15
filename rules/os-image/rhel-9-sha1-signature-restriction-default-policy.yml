@@ -63,4 +63,4 @@ fixtures:
           os.release.ID: rhel
           os.release.VERSION_ID: '9.4'
           crypto.policy: LEGACY
-status: pending-scanner
+status: active

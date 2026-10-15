@@ -50,4 +50,4 @@ fixtures:
       b:
         attrs:
           git.config.core.autocrlf: 'false'
-status: pending-scanner
+status: active

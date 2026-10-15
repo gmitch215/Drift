@@ -51,4 +51,4 @@ fixtures:
         attrs:
           tool.java.version: '17.0.10+7'
           project.java.javah-invocation: javah
-status: pending-scanner
+status: active

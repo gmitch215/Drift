@@ -35,4 +35,4 @@ fixtures:
     - name: symfony 7.0.0 to symfony 8.0.0 without a Request::get() call site
       a: {attrs: {project.composer.symfony/http-kernel: '7.0.0'}}
       b: {attrs: {project.composer.symfony/http-kernel: '8.0.0'}}
-status: pending-scanner
+status: active

@@ -35,4 +35,4 @@ fixtures:
     - name: symfony 6.4.0 to symfony 7.0.0 without a ParameterBag getInt() call site
       a: {attrs: {project.composer.symfony/http-kernel: '6.4.0'}}
       b: {attrs: {project.composer.symfony/http-kernel: '7.0.0'}}
-status: pending-scanner
+status: active

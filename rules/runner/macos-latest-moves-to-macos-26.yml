@@ -59,4 +59,4 @@ fixtures:
         attrs:
           ci.runner.label: macos-latest
           os.version: '26.0'
-status: pending-scanner
+status: active

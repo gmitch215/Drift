@@ -42,4 +42,4 @@ fixtures:
     - name: drupal 9.5.0 with ckeditor 4 to drupal 9.5.0 (same band)
       a: {attrs: {project.composer.drupal/core: '9.5.0', project.drupal.modules.ckeditor4: 'true'}}
       b: {attrs: {project.composer.drupal/core: '9.5.0'}}
-status: pending-scanner
+status: active

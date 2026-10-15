@@ -52,4 +52,4 @@ fixtures:
         attrs:
           project.gradle.wrapper: '8.14.3'
           project.gradle.javaexec-without-jvm-set: 'true'
-status: pending-scanner
+status: active

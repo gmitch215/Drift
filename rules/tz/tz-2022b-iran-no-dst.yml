@@ -47,4 +47,4 @@ fixtures:
       b:
         attrs:
           tz.database.version: '2021e'
-status: pending-scanner
+status: active

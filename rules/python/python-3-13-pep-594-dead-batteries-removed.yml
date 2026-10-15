@@ -87,4 +87,4 @@ fixtures:
         attrs:
           tool.python.version: '3.14.0'
           project.python.imports.cgi: 'true'
-status: pending-scanner
+status: active

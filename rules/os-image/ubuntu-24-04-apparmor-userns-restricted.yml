@@ -52,4 +52,4 @@ fixtures:
       b:
         attrs:
           os.release.VERSION_ID: '24.04'
-status: pending-scanner
+status: active

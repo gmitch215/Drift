@@ -54,4 +54,4 @@ fixtures:
     - name: drupal 9.5.0 with the node module to drupal 10.3.6 (module is still in core)
       a: {attrs: {project.composer.drupal/core: '9.5.0', project.drupal.modules.node: 'true'}}
       b: {attrs: {project.composer.drupal/core: '10.3.6'}}
-status: pending-scanner
+status: active

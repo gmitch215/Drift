@@ -39,4 +39,4 @@ fixtures:
     - name: twig 2.15.5 to twig 3.14.0 without a Twig_Simple class use
       a: {attrs: {project.composer.twig/twig: '2.15.5'}}
       b: {attrs: {project.composer.twig/twig: '3.14.0'}}
-status: pending-scanner
+status: active

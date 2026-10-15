@@ -53,4 +53,4 @@ fixtures:
         attrs:
           tool.python.version: '3.13.16'
           project.python.calls.ssl.wrap_socket: 'true'
-status: pending-scanner
+status: active

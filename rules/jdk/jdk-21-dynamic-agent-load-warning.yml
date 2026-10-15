@@ -50,4 +50,4 @@ fixtures:
         attrs:
           tool.java.version: '25.0.4.1'
           project.java.dynamic-agent-load: 'true'
-status: pending-scanner
+status: active

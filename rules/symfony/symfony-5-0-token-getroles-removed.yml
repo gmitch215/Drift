@@ -35,4 +35,4 @@ fixtures:
     - name: symfony 4.4.9 to symfony 5.0.0 without a getRoles() call site
       a: {attrs: {project.composer.symfony/http-kernel: '4.4.9'}}
       b: {attrs: {project.composer.symfony/http-kernel: '5.0.0'}}
-status: pending-scanner
+status: active

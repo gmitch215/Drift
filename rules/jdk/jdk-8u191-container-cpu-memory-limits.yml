@@ -61,4 +61,4 @@ fixtures:
           tool.java.version: '1.8.0_504'
           os.name: linux
           cgroup.memory.limit: '2147483648'
-status: pending-scanner
+status: active
