@@ -1,4 +1,24 @@
 #!/bin/sh
+gate_hash() {
+    h=$(( ($1 * 2654435761 + $2) % 4294967296 ))
+    h=$(( (((h >> 16) ^ h) * 73244475) % 4294967296 ))
+    h=$(( (((h >> 16) ^ h) * 73244475) % 4294967296 ))
+    h=$(( (h >> 16) ^ h ))
+}
+limit() {
+    if command -v timeout > /dev/null 2>&1; then
+        timeout 60 "$@"
+    else
+        perl -e 'alarm 60; exec @ARGV' -- "$@"
+    fi
+}
+if [ "$1" = "--hash" ]; then
+    while read -r trial salt; do
+        gate_hash "$trial" "$salt"
+        echo "$h"
+    done
+    exit 0
+fi
 arm=$1
 dir=${BENCH_DIR:-/bench}
 cd "$dir" || exit 2
@@ -11,13 +31,10 @@ if [ -x "$drift" ]; then
 fi
 i=0
 while [ "$i" -lt "$TRIALS" ]; do
-    h=$(( (i * 2654435761 + SALT) % 4294967296 ))
-    h=$(( (((h >> 16) ^ h) * 73244475) % 4294967296 ))
-    h=$(( (((h >> 16) ^ h) * 73244475) % 4294967296 ))
-    h=$(( (h >> 16) ^ h ))
+    gate_hash "$i" "$SALT"
     flake=0
     [ $(( h % 1000 )) -lt "$GATE" ] && flake=1
-    out=$(export BENCH_TRIAL=$i BENCH_FLAKE=$flake; eval "timeout 60 $CMD" 2>&1)
+    out=$(export BENCH_TRIAL=$i BENCH_FLAKE=$flake; eval "limit $CMD" 2>&1)
     code=$?
     sig=0
     if [ "$code" -ne 0 ]; then

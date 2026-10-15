@@ -1,0 +1,222 @@
+name: Bench Host Arms
+
+on:
+  workflow_dispatch:
+    inputs:
+      ids:
+        description: Scenario ids, separated by spaces
+        required: false
+        default: ''
+      template:
+        description: Template id; runs every instance of it
+        required: false
+        default: ''
+      hosts:
+        description: Runner labels, separated by spaces
+        required: false
+        default: 'macos-15 windows-2025 ubuntu-24.04-arm'
+
+jobs:
+  prepare:
+    name: Prepare Scenarios
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    permissions:
+      contents: read
+
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      arm64: ${{ steps.matrix.outputs.arm64 }}
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Select Hosts
+        id: matrix
+        env:
+          HOSTS: ${{ inputs.hosts }}
+          IDS: ${{ inputs.ids }}
+          TEMPLATE: ${{ inputs.template }}
+        run: |
+          if [ -z "$IDS$TEMPLATE" ]; then
+            echo '::error::Set ids or template'
+            exit 1
+          fi
+          all='[
+            {"os":"macos-15","name":"macos-arm64","link":"linkReleaseExecutableMacosArm64","exe":"cli/build/bin/macosArm64/releaseExecutable/drift.kexe","build":"here"},
+            {"os":"windows-2025","name":"windows-x64","link":"linkReleaseExecutableMingwX64","exe":"cli/build/bin/mingwX64/releaseExecutable/drift.exe","build":"here"},
+            {"os":"ubuntu-24.04-arm","name":"linux-arm64","link":"linkReleaseExecutableLinuxArm64","exe":"cli/build/bin/linuxArm64/releaseExecutable/drift.kexe","exedir":"cli/build/bin/linuxArm64/releaseExecutable","build":"download"}
+          ]'
+          matrix=$(printf '%s' "$all" | jq -c --arg hosts "$HOSTS" '{include: map(select(.os as $os | $hosts | split(" ") | index($os)))}')
+          if [ "$(printf '%s' "$matrix" | jq '.include | length')" -eq 0 ]; then
+            echo "::error::No known host in: $HOSTS"
+            exit 1
+          fi
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          echo "arm64=$(printf '%s' "$matrix" | jq 'any(.include[]; .build == "download")')" >> "$GITHUB_OUTPUT"
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Write Run Directories
+        env:
+          IDS: ${{ inputs.ids }}
+          TEMPLATE: ${{ inputs.template }}
+        run: |
+          args="prepare --root $PWD/bench --out $RUNNER_TEMP/prepared"
+          ids=$(printf '%s' "$IDS" | tr -s ' ' ',')
+          [ -n "$ids" ] && args="$args --only $ids"
+          [ -n "$TEMPLATE" ] && args="$args --template $TEMPLATE"
+          ./gradlew :bench:jvmRun --args="$args"
+      - name: Archive Run Directories
+        uses: actions/upload-artifact@v7
+        with:
+          name: bench-prepared
+          path: ${{ runner.temp }}/prepared
+          if-no-files-found: error
+      - name: Stop Gradle
+        run: ./gradlew --stop
+
+  link-arm64:
+    name: Link Executable (linux-arm64)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    needs: prepare
+    if: ${{ needs.prepare.outputs.arm64 == 'true' }}
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Set up Konan
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.konan/caches
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-prebuilt-*
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
+      - name: Build Executable
+        run: ./gradlew :cli:linkReleaseExecutableLinuxArm64
+      - name: Archive Executable
+        uses: actions/upload-artifact@v7
+        with:
+          name: bench-drift-linux-arm64
+          path: cli/build/bin/linuxArm64/releaseExecutable/drift.kexe
+          if-no-files-found: error
+      - name: Stop Gradle
+        run: ./gradlew --stop
+
+  run:
+    name: Run Arms (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    needs: [prepare, link-arm64]
+    if: ${{ !cancelled() && needs.prepare.result == 'success' && needs.link-arm64.result != 'failure' }}
+
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Download Run Directories
+        uses: actions/download-artifact@v8
+        with:
+          name: bench-prepared
+          path: prepared
+      - name: Set up JDK 21
+        if: ${{ matrix.build == 'here' }}
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - name: Set up Konan
+        if: ${{ matrix.build == 'here' }}
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.konan/caches
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-prebuilt-*
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
+      - name: Build Executable
+        if: ${{ matrix.build == 'here' }}
+        run: ./gradlew :cli:${{ matrix.link }}
+      - name: Download Executable
+        if: ${{ matrix.build == 'download' }}
+        uses: actions/download-artifact@v8
+        with:
+          name: bench-drift-linux-arm64
+          path: ${{ matrix.exedir }}
+      - name: Record Host
+        run: |
+          chmod +x "${{ matrix.exe }}" || true
+          "${{ matrix.exe }}" --version
+          {
+            echo "runner=${{ matrix.os }}"
+            echo "image=${ImageOS:-unknown} ${ImageVersion:-unknown}"
+            echo "commit=$GITHUB_SHA"
+            echo "uname=$(uname -a)"
+            echo "drift=${{ matrix.exe }}"
+            echo "drift_sha256=$(sha256sum "${{ matrix.exe }}" 2> /dev/null || shasum -a 256 "${{ matrix.exe }}")"
+          } > prepared/host.txt
+          cat prepared/host.txt
+      - name: Run Arms
+        if: ${{ runner.os != 'Windows' }}
+        run: DRIFT_BIN="$PWD/${{ matrix.exe }}" sh bench/runner/native.sh prepared
+      - name: Run Arms (PowerShell)
+        if: ${{ runner.os == 'Windows' }}
+        shell: pwsh
+        run: |
+          $env:DRIFT_BIN = Join-Path $PWD '${{ matrix.exe }}'
+          bench/runner/native.ps1 -Root prepared
+      - name: Check Outputs
+        run: |
+          status=0
+          for d in prepared/*/; do
+            if [ -f "$d/native.skip" ]; then
+              echo "skipped $d: $(cat "$d/native.skip")"
+              continue
+            fi
+            for arm in green red; do
+              if ! grep -q '^CAPSULE-END' "$d/$arm.out" || ! grep -q '^DONE' "$d/$arm.out"; then
+                echo "::error::$d$arm.out lacks a capsule or DONE"
+                status=1
+              fi
+            done
+          done
+          exit $status
+      - name: Archive Outputs
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: bench-${{ matrix.name }}
+          path: prepared
+          if-no-files-found: error
+      - name: Stop Gradle
+        if: ${{ matrix.build == 'here' }}
+        run: ./gradlew --stop
