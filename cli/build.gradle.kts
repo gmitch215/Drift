@@ -29,6 +29,12 @@ val embedCi = tasks.register<EmbedFixtures>("embedCi") {
     outputDir = layout.buildDirectory.dir("generated/ci")
 }
 
+val embedSet = tasks.register<EmbedFixtures>("embedSet") {
+    fixtures = rootProject.layout.projectDirectory.dir("fixtures/set")
+    objectName = "SetFixtures"
+    outputDir = layout.buildDirectory.dir("generated/set")
+}
+
 tasks.register<Sync>("stageStudio") {
     dependsOn(":studio:wasmJsBrowserDistribution")
     from(rootProject.layout.projectDirectory.dir("studio/build/dist/wasmJs/productionExecutable")) {
@@ -54,7 +60,7 @@ kotlin {
 
     listOf(linuxX64(), linuxArm64()).forEach {
         // clikt and clikt-mordant both define an identical selfAndAncestors (KT-81760)
-        it.binaries.all { linkerOpts("--allow-multiple-definition") }
+        it.binaries.all { linkerOpts("--as-needed", "--allow-multiple-definition") }
     }
 
     sourceSets {
@@ -69,6 +75,7 @@ kotlin {
             kotlin.srcDir(embedAtlas)
             kotlin.srcDir(embedVariants)
             kotlin.srcDir(embedCi)
+            kotlin.srcDir(embedSet)
         }
         macosMain { kotlin.srcDir("src/posix/main") }
         linuxMain { kotlin.srcDir("src/posix/main") }

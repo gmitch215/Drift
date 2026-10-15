@@ -41,6 +41,18 @@ val embedTriageFixtures = tasks.register<EmbedFixtures>("embedTriageFixtures") {
     outputDir = layout.buildDirectory.dir("generated/triageFixtures")
 }
 
+val embedSetFixtures = tasks.register<EmbedFixtures>("embedSetFixtures") {
+    fixtures = rootProject.layout.projectDirectory.dir("fixtures/set")
+    objectName = "SetFixtures"
+    outputDir = layout.buildDirectory.dir("generated/setFixtures")
+}
+
+val embedViewportFixtures = tasks.register<EmbedFixtures>("embedViewportFixtures") {
+    fixtures = rootProject.layout.projectDirectory.dir("fixtures/sites/viewport/capsules")
+    objectName = "ViewportFixtures"
+    outputDir = layout.buildDirectory.dir("generated/viewportFixtures")
+}
+
 val stageFlagshipA = tasks.register<Sync>("stageFlagshipA") {
     from(rootProject.layout.projectDirectory.dir("fixtures/cases/a")) {
         include("case/**", "ruled-out.yml", "vacuous-green.txt")
@@ -113,6 +125,8 @@ kotlin {
             kotlin.srcDir(embedLabFixtures)
             kotlin.srcDir(embedCiFixtures)
             kotlin.srcDir(embedTriageFixtures)
+            kotlin.srcDir(embedSetFixtures)
+            kotlin.srcDir(embedViewportFixtures)
             kotlin.srcDir(embedFlagshipBFixtures)
             kotlin.srcDir(embedFlagshipAFixtures)
             kotlin.srcDir(embedFlagshipCFixtures)

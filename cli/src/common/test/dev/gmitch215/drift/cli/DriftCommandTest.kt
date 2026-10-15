@@ -2,11 +2,22 @@ package dev.gmitch215.drift.cli
 
 import dev.gmitch215.drift.DRIFT_VERSION
 import dev.gmitch215.drift.case.Tar
+import dev.gmitch215.drift.ci.Execution
 import dev.gmitch215.drift.cli.command.DriftCommand
 import dev.gmitch215.drift.fixtures.Fixtures
+import dev.gmitch215.drift.fixtures.SetFixtures
 import dev.gmitch215.drift.hash.Sha256
 import dev.gmitch215.drift.host.FakeHost
+import dev.gmitch215.drift.json.CanonicalJson
+import dev.gmitch215.drift.json.JsonBool
+import dev.gmitch215.drift.json.array
+import dev.gmitch215.drift.json.long
+import dev.gmitch215.drift.json.obj
+import dev.gmitch215.drift.json.require
+import dev.gmitch215.drift.json.string
 import dev.gmitch215.drift.model.Capsule
+import dev.gmitch215.drift.model.Run
+import dev.gmitch215.drift.model.RunOutcome
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -241,6 +252,132 @@ class DriftCommandTest {
         assertEquals(1, result.statusCode)
         val message = "green.json is not a .driftcase archive; drop #passing"
         assertTrue(message in result.stderr, result.stderr)
+    }
+
+    private fun setHost(vararg extra: Pair<String, String>) = FakeHost(
+        canRun = false,
+        files = SetFixtures.names.filter { it.endsWith(".json") }
+            .associateWith { SetFixtures.text(it) } + extra,
+    )
+
+    private val toolchain = "'toolchain/pass-1.json#pass' 'toolchain/pass-2.json#pass' " +
+        "'toolchain/fail-1.json#fail' 'toolchain/fail-2.json#fail'"
+
+    @Test
+    fun diagnoseSetRanksTheSeparatingKeyFirstFromSelectors() {
+        val result = DriftCommand(setHost()).test("diagnose --set $toolchain")
+        assertEquals(0, result.statusCode, result.stderr)
+        val splits = CanonicalJson.parse(result.stdout.trim()).obj().require("splits").array()
+        val top = splits.first().obj()
+        assertEquals("tool.node.version", top.require("path").string())
+        assertEquals("22.4.0", top.require("value").string())
+        assertEquals(1_000_000, top.require("score").long())
+        assertEquals(1, splits.count { it.obj().require("separates") == JsonBool(true) })
+    }
+
+    @Test
+    fun diagnoseSetPrintsTextAtThreeDetails() {
+        val host = setHost()
+        val summary = DriftCommand(host).test("diagnose --set $toolchain --detail summary")
+        val detail = DriftCommand(host).test("diagnose --set $toolchain --detail detail")
+        val full = DriftCommand(host).test("diagnose --set $toolchain --detail full")
+        assertEquals(0, summary.statusCode, summary.stderr)
+        assertTrue(summary.stdout.startsWith("set: 2 failing, 2 passing, 1 separating\n1. "))
+        assertEquals(7, summary.stdout.lines().size)
+        assertTrue(detail.stdout.lines().size > 6, detail.stdout)
+        assertEquals(detail.stdout, full.stdout)
+        assertEquals(
+            DriftCommand(host).test("diagnose --set $toolchain --json").stdout,
+            DriftCommand(host).test("diagnose --set $toolchain").stdout,
+        )
+    }
+
+    @Test
+    fun diagnoseSetReadsTheOutcomeACapsuleDirectoryRecords() {
+        fun dir(name: String, outcome: RunOutcome?, exit: Int? = null): List<Pair<String, String>> {
+            val capsule = Capsule.parse(SetFixtures.text("toolchain/$name.json"))
+            return listOfNotNull(
+                "$name/capsule.json" to capsule.canonical(),
+                outcome?.let { "$name/run.json" to Run("r", it, capsule = null).canonical() },
+                exit?.let {
+                    "$name/result.json" to
+                        CanonicalJson.encode(Execution("cmd", it, 1, false).toJson())
+                },
+            )
+        }
+        val host = setHost(
+            *(
+                dir("pass-1", RunOutcome.PASS) + dir("pass-2", null, 0) +
+                    dir("fail-1", RunOutcome.FAIL) + dir("fail-2", null, 2)
+                ).toTypedArray(),
+        )
+        val recorded = DriftCommand(host).test("diagnose --set pass-1 pass-2 fail-1 fail-2")
+        assertEquals(0, recorded.statusCode, recorded.stderr)
+        fun splits(out: String) = CanonicalJson.parse(out.trim()).obj().require("splits")
+
+        val selected = DriftCommand(host).test("diagnose --set $toolchain")
+        assertEquals(splits(selected.stdout), splits(recorded.stdout))
+        val flipped = DriftCommand(host).test(
+            "diagnose --set 'pass-1#fail' pass-2 fail-1 fail-2 --detail summary",
+        )
+        assertTrue(flipped.stdout.startsWith("set: 3 failing, 1 passing"), flipped.stdout)
+    }
+
+    @Test
+    fun diagnoseSetWorksOnAnArchiveMember() {
+        val host = FakeHost(
+            canRun = false,
+            files = mapOf(
+                "case.driftcase" to Tar.write(
+                    mapOf(
+                        "environments/passing.json" to SetFixtures.text("toolchain/pass-1.json"),
+                        "environments/failing.json" to SetFixtures.text("toolchain/fail-1.json"),
+                    ),
+                ).decodeToString(),
+            ),
+        )
+        val result = DriftCommand(host).test(
+            "diagnose --set 'case.driftcase#passing' 'case.driftcase#failing' --detail summary",
+        )
+        assertEquals(0, result.statusCode, result.stderr)
+        assertTrue(result.stdout.startsWith("set: 1 failing, 1 passing"), result.stdout)
+    }
+
+    @Test
+    fun diagnoseSetRefusesWhatItCannotRank() {
+        val host = setHost("broken/capsule.json" to "{")
+        fun fails(args: String, message: String) {
+            val result = DriftCommand(host).test("diagnose --set $args")
+            assertEquals(1, result.statusCode, args)
+            assertTrue(message in result.stderr, result.stderr)
+        }
+        fails("'toolchain/pass-1.json#pass'", "at least two capsules")
+        fails(
+            "'toolchain/pass-1.json#pass' 'toolchain/pass-2.json#pass'",
+            "at least one passing and one failing capsule",
+        )
+        fails(
+            "'toolchain/fail-1.json#fail' 'toolchain/fail-2.json#fail'",
+            "at least one passing and one failing capsule",
+        )
+        fails(
+            "toolchain/pass-1.json 'toolchain/fail-1.json#fail'",
+            "toolchain/pass-1.json has no recorded outcome; end it with #pass or #fail",
+        )
+        fails("broken 'toolchain/fail-1.json#fail'", "invalid capsule directory broken")
+        fails(
+            "'nope.json#pass' 'toolchain/fail-1.json#fail'",
+            "cannot read capsule file: nope.json",
+        )
+        fails("--against base $toolchain", "cannot be combined with --against or --case")
+        fails("--case out $toolchain", "cannot be combined with --against or --case")
+    }
+
+    @Test
+    fun diagnoseWithoutSetStillNeedsExactlyTwoCapsules() {
+        val three = DriftCommand(diagnoseHost()).test("diagnose green.json red.json red.json")
+        assertEquals(1, three.statusCode)
+        assertTrue("expected a passing and a failing capsule" in three.stderr, three.stderr)
     }
 
     private companion object {

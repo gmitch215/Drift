@@ -18,24 +18,38 @@ import dev.gmitch215.drift.case.CaseStore
 import dev.gmitch215.drift.case.CaseWrite
 import dev.gmitch215.drift.case.Detail
 import dev.gmitch215.drift.case.Render
+import dev.gmitch215.drift.ci.CapsuleDirectories
+import dev.gmitch215.drift.ci.CapsuleDirectory
+import dev.gmitch215.drift.ci.DirectoryRead
 import dev.gmitch215.drift.cli.rawEcho
 import dev.gmitch215.drift.host.Host
 import dev.gmitch215.drift.json.CanonicalJson
 import dev.gmitch215.drift.model.Capsule
+import dev.gmitch215.drift.model.RunOutcome
 import dev.gmitch215.drift.plan.Frame
 import dev.gmitch215.drift.plan.Options
 import dev.gmitch215.drift.plan.Planner
 import dev.gmitch215.drift.rank.Ranker
 import dev.gmitch215.drift.scan.Capture
+import dev.gmitch215.drift.set.SetCapsule
+import dev.gmitch215.drift.set.SetDiagnosis
 import dev.gmitch215.drift.studio.StudioState
+
+private const val SET_SUMMARY_ROWS = 5
 
 class DiagnoseCommand(private val host: Host, private val files: CaseFiles) :
     CliktCommand(name = "diagnose") {
     private val capsules by argument(
         "capsule",
         help = "capsule file or directory of the passing run, then of the failing run; " +
-            "with --against, only the failing run (default: capture now)",
+            "with --against, only the failing run (default: capture now); with --set, every " +
+            "capsule of the set",
     ).multiple()
+    private val set by option(
+        "--set",
+        help = "rank what splits passing from failing over any number of capsules, each ending " +
+            "in #pass or #fail unless its directory records the outcome",
+    ).flag()
     private val against by option(
         "--against",
         help = "baseline capsule directory or file of a passing run",
@@ -60,7 +74,55 @@ class DiagnoseCommand(private val host: Host, private val files: CaseFiles) :
 
     override fun help(context: Context) =
         "Diagnose a green and a red capsule, or a baseline and the current run: canonical JSON " +
-            "by default, or text and a case"
+            "by default, or text and a case; with --set, rank the attributes that split a set " +
+            "of passing and failing capsules"
+
+    private fun labelled(path: String): SetCapsule {
+        val hash = path.lastIndexOf('#')
+        val tag = if (hash > 0) path.substring(hash + 1) else null
+        val source = if (tag == "pass" || tag == "fail") path.substring(0, hash) else path
+        var failing = when (tag) {
+            "pass", "passing" -> false
+            "fail", "failing" -> true
+            else -> null
+        }
+        val directory = CapsuleDirectories.read(host::readText, source)
+        val capsule = when (directory) {
+            is DirectoryRead.Loaded -> {
+                failing = failing ?: directory.directory.outcome()
+                directory.directory.capsule
+            }
+
+            is DirectoryRead.Failed -> throw CliktError(directory.reason)
+
+            null -> loadCapsule(host, source)
+        }
+        val outcome = failing
+            ?: throw UsageError("$source has no recorded outcome; end it with #pass or #fail")
+        return SetCapsule(source, outcome, capsule)
+    }
+
+    private fun CapsuleDirectory.outcome(): Boolean? = when (run?.outcome) {
+        RunOutcome.PASS -> false
+        RunOutcome.FAIL -> true
+        else -> execution?.let { it.exitCode != 0 }
+    }
+
+    private fun runSet() {
+        if (against != null || case != null) {
+            throw UsageError("--set cannot be combined with --against or --case")
+        }
+        if (capsules.size < 2) throw UsageError("--set needs at least two capsules")
+        val result = SetDiagnosis.of(capsules.map(::labelled))
+        if (result.failing == 0 || result.passing == 0) {
+            throw UsageError("--set needs at least one passing and one failing capsule")
+        }
+        when (detail) {
+            null -> rawEcho(CanonicalJson.encode(result.toJson()))
+            "summary" -> echo(result.text(SET_SUMMARY_ROWS), trailingNewline = false)
+            else -> echo(result.text(), trailingNewline = false)
+        }
+    }
 
     private fun pair(): Pair<Capsule, Capsule> {
         val baseline = against
@@ -80,6 +142,7 @@ class DiagnoseCommand(private val host: Host, private val files: CaseFiles) :
 
     override fun run() {
         if (json && detail != null) throw UsageError("--json and --detail cannot be combined")
+        if (set) return runSet()
         val (passing, failing) = pair()
         val rules = rulesWithLearned(files, learned)
         if (detail == null && case == null) {

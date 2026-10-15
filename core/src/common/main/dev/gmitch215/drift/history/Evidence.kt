@@ -3,6 +3,7 @@ package dev.gmitch215.drift.history
 import dev.gmitch215.drift.diff.CiVolatile
 import dev.gmitch215.drift.diff.Normalize
 import dev.gmitch215.drift.math.FixedPoint
+import dev.gmitch215.drift.model.Capsule
 import dev.gmitch215.drift.model.Run
 import dev.gmitch215.drift.model.RunOutcome
 import dev.gmitch215.drift.model.Stability
@@ -67,7 +68,7 @@ data class Evidence(
 
                     else -> ExclusionReason.NO_RESULT
                 }
-                val elements = elements(run)
+                val elements = elements(run.capsule)
                 when {
                     reason != null -> excluded += Exclusion(run.id, reason)
 
@@ -94,7 +95,8 @@ data class Evidence(
             )
         }
 
-        private fun elements(run: Run): Set<Element> = run.capsule?.attributes.orEmpty()
+        /** The static, non-volatile attributes of [capsule] with normalized values. */
+        fun elements(capsule: Capsule?): Set<Element> = capsule?.attributes.orEmpty()
             .filter { it.stability == Stability.STATIC && !CiVolatile.covers(it.path) }
             .map { Element(it.path, Normalize.value(it.path, it.value)) }.toSet()
     }
