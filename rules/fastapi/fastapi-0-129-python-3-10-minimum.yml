@@ -1,0 +1,43 @@
+schema: 1
+id: fastapi-0-129-python-3-10-minimum
+title: FastAPI 0.129 and newer requires Python 3.10 or newer, so a Python below 3.10 host cannot install it
+applies:
+  - build
+difference: >-
+  side a is Python 3.10 or newer with FastAPI 0.129 and newer; side b is Python below 3.10 with the same release line
+symptoms:
+  - text: 'ERROR: No matching distribution found for fastapi==0.129.0 (pip lists the release line under "Ignored the following versions that require a different python version")'
+    basis: verified
+mechanism: PyPI metadata for fastapi 0.129.0 gives requires_python ">=3.10" and the later releases of the line keep it.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '>=3.10'
+    - b: tool.python.version
+      ver: '<3.10'
+    - a: project.python.fastapi
+      ver: '>=0.129'
+    - b: project.python.fastapi
+      ver: '>=0.129'
+severity: high
+provenance:
+  - url: https://pypi.org/pypi/fastapi/0.129.0/json
+    kind: spec
+    verified: '2026-10-15'
+    section: 'info.requires_python'
+fixtures:
+  positive:
+    - name: python 3.12.4 to python 3.9.19 with fastapi 0.130.0
+      a: {attrs: {tool.python.version: '3.12.4', project.python.fastapi: '0.130.0'}}
+      b: {attrs: {tool.python.version: '3.9.19', project.python.fastapi: '0.130.0'}}
+  negative:
+    - name: python 3.9.19 to python 3.12.4 with fastapi 0.130.0 (reverse direction)
+      a: {attrs: {tool.python.version: '3.9.19', project.python.fastapi: '0.130.0'}}
+      b: {attrs: {tool.python.version: '3.12.4', project.python.fastapi: '0.130.0'}}
+    - name: python 3.12.4 to python 3.9.19 with fastapi 0.128.0 (outside the release line)
+      a: {attrs: {tool.python.version: '3.12.4', project.python.fastapi: '0.128.0'}}
+      b: {attrs: {tool.python.version: '3.9.19', project.python.fastapi: '0.128.0'}}
+    - name: python 3.9.19 to python 3.9.19 with fastapi 0.130.0 (same band)
+      a: {attrs: {tool.python.version: '3.9.19', project.python.fastapi: '0.130.0'}}
+      b: {attrs: {tool.python.version: '3.9.19', project.python.fastapi: '0.130.0'}}
+status: active

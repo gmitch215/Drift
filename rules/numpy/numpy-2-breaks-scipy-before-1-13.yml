@@ -1,0 +1,47 @@
+schema: 1
+id: numpy-2-breaks-scipy-before-1-13
+title: NumPy 2.0 breaks the binary interface, so scipy below 1.13 stops importing after the move to NumPy 2
+applies:
+  - runtime
+difference: >-
+  side a is NumPy 1.x with scipy 1.12.3; side b is NumPy 2.x with the same scipy
+symptoms:
+  - text: 'ImportError on import with a message about binary incompatibility'
+    basis: inferred
+mechanism: The SciPy 1.13.0 notes list support for NumPy 2.0.0 as new and the NumPy 2.0.0 notes say packages built against NumPy 1.x fail on import.
+detect:
+  all:
+    - a: project.python.numpy
+      ver: '>=1.22,<2'
+    - b: project.python.numpy
+      ver: '>=2'
+    - a: project.python.scipy
+      ver: '<1.13'
+    - b: project.python.scipy
+      ver: '<1.13'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/scipy/scipy/v1.13.0/doc/source/release/1.13.0-notes.rst
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'SciPy 1.13.0 Release Notes'
+  - url: https://raw.githubusercontent.com/numpy/numpy/v2.0.0/doc/source/release/2.0.0-notes.rst
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'Breaking changes to the NumPy ABI'
+fixtures:
+  positive:
+    - name: numpy 1.26.4 to numpy 2.0.2 with scipy 1.12.3
+      a: {attrs: {project.python.numpy: '1.26.4', project.python.scipy: '1.12.3'}}
+      b: {attrs: {project.python.numpy: '2.0.2', project.python.scipy: '1.12.3'}}
+  negative:
+    - name: numpy 2.0.2 to numpy 1.26.4 with scipy 1.12.3 (reverse direction)
+      a: {attrs: {project.python.numpy: '2.0.2', project.python.scipy: '1.12.3'}}
+      b: {attrs: {project.python.numpy: '1.26.4', project.python.scipy: '1.12.3'}}
+    - name: numpy 1.26.4 to numpy 2.0.2 with scipy 1.13.1 (built for NumPy 2)
+      a: {attrs: {project.python.numpy: '1.26.4', project.python.scipy: '1.13.1'}}
+      b: {attrs: {project.python.numpy: '2.0.2', project.python.scipy: '1.13.1'}}
+    - name: numpy 1.26.4 to numpy 1.26.4 with scipy 1.12.3 (no NumPy move)
+      a: {attrs: {project.python.numpy: '1.26.4', project.python.scipy: '1.12.3'}}
+      b: {attrs: {project.python.numpy: '1.26.4', project.python.scipy: '1.12.3'}}
+status: active

@@ -1,0 +1,55 @@
+schema: 1
+id: react-native-0-81-node-20-19-4-minimum
+title: React Native 0.81 declares engines.node >= 20.19.4, so a Node version outside that range is unsupported
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is a Node version inside the engines range of React Native 0.81 and side b is a Node version outside it, with the same React Native 0.81 release on side b
+symptoms:
+  - text: 'npm reports EBADENGINE for react-native on the unsupported Node version, and the package may fail to start'
+    basis: inferred
+mechanism: >-
+  The registry document of react-native 0.81.0 declares engines.node >= 20.19.4, so a Node version outside that range is unsupported by React Native 0.81.
+detect:
+  all:
+    - a: tool.node.version
+      ver: '>=20.19.4'
+    - b: tool.node.version
+      ver: '<20.19.4'
+    - b: project.npm.react-native
+      ver: '>=0.81.0'
+severity: medium
+provenance:
+  - url: https://registry.npmjs.org/react-native/0.81.0
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'engines of react-native 0.81.0: "engines":{"node":">= 20.19.4"}'
+fixtures:
+  positive:
+    - name: 'React Native 0.81 on node 22.11.0 to node 18.20.4'
+      a:
+        attrs:
+          tool.node.version: '22.11.0'
+      b:
+        attrs:
+          tool.node.version: '18.20.4'
+          project.npm.react-native: '0.81.0'
+  negative:
+    - name: 'react-native 0.80.2 is below the first release with this range'
+      a:
+        attrs:
+          tool.node.version: '22.11.0'
+      b:
+        attrs:
+          tool.node.version: '18.20.4'
+          project.npm.react-native: '0.80.2'
+    - name: 'node 22.11.0 is inside the range on both sides'
+      a:
+        attrs:
+          tool.node.version: '22.11.0'
+      b:
+        attrs:
+          tool.node.version: '22.11.0'
+          project.npm.react-native: '0.81.0'
+status: active

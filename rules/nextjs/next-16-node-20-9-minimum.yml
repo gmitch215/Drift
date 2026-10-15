@@ -1,0 +1,59 @@
+schema: 1
+id: next-16-node-20-9-minimum
+title: Next.js 16 declares engines.node >=20.9.0, so a Node version outside that range is unsupported
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is a Node version inside the engines range of Next.js 16 and side b is a Node version outside it, with the same Next.js 16 release on side b
+symptoms:
+  - text: 'You are using Node.js 18.20.4. For Next.js, Node.js version ">=20.9.0" is required.'
+    basis: verified
+mechanism: >-
+  The registry document of next 16.0.0 declares engines.node >=20.9.0, so a Node version outside that range is unsupported by Next.js 16.
+detect:
+  all:
+    - a: tool.node.version
+      ver: '>=20.9.0'
+    - b: tool.node.version
+      ver: '<20.9.0'
+    - b: project.npm.next
+      ver: '>=16.0.0'
+severity: medium
+provenance:
+  - url: https://registry.npmjs.org/next/16.0.0
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'engines of next 16.0.0: "engines":{"node":">=20.9.0"}'
+  - url: https://github.com/vercel/next.js/blob/v16.0.0/packages/next/src/bin/next.ts
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'console.error(`You are using Node.js ${process.versions.node}. For Next.js, Node.js version "${process.env.__NEXT_REQUIRED_NODE_VERSION_RANGE}" is required.`) then process.exit(1)'
+fixtures:
+  positive:
+    - name: 'Next.js 16 on node 22.11.0 to node 18.20.4'
+      a:
+        attrs:
+          tool.node.version: '22.11.0'
+      b:
+        attrs:
+          tool.node.version: '18.20.4'
+          project.npm.next: '16.0.0'
+  negative:
+    - name: 'next 15.5.27 is below the first release with this range'
+      a:
+        attrs:
+          tool.node.version: '22.11.0'
+      b:
+        attrs:
+          tool.node.version: '18.20.4'
+          project.npm.next: '15.5.27'
+    - name: 'node 22.11.0 is inside the range on both sides'
+      a:
+        attrs:
+          tool.node.version: '22.11.0'
+      b:
+        attrs:
+          tool.node.version: '22.11.0'
+          project.npm.next: '16.0.0'
+status: active

@@ -1,0 +1,55 @@
+schema: 1
+id: next-14-node-18-17-minimum
+title: Next.js 14 declares engines.node >=18.17.0, so a Node version outside that range is unsupported
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is a Node version inside the engines range of Next.js 14 and side b is a Node version outside it, with the same Next.js 14 release on side b
+symptoms:
+  - text: 'npm reports EBADENGINE for next on the unsupported Node version, and the package may fail to start'
+    basis: inferred
+mechanism: >-
+  The registry document of next 14.0.0 declares engines.node >=18.17.0, so a Node version outside that range is unsupported by Next.js 14.
+detect:
+  all:
+    - a: tool.node.version
+      ver: '>=18.17.0'
+    - b: tool.node.version
+      ver: '<18.17.0'
+    - b: project.npm.next
+      ver: '>=14.0.0'
+severity: medium
+provenance:
+  - url: https://registry.npmjs.org/next/14.0.0
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'engines of next 14.0.0: "engines":{"node":">=18.17.0"}'
+fixtures:
+  positive:
+    - name: 'Next.js 14 on node 20.11.1 to node 16.20.2'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '16.20.2'
+          project.npm.next: '14.0.0'
+  negative:
+    - name: 'next 13.5.6 is below the first release with this range'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '16.20.2'
+          project.npm.next: '13.5.6'
+    - name: 'node 20.11.1 is inside the range on both sides'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '20.11.1'
+          project.npm.next: '14.0.0'
+status: active

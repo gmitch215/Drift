@@ -1,0 +1,55 @@
+schema: 1
+id: astro-3-node-18-14-1-minimum
+title: Astro 3 declares engines.node >=18.14.1, so a Node version outside that range is unsupported
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is a Node version inside the engines range of Astro 3 and side b is a Node version outside it, with the same Astro 3 release on side b
+symptoms:
+  - text: 'npm reports EBADENGINE for astro on the unsupported Node version, and the package may fail to start'
+    basis: inferred
+mechanism: >-
+  The registry document of astro 3.0.0 declares engines.node >=18.14.1, so a Node version outside that range is unsupported by Astro 3.
+detect:
+  all:
+    - a: tool.node.version
+      ver: '>=18.14.1'
+    - b: tool.node.version
+      ver: '<18.14.1'
+    - b: project.npm.astro
+      ver: '>=3.0.0'
+severity: medium
+provenance:
+  - url: https://registry.npmjs.org/astro/3.0.0
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'engines of astro 3.0.0: "engines":{"node":">=18.14.1"}'
+fixtures:
+  positive:
+    - name: 'Astro 3 on node 20.11.1 to node 16.20.2'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '16.20.2'
+          project.npm.astro: '3.0.0'
+  negative:
+    - name: 'astro 2.10.15 is below the first release with this range'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '16.20.2'
+          project.npm.astro: '2.10.15'
+    - name: 'node 20.11.1 is inside the range on both sides'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '20.11.1'
+          project.npm.astro: '3.0.0'
+status: active

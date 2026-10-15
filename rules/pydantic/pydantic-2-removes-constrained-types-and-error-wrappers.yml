@@ -1,0 +1,41 @@
+schema: 1
+id: pydantic-2-removes-constrained-types-and-error-wrappers
+title: Pydantic 2 removes ConstrainedInt, ConstrainedStr and the other Constrained types, ErrorWrapper and datetime_parse
+applies:
+  - runtime
+difference: >-
+  side a is Pydantic 1.x; side b is Pydantic 2.x with source that still uses the removed names
+symptoms:
+  - text: 'PydanticImportError: `pydantic:ConstrainedInt` has been removed in V2.'
+    basis: verified
+mechanism: pydantic/_migration.py at tag v2.0 lists these names in REMOVED_IN_V2 and raises PydanticImportError for them.
+detect:
+  all:
+    - a: project.python.pydantic
+      ver: '>=1,<2'
+    - b: project.python.pydantic
+      ver: '>=2'
+    - b: project.pydantic.source.removed-names
+      present: 'true'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/pydantic/pydantic/v2.0/pydantic/_migration.py
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'getattr_migration'
+fixtures:
+  positive:
+    - name: pydantic 1.10.26 to pydantic 2.12.5 with the removed names in the source
+      a: {attrs: {project.python.pydantic: '1.10.26'}}
+      b: {attrs: {project.python.pydantic: '2.12.5', project.pydantic.source.removed-names: 'true'}}
+  negative:
+    - name: pydantic 2.12.5 to pydantic 1.10.26 with the removed names in the source (reverse direction)
+      a: {attrs: {project.python.pydantic: '2.12.5', project.pydantic.source.removed-names: 'true'}}
+      b: {attrs: {project.python.pydantic: '1.10.26'}}
+    - name: pydantic 1.10.26 to pydantic 2.12.5 without the removed names in the source
+      a: {attrs: {project.python.pydantic: '1.10.26'}}
+      b: {attrs: {project.python.pydantic: '2.12.5'}}
+    - name: pydantic 1.10.26 to pydantic 1.10.26 with the removed names in the source (no version move)
+      a: {attrs: {project.python.pydantic: '1.10.26'}}
+      b: {attrs: {project.python.pydantic: '1.10.26', project.pydantic.source.removed-names: 'true'}}
+status: active

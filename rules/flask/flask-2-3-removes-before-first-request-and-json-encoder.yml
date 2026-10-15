@@ -1,0 +1,41 @@
+schema: 1
+id: flask-2-3-removes-before-first-request-and-json-encoder
+title: Flask 2.3 removes before_first_request, json_encoder, json_decoder and the JSON_* config keys
+applies:
+  - runtime
+difference: >-
+  side a is Flask 2.2 or older; side b is Flask 2.3 or newer with source that still uses the removed names
+symptoms:
+  - text: 'AttributeError: ''Flask'' object has no attribute ''before_first_request'''
+    basis: verified
+mechanism: The 2.3.0 changes list these decorators, attributes and config keys as removed.
+detect:
+  all:
+    - a: project.python.flask
+      ver: '<2.3'
+    - b: project.python.flask
+      ver: '>=2.3'
+    - b: project.flask.source.removed-2-3-features
+      present: 'true'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/pallets/flask/2.3.0/CHANGES.rst
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'Version 2.3.0'
+fixtures:
+  positive:
+    - name: flask 2.2.5 to flask 2.3.3 with the removed names in the source
+      a: {attrs: {project.python.flask: '2.2.5'}}
+      b: {attrs: {project.python.flask: '2.3.3', project.flask.source.removed-2-3-features: 'true'}}
+  negative:
+    - name: flask 2.3.3 to flask 2.2.5 with the removed names in the source (reverse direction)
+      a: {attrs: {project.python.flask: '2.3.3', project.flask.source.removed-2-3-features: 'true'}}
+      b: {attrs: {project.python.flask: '2.2.5'}}
+    - name: flask 2.2.5 to flask 2.3.3 without the removed names in the source
+      a: {attrs: {project.python.flask: '2.2.5'}}
+      b: {attrs: {project.python.flask: '2.3.3'}}
+    - name: flask 2.2.5 to flask 2.2.5 with the removed names in the source (no version move)
+      a: {attrs: {project.python.flask: '2.2.5'}}
+      b: {attrs: {project.python.flask: '2.2.5', project.flask.source.removed-2-3-features: 'true'}}
+status: active

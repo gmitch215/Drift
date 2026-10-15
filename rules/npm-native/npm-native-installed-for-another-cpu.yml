@@ -1,0 +1,91 @@
+schema: 1
+id: npm-native-installed-for-another-cpu
+title: node_modules installed for x64 holds no arm64 native packages, so it fails on an arm64 host, and the reverse
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is a machine whose CPU matches the native packages in node_modules; side b has the other CPU (x86_64 or aarch64) and the same node_modules with no native package for its CPU
+symptoms:
+  - text: >-
+      You installed esbuild for another platform than the one you're currently using
+    basis: verified
+mechanism: >-
+  npm installs the optional platform packages whose cpu field matches process.arch of the installing machine, so node_modules moved between x64 and arm64 hosts carries binaries for the wrong CPU.
+detect:
+  all:
+    - any:
+        - all:
+            - a: os.arch
+              eq: x86_64
+            - a: project.npm.native.platforms
+              has: '-x64'
+            - b: os.arch
+              eq: aarch64
+            - b: project.npm.native.platforms
+              has: '-x64'
+            - not:
+                b: project.npm.native.platforms
+                has: '-arm64'
+        - all:
+            - a: os.arch
+              eq: aarch64
+            - a: project.npm.native.platforms
+              has: '-arm64'
+            - b: os.arch
+              eq: x86_64
+            - b: project.npm.native.platforms
+              has: '-arm64'
+            - not:
+                b: project.npm.native.platforms
+                has: '-x64'
+severity: high
+provenance:
+  - url: https://github.com/evanw/esbuild/blob/v0.28.2/lib/npm/node-platform.ts
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: "throw new Error(`You installed esbuild for another platform than the one you're currently using."
+  - url: https://github.com/npm/cli/blob/v11.6.0/docs/lib/content/configuring-npm/package-json.md
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'cpu: The host architecture is determined by `process.arch`'
+fixtures:
+  positive:
+    - name: x64 node_modules run on an arm64 host
+      a:
+        attrs:
+          os.arch: x86_64
+          project.npm.native.platforms: 'linux-x64-glibc'
+      b:
+        attrs:
+          os.arch: aarch64
+          project.npm.native.platforms: 'linux-x64-glibc'
+    - name: arm64 node_modules run on an x64 host
+      a:
+        attrs:
+          os.arch: aarch64
+          project.npm.native.platforms: 'darwin-arm64'
+      b:
+        attrs:
+          os.arch: x86_64
+          project.npm.native.platforms: 'darwin-arm64'
+  negative:
+    - name: arm64 host also has an arm64 native package
+      a:
+        attrs:
+          os.arch: x86_64
+          project.npm.native.platforms: 'linux-x64-glibc'
+      b:
+        attrs:
+          os.arch: aarch64
+          project.npm.native.platforms: 'linux-arm64-glibc,linux-x64-glibc'
+    - name: both sides match the installed CPU
+      a:
+        attrs:
+          os.arch: x86_64
+          project.npm.native.platforms: 'linux-x64-glibc'
+      b:
+        attrs:
+          os.arch: x86_64
+          project.npm.native.platforms: 'linux-x64-glibc'
+status: active

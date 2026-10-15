@@ -1,0 +1,47 @@
+schema: 1
+id: numpy-2-breaks-pandas-before-2-2-2
+title: NumPy 2.0 breaks the binary interface, so pandas below 2.2.2 stops importing after the move to NumPy 2
+applies:
+  - runtime
+difference: >-
+  side a is NumPy 1.x with pandas 2.1.4; side b is NumPy 2.x with the same pandas
+symptoms:
+  - text: 'ImportError on import with a message about binary incompatibility'
+    basis: inferred
+mechanism: The pandas 2.2.2 whatsnew says 2.2.2 is the first release compatible with numpy 2.0 and the NumPy 2.0.0 notes say packages built against NumPy 1.x fail on import.
+detect:
+  all:
+    - a: project.python.numpy
+      ver: '>=1.22,<2'
+    - b: project.python.numpy
+      ver: '>=2'
+    - a: project.python.pandas
+      ver: '<2.2.2'
+    - b: project.python.pandas
+      ver: '<2.2.2'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/pandas-dev/pandas/v2.2.2/doc/source/whatsnew/v2.2.2.rst
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'Pandas 2.2.2 is now compatible with numpy 2.0'
+  - url: https://raw.githubusercontent.com/numpy/numpy/v2.0.0/doc/source/release/2.0.0-notes.rst
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'Breaking changes to the NumPy ABI'
+fixtures:
+  positive:
+    - name: numpy 1.26.4 to numpy 2.0.2 with pandas 2.1.4
+      a: {attrs: {project.python.numpy: '1.26.4', project.python.pandas: '2.1.4'}}
+      b: {attrs: {project.python.numpy: '2.0.2', project.python.pandas: '2.1.4'}}
+  negative:
+    - name: numpy 2.0.2 to numpy 1.26.4 with pandas 2.1.4 (reverse direction)
+      a: {attrs: {project.python.numpy: '2.0.2', project.python.pandas: '2.1.4'}}
+      b: {attrs: {project.python.numpy: '1.26.4', project.python.pandas: '2.1.4'}}
+    - name: numpy 1.26.4 to numpy 2.0.2 with pandas 2.2.2 (built for NumPy 2)
+      a: {attrs: {project.python.numpy: '1.26.4', project.python.pandas: '2.2.2'}}
+      b: {attrs: {project.python.numpy: '2.0.2', project.python.pandas: '2.2.2'}}
+    - name: numpy 1.26.4 to numpy 1.26.4 with pandas 2.1.4 (no NumPy move)
+      a: {attrs: {project.python.numpy: '1.26.4', project.python.pandas: '2.1.4'}}
+      b: {attrs: {project.python.numpy: '1.26.4', project.python.pandas: '2.1.4'}}
+status: active

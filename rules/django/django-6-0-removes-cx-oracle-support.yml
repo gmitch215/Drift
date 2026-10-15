@@ -1,0 +1,41 @@
+schema: 1
+id: django-6-0-removes-cx-oracle-support
+title: Django 6.0 removes cx_Oracle support, so a project that imports cx_Oracle for its database no longer connects
+applies:
+  - runtime
+difference: >-
+  side a is Django 5.x; side b is Django 6.x with cx_Oracle imported in the project
+symptoms:
+  - text: 'django.core.exceptions.ImproperlyConfigured: Error loading oracledb module'
+    basis: inferred
+mechanism: The 6.0 release notes list "Support for cx_Oracle is removed" under Features removed in 6.0.
+detect:
+  all:
+    - a: project.python.django
+      ver: '>=5,<6'
+    - b: project.python.django
+      ver: '>=6'
+    - b: project.python.imports.cx_Oracle
+      present: 'true'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/django/django/6.0/docs/releases/6.0.txt
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'Features removed in 6.0'
+fixtures:
+  positive:
+    - name: django 5.2.18 to django 6.0.9 with the removed names in the source
+      a: {attrs: {project.python.django: '5.2.18'}}
+      b: {attrs: {project.python.django: '6.0.9', project.python.imports.cx_Oracle: 'true'}}
+  negative:
+    - name: django 6.0.9 to django 5.2.18 with the removed names in the source (reverse direction)
+      a: {attrs: {project.python.django: '6.0.9', project.python.imports.cx_Oracle: 'true'}}
+      b: {attrs: {project.python.django: '5.2.18'}}
+    - name: django 5.2.18 to django 6.0.9 without the removed names in the source
+      a: {attrs: {project.python.django: '5.2.18'}}
+      b: {attrs: {project.python.django: '6.0.9'}}
+    - name: django 5.2.18 to django 5.2.18 with the removed names in the source (no version move)
+      a: {attrs: {project.python.django: '5.2.18'}}
+      b: {attrs: {project.python.django: '5.2.18', project.python.imports.cx_Oracle: 'true'}}
+status: active

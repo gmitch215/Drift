@@ -1,0 +1,73 @@
+schema: 1
+id: npm-native-installed-on-another-os
+title: node_modules installed on macOS or Windows holds only that platform's native packages, so it fails on Linux
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is a macOS or Windows machine whose node_modules holds its own native platform packages; side b is a Linux machine that runs the same node_modules and has no Linux native package installed
+symptoms:
+  - text: >-
+      You installed esbuild for another platform than the one you're currently using
+    basis: verified
+mechanism: >-
+  npm installs the optional platform packages whose os, cpu and libc fields match the machine that runs the install, so node_modules copied to a Linux machine carries darwin or win32 binaries only.
+detect:
+  all:
+    - a: os.name
+      in:
+        - macos
+        - windows
+    - a: project.npm.native.platforms
+      present: 'true'
+    - b: os.name
+      eq: linux
+    - any:
+        - b: project.npm.native.platforms
+          has: 'darwin-'
+        - b: project.npm.native.platforms
+          has: 'win32-'
+    - not:
+        b: project.npm.native.platforms
+        has: 'linux-'
+severity: high
+provenance:
+  - url: https://github.com/evanw/esbuild/blob/v0.28.2/lib/npm/node-platform.ts
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: "throw new Error(`You installed esbuild for another platform than the one you're currently using."
+  - url: https://github.com/npm/cli/blob/v11.6.0/docs/lib/content/configuring-npm/package-json.md
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'os: The host operating system is determined by `process.platform`'
+fixtures:
+  positive:
+    - name: node_modules from an Apple Silicon Mac run on Linux
+      a:
+        attrs:
+          os.name: macos
+          project.npm.native.platforms: 'darwin-arm64'
+      b:
+        attrs:
+          os.name: linux
+          project.npm.native.platforms: 'darwin-arm64'
+  negative:
+    - name: Linux side also has a Linux native package
+      a:
+        attrs:
+          os.name: macos
+          project.npm.native.platforms: 'darwin-arm64'
+      b:
+        attrs:
+          os.name: linux
+          project.npm.native.platforms: 'darwin-arm64,linux-x64-glibc'
+    - name: failing side is macOS, so the install matches the host
+      a:
+        attrs:
+          os.name: windows
+          project.npm.native.platforms: 'win32-x64'
+      b:
+        attrs:
+          os.name: macos
+          project.npm.native.platforms: 'darwin-arm64'
+status: active

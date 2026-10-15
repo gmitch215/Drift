@@ -1,0 +1,52 @@
+schema: 1
+id: wordpress-6-4-php-7-0-minimum
+title: WordPress 6.4 and 6.5 requires PHP 7.0.0 or higher, so a PHP below 7.0.0 host stops at the version check
+applies:
+  - runtime
+difference: >-
+  side a is PHP 7.0.0 or higher with WordPress 6.4 and 6.5; side b is PHP below 7.0.0 with the same release line
+symptoms:
+  - text: 'WordPress dies with "Your server is running PHP version X but WordPress Y requires at least 7.0.0."'
+    basis: inferred
+mechanism: wp-includes/version.php at tag 6.5.0 sets $required_php_version to 7.0.0 and wp_check_php_mysql_versions() stops the request below it.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '>=7.0.0'
+    - b: tool.php.version
+      ver: '<7.0.0'
+    - any:
+        - a: project.wordpress.version
+          ver: '>=6.4,<6.6'
+        - a: project.composer.johnpbloch/wordpress-core
+          ver: '>=6.4,<6.6'
+    - any:
+        - b: project.wordpress.version
+          ver: '>=6.4,<6.6'
+        - b: project.composer.johnpbloch/wordpress-core
+          ver: '>=6.4,<6.6'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/WordPress/wordpress-develop/6.5.0/src/wp-includes/version.php
+    kind: spec
+    verified: '2026-10-15'
+    section: '$required_php_version'
+fixtures:
+  positive:
+    - name: php 8.2.20 to php 5.6.40 with a wordpress 6.5 source tree
+      a: {attrs: {tool.php.version: '8.2.20', project.wordpress.version: '6.5'}}
+      b: {attrs: {tool.php.version: '5.6.40', project.wordpress.version: '6.5'}}
+    - name: php 8.2.20 to php 5.6.40 with johnpbloch/wordpress-core 6.5.0
+      a: {attrs: {tool.php.version: '8.2.20', project.composer.johnpbloch/wordpress-core: '6.5.0'}}
+      b: {attrs: {tool.php.version: '5.6.40', project.composer.johnpbloch/wordpress-core: '6.5.0'}}
+  negative:
+    - name: php 5.6.40 to php 8.2.20 with a wordpress 6.5 source tree (reverse direction)
+      a: {attrs: {tool.php.version: '5.6.40', project.wordpress.version: '6.5'}}
+      b: {attrs: {tool.php.version: '8.2.20', project.wordpress.version: '6.5'}}
+    - name: php 8.2.20 to php 5.6.40 with a wordpress 6.6 source tree (outside the release line)
+      a: {attrs: {tool.php.version: '8.2.20', project.wordpress.version: '6.6'}}
+      b: {attrs: {tool.php.version: '5.6.40', project.wordpress.version: '6.6'}}
+    - name: php 5.6.40 to php 5.6.40 with a wordpress 6.5 source tree (same band)
+      a: {attrs: {tool.php.version: '5.6.40', project.wordpress.version: '6.5'}}
+      b: {attrs: {tool.php.version: '5.6.40', project.wordpress.version: '6.5'}}
+status: active

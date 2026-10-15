@@ -1,0 +1,47 @@
+schema: 1
+id: fastapi-before-0-100-requires-pydantic-1
+title: FastAPI below 0.100 requires pydantic below 2, so a move to Pydantic 2 cannot resolve
+applies:
+  - build
+difference: >-
+  side a is Pydantic 1.x with FastAPI below 0.100; side b is Pydantic 2.x with the same FastAPI
+symptoms:
+  - text: 'fastapi 0.99.1 depends on pydantic!=1.8, !=1.8.1, <2.0.0 and >=1.7.4'
+    basis: verified
+mechanism: PyPI metadata for fastapi 0.99.1 gives requires_dist pydantic!=1.8,!=1.8.1,<2.0.0,>=1.7.4 and 0.100.0 raises the bound to <3.0.0.
+detect:
+  all:
+    - a: project.python.pydantic
+      ver: '>=1,<2'
+    - b: project.python.pydantic
+      ver: '>=2'
+    - a: project.python.fastapi
+      ver: '<0.100'
+    - b: project.python.fastapi
+      ver: '<0.100'
+severity: high
+provenance:
+  - url: https://pypi.org/pypi/fastapi/0.99.1/json
+    kind: spec
+    verified: '2026-10-15'
+    section: 'info.requires_dist'
+  - url: https://pypi.org/pypi/fastapi/0.100.0/json
+    kind: spec
+    verified: '2026-10-15'
+    section: 'info.requires_dist'
+fixtures:
+  positive:
+    - name: pydantic 1.10.26 to pydantic 2.12.5 with fastapi 0.99.1
+      a: {attrs: {project.python.pydantic: '1.10.26', project.python.fastapi: '0.99.1'}}
+      b: {attrs: {project.python.pydantic: '2.12.5', project.python.fastapi: '0.99.1'}}
+  negative:
+    - name: pydantic 2.12.5 to pydantic 1.10.26 with fastapi 0.99.1 (reverse direction)
+      a: {attrs: {project.python.pydantic: '2.12.5', project.python.fastapi: '0.99.1'}}
+      b: {attrs: {project.python.pydantic: '1.10.26', project.python.fastapi: '0.99.1'}}
+    - name: pydantic 1.10.26 to pydantic 2.12.5 with fastapi 0.100.0 (allows both)
+      a: {attrs: {project.python.pydantic: '1.10.26', project.python.fastapi: '0.100.0'}}
+      b: {attrs: {project.python.pydantic: '2.12.5', project.python.fastapi: '0.100.0'}}
+    - name: pydantic 1.10.26 to pydantic 1.10.26 with fastapi 0.99.1 (no pydantic move)
+      a: {attrs: {project.python.pydantic: '1.10.26', project.python.fastapi: '0.99.1'}}
+      b: {attrs: {project.python.pydantic: '1.10.26', project.python.fastapi: '0.99.1'}}
+status: active

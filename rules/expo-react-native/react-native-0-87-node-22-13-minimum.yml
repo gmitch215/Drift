@@ -1,0 +1,61 @@
+schema: 1
+id: react-native-0-87-node-22-13-minimum
+title: React Native 0.87 declares engines.node ^22.13.0 || ^24.3.0 || >= 26.0.0, so a Node version outside that range is unsupported
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is a Node version inside the engines range of React Native 0.87 and side b is a Node version outside it, with the same React Native 0.87 release on side b
+symptoms:
+  - text: 'npm reports EBADENGINE for react-native on the unsupported Node version, and the package may fail to start'
+    basis: inferred
+mechanism: >-
+  The registry document of react-native 0.87.0 declares engines.node ^22.13.0 || ^24.3.0 || >= 26.0.0, so a Node version outside that range is unsupported by React Native 0.87.
+detect:
+  all:
+    - a: tool.node.version
+      ver:
+        - '>=22.13.0,<23.0.0'
+        - '>=24.3.0,<25.0.0'
+        - '>=26.0.0'
+    - b: tool.node.version
+      ver:
+        - '<22.13.0'
+        - '>=23.0.0,<24.3.0'
+        - '>=25.0.0,<26.0.0'
+    - b: project.npm.react-native
+      ver: '>=0.87.0'
+severity: medium
+provenance:
+  - url: https://registry.npmjs.org/react-native/0.87.0
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'engines of react-native 0.87.0: "engines":{"node":"^22.13.0 || ^24.3.0 || >= 26.0.0"}'
+fixtures:
+  positive:
+    - name: 'React Native 0.87 on node 24.11.0 to node 20.19.4'
+      a:
+        attrs:
+          tool.node.version: '24.11.0'
+      b:
+        attrs:
+          tool.node.version: '20.19.4'
+          project.npm.react-native: '0.87.0'
+  negative:
+    - name: 'react-native 0.86.0 is below the first release with this range'
+      a:
+        attrs:
+          tool.node.version: '24.11.0'
+      b:
+        attrs:
+          tool.node.version: '20.19.4'
+          project.npm.react-native: '0.86.0'
+    - name: 'node 24.11.0 is inside the range on both sides'
+      a:
+        attrs:
+          tool.node.version: '24.11.0'
+      b:
+        attrs:
+          tool.node.version: '24.11.0'
+          project.npm.react-native: '0.87.0'
+status: active

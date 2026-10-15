@@ -1,0 +1,68 @@
+schema: 1
+id: npm-native-glibc-packages-on-musl
+title: node_modules holding only glibc native packages fails on a musl system such as Alpine
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is a glibc Linux machine whose node_modules holds glibc native packages; side b is a musl Linux machine that runs the same node_modules with no musl native package installed
+symptoms:
+  - text: >-
+      Could not load the "sharp" module using the linuxmusl-x64 runtime
+    basis: verified
+mechanism: >-
+  Packages that ship separate glibc and musl builds mark them with the libc field and npm installs only the build that matches the installing machine, so a glibc install carries no musl binary.
+detect:
+  all:
+    - a: tool.libc.family
+      eq: glibc
+    - a: project.npm.native.platforms
+      has: '-glibc'
+    - b: tool.libc.family
+      eq: musl
+    - b: project.npm.native.platforms
+      has: '-glibc'
+    - not:
+        b: project.npm.native.platforms
+        has: '-musl'
+severity: high
+provenance:
+  - url: https://github.com/lovell/sharp/blob/v0.35.5/lib/sharp.mjs
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'const help = [`Could not load the "sharp" module using the ${runtimePlatform} runtime`]; runtimePlatform is linuxmusl-x64 on musl'
+  - url: https://github.com/npm/cli/blob/v11.6.0/docs/lib/content/configuring-npm/package-json.md
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'libc: If your code only runs or builds in certain versions of libc, you can specify which ones'
+fixtures:
+  positive:
+    - name: glibc install run on Alpine
+      a:
+        attrs:
+          tool.libc.family: glibc
+          project.npm.native.platforms: 'linux-x64-glibc'
+      b:
+        attrs:
+          tool.libc.family: musl
+          project.npm.native.platforms: 'linux-x64-glibc'
+  negative:
+    - name: musl side also has a musl native package
+      a:
+        attrs:
+          tool.libc.family: glibc
+          project.npm.native.platforms: 'linux-x64-glibc'
+      b:
+        attrs:
+          tool.libc.family: musl
+          project.npm.native.platforms: 'linux-x64-glibc,linux-x64-musl'
+    - name: failing side is glibc
+      a:
+        attrs:
+          tool.libc.family: glibc
+          project.npm.native.platforms: 'linux-x64-glibc'
+      b:
+        attrs:
+          tool.libc.family: glibc
+          project.npm.native.platforms: 'linux-x64-glibc'
+status: active

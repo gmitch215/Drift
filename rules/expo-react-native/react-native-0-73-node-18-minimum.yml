@@ -1,0 +1,55 @@
+schema: 1
+id: react-native-0-73-node-18-minimum
+title: React Native 0.73 declares engines.node >=18, so a Node version outside that range is unsupported
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is a Node version inside the engines range of React Native 0.73 and side b is a Node version outside it, with the same React Native 0.73 release on side b
+symptoms:
+  - text: 'npm reports EBADENGINE for react-native on the unsupported Node version, and the package may fail to start'
+    basis: inferred
+mechanism: >-
+  The registry document of react-native 0.73.0 declares engines.node >=18, so a Node version outside that range is unsupported by React Native 0.73.
+detect:
+  all:
+    - a: tool.node.version
+      ver: '>=18.0.0'
+    - b: tool.node.version
+      ver: '<18.0.0'
+    - b: project.npm.react-native
+      ver: '>=0.73.0'
+severity: medium
+provenance:
+  - url: https://registry.npmjs.org/react-native/0.73.0
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'engines of react-native 0.73.0: "engines":{"node":">=18"}'
+fixtures:
+  positive:
+    - name: 'React Native 0.73 on node 20.11.1 to node 16.20.2'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '16.20.2'
+          project.npm.react-native: '0.73.0'
+  negative:
+    - name: 'react-native 0.72.17 is below the first release with this range'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '16.20.2'
+          project.npm.react-native: '0.72.17'
+    - name: 'node 20.11.1 is inside the range on both sides'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '20.11.1'
+          project.npm.react-native: '0.73.0'
+status: active

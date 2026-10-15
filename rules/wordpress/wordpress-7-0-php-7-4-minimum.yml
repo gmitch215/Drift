@@ -1,0 +1,52 @@
+schema: 1
+id: wordpress-7-0-php-7-4-minimum
+title: WordPress 7.x requires PHP 7.4 or higher, so a PHP below 7.4 host stops at the version check
+applies:
+  - runtime
+difference: >-
+  side a is PHP 7.4 or higher with WordPress 7.x; side b is PHP below 7.4 with the same release line
+symptoms:
+  - text: 'WordPress dies with "Your server is running PHP version X but WordPress Y requires at least 7.4."'
+    basis: inferred
+mechanism: wp-includes/version.php at tag 7.0.0 sets $required_php_version to 7.4 and wp_check_php_mysql_versions() stops the request below it.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '>=7.4'
+    - b: tool.php.version
+      ver: '<7.4'
+    - any:
+        - a: project.wordpress.version
+          ver: '>=7,<8'
+        - a: project.composer.johnpbloch/wordpress-core
+          ver: '>=7,<8'
+    - any:
+        - b: project.wordpress.version
+          ver: '>=7,<8'
+        - b: project.composer.johnpbloch/wordpress-core
+          ver: '>=7,<8'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/WordPress/wordpress-develop/7.0.0/src/wp-includes/version.php
+    kind: spec
+    verified: '2026-10-15'
+    section: '$required_php_version'
+fixtures:
+  positive:
+    - name: php 8.2.20 to php 7.3.33 with a wordpress 7.0 source tree
+      a: {attrs: {tool.php.version: '8.2.20', project.wordpress.version: '7.0'}}
+      b: {attrs: {tool.php.version: '7.3.33', project.wordpress.version: '7.0'}}
+    - name: php 8.2.20 to php 7.3.33 with johnpbloch/wordpress-core 7.0.0
+      a: {attrs: {tool.php.version: '8.2.20', project.composer.johnpbloch/wordpress-core: '7.0.0'}}
+      b: {attrs: {tool.php.version: '7.3.33', project.composer.johnpbloch/wordpress-core: '7.0.0'}}
+  negative:
+    - name: php 7.3.33 to php 8.2.20 with a wordpress 7.0 source tree (reverse direction)
+      a: {attrs: {tool.php.version: '7.3.33', project.wordpress.version: '7.0'}}
+      b: {attrs: {tool.php.version: '8.2.20', project.wordpress.version: '7.0'}}
+    - name: php 8.2.20 to php 7.3.33 with a wordpress 6.9 source tree (outside the release line)
+      a: {attrs: {tool.php.version: '8.2.20', project.wordpress.version: '6.9'}}
+      b: {attrs: {tool.php.version: '7.3.33', project.wordpress.version: '6.9'}}
+    - name: php 7.3.33 to php 7.3.33 with a wordpress 7.0 source tree (same band)
+      a: {attrs: {tool.php.version: '7.3.33', project.wordpress.version: '7.0'}}
+      b: {attrs: {tool.php.version: '7.3.33', project.wordpress.version: '7.0'}}
+status: active

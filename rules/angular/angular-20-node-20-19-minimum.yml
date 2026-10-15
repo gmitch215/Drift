@@ -1,0 +1,61 @@
+schema: 1
+id: angular-20-node-20-19-minimum
+title: Angular 20 declares engines.node ^20.19.0 || ^22.12.0 || >=24.0.0, so a Node version outside that range is unsupported
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is a Node version inside the engines range of Angular 20 and side b is a Node version outside it, with the same Angular 20 release on side b
+symptoms:
+  - text: 'npm reports EBADENGINE for @angular/core on the unsupported Node version, and the package may fail to start'
+    basis: inferred
+mechanism: >-
+  The registry document of @angular/core 20.0.0 declares engines.node ^20.19.0 || ^22.12.0 || >=24.0.0, so a Node version outside that range is unsupported by Angular 20.
+detect:
+  all:
+    - a: tool.node.version
+      ver:
+        - '>=20.19.0,<21.0.0'
+        - '>=22.12.0,<23.0.0'
+        - '>=24.0.0'
+    - b: tool.node.version
+      ver:
+        - '<20.19.0'
+        - '>=21.0.0,<22.12.0'
+        - '>=23.0.0,<24.0.0'
+    - b: project.npm.@angular/core
+      ver: '>=20.0.0'
+severity: medium
+provenance:
+  - url: https://registry.npmjs.org/@angular/core/20.0.0
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'engines of @angular/core 20.0.0: "engines":{"node":"^20.19.0 || ^22.12.0 || >=24.0.0"}'
+fixtures:
+  positive:
+    - name: 'Angular 20 on node 22.12.0 to node 20.11.1'
+      a:
+        attrs:
+          tool.node.version: '22.12.0'
+      b:
+        attrs:
+          tool.node.version: '20.11.1'
+          project.npm.@angular/core: '20.0.0'
+  negative:
+    - name: '@angular/core 19.2.15 is below the first release with this range'
+      a:
+        attrs:
+          tool.node.version: '22.12.0'
+      b:
+        attrs:
+          tool.node.version: '20.11.1'
+          project.npm.@angular/core: '19.2.15'
+    - name: 'node 22.12.0 is inside the range on both sides'
+      a:
+        attrs:
+          tool.node.version: '22.12.0'
+      b:
+        attrs:
+          tool.node.version: '22.12.0'
+          project.npm.@angular/core: '20.0.0'
+status: active

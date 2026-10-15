@@ -1,0 +1,59 @@
+schema: 1
+id: vite-5-node-18-minimum
+title: Vite 5 declares engines.node ^18.0.0 || >=20.0.0, so a Node version outside that range is unsupported
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is a Node version inside the engines range of Vite 5 and side b is a Node version outside it, with the same Vite 5 release on side b
+symptoms:
+  - text: 'npm reports EBADENGINE for vite on the unsupported Node version, and the package may fail to start'
+    basis: inferred
+mechanism: >-
+  The registry document of vite 5.0.0 declares engines.node ^18.0.0 || >=20.0.0, so a Node version outside that range is unsupported by Vite 5.
+detect:
+  all:
+    - a: tool.node.version
+      ver:
+        - '>=18.0.0,<19.0.0'
+        - '>=20.0.0'
+    - b: tool.node.version
+      ver:
+        - '<18.0.0'
+        - '>=19.0.0,<20.0.0'
+    - b: project.npm.vite
+      ver: '>=5.0.0'
+severity: medium
+provenance:
+  - url: https://registry.npmjs.org/vite/5.0.0
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'engines of vite 5.0.0: "engines":{"node":"^18.0.0 || >=20.0.0"}'
+fixtures:
+  positive:
+    - name: 'Vite 5 on node 20.11.1 to node 16.20.2'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '16.20.2'
+          project.npm.vite: '5.0.0'
+  negative:
+    - name: 'vite 4.5.14 is below the first release with this range'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '16.20.2'
+          project.npm.vite: '4.5.14'
+    - name: 'node 20.11.1 is inside the range on both sides'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '20.11.1'
+          project.npm.vite: '5.0.0'
+status: active

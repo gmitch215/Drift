@@ -1,0 +1,61 @@
+schema: 1
+id: angular-22-node-22-22-3-minimum
+title: Angular 22 declares engines.node ^22.22.3 || ^24.15.0 || >=26.0.0, so a Node version outside that range is unsupported
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is a Node version inside the engines range of Angular 22 and side b is a Node version outside it, with the same Angular 22 release on side b
+symptoms:
+  - text: 'npm reports EBADENGINE for @angular/core on the unsupported Node version, and the package may fail to start'
+    basis: inferred
+mechanism: >-
+  The registry document of @angular/core 22.0.0 declares engines.node ^22.22.3 || ^24.15.0 || >=26.0.0, so a Node version outside that range is unsupported by Angular 22.
+detect:
+  all:
+    - a: tool.node.version
+      ver:
+        - '>=22.22.3,<23.0.0'
+        - '>=24.15.0,<25.0.0'
+        - '>=26.0.0'
+    - b: tool.node.version
+      ver:
+        - '<22.22.3'
+        - '>=23.0.0,<24.15.0'
+        - '>=25.0.0,<26.0.0'
+    - b: project.npm.@angular/core
+      ver: '>=22.0.0'
+severity: medium
+provenance:
+  - url: https://registry.npmjs.org/@angular/core/22.0.0
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'engines of @angular/core 22.0.0: "engines":{"node":"^22.22.3 || ^24.15.0 || >=26.0.0"}'
+fixtures:
+  positive:
+    - name: 'Angular 22 on node 24.15.0 to node 22.12.0'
+      a:
+        attrs:
+          tool.node.version: '24.15.0'
+      b:
+        attrs:
+          tool.node.version: '22.12.0'
+          project.npm.@angular/core: '22.0.0'
+  negative:
+    - name: '@angular/core 21.2.0 is below the first release with this range'
+      a:
+        attrs:
+          tool.node.version: '24.15.0'
+      b:
+        attrs:
+          tool.node.version: '22.12.0'
+          project.npm.@angular/core: '21.2.0'
+    - name: 'node 24.15.0 is inside the range on both sides'
+      a:
+        attrs:
+          tool.node.version: '24.15.0'
+      b:
+        attrs:
+          tool.node.version: '24.15.0'
+          project.npm.@angular/core: '22.0.0'
+status: active

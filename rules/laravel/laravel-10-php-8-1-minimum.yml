@@ -1,0 +1,43 @@
+schema: 1
+id: laravel-10-php-8-1-minimum
+title: Laravel 10 declares PHP 8.1 or higher, so a PHP below 8.1 host cannot install it
+applies:
+  - build
+difference: >-
+  side a is PHP 8.1 or higher with Laravel 10; side b is PHP below 8.1 with the same release line
+symptoms:
+  - text: 'laravel/framework[v10.0.0, ..., v10.50.3] require php ^8.1 -> your php version (8.0.30) does not satisfy that requirement'
+    basis: verified
+mechanism: The composer.json of Laravel 10 at tag v10.0.0 requires php ^8.1.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '>=8.1'
+    - b: tool.php.version
+      ver: '<8.1'
+    - a: project.composer.laravel/framework
+      ver: '>=10,<11'
+    - b: project.composer.laravel/framework
+      ver: '>=10,<11'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/laravel/framework/v10.0.0/composer.json
+    kind: spec
+    verified: '2026-10-15'
+    section: 'require.php'
+fixtures:
+  positive:
+    - name: php 8.3.12 to php 8.0.30 with laravel/framework 10.48.0
+      a: {attrs: {tool.php.version: '8.3.12', project.composer.laravel/framework: '10.48.0'}}
+      b: {attrs: {tool.php.version: '8.0.30', project.composer.laravel/framework: '10.48.0'}}
+  negative:
+    - name: php 8.0.30 to php 8.3.12 with laravel/framework 10.48.0 (reverse direction)
+      a: {attrs: {tool.php.version: '8.0.30', project.composer.laravel/framework: '10.48.0'}}
+      b: {attrs: {tool.php.version: '8.3.12', project.composer.laravel/framework: '10.48.0'}}
+    - name: php 8.3.12 to php 8.0.30 with laravel/framework 9.52.16 (outside the release line)
+      a: {attrs: {tool.php.version: '8.3.12', project.composer.laravel/framework: '9.52.16'}}
+      b: {attrs: {tool.php.version: '8.0.30', project.composer.laravel/framework: '9.52.16'}}
+    - name: php 8.0.30 to php 8.0.30 with laravel/framework 10.48.0 (same band)
+      a: {attrs: {tool.php.version: '8.0.30', project.composer.laravel/framework: '10.48.0'}}
+      b: {attrs: {tool.php.version: '8.0.30', project.composer.laravel/framework: '10.48.0'}}
+status: active

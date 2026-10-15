@@ -1,0 +1,41 @@
+schema: 1
+id: numpy-2-0-removes-main-namespace-members
+title: NumPy 2.0 removes np.float_, np.NaN, np.Inf, np.product, np.string_ and about forty other main namespace members
+applies:
+  - runtime
+difference: >-
+  side a is NumPy 1.x; side b is NumPy 2.x with source that still uses the removed members
+symptoms:
+  - text: 'AttributeError: `np.float_` was removed in the NumPy 2.0 release. Use `np.float64` instead.'
+    basis: verified
+mechanism: The NumPy 2.0 migration guide lists these members in the table of removed members of the main namespace.
+detect:
+  all:
+    - a: project.python.numpy
+      ver: '>=1.21,<2'
+    - b: project.python.numpy
+      ver: '>=2'
+    - b: project.numpy.source.removed-2-0-members
+      present: 'true'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/numpy/numpy/v2.0.0/doc/source/numpy_2_0_migration_guide.rst
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'Main namespace'
+fixtures:
+  positive:
+    - name: numpy 1.26.4 to numpy 2.0.2 with the removed names in the source
+      a: {attrs: {project.python.numpy: '1.26.4'}}
+      b: {attrs: {project.python.numpy: '2.0.2', project.numpy.source.removed-2-0-members: 'true'}}
+  negative:
+    - name: numpy 2.0.2 to numpy 1.26.4 with the removed names in the source (reverse direction)
+      a: {attrs: {project.python.numpy: '2.0.2', project.numpy.source.removed-2-0-members: 'true'}}
+      b: {attrs: {project.python.numpy: '1.26.4'}}
+    - name: numpy 1.26.4 to numpy 2.0.2 without the removed names in the source
+      a: {attrs: {project.python.numpy: '1.26.4'}}
+      b: {attrs: {project.python.numpy: '2.0.2'}}
+    - name: numpy 1.26.4 to numpy 1.26.4 with the removed names in the source (no version move)
+      a: {attrs: {project.python.numpy: '1.26.4'}}
+      b: {attrs: {project.python.numpy: '1.26.4', project.numpy.source.removed-2-0-members: 'true'}}
+status: active

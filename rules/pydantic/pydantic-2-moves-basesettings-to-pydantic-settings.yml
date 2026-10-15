@@ -1,0 +1,41 @@
+schema: 1
+id: pydantic-2-moves-basesettings-to-pydantic-settings
+title: Pydantic 2 moves BaseSettings to the pydantic-settings package, so from pydantic import BaseSettings fails
+applies:
+  - runtime
+difference: >-
+  side a is Pydantic 1.x; side b is Pydantic 2.x with source that imports BaseSettings from pydantic
+symptoms:
+  - text: 'PydanticImportError: `BaseSettings` has been moved to the `pydantic-settings` package.'
+    basis: verified
+mechanism: pydantic/_migration.py at tag v2.0 raises PydanticImportError for the import path pydantic:BaseSettings.
+detect:
+  all:
+    - a: project.python.pydantic
+      ver: '>=1,<2'
+    - b: project.python.pydantic
+      ver: '>=2'
+    - b: project.pydantic.source.basesettings-import
+      present: 'true'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/pydantic/pydantic/v2.0/pydantic/_migration.py
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'getattr_migration'
+fixtures:
+  positive:
+    - name: pydantic 1.10.26 to pydantic 2.12.5 with the removed names in the source
+      a: {attrs: {project.python.pydantic: '1.10.26'}}
+      b: {attrs: {project.python.pydantic: '2.12.5', project.pydantic.source.basesettings-import: 'true'}}
+  negative:
+    - name: pydantic 2.12.5 to pydantic 1.10.26 with the removed names in the source (reverse direction)
+      a: {attrs: {project.python.pydantic: '2.12.5', project.pydantic.source.basesettings-import: 'true'}}
+      b: {attrs: {project.python.pydantic: '1.10.26'}}
+    - name: pydantic 1.10.26 to pydantic 2.12.5 without the removed names in the source
+      a: {attrs: {project.python.pydantic: '1.10.26'}}
+      b: {attrs: {project.python.pydantic: '2.12.5'}}
+    - name: pydantic 1.10.26 to pydantic 1.10.26 with the removed names in the source (no version move)
+      a: {attrs: {project.python.pydantic: '1.10.26'}}
+      b: {attrs: {project.python.pydantic: '1.10.26', project.pydantic.source.basesettings-import: 'true'}}
+status: active

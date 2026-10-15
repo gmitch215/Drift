@@ -1,0 +1,41 @@
+schema: 1
+id: pandas-3-0-removes-applymap-and-delim-whitespace
+title: pandas 3.0 removes DataFrame.applymap and the delim_whitespace keyword of read_csv and read_table
+applies:
+  - runtime
+difference: >-
+  side a is pandas 2.x; side b is pandas 3.x with source that still uses the removed names
+symptoms:
+  - text: 'AttributeError: ''DataFrame'' object has no attribute ''applymap'''
+    basis: verified
+mechanism: The 3.0.0 whatsnew lists these under Removal of prior version deprecations/changes.
+detect:
+  all:
+    - a: project.python.pandas
+      ver: '>=2,<3'
+    - b: project.python.pandas
+      ver: '>=3'
+    - b: project.pandas.source.removed-3-0-members
+      present: 'true'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/pandas-dev/pandas/v3.0.0/doc/source/whatsnew/v3.0.0.rst
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'Removal of prior version deprecations/changes'
+fixtures:
+  positive:
+    - name: pandas 2.3.3 to pandas 3.0.0 with the removed names in the source
+      a: {attrs: {project.python.pandas: '2.3.3'}}
+      b: {attrs: {project.python.pandas: '3.0.0', project.pandas.source.removed-3-0-members: 'true'}}
+  negative:
+    - name: pandas 3.0.0 to pandas 2.3.3 with the removed names in the source (reverse direction)
+      a: {attrs: {project.python.pandas: '3.0.0', project.pandas.source.removed-3-0-members: 'true'}}
+      b: {attrs: {project.python.pandas: '2.3.3'}}
+    - name: pandas 2.3.3 to pandas 3.0.0 without the removed names in the source
+      a: {attrs: {project.python.pandas: '2.3.3'}}
+      b: {attrs: {project.python.pandas: '3.0.0'}}
+    - name: pandas 2.3.3 to pandas 2.3.3 with the removed names in the source (no version move)
+      a: {attrs: {project.python.pandas: '2.3.3'}}
+      b: {attrs: {project.python.pandas: '2.3.3', project.pandas.source.removed-3-0-members: 'true'}}
+status: active

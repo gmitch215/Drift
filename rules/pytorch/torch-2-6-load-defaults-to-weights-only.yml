@@ -1,0 +1,41 @@
+schema: 1
+id: torch-2-6-load-defaults-to-weights-only
+title: PyTorch 2.6 makes torch.load default to weights_only=True, so loading a pickled full model fails
+applies:
+  - runtime
+difference: >-
+  side a is PyTorch below 2.6; side b is PyTorch 2.6 or newer with torch.load calls that do not pass weights_only
+symptoms:
+  - text: '_pickle.UnpicklingError: Weights only load failed.'
+    basis: inferred
+mechanism: The v2.6.0 release notes list "Flip default torch.load to weights_only" as a backward compatibility breaking change.
+detect:
+  all:
+    - a: project.python.torch
+      ver: '<2.6'
+    - b: project.python.torch
+      ver: '>=2.6'
+    - b: project.torch.source.load-without-weights-only
+      present: 'true'
+severity: high
+provenance:
+  - url: https://github.com/pytorch/pytorch/releases/tag/v2.6.0
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'Flip default torch.load to weights_only'
+fixtures:
+  positive:
+    - name: torch 2.5.1 to torch 2.6.0 with the removed names in the source
+      a: {attrs: {project.python.torch: '2.5.1'}}
+      b: {attrs: {project.python.torch: '2.6.0', project.torch.source.load-without-weights-only: 'true'}}
+  negative:
+    - name: torch 2.6.0 to torch 2.5.1 with the removed names in the source (reverse direction)
+      a: {attrs: {project.python.torch: '2.6.0', project.torch.source.load-without-weights-only: 'true'}}
+      b: {attrs: {project.python.torch: '2.5.1'}}
+    - name: torch 2.5.1 to torch 2.6.0 without the removed names in the source
+      a: {attrs: {project.python.torch: '2.5.1'}}
+      b: {attrs: {project.python.torch: '2.6.0'}}
+    - name: torch 2.5.1 to torch 2.5.1 with the removed names in the source (no version move)
+      a: {attrs: {project.python.torch: '2.5.1'}}
+      b: {attrs: {project.python.torch: '2.5.1', project.torch.source.load-without-weights-only: 'true'}}
+status: active

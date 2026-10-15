@@ -1,0 +1,58 @@
+schema: 1
+id: prisma-6-node-18-18-minimum
+title: Prisma 6 declares engines.node >=18.18, so a Node version outside that range is unsupported
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is a Node version inside the engines range of Prisma 6 and side b is a Node version outside it, with the same Prisma 6 release on side b
+symptoms:
+  - text: 'npm reports EBADENGINE for prisma on the unsupported Node version, and the package may fail to start'
+    basis: inferred
+mechanism: >-
+  The registry document of prisma 6.0.0 declares engines.node >=18.18, so a Node version outside that range is unsupported by Prisma 6.
+detect:
+  all:
+    - a: tool.node.version
+      ver: '>=18.18.0'
+    - b: tool.node.version
+      ver: '<18.18.0'
+    - any:
+        - b: project.npm.@prisma/client
+          ver: '>=6.0.0'
+        - b: project.npm.prisma
+          ver: '>=6.0.0'
+severity: medium
+provenance:
+  - url: https://registry.npmjs.org/prisma/6.0.0
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'engines of prisma 6.0.0: "engines":{"node":">=18.18"}'
+fixtures:
+  positive:
+    - name: 'Prisma 6 on node 20.11.1 to node 16.20.2'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '16.20.2'
+          project.npm.@prisma/client: '6.0.0'
+  negative:
+    - name: 'prisma 5.22.0 is below the first release with this range'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '16.20.2'
+          project.npm.@prisma/client: '5.22.0'
+    - name: 'node 20.11.1 is inside the range on both sides'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '20.11.1'
+          project.npm.@prisma/client: '6.0.0'
+status: active

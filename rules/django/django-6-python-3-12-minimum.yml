@@ -1,0 +1,43 @@
+schema: 1
+id: django-6-python-3-12-minimum
+title: Django 6.x requires Python 3.12 or newer, so a Python below 3.12 host cannot install it
+applies:
+  - build
+difference: >-
+  side a is Python 3.12 or newer with Django 6.x; side b is Python below 3.12 with the same release line
+symptoms:
+  - text: 'ERROR: No matching distribution found for django==6.0 (pip lists the release line under "Ignored the following versions that require a different python version")'
+    basis: verified
+mechanism: PyPI metadata for django 6.0 gives requires_python ">=3.12" and the later releases of the line keep it.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '>=3.12'
+    - b: tool.python.version
+      ver: '<3.12'
+    - a: project.python.django
+      ver: '>=6,<7'
+    - b: project.python.django
+      ver: '>=6,<7'
+severity: high
+provenance:
+  - url: https://pypi.org/pypi/django/6.0/json
+    kind: spec
+    verified: '2026-10-15'
+    section: 'info.requires_python'
+fixtures:
+  positive:
+    - name: python 3.13.1 to python 3.11.9 with django 6.0.9
+      a: {attrs: {tool.python.version: '3.13.1', project.python.django: '6.0.9'}}
+      b: {attrs: {tool.python.version: '3.11.9', project.python.django: '6.0.9'}}
+  negative:
+    - name: python 3.11.9 to python 3.13.1 with django 6.0.9 (reverse direction)
+      a: {attrs: {tool.python.version: '3.11.9', project.python.django: '6.0.9'}}
+      b: {attrs: {tool.python.version: '3.13.1', project.python.django: '6.0.9'}}
+    - name: python 3.13.1 to python 3.11.9 with django 5.2.18 (outside the release line)
+      a: {attrs: {tool.python.version: '3.13.1', project.python.django: '5.2.18'}}
+      b: {attrs: {tool.python.version: '3.11.9', project.python.django: '5.2.18'}}
+    - name: python 3.11.9 to python 3.11.9 with django 6.0.9 (same band)
+      a: {attrs: {tool.python.version: '3.11.9', project.python.django: '6.0.9'}}
+      b: {attrs: {tool.python.version: '3.11.9', project.python.django: '6.0.9'}}
+status: active

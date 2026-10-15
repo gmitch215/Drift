@@ -1,0 +1,43 @@
+schema: 1
+id: torch-2-6-python-3-9-minimum
+title: PyTorch 2.6 to 2.8 requires Python 3.9 or newer, so a Python below 3.9 host cannot install it
+applies:
+  - build
+difference: >-
+  side a is Python 3.9 or newer with PyTorch 2.6 to 2.8; side b is Python below 3.9 with the same release line
+symptoms:
+  - text: 'ERROR: No matching distribution found for torch==2.6.0'
+    basis: verified
+mechanism: PyPI metadata for torch 2.6.0 gives requires_python ">=3.9" and the later releases of the line keep it.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '>=3.9'
+    - b: tool.python.version
+      ver: '<3.9'
+    - a: project.python.torch
+      ver: '>=2.6,<2.9'
+    - b: project.python.torch
+      ver: '>=2.6,<2.9'
+severity: high
+provenance:
+  - url: https://pypi.org/pypi/torch/2.6.0/json
+    kind: spec
+    verified: '2026-10-15'
+    section: 'info.requires_python'
+fixtures:
+  positive:
+    - name: python 3.11.9 to python 3.8.18 with torch 2.7.1
+      a: {attrs: {tool.python.version: '3.11.9', project.python.torch: '2.7.1'}}
+      b: {attrs: {tool.python.version: '3.8.18', project.python.torch: '2.7.1'}}
+  negative:
+    - name: python 3.8.18 to python 3.11.9 with torch 2.7.1 (reverse direction)
+      a: {attrs: {tool.python.version: '3.8.18', project.python.torch: '2.7.1'}}
+      b: {attrs: {tool.python.version: '3.11.9', project.python.torch: '2.7.1'}}
+    - name: python 3.11.9 to python 3.8.18 with torch 2.5.1 (outside the release line)
+      a: {attrs: {tool.python.version: '3.11.9', project.python.torch: '2.5.1'}}
+      b: {attrs: {tool.python.version: '3.8.18', project.python.torch: '2.5.1'}}
+    - name: python 3.8.18 to python 3.8.18 with torch 2.7.1 (same band)
+      a: {attrs: {tool.python.version: '3.8.18', project.python.torch: '2.7.1'}}
+      b: {attrs: {tool.python.version: '3.8.18', project.python.torch: '2.7.1'}}
+status: active

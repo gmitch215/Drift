@@ -1,0 +1,41 @@
+schema: 1
+id: django-5-0-removes-datetime-safe-and-baseconv
+title: Django 5.0 removes django.utils.datetime_safe and django.utils.baseconv, so code that imports them fails
+applies:
+  - runtime
+difference: >-
+  side a is Django 4.x; side b is Django 5.x with source that imports either module
+symptoms:
+  - text: 'ImportError: cannot import name ''datetime_safe'' from ''django.utils'''
+    basis: verified
+mechanism: The 5.0 release notes list both undocumented modules under Features removed in 5.0.
+detect:
+  all:
+    - a: project.python.django
+      ver: '>=4,<5'
+    - b: project.python.django
+      ver: '>=5'
+    - b: project.django.source.removed-5-0-modules
+      present: 'true'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/django/django/5.0/docs/releases/5.0.txt
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'Features removed in 5.0'
+fixtures:
+  positive:
+    - name: django 4.2.30 to django 5.0.14 with the removed names in the source
+      a: {attrs: {project.python.django: '4.2.30'}}
+      b: {attrs: {project.python.django: '5.0.14', project.django.source.removed-5-0-modules: 'true'}}
+  negative:
+    - name: django 5.0.14 to django 4.2.30 with the removed names in the source (reverse direction)
+      a: {attrs: {project.python.django: '5.0.14', project.django.source.removed-5-0-modules: 'true'}}
+      b: {attrs: {project.python.django: '4.2.30'}}
+    - name: django 4.2.30 to django 5.0.14 without the removed names in the source
+      a: {attrs: {project.python.django: '4.2.30'}}
+      b: {attrs: {project.python.django: '5.0.14'}}
+    - name: django 4.2.30 to django 4.2.30 with the removed names in the source (no version move)
+      a: {attrs: {project.python.django: '4.2.30'}}
+      b: {attrs: {project.python.django: '4.2.30', project.django.source.removed-5-0-modules: 'true'}}
+status: active

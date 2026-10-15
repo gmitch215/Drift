@@ -1,0 +1,59 @@
+schema: 1
+id: angular-17-node-18-13-minimum
+title: Angular 17 declares engines.node ^18.13.0 || >=20.9.0, so a Node version outside that range is unsupported
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is a Node version inside the engines range of Angular 17 and side b is a Node version outside it, with the same Angular 17 release on side b
+symptoms:
+  - text: 'npm reports EBADENGINE for @angular/core on the unsupported Node version, and the package may fail to start'
+    basis: inferred
+mechanism: >-
+  The registry document of @angular/core 17.0.0 declares engines.node ^18.13.0 || >=20.9.0, so a Node version outside that range is unsupported by Angular 17.
+detect:
+  all:
+    - a: tool.node.version
+      ver:
+        - '>=18.13.0,<19.0.0'
+        - '>=20.9.0'
+    - b: tool.node.version
+      ver:
+        - '<18.13.0'
+        - '>=19.0.0,<20.9.0'
+    - b: project.npm.@angular/core
+      ver: '>=17.0.0'
+severity: medium
+provenance:
+  - url: https://registry.npmjs.org/@angular/core/17.0.0
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'engines of @angular/core 17.0.0: "engines":{"node":"^18.13.0 || >=20.9.0"}'
+fixtures:
+  positive:
+    - name: 'Angular 17 on node 20.11.1 to node 16.20.2'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '16.20.2'
+          project.npm.@angular/core: '17.0.0'
+  negative:
+    - name: '@angular/core 16.2.12 is below the first release with this range'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '16.20.2'
+          project.npm.@angular/core: '16.2.12'
+    - name: 'node 20.11.1 is inside the range on both sides'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '20.11.1'
+          project.npm.@angular/core: '17.0.0'
+status: active

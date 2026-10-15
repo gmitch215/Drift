@@ -1,0 +1,41 @@
+schema: 1
+id: django-4-0-removes-ugettext-force-text-urlquote
+title: Django 4.0 removes ugettext, force_text, smart_text, urlquote and is_safe_url, so code that still uses them fails
+applies:
+  - runtime
+difference: >-
+  side a is Django 3.x; side b is Django 4.x with source that still uses the removed names
+symptoms:
+  - text: 'ImportError: cannot import name ''ugettext_lazy'' from ''django.utils.translation'''
+    basis: verified
+mechanism: The 4.0 release notes list these functions under Features removed in 4.0.
+detect:
+  all:
+    - a: project.python.django
+      ver: '>=3,<4'
+    - b: project.python.django
+      ver: '>=4'
+    - b: project.django.source.removed-4-0-names
+      present: 'true'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/django/django/4.0/docs/releases/4.0.txt
+    kind: release-note
+    verified: '2026-10-15'
+    section: 'Features removed in 4.0'
+fixtures:
+  positive:
+    - name: django 3.2.25 to django 4.0.10 with the removed names in the source
+      a: {attrs: {project.python.django: '3.2.25'}}
+      b: {attrs: {project.python.django: '4.0.10', project.django.source.removed-4-0-names: 'true'}}
+  negative:
+    - name: django 4.0.10 to django 3.2.25 with the removed names in the source (reverse direction)
+      a: {attrs: {project.python.django: '4.0.10', project.django.source.removed-4-0-names: 'true'}}
+      b: {attrs: {project.python.django: '3.2.25'}}
+    - name: django 3.2.25 to django 4.0.10 without the removed names in the source
+      a: {attrs: {project.python.django: '3.2.25'}}
+      b: {attrs: {project.python.django: '4.0.10'}}
+    - name: django 3.2.25 to django 3.2.25 with the removed names in the source (no version move)
+      a: {attrs: {project.python.django: '3.2.25'}}
+      b: {attrs: {project.python.django: '3.2.25', project.django.source.removed-4-0-names: 'true'}}
+status: active

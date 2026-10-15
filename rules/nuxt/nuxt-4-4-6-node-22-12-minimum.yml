@@ -1,0 +1,61 @@
+schema: 1
+id: nuxt-4-4-6-node-22-12-minimum
+title: Nuxt 4.4.6 declares engines.node ^22.12.0 || ^24.11.0 || >=26.0.0, so a Node version outside that range is unsupported
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is a Node version inside the engines range of Nuxt 4.4.6 and side b is a Node version outside it, with the same Nuxt 4.4.6 release on side b
+symptoms:
+  - text: 'npm reports EBADENGINE for nuxt on the unsupported Node version, and the package may fail to start'
+    basis: inferred
+mechanism: >-
+  The registry document of nuxt 4.4.6 declares engines.node ^22.12.0 || ^24.11.0 || >=26.0.0, so a Node version outside that range is unsupported by Nuxt 4.4.6.
+detect:
+  all:
+    - a: tool.node.version
+      ver:
+        - '>=22.12.0,<23.0.0'
+        - '>=24.11.0,<25.0.0'
+        - '>=26.0.0'
+    - b: tool.node.version
+      ver:
+        - '<22.12.0'
+        - '>=23.0.0,<24.11.0'
+        - '>=25.0.0,<26.0.0'
+    - b: project.npm.nuxt
+      ver: '>=4.4.6'
+severity: medium
+provenance:
+  - url: https://registry.npmjs.org/nuxt/4.4.6
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'engines of nuxt 4.4.6: "engines":{"node":"^22.12.0 || ^24.11.0 || >=26.0.0"}'
+fixtures:
+  positive:
+    - name: 'Nuxt 4.4.6 on node 24.11.0 to node 20.19.1'
+      a:
+        attrs:
+          tool.node.version: '24.11.0'
+      b:
+        attrs:
+          tool.node.version: '20.19.1'
+          project.npm.nuxt: '4.4.6'
+  negative:
+    - name: 'nuxt 4.4.5 is below the first release with this range'
+      a:
+        attrs:
+          tool.node.version: '24.11.0'
+      b:
+        attrs:
+          tool.node.version: '20.19.1'
+          project.npm.nuxt: '4.4.5'
+    - name: 'node 24.11.0 is inside the range on both sides'
+      a:
+        attrs:
+          tool.node.version: '24.11.0'
+      b:
+        attrs:
+          tool.node.version: '24.11.0'
+          project.npm.nuxt: '4.4.6'
+status: active

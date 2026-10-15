@@ -1,0 +1,43 @@
+schema: 1
+id: numpy-2-1-python-3-10-minimum
+title: NumPy 2.1 and 2.2 requires Python 3.10 or newer, so a Python below 3.10 host cannot install it
+applies:
+  - build
+difference: >-
+  side a is Python 3.10 or newer with NumPy 2.1 and 2.2; side b is Python below 3.10 with the same release line
+symptoms:
+  - text: 'ERROR: No matching distribution found for numpy==2.1.0 (pip lists the release line under "Ignored the following versions that require a different python version")'
+    basis: verified
+mechanism: PyPI metadata for numpy 2.1.0 gives requires_python ">=3.10" and the later releases of the line keep it.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '>=3.10'
+    - b: tool.python.version
+      ver: '<3.10'
+    - a: project.python.numpy
+      ver: '>=2.1,<2.3'
+    - b: project.python.numpy
+      ver: '>=2.1,<2.3'
+severity: high
+provenance:
+  - url: https://pypi.org/pypi/numpy/2.1.0/json
+    kind: spec
+    verified: '2026-10-15'
+    section: 'info.requires_python'
+fixtures:
+  positive:
+    - name: python 3.12.4 to python 3.9.19 with numpy 2.1.3
+      a: {attrs: {tool.python.version: '3.12.4', project.python.numpy: '2.1.3'}}
+      b: {attrs: {tool.python.version: '3.9.19', project.python.numpy: '2.1.3'}}
+  negative:
+    - name: python 3.9.19 to python 3.12.4 with numpy 2.1.3 (reverse direction)
+      a: {attrs: {tool.python.version: '3.9.19', project.python.numpy: '2.1.3'}}
+      b: {attrs: {tool.python.version: '3.12.4', project.python.numpy: '2.1.3'}}
+    - name: python 3.12.4 to python 3.9.19 with numpy 2.0.2 (outside the release line)
+      a: {attrs: {tool.python.version: '3.12.4', project.python.numpy: '2.0.2'}}
+      b: {attrs: {tool.python.version: '3.9.19', project.python.numpy: '2.0.2'}}
+    - name: python 3.9.19 to python 3.9.19 with numpy 2.1.3 (same band)
+      a: {attrs: {tool.python.version: '3.9.19', project.python.numpy: '2.1.3'}}
+      b: {attrs: {tool.python.version: '3.9.19', project.python.numpy: '2.1.3'}}
+status: active

@@ -1,0 +1,59 @@
+schema: 1
+id: nuxt-3-18-node-20-19-minimum
+title: Nuxt 3.18 declares engines.node ^20.19.0 || >=22.12.0, so a Node version outside that range is unsupported
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is a Node version inside the engines range of Nuxt 3.18 and side b is a Node version outside it, with the same Nuxt 3.18 release on side b
+symptoms:
+  - text: 'npm reports EBADENGINE for nuxt on the unsupported Node version, and the package may fail to start'
+    basis: inferred
+mechanism: >-
+  The registry document of nuxt 3.18.0 declares engines.node ^20.19.0 || >=22.12.0, so a Node version outside that range is unsupported by Nuxt 3.18.
+detect:
+  all:
+    - a: tool.node.version
+      ver:
+        - '>=20.19.0,<21.0.0'
+        - '>=22.12.0'
+    - b: tool.node.version
+      ver:
+        - '<20.19.0'
+        - '>=21.0.0,<22.12.0'
+    - b: project.npm.nuxt
+      ver: '>=3.18.0'
+severity: medium
+provenance:
+  - url: https://registry.npmjs.org/nuxt/3.18.0
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'engines of nuxt 3.18.0: "engines":{"node":"^20.19.0 || >=22.12.0"}'
+fixtures:
+  positive:
+    - name: 'Nuxt 3.18 on node 22.12.0 to node 18.20.4'
+      a:
+        attrs:
+          tool.node.version: '22.12.0'
+      b:
+        attrs:
+          tool.node.version: '18.20.4'
+          project.npm.nuxt: '3.18.0'
+  negative:
+    - name: 'nuxt 3.17.7 is below the first release with this range'
+      a:
+        attrs:
+          tool.node.version: '22.12.0'
+      b:
+        attrs:
+          tool.node.version: '18.20.4'
+          project.npm.nuxt: '3.17.7'
+    - name: 'node 22.12.0 is inside the range on both sides'
+      a:
+        attrs:
+          tool.node.version: '22.12.0'
+      b:
+        attrs:
+          tool.node.version: '22.12.0'
+          project.npm.nuxt: '3.18.0'
+status: active

@@ -1,0 +1,43 @@
+schema: 1
+id: pydantic-2-11-python-3-9-minimum
+title: Pydantic 2.11 to 2.13 requires Python 3.9 or newer, so a Python below 3.9 host cannot install it
+applies:
+  - build
+difference: >-
+  side a is Python 3.9 or newer with Pydantic 2.11 to 2.13; side b is Python below 3.9 with the same release line
+symptoms:
+  - text: 'ERROR: No matching distribution found for pydantic==2.11.0 (pip lists the release line under "Ignored the following versions that require a different python version")'
+    basis: verified
+mechanism: PyPI metadata for pydantic 2.11.0 gives requires_python ">=3.9" and the later releases of the line keep it.
+detect:
+  all:
+    - a: tool.python.version
+      ver: '>=3.9'
+    - b: tool.python.version
+      ver: '<3.9'
+    - a: project.python.pydantic
+      ver: '>=2.11,<2.14'
+    - b: project.python.pydantic
+      ver: '>=2.11,<2.14'
+severity: high
+provenance:
+  - url: https://pypi.org/pypi/pydantic/2.11.0/json
+    kind: spec
+    verified: '2026-10-15'
+    section: 'info.requires_python'
+fixtures:
+  positive:
+    - name: python 3.11.9 to python 3.8.18 with pydantic 2.12.0
+      a: {attrs: {tool.python.version: '3.11.9', project.python.pydantic: '2.12.0'}}
+      b: {attrs: {tool.python.version: '3.8.18', project.python.pydantic: '2.12.0'}}
+  negative:
+    - name: python 3.8.18 to python 3.11.9 with pydantic 2.12.0 (reverse direction)
+      a: {attrs: {tool.python.version: '3.8.18', project.python.pydantic: '2.12.0'}}
+      b: {attrs: {tool.python.version: '3.11.9', project.python.pydantic: '2.12.0'}}
+    - name: python 3.11.9 to python 3.8.18 with pydantic 2.10.6 (outside the release line)
+      a: {attrs: {tool.python.version: '3.11.9', project.python.pydantic: '2.10.6'}}
+      b: {attrs: {tool.python.version: '3.8.18', project.python.pydantic: '2.10.6'}}
+    - name: python 3.8.18 to python 3.8.18 with pydantic 2.12.0 (same band)
+      a: {attrs: {tool.python.version: '3.8.18', project.python.pydantic: '2.12.0'}}
+      b: {attrs: {tool.python.version: '3.8.18', project.python.pydantic: '2.12.0'}}
+status: active

@@ -1,0 +1,43 @@
+schema: 1
+id: typo3-12-php-8-1-minimum
+title: TYPO3 12 declares PHP 8.1 or higher, so a PHP below 8.1 host cannot install it
+applies:
+  - build
+difference: >-
+  side a is PHP 8.1 or higher with TYPO3 12; side b is PHP below 8.1 with the same release line
+symptoms:
+  - text: 'typo3/cms-core[v12.0.0, ..., v12.4.45] require php ^8.1 -> your php version (8.0.30) does not satisfy that requirement'
+    basis: verified
+mechanism: The composer.json of TYPO3 12 at tag v12.0.0 requires php ^8.1.
+detect:
+  all:
+    - a: tool.php.version
+      ver: '>=8.1'
+    - b: tool.php.version
+      ver: '<8.1'
+    - a: project.composer.typo3/cms-core
+      ver: '>=12,<13'
+    - b: project.composer.typo3/cms-core
+      ver: '>=12,<13'
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/TYPO3/typo3/v12.0.0/typo3/sysext/core/composer.json
+    kind: spec
+    verified: '2026-10-15'
+    section: 'require.php'
+fixtures:
+  positive:
+    - name: php 8.3.12 to php 8.0.30 with typo3/cms-core 12.4.20
+      a: {attrs: {tool.php.version: '8.3.12', project.composer.typo3/cms-core: '12.4.20'}}
+      b: {attrs: {tool.php.version: '8.0.30', project.composer.typo3/cms-core: '12.4.20'}}
+  negative:
+    - name: php 8.0.30 to php 8.3.12 with typo3/cms-core 12.4.20 (reverse direction)
+      a: {attrs: {tool.php.version: '8.0.30', project.composer.typo3/cms-core: '12.4.20'}}
+      b: {attrs: {tool.php.version: '8.3.12', project.composer.typo3/cms-core: '12.4.20'}}
+    - name: php 8.3.12 to php 8.0.30 with typo3/cms-core 11.5.30 (outside the release line)
+      a: {attrs: {tool.php.version: '8.3.12', project.composer.typo3/cms-core: '11.5.30'}}
+      b: {attrs: {tool.php.version: '8.0.30', project.composer.typo3/cms-core: '11.5.30'}}
+    - name: php 8.0.30 to php 8.0.30 with typo3/cms-core 12.4.20 (same band)
+      a: {attrs: {tool.php.version: '8.0.30', project.composer.typo3/cms-core: '12.4.20'}}
+      b: {attrs: {tool.php.version: '8.0.30', project.composer.typo3/cms-core: '12.4.20'}}
+status: active

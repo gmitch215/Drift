@@ -1,0 +1,61 @@
+schema: 1
+id: angular-18-node-18-19-1-minimum
+title: Angular 18 declares engines.node ^18.19.1 || ^20.11.1 || >=22.0.0, so a Node version outside that range is unsupported
+applies:
+  - runtime
+  - build
+difference: >-
+  side a is a Node version inside the engines range of Angular 18 and side b is a Node version outside it, with the same Angular 18 release on side b
+symptoms:
+  - text: 'npm reports EBADENGINE for @angular/core on the unsupported Node version, and the package may fail to start'
+    basis: inferred
+mechanism: >-
+  The registry document of @angular/core 18.0.2 declares engines.node ^18.19.1 || ^20.11.1 || >=22.0.0, so a Node version outside that range is unsupported by Angular 18.
+detect:
+  all:
+    - a: tool.node.version
+      ver:
+        - '>=18.19.1,<19.0.0'
+        - '>=20.11.1,<21.0.0'
+        - '>=22.0.0'
+    - b: tool.node.version
+      ver:
+        - '<18.19.1'
+        - '>=19.0.0,<20.11.1'
+        - '>=21.0.0,<22.0.0'
+    - b: project.npm.@angular/core
+      ver: '>=18.0.2'
+severity: medium
+provenance:
+  - url: https://registry.npmjs.org/@angular/core/18.0.2
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'engines of @angular/core 18.0.2: "engines":{"node":"^18.19.1 || ^20.11.1 || >=22.0.0"}'
+fixtures:
+  positive:
+    - name: 'Angular 18 on node 20.11.1 to node 18.18.2'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '18.18.2'
+          project.npm.@angular/core: '18.0.2'
+  negative:
+    - name: '@angular/core 17.3.12 is below the first release with this range'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '18.18.2'
+          project.npm.@angular/core: '17.3.12'
+    - name: 'node 20.11.1 is inside the range on both sides'
+      a:
+        attrs:
+          tool.node.version: '20.11.1'
+      b:
+        attrs:
+          tool.node.version: '20.11.1'
+          project.npm.@angular/core: '18.0.2'
+status: active
