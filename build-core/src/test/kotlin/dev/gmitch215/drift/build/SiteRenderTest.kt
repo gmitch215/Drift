@@ -26,7 +26,9 @@ internal fun sampleJson(): String {
         "classification":{"basis":"verified","causes":["a","c"],"id":"$id",
         "classification":"$classification","note":"Why <it> differs.","references":[
         {"quote":"It is \"unspecified\".","url":"https://example.org/doc?a=1&b=2"}],
-        "issues":[{"id":"KT-1","state":"Open","summary":"Sum & more"}]$extra},
+        "issues":[{"id":"KT-1","state":"Open","summary":"Sum & more"},
+        {"id":"teavm#1","state":"Open","summary":"Other tracker",
+        "url":"https://github.com/konsoletyper/teavm/issues/1"}]$extra},
         "divergence":{"changedAcrossVersions":[],"divergent":$divergent,"versions":[
         {"divergent":$divergent,"groups":[${
         if (divergent) "[\"jvm\"],[\"wasm\",\"wasm-x\"]" else "[\"jvm\",\"wasm\",\"wasm-x\"]"
@@ -125,6 +127,9 @@ class SiteRenderTest {
         assertTrue("<p>It is &quot;unspecified&quot;.</p>" in html)
         assertTrue("<a href=\"https://example.org/doc?a=1&amp;b=2\">" in html)
         assertTrue("<a href=\"https://youtrack.jetbrains.com/issue/KT-1\">KT-1</a>" in html)
+        assertTrue(
+            "<a href=\"https://github.com/konsoletyper/teavm/issues/1\">teavm#1</a>" in html,
+        )
         assertTrue("<td>Open</td>" in html)
         assertTrue("Tracker state on 2026-01-02" in html)
         assertTrue("Searched &lt;here&gt;." in html)
@@ -153,7 +158,7 @@ class SiteRenderTest {
     fun indexListsEveryProbeColumnAndCount() {
         val html = SiteRender.index(dataset, columns, "2026-01-02", files)
         assertTrue("<a href=\"kotlin.a.same.html\">kotlin.a.same</a>" in html)
-        assertTrue("<td>1.0</td><td>KT-1</td>" in html)
+        assertTrue("<td>1.0</td><td>KT-1, teavm#1</td>" in html)
         assertTrue("<th scope=\"row\">unclassified</th><td>1</td><td>1</td>" in html)
         assertTrue("<th scope=\"row\">documented</th><td>1</td><td>0</td>" in html)
         assertTrue("2 Kotlin probes, 3 measured columns" in html)

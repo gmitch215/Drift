@@ -4,7 +4,13 @@ import groovy.json.JsonSlurper
 
 class SiteRef(val url: String, val quote: String)
 
-class SiteIssue(val id: String, val state: String, val resolved: String?, val summary: String)
+class SiteIssue(
+    val id: String,
+    val state: String,
+    val resolved: String?,
+    val summary: String,
+    val url: String? = null,
+)
 
 class SiteCell(val target: String, val version: String, val status: String, val lines: List<String>)
 
@@ -85,6 +91,7 @@ object SiteData {
                     text(i["state"], "state"),
                     i["resolved"] as? String,
                     text(i["summary"], "summary"),
+                    i["url"] as? String,
                 )
             },
             searched = info["searched"] as? String,

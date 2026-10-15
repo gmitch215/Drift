@@ -15,8 +15,17 @@ import dev.gmitch215.drift.scan.probe.kotlin.Classification
 
 class Reference(val url: String, val quote: String)
 
-/** A tracker issue with the state it had when the research read it. */
-class IssueRef(val id: String, val state: String, val resolved: String?, val summary: String)
+/**
+ * A tracker issue with the state it had when the research read it. A Kotlin issue has no [url];
+ * an issue in another tracker names its page there.
+ */
+class IssueRef(
+    val id: String,
+    val state: String,
+    val resolved: String?,
+    val summary: String,
+    val url: String? = null,
+)
 
 /** One differing line of a probe, with the cause class and the columns that differ. */
 class LineNote(val line: String, val cause: String, val columns: String, val issue: String?)
@@ -77,6 +86,7 @@ object Classifications {
                         "summary" to JsonString(it.summary),
                     )
                     it.resolved?.let { r -> issue["resolved"] = JsonString(r) }
+                    it.url?.let { u -> issue["url"] = JsonString(u) }
                     JsonObject(issue)
                 },
             ),
@@ -130,6 +140,7 @@ object Classifications {
                     i.require("state").string(),
                     optional(i, "resolved")?.string(),
                     i.require("summary").string(),
+                    optional(i, "url")?.string(),
                 )
             },
             searched = optional(o, "searched")?.string(),

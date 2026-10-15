@@ -242,16 +242,16 @@ class AtlasCommandTest {
     private companion object {
         val ARM = setOf("aarch64", "arm64")
         const val DATASET_SHA =
-            "18e154bf26aba9464760e3e5ed1b8e02307e33f1c07fe3565bc20906c0c3d3e7"
+            "c69fd560a487f6084b1e1296ed478aac18b58265c47e96e6a10fa3e1503e5ea4"
         const val COMPARE_DETAIL_SHA =
-            "d69a90a70b10284578613e343d6332115df8a62a574ce55668fe99e62ebce134"
+            "566dc95c2feaef903c7d1bcc06dfd3f0279879db0465b2eb0248a26d4aedfc75"
         const val COMPARE_FULL_SHA =
-            "2bde5e9bba9381085075c70dbc6f7d8d2ff1c9e9f0af0a40c4c2d3f451647827"
+            "3672f81fd558e4a0e7e8d80a57a08c38f432813171d48254b163f1642ea02954"
         const val MATRIX_SHA =
-            "e2bd6866ff8dbc0737c7e9eea91a702b14536c9653c0686dbf585c10c3c84182"
+            "800483af48794ce8823777cd9d70becd41d54bc27d351e4bc566124fa4bab254"
         const val DIFF_WASM_SHA =
             "b04a84a8804b7ae389607e0d6f93888f498d5865b22133c4dab0572152a578de"
         const val REPRO_FLOAT_SHA =
-            "b714f4685788219346f795ad2a459577efb8cfbad808554c324fe8cc5a42be46"
+            "64ca23c7c0b73c3aa8f7cc6e3737a42abab8be6167025d61e66ad9721aadd3e7"
     }
 }

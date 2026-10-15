@@ -67,14 +67,14 @@ class ClassificationTest {
     @Test
     fun unclassifiedEntriesNameWhatWasSearchedAndLinkTheirDraft() {
         val unclassified = data.entries.filter { it.classification == Classification.UNCLASSIFIED }
-        assertEquals(25, unclassified.size)
+        assertEquals(24, unclassified.size)
         for (e in unclassified) {
             assertTrue(!e.searched.isNullOrBlank(), "${e.id} does not say what was searched")
             val divergent = full.probe(e.id)!!.divergent
             assertEquals(divergent, e.repro != null, "${e.id} repro link and divergence disagree")
             if (divergent) assertEquals("atlas/repros/${e.id}.md", e.repro)
         }
-        assertEquals(25, unclassified.count { it.repro != null })
+        assertEquals(24, unclassified.count { it.repro != null })
     }
 
     @Test
@@ -91,9 +91,25 @@ class ClassificationTest {
             }.joinToString(" ")
             val mentioned = issueId.findAll(text).map { it.value }.toSet()
             assertTrue(read.containsAll(mentioned), "${e.id}: ${mentioned - read}")
-            assertTrue(read.containsAll(e.issues.map { it.id }), "${e.id} lists an unread issue")
+            assertTrue(
+                read.containsAll(e.issues.filter { it.url == null }.map { it.id }),
+                "${e.id} lists an unread issue",
+            )
             for (i in e.issues) assertTrue(i.state.isNotBlank(), "${e.id} ${i.id} has no state")
         }
+    }
+
+    @Test
+    fun issuesOutsideTheKotlinTrackerNameTheirPage() {
+        val outside = data.entries.flatMap { e -> e.issues.map { e.id to it } }
+            .filter { it.second.url != null }
+        assertEquals(listOf("teavm#1249", "teavm#1249", "teavm#1263"), outside.map { it.second.id })
+        for ((id, issue) in outside) {
+            assertTrue(issue.url!!.startsWith("https://github.com/konsoletyper/teavm/issues/"), id)
+            assertTrue(!issueId.matches(issue.id), id)
+        }
+        val inKotlin = data.entries.flatMap { it.issues }.filter { it.url == null }
+        assertTrue(inKotlin.all { issueId.matches(it.id) })
     }
 
     @Test
@@ -101,7 +117,7 @@ class ClassificationTest {
         val down = data.entries.filter { it.downgradedFrom != null }
         val expected = mapOf(
             "kotlin.char.case-special" to Classification.DOCUMENTED,
-            "kotlin.double.equality-order" to Classification.DOCUMENTED,
+            "kotlin.collections.iterator-modification" to Classification.PLATFORM_DEFINED,
             "kotlin.exceptions.tostring-cause" to Classification.DOCUMENTED,
             "kotlin.int.division-modulo" to Classification.DOCUMENTED,
             "kotlin.int.overflow" to Classification.DOCUMENTED,
@@ -125,7 +141,7 @@ class ClassificationTest {
     @Test
     fun countsMatchTheResearch() {
         assertEquals(
-            Triple(10, 3, 25),
+            Triple(10, 4, 24),
             Triple(
                 count(Classification.DOCUMENTED),
                 count(Classification.PLATFORM_DEFINED),
@@ -135,7 +151,7 @@ class ClassificationTest {
         val divergent = full.probes.filter { it.divergent }.map { it.id }.toSet()
         assertEquals(32, divergent.size)
         assertEquals(
-            Triple(4, 3, 25),
+            Triple(4, 4, 24),
             Triple(
                 count(Classification.DOCUMENTED) { it in divergent },
                 count(Classification.PLATFORM_DEFINED) { it in divergent },

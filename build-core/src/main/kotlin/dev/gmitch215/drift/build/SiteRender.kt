@@ -328,9 +328,8 @@ object SiteRender {
         b.append("<th scope=\"col\">Resolved</th><th scope=\"col\">Summary</th></tr>\n")
         for (i in p.issues) {
             b.append(
-                "<tr><th scope=\"row\"><a href=\"$TRACKER${escape(
-                    i.id,
-                )}\">${escape(i.id)}</a></th>" +
+                "<tr><th scope=\"row\"><a href=\"${escape(i.url ?: (TRACKER + i.id))}\">" +
+                    "${escape(i.id)}</a></th>" +
                     "<td>${escape(i.state)}</td><td>${escape(i.resolved.orEmpty())}</td>" +
                     "<td>${escape(visible(i.summary))}</td></tr>\n",
             )

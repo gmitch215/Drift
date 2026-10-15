@@ -53,7 +53,7 @@ class AtlasScreenTest {
         onNodeWithText(ATLAS_FOOTER).assertExists()
         onNodeWithTag("badge:kotlin.double.parse")
             .assertTextEquals("unclassified: no explanation found")
-        onNodeWithTag("badge:kotlin.collections.iterator-modification")
+        onNodeWithTag("badge:kotlin.regex.anchors-lines")
             .assertTextEquals("platform-defined")
     }
 
@@ -125,12 +125,12 @@ class AtlasScreenTest {
     @Test
     fun tappingARowShowsTheFullResults() = runComposeUiTest {
         show()
-        val row = onNodeWithTag("row:kotlin.collections.iterator-modification")
+        val row = onNodeWithTag("row:kotlin.regex.anchors-lines")
         onNodeWithText("Selected Probe").assertDoesNotExist()
         row.performScrollTo().performClick()
         onNodeWithText("Selected Probe").assertExists()
         onNodeWithText("jvm on kotlin 2.4.20:").assertExists()
-        onNodeWithText("linked issues: KT-88775 (Open), KT-89031 (To be discussed)")
+        onNodeWithText("linked issues: KT-82450 (Submitted)")
             .assertExists()
         row.performScrollTo().performClick()
         onNodeWithText("Selected Probe").assertDoesNotExist()

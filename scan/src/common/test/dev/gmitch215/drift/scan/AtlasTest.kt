@@ -65,8 +65,8 @@ class AtlasTest {
         assertEquals(
             mapOf(
                 Classification.DOCUMENTED to (10 to 3),
-                Classification.PLATFORM_DEFINED to (3 to 3),
-                Classification.UNCLASSIFIED to (25 to 17),
+                Classification.PLATFORM_DEFINED to (4 to 2),
+                Classification.UNCLASSIFIED to (24 to 18),
             ),
             by,
         )
@@ -98,7 +98,7 @@ class AtlasTest {
             listOf("KT-88775", "KT-89031"),
             ids("kotlin.collections.iterator-modification"),
         )
-        assertEquals(emptyList(), ids("kotlin.int.overflow"))
+        assertEquals(listOf("teavm#1249"), ids("kotlin.int.overflow"))
         assertEquals("Fixed", dataset.probe("kotlin.double.extremes")!!.issues.first().state)
     }
 
@@ -422,7 +422,7 @@ class AtlasTest {
         val row = text.lines().single { it.startsWith("kotlin.double.extremes ") }
         val cells = row.split(Regex(" +"))
         assertEquals(listOf("kotlin.double.extremes", "unclassified", "A", "A", "B"), cells)
-        assertTrue(text.endsWith("  platform-defined: 3 of 3\n  unclassified: 17 of 25\n"), text)
+        assertTrue(text.endsWith("  platform-defined: 2 of 4\n  unclassified: 18 of 24\n"), text)
         assertTrue(text.contains("divergent probes: 23 of 38\n  documented: 3 of 10\n"), text)
     }
 
@@ -459,7 +459,7 @@ class AtlasTest {
 }
 
 private const val BOTH_SHA =
-    "1e5349013ab35e40b93d2f57a48141e29f10d9191d07e412a19d76c3760e7717"
+    "b96ea2ed44bf242f80492e77362d4e5708d73215cf2358eb3cc008d0a33a3fc8"
 
 private const val HEAD_TARGET = "# kotlin.target = x\n"
 
@@ -477,19 +477,19 @@ private const val VERSION_DIFF_FULL_SHA =
     "f4686e67cfa432962ee7623e446c06d37ab8ecdfb7008540a0796c571c7f93ad"
 
 private const val DATASET_SHA =
-    "18e154bf26aba9464760e3e5ed1b8e02307e33f1c07fe3565bc20906c0c3d3e7"
+    "c69fd560a487f6084b1e1296ed478aac18b58265c47e96e6a10fa3e1503e5ea4"
 
 private const val COMPARE_DETAIL_SHA =
-    "d69a90a70b10284578613e343d6332115df8a62a574ce55668fe99e62ebce134"
+    "566dc95c2feaef903c7d1bcc06dfd3f0279879db0465b2eb0248a26d4aedfc75"
 
 private const val COMPARE_FULL_SHA =
-    "2bde5e9bba9381085075c70dbc6f7d8d2ff1c9e9f0af0a40c4c2d3f451647827"
+    "3672f81fd558e4a0e7e8d80a57a08c38f432813171d48254b163f1642ea02954"
 
 private const val MATRIX_SHA =
-    "e2bd6866ff8dbc0737c7e9eea91a702b14536c9653c0686dbf585c10c3c84182"
+    "800483af48794ce8823777cd9d70becd41d54bc27d351e4bc566124fa4bab254"
 
 private const val REPRO_FLOAT_SHA =
-    "b714f4685788219346f795ad2a459577efb8cfbad808554c324fe8cc5a42be46"
+    "64ca23c7c0b73c3aa8f7cc6e3737a42abab8be6167025d61e66ad9721aadd3e7"
 
 private const val REPRO_ITERATOR_SHA =
-    "1b6918271c0d551dbcae3f42bc298749b07c0c08494c09317c6fd1e6fa74f38b"
+    "1c072f50cb7f4fc70ef51e08591987d4d89565d8d2c69714a1597330806d0e7a"

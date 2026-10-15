@@ -5,7 +5,7 @@ here; the results themselves are the transcripts in `fixtures/atlas`.
 | --- | --- |
 | `classification.yml` | one entry per probe: `documented`, `platform-defined` or `unclassified`, the cause classes, the references with a short quote, the issue ids with the state read on the research date, which columns differ, and for `unclassified` entries what was searched |
 | `columns.yml` | how each column was measured |
-| `repros/<probe>.md` | a repro draft for each unclassified probe that differs between columns; each starts with "Draft for human review. Not filed." and is never sent anywhere |
+| `repros/<probe>.md` | a repro draft for each unclassified probe that differs between columns, with the results regenerated from the transcripts; each starts with "Draft for human review. Not filed." and is never sent anywhere |
 
 The build converts `classification.yml` to JSON and embeds it in `scan`, so the dataset, `drift atlas
 show` and Studio read one source. `./gradlew atlasSite` builds the static site into
@@ -16,3 +16,17 @@ An entry is `documented` when a page read in full states the behavior as unspeci
 dependent or different, for every differing line. It is `platform-defined` when a platform
 specification delegates it. Anything else is `unclassified`, which means no explanation was found
 in the sources searched. It does not call the behavior a defect.
+
+Each entry lists cause letters:
+
+| letter | cause |
+| --- | --- |
+| `a` | documented difference |
+| `b` | platform-defined |
+| `c` | Kotlin issue |
+| `d` | hardware |
+| `e` | JDK version |
+| `f` | build tool |
+| `g` | unexplained |
+
+An issue in another tracker, such as a TeaVM issue, is listed under `issues` with a `url` field; an issue without one is a Kotlin issue.

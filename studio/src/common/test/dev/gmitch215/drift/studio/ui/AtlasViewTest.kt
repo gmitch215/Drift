@@ -8,9 +8,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
-private const val FULL_MACOS = "02361993c104ca53ce88bf037725892326051c0208f221bfa1c2f3a224261b58"
+private const val FULL_MACOS = "4551accde5e8ac6f7f313f9fd62154a1e2745af49c506d2e38d54a4713cf3eff"
 
-private const val DETAIL_BETA = "fcfdb9337c4cc7042cc8da25d2fb3032a4552c7489dcb245928ea6a01e7302f9"
+private const val DETAIL_BETA = "b0ddddade8b62da7d7c6cf1f283544f482a98678ab8061430938c7c7530aecda"
 
 private val TARGETS_2_4_20 = listOf(
     "jvm", "jvm-17", "jvm-21", "jvm-25", "linux", "linux-arm64", "macos",
@@ -151,10 +151,10 @@ class AtlasViewTest {
         assertEquals(summary.rows.map { it.id to it.cells }, full.rows.map { it.id to it.cells })
         assertTrue(summary.rows.all { it.notes.isEmpty() })
         assertTrue(detail.rows.all { it.notes.size == 1 })
-        val row = full.rows.first { it.id == "kotlin.collections.iterator-modification" }
+        val row = full.rows.first { it.id == "kotlin.regex.anchors-lines" }
         assertTrue(row.notes.any { it.startsWith("reference: https://") })
         assertTrue(
-            row.notes.any { it == "linked issues: KT-88775 (Open), KT-89031 (To be discussed)" },
+            row.notes.any { it == "linked issues: KT-82450 (Submitted)" },
         )
         assertTrue(row.notes.any { it.startsWith("reference: https://") && "\"" in it })
         assertTrue(row.notes.any { it == "basis: verified" })
@@ -208,12 +208,12 @@ class AtlasViewTest {
     @Test
     fun drillShowsSourceResultsAndCitations() {
         val state = AtlasState(dataset, device = macos)
-        val lines = AtlasView.drill(state, "kotlin.collections.iterator-modification")
+        val lines = AtlasView.drill(state, "kotlin.regex.anchors-lines")
         assertTrue("platform-defined" in lines)
         assertTrue("source:" in lines)
         assertTrue("jvm on kotlin 2.4.20:" in lines)
         assertTrue("this JVM:" in lines)
-        assertTrue("linked issues: KT-88775 (Open), KT-89031 (To be discussed)" in lines)
+        assertTrue("linked issues: KT-82450 (Submitted)" in lines)
         assertTrue(AtlasView.drill(state, "no.such.probe").isEmpty())
     }
 
