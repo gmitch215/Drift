@@ -177,6 +177,7 @@ private fun UpgradeResult(view: UpgradeView) {
     }
     Group.entries.forEach { group ->
         val findings = view.report.of(group)
+        if (group == Group.OUTSIDE_RANGE && findings.isEmpty()) return@forEach
         val words = UpgradeStory.words(group)
         Section("${words.title} (${findings.size})") {
             Muted(words.about, style = Type.body)

@@ -49,6 +49,7 @@ class UpgradeScreenTest {
         onNodeWithText(UPGRADE_CAVEAT).assertExists()
         Group.entries.forEach { g ->
             val n = expected.report.of(g).size
+            if (g == Group.OUTSIDE_RANGE && n == 0) return@forEach
             val words = UpgradeStory.words(g)
             onNodeWithText("${words.title} ($n)").performScrollTo().assertExists()
             if (n == 0) onNodeWithText(words.none).assertExists()

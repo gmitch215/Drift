@@ -57,6 +57,11 @@ class UpgradeStoryTest {
             UpgradeStory.headline(report(Group.MAY_BREAK to 2)),
         )
         assertEquals(
+            "No documented change is known to break this environment when $head " +
+                "3 changes leave a documented compatible range.",
+            UpgradeStory.headline(report(Group.OUTSIDE_RANGE to 3)),
+        )
+        assertEquals(
             "No documented change is known to break this environment when $head",
             UpgradeStory.headline(report()),
         )
@@ -106,11 +111,17 @@ class UpgradeStoryTest {
     fun everyGroupHasItsOwnFixedWords() {
         val words = Group.entries.map { UpgradeStory.words(it) }
         assertEquals(
-            listOf("Will Break", "May Break", "Version Boundary Crossed", "Unknown"),
+            listOf(
+                "Will Break",
+                "May Break",
+                "Version Boundary Crossed",
+                "Outside the Tested Range",
+                "Unknown",
+            ),
             words.map { it.title },
         )
-        assertEquals(4, words.map { it.about }.toSet().size)
-        assertEquals(4, words.map { it.none }.toSet().size)
+        assertEquals(5, words.map { it.about }.toSet().size)
+        assertEquals(5, words.map { it.none }.toSet().size)
     }
 
     @Test

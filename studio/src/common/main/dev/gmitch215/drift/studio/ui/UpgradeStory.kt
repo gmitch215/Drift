@@ -91,6 +91,13 @@ object UpgradeStory {
             "No rule matches on the version change alone.",
         )
 
+        Group.OUTSIDE_RANGE -> GroupWords(
+            "Outside the Tested Range",
+            "A source lists the compatible versions and this move leaves them. It states no " +
+                "failure, so the move may still work.",
+            "No move leaves a documented compatible range.",
+        )
+
         Group.UNKNOWN -> GroupWords(
             "Unknown",
             "Drift cannot judge these: the capsule lacks a current value Drift needs, or the " +
@@ -128,6 +135,7 @@ object UpgradeStory {
         val will = report.of(Group.WILL_BREAK).size
         val may = report.of(Group.MAY_BREAK).size
         val boundary = report.of(Group.VERSION_BOUNDARY).size
+        val range = report.of(Group.OUTSIDE_RANGE).size
         val unknown = report.of(Group.UNKNOWN).size
         val move = "moving to ${moveTo(report.targets.map { it.target })}"
         val first = if (will > 0) {
@@ -143,8 +151,13 @@ object UpgradeStory {
         } else {
             ""
         }
+        val outside = if (range > 0) {
+            " ${changes(range, more)} leave a documented compatible range."
+        } else {
+            ""
+        }
         val third = if (unknown > 0) " ${changes(unknown, more)} cannot be judged." else ""
-        return first + second + crossed + third
+        return first + second + crossed + outside + third
     }
 
     private fun changes(n: Int, more: Boolean = false): String {
@@ -171,6 +184,7 @@ object UpgradeStory {
         "Severity: ${finding.rule.severity.id}. " + when (finding.basis) {
             Basis.VERIFIED -> "The source states this symptom."
             Basis.INFERRED -> "The source describes the mechanism, not this symptom."
+            Basis.RANGE -> "The source lists a compatible range and states no failure."
         }
 
     fun boundary(c: Crossing): String {
@@ -179,10 +193,11 @@ object UpgradeStory {
             "Rule condition after the move: ${c.now.joinToString("; ")}.$was"
     }
 
-    fun evidence(finding: Finding): String? = if (finding.group == Group.WILL_BREAK) {
-        "Matched on: ${finding.evidence.joinToString(", ")}."
-    } else {
-        null
+    fun evidence(finding: Finding): String? = when (finding.group) {
+        Group.WILL_BREAK, Group.OUTSIDE_RANGE ->
+            "Matched on: ${finding.evidence.joinToString(", ")}."
+
+        else -> null
     }
 
     fun needs(finding: Finding): String? {
