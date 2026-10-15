@@ -1,0 +1,68 @@
+schema: 1
+id: browser-css-interpolate-size-support-divergence
+title: interpolate-size animates to intrinsic sizes in Chromium only, so the same page lays out differently in Firefox and WebKit
+applies:
+  - browser
+difference: >-
+  a = an engine that supports interpolate-size (Chromium 129 or later); b = an engine that does not (Firefox and the WebKit build in Playwright 1.63.0), or the reverse
+symptoms:
+  - text: >-
+      a box animated or transitioned between a length and height: auto (an accordion, a details panel) is a different height at the same moment, and the content below it sits at a different offset
+    basis: verified
+mechanism: >-
+  Interpolation between a length and an intrinsic size happens only where interpolate-size: allow-keywords is supported, and an engine without it treats the animation as discrete.
+detect:
+  changed: browser.css.supports.interpolate-size
+severity: medium
+provenance:
+  - url: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/interpolate-size
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'Description: allow-keywords enables interpolation between a length-percentage value and an intrinsic size value'
+  - url: https://raw.githubusercontent.com/mdn/browser-compat-data/main/css/properties/interpolate-size.json
+    kind: report
+    verified: '2026-10-15'
+    section: 'support: chrome version_added 129, firefox false, safari false'
+  - url: https://github.com/gmitch215/Drift/blob/master/fixtures/sites/viewport/README.md
+    kind: measurement
+    verified: '2026-10-15'
+    section: 'Measured Layout: a panel 45 px tall in Chromium and 0 px in Firefox and WebKit at the same animation time'
+fixtures:
+  positive:
+    - name: Chromium against Firefox
+      a:
+        attrs:
+          browser.css.supports.interpolate-size: 'true'
+      b:
+        attrs:
+          browser.css.supports.interpolate-size: 'false'
+    - name: Firefox against Chromium
+      a:
+        attrs:
+          browser.css.supports.interpolate-size: 'false'
+      b:
+        attrs:
+          browser.css.supports.interpolate-size: 'true'
+  negative:
+    - name: both engines support it
+      a:
+        attrs:
+          browser.css.supports.interpolate-size: 'true'
+      b:
+        attrs:
+          browser.css.supports.interpolate-size: 'true'
+    - name: neither engine supports it
+      a:
+        attrs:
+          browser.css.supports.interpolate-size: 'false'
+      b:
+        attrs:
+          browser.css.supports.interpolate-size: 'false'
+    - name: support is not captured on one side
+      a:
+        attrs:
+          browser.css.supports.interpolate-size: 'true'
+      b:
+        attrs:
+          browser.engine.name: firefox
+status: active

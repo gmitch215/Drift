@@ -1,6 +1,7 @@
 package dev.gmitch215.drift.scan
 
 import dev.gmitch215.drift.fixtures.Fixtures
+import dev.gmitch215.drift.fixtures.LayoutFixtures
 import dev.gmitch215.drift.fixtures.ProjectFixtures
 import dev.gmitch215.drift.host.CommandResult
 import dev.gmitch215.drift.host.FakeHost
@@ -8,6 +9,7 @@ import dev.gmitch215.drift.know.Node
 import dev.gmitch215.drift.know.Rule
 import dev.gmitch215.drift.know.Rules
 import dev.gmitch215.drift.know.Status
+import dev.gmitch215.drift.model.Capsule
 import dev.gmitch215.drift.scan.probe.Catalog
 import dev.gmitch215.drift.scan.project.ProjectScanner
 import dev.gmitch215.drift.scan.scanner.Scanners
@@ -37,12 +39,24 @@ class RuleCatalogTest {
                 "/etc/os-release" to "ID=x\nVERSION_ID=\"1\"\nPRETTY_NAME=\"x\"\n",
                 "/sys/fs/cgroup/cpu.max" to "max 100000\n",
                 "/proc/self/cgroup" to "0::/\n",
+                "/sys/fs/cgroup/memory.max" to "536870912\n",
+                "/proc/cmdline" to "ro net.ifnames=0\n",
+                "/proc/sys/kernel/apparmor_restrict_unprivileged_userns" to "1\n",
+                "/etc/crypto-policies/config" to "DEFAULT\n",
+                "/usr/share/zoneinfo/tzdata.zi" to "# version 2024a\n",
             ),
             commands = mapOf(
                 listOf("uname", "-r") to CommandResult(0, "1\n"),
                 listOf("readlink", "/etc/localtime") to
                     CommandResult(0, "/usr/share/zoneinfo/Etc/UTC\n"),
             ),
+        ),
+        "catalog",
+    ).attributes.map { it.path }.toSet() + Capture.run(
+        FakeHost(
+            platform = "macosArm64",
+            os = "macos",
+            commands = mapOf(listOf("sw_vers", "-productVersion") to CommandResult(0, "26.0\n")),
         ),
         "catalog",
     ).attributes.map { it.path }.toSet()
@@ -65,10 +79,14 @@ class RuleCatalogTest {
         }
         .toSet()
 
+    private val laidOut: Set<String> = LayoutFixtures.names
+        .flatMap { Capsule.parse(LayoutFixtures.text(it)).attributes.map { a -> a.path } }
+        .toSet()
+
     private fun emitted(path: String): Boolean {
         val base = path.removeSuffix("*")
         if (path.startsWith("env.")) return capture.any { it.startsWith("env.") }
-        return (capture + scanned + projected).any {
+        return (capture + scanned + projected + laidOut).any {
             it == path ||
                 (path.endsWith("*") && it.startsWith(base))
         }
@@ -124,6 +142,8 @@ class RuleCatalogTest {
             "tz.system-zone",
             "runtime.jvm.options",
             "project.composer.json.plugins.unlisted",
+            "browser.css.supports.interpolate-size",
+            "browser.viewport.width",
         )
         for (path in expected) assertTrue(emitted(path), path)
         assertEquals(false, emitted("tool.nope.version"))

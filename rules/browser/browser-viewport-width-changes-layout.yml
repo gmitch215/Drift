@@ -1,0 +1,50 @@
+schema: 1
+id: browser-viewport-width-changes-layout
+title: A different viewport width changes which media queries match and how responsive boxes lay out
+applies:
+  - browser
+difference: >-
+  a = a page captured at one viewport width; b = the same page captured at another width
+symptoms:
+  - text: >-
+      breakpoints flip, flex and grid containers change direction or column count, and the boxes below them move
+    basis: verified
+mechanism: >-
+  A width media feature tests the width of the viewport, so a page captured at two widths evaluates its breakpoints differently.
+detect:
+  changed: browser.viewport.width
+severity: low
+provenance:
+  - url: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/width
+    kind: vendor-doc
+    verified: '2026-10-15'
+    section: 'The width media feature tests the width of the viewport'
+  - url: https://github.com/gmitch215/Drift/blob/master/fixtures/sites/viewport/README.md
+    kind: measurement
+    verified: '2026-10-15'
+    section: 'Measured Layout: the header and the card grid change size between 390, 768 and 1280 px in every engine'
+fixtures:
+  positive:
+    - name: a phone width against a desktop width
+      a:
+        attrs:
+          browser.viewport.width: '390'
+      b:
+        attrs:
+          browser.viewport.width: '1280'
+  negative:
+    - name: the same width
+      a:
+        attrs:
+          browser.viewport.width: '1280'
+      b:
+        attrs:
+          browser.viewport.width: '1280'
+    - name: width is not captured on one side
+      a:
+        attrs:
+          browser.viewport.width: '1280'
+      b:
+        attrs:
+          browser.engine.name: firefox
+status: active
