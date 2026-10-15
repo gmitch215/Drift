@@ -1,0 +1,16 @@
+plugins {
+    id 'java'
+}
+
+dependencies {
+    implementation 'org.springframework:spring-core:5.3.30'
+}
+
+task header(type: Exec) {
+    commandLine 'javah', '-d', 'build/headers', 'app.Native'
+}
+
+task runTool(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'app.Main'
+}

@@ -11,6 +11,11 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
+    compileSdkVersion 34
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion(34)
+    }
     kotlinOptions {
         jvmTarget = "17"
     }

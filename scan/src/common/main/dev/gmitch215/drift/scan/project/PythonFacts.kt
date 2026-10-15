@@ -31,15 +31,17 @@ internal fun python(files: ProjectScanner.Files, out: ProjectScanner.Out) {
         }
     }
     val resolved = linkedMapOf<String, String>()
+    val pythonVersions = linkedMapOf<String, String>()
     var file = ""
     for (lock in listOf("uv.lock", "poetry.lock")) {
         val text = files.read(lock) ?: continue
         for (table in Toml.parse(text).filter { it.name == "package" }) {
-            val name = Toml.string(table.values["name"]) ?: continue
+            val name = normalizeName(Toml.string(table.values["name"]) ?: continue)
             val version = Toml.string(table.values["version"]) ?: continue
             val source = table.values["source"].orEmpty()
-            if ("virtual" in source || "editable" in source) continue
-            resolved.keep(normalizeName(name), version)
+            if ("virtual" in source || "editable" in source || name in resolved) continue
+            resolved[name] = version
+            Toml.string(table.values["python-versions"])?.let { pythonVersions[name] = it }
         }
         if (resolved.isNotEmpty()) {
             file = lock
@@ -57,5 +59,5 @@ internal fun python(files: ProjectScanner.Files, out: ProjectScanner.Out) {
             file = "requirements.txt"
         }
     }
-    out.packages(direct, resolved, file)
+    out.packages(direct, resolved, file, "python", pythonVersions)
 }

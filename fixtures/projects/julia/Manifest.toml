@@ -1,0 +1,12 @@
+# This file is machine-generated - editing it directly is not advised
+
+julia_version = "1.13.1"
+manifest_format = "2.1"
+project_hash = "72e3b6274dbcfd64d294f19fccd9d75e091f4b67"
+
+[[deps.JSON]]
+deps = ["Dates", "Logging", "Parsers", "PrecompileTools", "StructUtils", "UUIDs", "Unicode"]
+git-tree-sha1 = "4657a834b01ce00f2b94546095c4350617b9af2c"
+registries = "General"
+uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+version = "1.10.0"

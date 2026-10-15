@@ -10,6 +10,7 @@ private val bunEntry = Regex(
 private val yarnVersion = Regex("^ {2}version:? \"?([^\"\\s]+)\"?", RegexOption.MULTILINE)
 private val pnpmKey =
     Regex("^ {2}'?/?((?:@[^/@'\\s]+/)?[^/@'\\s]+)(?:@|/)(\\d[^:'(\\s_]*)", RegexOption.MULTILINE)
+private val pnpmEngineNode = Regex("\\bnode:\\s*(?:'([^']*)'|\"([^\"]*)\"|([^,}\\s]+))")
 private val pnpmSections = setOf("dependencies", "devDependencies", "optionalDependencies")
 private val nodeTsScript =
     Regex("(?:^|[\\s;&|])node(?:\\s+--?[\\w-]+(?:=\\S+)?)*\\s+\\S+\\.(?:ts|mts|cts)(?:\\s|$)")
@@ -36,35 +37,46 @@ internal fun npm(files: ProjectScanner.Files, out: ProjectScanner.Out) {
             out.put("engines.$name", engines[name].text(), "package.json")
         }
     }
-    val (file, resolved) = lockfile(files, ranges, out) ?: return
-    out.packages(ranges.keys, resolved, file)
+    val locked = lockfile(files, ranges, out) ?: return
+    out.packages(ranges.keys, locked.resolved, locked.file, "node", locked.engines)
 }
+
+/** [engines] holds the `node` constraint each package records, when the format has one. */
+private class Locked(
+    val file: String,
+    val resolved: Map<String, String>,
+    val engines: Map<String, String> = emptyMap(),
+)
 
 private fun lockfile(
     files: ProjectScanner.Files,
     ranges: Map<String, String>,
     out: ProjectScanner.Out,
-): Pair<String, Map<String, String>>? {
+): Locked? {
     for (name in listOf("package-lock.json", "npm-shrinkwrap.json")) {
         files.json(name)?.let { lock ->
             val version = (lock["lockfileVersion"] as? JsonInt)?.value
             out.put("lockfile-version", version?.toString(), name)
-            return name to packageLock(lock)
+            return packageLock(name, lock)
         }
     }
-    files.read("pnpm-lock.yaml")?.let { return "pnpm-lock.yaml" to pnpm(it) }
-    files.read("yarn.lock")?.let { return "yarn.lock" to yarn(it, ranges) }
-    files.read("bun.lock")?.let { return "bun.lock" to bun(it) }
+    files.read("pnpm-lock.yaml")?.let { return pnpm(it) }
+    files.read("yarn.lock")?.let { return Locked("yarn.lock", yarn(it, ranges)) }
+    files.read("bun.lock")?.let { return Locked("bun.lock", bun(it)) }
     return null
 }
 
-private fun packageLock(lock: JsonObject): Map<String, String> {
+private fun packageLock(file: String, lock: JsonObject): Locked {
     val resolved = linkedMapOf<String, String>()
+    val engines = linkedMapOf<String, String>()
     val prefix = "node_modules/"
     lock.obj("packages")?.fields?.forEach { (key, value) ->
         val name = key.removePrefix(prefix)
-        if (key.startsWith(prefix) && prefix !in name) {
-            (value as? JsonObject)?.get("version").text()?.let { resolved.keep(name, it) }
+        val entry = value as? JsonObject
+        if (key.startsWith(prefix) && prefix !in name && name !in resolved) {
+            val version = entry?.get("version").text() ?: return@forEach
+            resolved[name] = version
+            entry?.obj("engines")?.get("node").text()?.let { engines[name] = it }
         }
     }
     if (resolved.isEmpty()) {
@@ -72,7 +84,7 @@ private fun packageLock(lock: JsonObject): Map<String, String> {
             (value as? JsonObject)?.get("version").text()?.let { resolved.keep(name, it) }
         }
     }
-    return resolved
+    return Locked(file, resolved, engines)
 }
 
 private fun bun(text: String): Map<String, String> {
@@ -107,18 +119,31 @@ private fun yarn(text: String, ranges: Map<String, String>): Map<String, String>
     return resolved
 }
 
-private fun pnpm(text: String): Map<String, String> {
-    val lines = text.lines()
+private fun pnpm(text: String): Locked {
+    val all = text.lines()
+    val lines = all.drop(all.lastIndexOf("---") + 1)
     val resolved = linkedMapOf<String, String>()
     for ((name, version) in pnpmDirect(lines)) resolved[name] = version
+    val engines = hashMapOf<String, String>()
     val start = lines.indexOf("packages:")
     if (start >= 0) {
         val body = lines.drop(start + 1).takeWhile { it.isEmpty() || it.startsWith(" ") }
-        for (m in pnpmKey.findAll(body.joinToString("\n"))) {
-            resolved.keep(m.groupValues[1], m.groupValues[2])
+        var entry = ""
+        for (line in body) {
+            val key = pnpmKey.find(line)
+            if (key != null) {
+                entry = "${key.groupValues[1]}@${key.groupValues[2]}"
+                resolved.keep(key.groupValues[1], key.groupValues[2])
+            } else if (line.startsWith("    engines:")) {
+                pnpmEngineNode.find(line)?.groupValues?.drop(1)?.firstOrNull { it.isNotEmpty() }
+                    ?.let { engines[entry] = it }
+            }
         }
     }
-    return resolved
+    val kept = resolved.mapNotNull { (name, version) ->
+        engines["$name@$version"]?.let { name to it }
+    }
+    return Locked("pnpm-lock.yaml", resolved, kept.toMap())
 }
 
 /** Versions of the root importer's dependencies, from the v5, v6 and v9 layouts. */

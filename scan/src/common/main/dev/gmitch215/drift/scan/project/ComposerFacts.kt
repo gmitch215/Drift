@@ -36,14 +36,23 @@ internal fun composer(files: ProjectScanner.Files, out: ProjectScanner.Out) {
         }
     }
     val resolved = linkedMapOf<String, String>()
+    val phpRequires = linkedMapOf<String, String>()
     for (section in listOf("packages", "packages-dev")) {
         for (entry in (lock[section] as? JsonArray)?.items.orEmpty()) {
             val pkg = entry as? JsonObject ?: continue
             val name = pkg["name"].text() ?: continue
-            resolved.keep(name, pkg["version"].text() ?: continue)
+            if (name in resolved) continue
+            resolved[name] = pkg["version"].text() ?: continue
+            pkg.obj("require")?.get("php").text()?.let { phpRequires[name] = it }
         }
     }
-    out.packages(require.keys.filter { '/' in it }, resolved, "composer.lock")
+    out.packages(
+        require.keys.filter { '/' in it },
+        resolved,
+        "composer.lock",
+        "php",
+        phpRequires,
+    )
 }
 
 private fun unlistedPlugins(lock: JsonObject, allowed: JsonValue?): List<String> {

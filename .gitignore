@@ -14,3 +14,4 @@ kotlin-js-store
 local.properties
 tools/perf/stage/
 docs/submission/
+!fixtures/projects/**/node_modules/

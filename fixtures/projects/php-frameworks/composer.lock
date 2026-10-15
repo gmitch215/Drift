@@ -1,0 +1,31 @@
+{
+    "packages": [
+        {
+            "name": "laravel/framework",
+            "version": "v13.0.0",
+            "require": {
+                "php": "^8.3"
+            },
+            "type": "library"
+        },
+        {
+            "name": "typo3/cms-core",
+            "version": "v13.4.0",
+            "require": {
+                "php": "^8.2"
+            },
+            "type": "typo3-cms-framework"
+        },
+        {
+            "name": "johnpbloch/wordpress-core",
+            "version": "6.6.0",
+            "require": {
+                "php": ">=7.2.24"
+            },
+            "type": "wordpress-core"
+        }
+    ],
+    "packages-dev": [],
+    "platform": {},
+    "platform-dev": []
+}

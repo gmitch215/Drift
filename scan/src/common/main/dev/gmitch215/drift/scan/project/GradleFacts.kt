@@ -1,5 +1,7 @@
 package dev.gmitch215.drift.scan.project
 
+import dev.gmitch215.drift.host.Host
+
 private const val MAX_MODULES = 50
 private const val KOTLIN_PLUGIN = "org.jetbrains.kotlin."
 private const val CATALOG = "gradle/libs.versions.toml"
@@ -9,6 +11,8 @@ private val blockComment = Regex("/\\*[\\s\\S]*?\\*/")
 private val lineComment = Regex("(^|\\s)//.*$", RegexOption.MULTILINE)
 private val coordinate =
     Regex("[\"']([A-Za-z0-9_.-]+):([A-Za-z0-9_.-]+):([0-9][A-Za-z0-9_.+-]*)[\"']")
+private val javaExec = Regex("\\bJavaExec\\b")
+private val javaExecJvm = Regex("\\b(?:javaLauncher|executable)\\b")
 private val wrapperVersion = Regex("gradle-(\\d[\\w.-]*?)-(?:bin|all)\\.zip")
 private val pluginId = Regex(
     "\\bid\\s*\\(?\\s*[\"']([\\w.-]+)[\"']\\s*\\)?(?:\\s+version\\s+(?:[\"']([^\"']+)[\"']" +
@@ -40,6 +44,19 @@ private val languageVersion = Regex(
         "|-language-version[=\"',\\s]+([0-9.]+)",
 )
 private val annotationTarget = Regex("-Xannotation-default-target=([\\w-]+)")
+private fun sdkLevel(name: String) = Regex(
+    "\\b$name(?:Version)?\\s*(?:=\\s*|\\s+|\\()\\s*" +
+        "(?:(\\d+(?:\\.\\d+)?)\\b|libs\\.versions\\.([\\w.]+)\\.get\\(\\))" +
+        "|\\b$name\\s*\\{[^}]*?release\\(\\s*(\\d+)\\s*\\)" +
+        "(?:\\s*\\{\\s*minorApiLevel\\s*=\\s*(\\d+))?",
+)
+private val sdkNumber = Regex("[0-9.]+")
+private val sdkLevels = listOf(
+    "compileSdk" to "compile-sdk",
+    "minSdk" to "min-sdk",
+    "targetSdk" to "target-sdk",
+)
+    .map { (name, key) -> key to sdkLevel(name) }
 private const val CONFIGURATIONS = "compile|runtime|testCompile|testRuntime"
 private val buildCalls = listOf(
     "compile-configuration" to Regex(
@@ -178,7 +195,30 @@ private fun modules(settings: String): List<String> {
 
 private fun jvmName(raw: String) = raw.replace('_', '.')
 
-internal fun gradle(files: ProjectScanner.Files, out: ProjectScanner.Out) {
+private fun sdkValue(m: MatchResult, catalog: Catalog): String? {
+    val (plain, ref, release, minor) = m.destructured
+    return when {
+        plain.isNotEmpty() -> plain
+        ref.isNotEmpty() -> catalog.versions[ref]?.takeIf(sdkNumber::matches)
+        release.isNotEmpty() -> if (minor.isEmpty()) release else "$release.$minor"
+        else -> null
+    }
+}
+
+/** Flutter keeps its Gradle project in `android/`; a root without Gradle files reads that. */
+internal fun gradleFiles(
+    host: Host,
+    dir: String,
+    files: ProjectScanner.Files,
+): ProjectScanner.Files {
+    val settings = listOf("settings.gradle.kts", "settings.gradle")
+    if (settings.any { files.read(it) != null } || files.read("pubspec.yaml") == null) return files
+    if (settings.none { files.read("android/$it") != null }) return files
+    val prefix = if (dir.isEmpty()) "" else dir.trimEnd('/') + "/"
+    return ProjectScanner.Files(host, prefix + "android")
+}
+
+internal fun gradle(files: ProjectScanner.Files, out: ProjectScanner.Out): Map<String, String> {
     val catalogText = files.read(CATALOG)
     val catalog = catalog(catalogText)
     val settings = listOf("settings.gradle.kts", "settings.gradle").firstNotNullOfOrNull {
@@ -295,4 +335,14 @@ internal fun gradle(files: ProjectScanner.Files, out: ProjectScanner.Out) {
     modulesText.firstNotNullOfOrNull { annotationTarget.find(it) }?.let {
         out.put("kotlin.annotation-default-target", it.groupValues[1], BUILD)
     }
+    for ((key, regex) in sdkLevels) {
+        val level = modulesText.firstNotNullOfOrNull { text ->
+            regex.find(text)?.let { sdkValue(it, catalog) }
+        }
+        out.put("android.$key", level, BUILD)
+    }
+    if (modulesText.any { javaExec.containsMatchIn(it) && !javaExecJvm.containsMatchIn(it) }) {
+        out.put("javaexec-without-jvm-set", "true", BUILD)
+    }
+    return libraries
 }

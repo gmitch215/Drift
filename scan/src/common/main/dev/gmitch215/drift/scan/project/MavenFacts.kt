@@ -20,8 +20,8 @@ private val javaProperties = setOf(
 private fun tag(body: String, name: String) =
     Regex("<$name>\\s*([^<]*?)\\s*</$name>").find(body)?.groupValues?.get(1)
 
-internal fun maven(files: ProjectScanner.Files, out: ProjectScanner.Out) {
-    val pom = files.read("pom.xml")?.replace(comments, "") ?: return
+internal fun maven(files: ProjectScanner.Files, out: ProjectScanner.Out): Map<String, String> {
+    val pom = files.read("pom.xml")?.replace(comments, "") ?: return emptyMap()
     val props = properties.find(pom)?.groupValues?.get(1)?.let { block ->
         property.findAll(block).associate { it.groupValues[1] to it.groupValues[2] }
     }.orEmpty()
@@ -43,4 +43,5 @@ internal fun maven(files: ProjectScanner.Files, out: ProjectScanner.Out) {
         resolve(tag(body, "version"))?.let { resolved.keep("$group:$artifact", it) }
     }
     out.packages(resolved.keys, resolved, "pom.xml")
+    return resolved
 }
