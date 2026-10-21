@@ -40,7 +40,7 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <main id="main">
 <h1>kotlin.double.equality-order</h1>
 <p>How do NaN and signed zero compare, statically and as Any?</p>
-<p><strong>unclassified</strong> (basis: verified); differs between targets</p>
+<p><strong>platform-defined</strong> (basis: inferred); differs between targets</p>
 <h2>Source</h2>
 <pre><code>val nan = &quot;NaN&quot;.toDouble()
 val a: Any = nan
@@ -146,65 +146,16 @@ list-nan = true
 nan&gt;1 = false
 float-any-eq = false</pre>
 <h2>Classification</h2>
-<p>unclassified, basis verified.</p>
-<p>Downgraded from documented; the reason is in the notes.</p>
-<p>No explanation was found in the sources searched.</p>
-<blockquote><p>NaN is considered equal to itself</p>
+<p>platform-defined, basis inferred; causes: platform-defined.</p>
+<blockquote><p>println(0.0 == -0.0) // true</p>
 <footer><a href="https://kotlinlang.org/docs/numbers.html">https://kotlinlang.org/docs/numbers.html</a></footer></blockquote>
+<blockquote><p>If x is either +0 or -0, return &quot;0&quot;.</p>
+<footer><a href="https://tc39.es/ecma262/#sec-numeric-types-number-tostring">https://tc39.es/ecma262/#sec-numeric-types-number-tostring</a></footer></blockquote>
 <h3>Notes</h3>
-<p>Downgraded from documented: js-ir prints the zero lines (minOf, maxOf, distinct) as 0 where every other column prints 0.0 or -0.0, and distinct still keeps two elements. The numbers page (read) says generic and Any typed comparison uses equals and compareTo, with -0.0 less than 0.0. Whether js-ir keeps the sign of -0.0 is not shown by these lines: it may be the JavaScript number printing, or the value. kotlin.string.hashcode prints hash 0 for -0.0 on js-ir where the others print -2147483648.</p>
-<p class="muted">Read on 2026-10-07.</p>
+<p>Only js-ir differs, on three lines: minOf(0.0, -0.0) and maxOf(0.0, -0.0) print 0 and listOf(0.0, -0.0).distinct() prints [0, 0], where every other column prints 0.0, -0.0 and [0.0, -0.0]. ECMAScript Number::toString returns &quot;0&quot; for both zeros, which accounts for all three lines by printing alone. The equality and ordering lines (nan==nan, 0.0==-0.0, equals, compareTo, sets, lists) agree on every column, js-ir included. Whether js-ir holds the sign of -0.0 is not measured: distinct keeps two elements, which under the numbers page contract means one of them is -0.0, but that is an inference from the transcript. kotlin.string.hashcode prints double-neg-0 = 0 on js-ir against -2147483648 elsewhere. Earlier this entry was documented, then unclassified; the printing rule is why it is platform-defined now, with the sign left open.</p>
+<p class="muted">Read on 2026-10-15.</p>
 <h2>What was searched</h2>
-<p>Not searched beyond the numbers page quoted above; no tracker was queried for the js-ir lines.</p>
-<h2>Repro draft</h2>
-<div class="draft">
-<p><strong>Draft for human review; not filed.</strong></p>
-<pre>Draft for human review. Not filed.
-
-# kotlin.double.equality-order
-
-This text was written by an agent from measured transcripts and the page it read. A person must rerun the probe, read the page named below and rewrite it in their own words before anything is posted; the Kotlin maintainers do not want generated reports.
-
-Question: How do NaN and signed zero compare under == , equals, compareTo and generic collection code?
-
-Classification now: unclassified (was documented); cause letters: none; basis: verified.
-
-Measured: Kotlin 2.4.20 on 16 columns of fixtures/atlas (android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, js-ir on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, linux x64, linux arm64, and cloudflare-wasm and cloudflare-jvm on workerd 1.20261001.1). Single run per cell; no spread measured.
-
-Helpers (not shown below): `line(label, v)` prints `label = v`.
-
-Code for the differing lines (from the displayed probe source):
-
-```kotlin
-line(&quot;minOf&quot;, minOf(0.0, -0.0))
-line(&quot;maxOf&quot;, maxOf(-0.0, 0.0))
-line(&quot;distinct&quot;, listOf(0.0, -0.0).distinct())
-```
-
-Results at 2.4.20, one row per distinct output (columns that agree share a row):
-
-- `minOf`
-  - `-0.0`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `0`: js-ir
-- `maxOf`
-  - `0.0`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `0`: js-ir
-- `distinct`
-  - `[0.0, -0.0]`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `[0, 0]`: js-ir
-
-The lines `0.0==-0.0 = true`, `any-0.0==any-neg-0.0 = false`, `nan==nan = false` and `any-nan==any-nan = true` agree on all 16 columns, including js-ir.
-
-Docs read (FULL text):
-- https://kotlinlang.org/docs/numbers.html : &quot;NaN is considered equal to itself&quot; (the page also states that generic and Any-typed comparison uses equals and compareTo, with -0.0 less than 0.0; that sentence was read on the earlier pass and is quoted from that read)
-
-Existing tracker issues: none read for the js-ir lines.
-
-What is known: js-ir prints both zeros as 0 in minOf, maxOf and distinct, where every other column prints 0.0 or -0.0. distinct keeps two elements on js-ir, so the two zeros are not merged. The js-ir hash of -0.0 is also 0 (see kotlin.string.hashcode).
-
-What is NOT known: whether js-ir keeps the sign of -0.0 in the value and only prints it as 0, or drops it; whether the numbers page's ordering (-0.0 less than 0.0) holds for generic code on js-ir; whether a different js-ir release changes the result; whether the displayed snippet matches the executed probe body (they are two hand-written copies).
-</pre>
-</div>
+<p>Pages read in full: Kotlin floating-point numbers page, ECMAScript Number::toString. The Kotlin/JS source for Double.toString was not read, so that Kotlin/JS prints through the ECMAScript rule is inferred from the output. No tracker was searched for these lines.</p>
 <h2>Kotlin versions measured</h2>
 <p>2.4.20, 2.5.0-Beta1</p>
 <h2>How it was measured</h2>

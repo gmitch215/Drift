@@ -25,6 +25,7 @@ dev.gmitch215.drift.model
 dev.gmitch215.drift.plan
 dev.gmitch215.drift.rank
 dev.gmitch215.drift.redact
+dev.gmitch215.drift.set
 dev.gmitch215.drift.spectrum
 dev.gmitch215.drift.studio
 dev.gmitch215.drift.symptom

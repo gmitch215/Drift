@@ -351,6 +351,12 @@
 <td>no</td>
 </tr>
 <tr>
+<td><a href="#over-a-set-of-capsules"><code>diagnose --set</code></a></td>
+<td>two or more capsules, each passing or failing</td>
+<td>JSON or text</td>
+<td>no</td>
+</tr>
+<tr>
 <td><a href="#run"><code>run</code></a></td>
 <td>this machine, a command</td>
 <td>a capsule directory</td>
@@ -756,7 +762,7 @@ drift capture --label demo | jq '[.attributes[] | select(.value == &quot;&lt;red
 <tr>
 <td>Gradle</td>
 <td><code>gradle/libs.versions.toml</code>, <code>settings.gradle(.kts)</code>, <code>build.gradle(.kts)</code> of the root and of each included module (50 at most), <code>gradle.properties</code>, <code>gradle/wrapper/gradle-wrapper.properties</code>, <code>gradle/gradle-daemon-jvm.properties</code></td>
-<td><code>project.gradle.&lt;group&gt;:&lt;artifact&gt;</code>, <code>project.gradle.plugin.&lt;id&gt;</code>, <code>project.gradle.wrapper</code>, <code>project.gradle.jdk.version</code>, <code>project.gradle.properties.&lt;key&gt;</code>, <code>project.gradle.kotlin.version</code>, <code>project.gradle.agp.version</code>, <code>project.gradle.kotlin.target.&lt;name&gt;</code>, <code>project.gradle.kotlin.jvm-target</code>, <code>.toolchain</code>, <code>.language-version</code>, <code>.annotation-default-target</code>, <code>project.gradle.kmp-android-module</code>, <code>project.gradle.dsl</code> (<code>kotlin</code> or <code>groovy</code>, from the first build file), <code>project.gradle.calls.&lt;name&gt;</code> (see below)</td>
+<td><code>project.gradle.&lt;group&gt;:&lt;artifact&gt;</code>, <code>project.gradle.plugin.&lt;id&gt;</code>, <code>project.gradle.wrapper</code>, <code>project.gradle.jdk.version</code>, <code>project.gradle.properties.&lt;key&gt;</code>, <code>project.gradle.kotlin.version</code>, <code>project.gradle.agp.version</code>, <code>project.gradle.kotlin.target.&lt;name&gt;</code>, <code>project.gradle.android.compile-sdk</code>, <code>.min-sdk</code> and <code>.target-sdk</code> (a number, <code>release(36)</code> forms and a <code>libs.versions</code> reference are read; <code>flutter.compileSdkVersion</code> and other expressions are not), <code>project.gradle.kotlin.jvm-target</code>, <code>.toolchain</code>, <code>.language-version</code>, <code>.annotation-default-target</code>, <code>project.gradle.kmp-android-module</code>, <code>project.gradle.dsl</code> (<code>kotlin</code> or <code>groovy</code>, from the first build file), <code>project.gradle.calls.&lt;name&gt;</code> (see below)</td>
 </tr>
 <tr>
 <td>Maven</td>
@@ -772,6 +778,26 @@ drift capture --label demo | jq '[.attributes[] | select(.value == &quot;&lt;red
 <td>Go</td>
 <td><code>go.mod</code></td>
 <td><code>project.go.version</code> (the <code>go</code> line), <code>project.go.toolchain</code>, <code>project.go.&lt;module path&gt;</code></td>
+</tr>
+<tr>
+<td>R</td>
+<td><code>renv.lock</code></td>
+<td><code>project.r.r-version</code> (<code>R.Version</code>), <code>project.r.&lt;package&gt;</code> (every entry under <code>Packages</code>; renv records only packages the project code uses)</td>
+</tr>
+<tr>
+<td>Dart</td>
+<td><code>pubspec.lock</code></td>
+<td><code>project.dart.&lt;package&gt;</code> (not <code>sdk</code> packages), <code>project.dart.sdks.dart</code> and <code>.sdks.flutter</code> (the constraint as written), <code>project.dart.sdk-min</code> (the lower bound of <code>sdks.dart</code>); direct dependencies come first</td>
+</tr>
+<tr>
+<td>Julia</td>
+<td><code>Manifest.toml</code>, <code>Project.toml</code></td>
+<td><code>project.julia.julia-version</code>, <code>project.julia.manifest-format</code>, <code>project.julia.&lt;package&gt;</code> (entries with a <code>version</code>, so not standard libraries); <code>[deps]</code> of <code>Project.toml</code> come first</td>
+</tr>
+<tr>
+<td>Elixir</td>
+<td><code>mix.lock</code></td>
+<td><code>project.elixir.&lt;package&gt;</code> (<code>:hex</code> entries only; <code>:git</code> entries have no version)</td>
 </tr>
 </tbody>
 </table></div>
@@ -883,6 +909,41 @@ drift capture --label demo | jq '[.attributes[] | select(.value == &quot;&lt;red
 <td>curl</td>
 <td><code>curl --version</code></td>
 <td><code>tool.curl.version</code></td>
+</tr>
+<tr>
+<td>R</td>
+<td><code>R --version</code></td>
+<td><code>tool.r.version</code></td>
+</tr>
+<tr>
+<td>Dart</td>
+<td><code>dart --version</code></td>
+<td><code>tool.dart.version</code>, <code>tool.dart.channel</code> (<code>stable</code>, <code>beta</code>, <code>dev</code>)</td>
+</tr>
+<tr>
+<td>Julia</td>
+<td><code>julia --version</code></td>
+<td><code>tool.julia.version</code></td>
+</tr>
+<tr>
+<td>Xcode</td>
+<td><code>xcodebuild -version</code></td>
+<td><code>tool.xcode.version</code> (macOS with Xcode installed)</td>
+</tr>
+<tr>
+<td>CocoaPods</td>
+<td><code>pod --version</code></td>
+<td><code>tool.cocoapods.version</code></td>
+</tr>
+<tr>
+<td>Elixir</td>
+<td><code>elixir --version</code></td>
+<td><code>tool.elixir.version</code>, <code>tool.elixir.compiled-otp</code> (the OTP release Elixir was compiled with, when printed)</td>
+</tr>
+<tr>
+<td>Erlang/OTP</td>
+<td><code>erl -noshell -eval 'io:format(&quot;~s&quot;,[erlang:system_info(otp_release)]),halt().'</code></td>
+<td><code>tool.erlang.otp</code> (the major release, such as <code>29</code>; the one the runtime reports, which can differ from <code>compiled-otp</code>)</td>
 </tr>
 </tbody>
 </table></div>
@@ -1066,6 +1127,45 @@ env.TZ differs most (tier difference); this ranks differences and does not confi
 </code></pre>
 <p>The two <code>drift:</code> lines go to standard error. The comparison reads the capsules only; the symptoms and steps stored beside them are not part of the ranking. Compare like with like: a capsule from <code>run</code> or <code>capture</code> holds attributes such as <code>os.name</code> and <code>kernel.release</code>, and a capsule from <code>import</code> holds the attributes a CI log prints (<code>ci.runner.image.version</code>), so a baseline from one and a current run from the other differ in most paths.</p>
 <p><code>--against</code> with two capsules fails with <code>--against takes at most one capsule</code>. Without <code>--against</code>, <code>diagnose</code> still takes exactly two capsules, and each may now be a directory.</p>
+<h3 id="over-a-set-of-capsules">Over a Set of Capsules</h3>
+<p><code>drift diagnose --set CAPSULE...</code> takes any number of capsules, some from passing runs and some from failing runs, and ranks the attribute values that split the two groups. It scores each value with the Ochiai spectrum that ranks a CI history, with the failing capsules as the failing runs. Only static attributes count, and a value that every capsule holds is left out because it splits nothing.</p>
+<p>A capsule is labelled in one of two ways. End its path with <code>#pass</code> or <code>#fail</code>, or pass a capsule directory whose <code>run.json</code> records a pass or a fail (or whose <code>result.json</code> records the exit code of <code>drift run</code>). A <code>#pass</code> or <code>#fail</code> selector wins over a recorded outcome. <code>case.driftcase#passing</code> and <code>case.driftcase#failing</code> select an archive member and label it. Quote the selectors, since <code>#</code> starts a comment in most shells.</p>
+<pre><code class="language-sh">drift diagnose --set 'fixtures/set/toolchain/pass-1.json#pass' 'fixtures/set/toolchain/pass-2.json#pass' \
+  'fixtures/set/toolchain/fail-1.json#fail' 'fixtures/set/toolchain/fail-2.json#fail' --detail detail
+</code></pre>
+<pre><code>set: 2 failing, 2 passing, 1 separating
+1. tool.node.version = 22.4.0  failing 2/2  passing 0/2  score 1.000000  separates
+2. cpu.count = 16  failing 1/2  passing 0/2  score 0.707106
+3. tool.npm.version = 10.8.1  failing 1/2  passing 0/2  score 0.707106
+4. cpu.count = 8  failing 1/2  passing 1/2  score 0.500000
+5. env.TZ = Asia/Tokyo  failing 1/2  passing 1/2  score 0.500000
+6. env.TZ = UTC  failing 1/2  passing 1/2  score 0.500000
+7. tool.npm.version = 10.2.4  failing 1/2  passing 2/2  score 0.408248
+</code></pre>
+<p>A value separates when every failing capsule holds it and no passing capsule does; its score is 1.000000. The other rows are partial splits, with the number of capsules on each side that hold the value. The default output is canonical JSON with the capsule names and outcomes, the two counts and one object per split. <code>--detail summary</code> prints the first five rows, and <code>detail</code> and <code>full</code> print every row.</p>
+<p>Only the failing side is scored. When the failing capsules disagree on a key, each of their values ranks as a partial split, even if no passing capsule shares any of them. With two repeats of one benchmark scenario, <code>network-proxy-decoy</code>, the proxy variable that the failing runs add ranks above the <code>NO_PROXY</code> decoy whose value differs in each failing run:</p>
+<pre><code>set: 2 failing, 2 passing, 1 separating
+1. env.HTTP_PROXY = http://127.0.0.1:9  failing 2/2  passing 0/2  score 1.000000  separates
+2. env.NO_PROXY = corp.example,10.0.0.0/8  failing 1/2  passing 0/2  score 0.707106
+3. env.NO_PROXY = internal.example  failing 1/2  passing 0/2  score 0.707106
+</code></pre>
+<p>The set needs at least two capsules, one passing and one failing. <code>--set</code> cannot be combined with <code>--against</code> or <code>--case</code>, and a capsule with no selector and no recorded outcome fails with <code>has no recorded outcome; end it with #pass or #fail</code>. The command opens no network connection. Studio has a Set tab that does the same with capsules chosen from files or from two sample sets.</p>
+<h3 id="browser-layout-capsules">Browser Layout Capsules</h3>
+<p><code>tools/browsers/layout.mjs</code> loads a page in Playwright's Chromium, Firefox and WebKit at several viewports and writes one capsule per engine and viewport, which <code>diagnose</code> compares like any other pair. It is a Node script and needs <code>npm ci</code> in <code>tools/browsers</code> and the Playwright browsers.</p>
+<pre><code class="language-sh">cd tools/browsers
+node layout.mjs --dir ../../fixtures/sites/viewport --out ../../build/layout
+</code></pre>
+<p><code>--dir</code> serves a directory and <code>--url</code> captures a page that is already served. <code>--engine</code> (repeatable) picks engines, <code>--viewport WxH[@DPR]</code> (repeatable) replaces the default 390x844, 768x1024 and 1280x800, and <code>--select ID=SELECTOR</code> (repeatable) replaces the default of every element with a <code>data-drift</code> attribute. The files are named <code>&lt;engine&gt;-&lt;width&gt;x&lt;height&gt;.json</code>.</p>
+<p>Each capsule holds static attributes in the browser dimension: <code>browser.engine.name</code> and <code>browser.engine.version</code>, <code>browser.playwright.version</code>, <code>browser.viewport.width</code> and <code>.height</code>, <code>browser.dpr</code>, <code>browser.css.supports.&lt;feature&gt;</code> (the result of <code>CSS.supports</code> for five declarations, <code>true</code> or <code>false</code>), <code>browser.media.&lt;name&gt;</code> (<code>matchMedia</code> for seven queries) and <code>browser.layout.&lt;id&gt;.x</code>, <code>.y</code>, <code>.width</code> and <code>.height</code> for each selected element, from <code>getBoundingClientRect</code> in CSS pixels rounded to two decimals. An id with no matching element gets <code>missing</code>.</p>
+<p>Two rules explain a pair of these capsules: <code>browser-css-interpolate-size-support-divergence</code> matches when <code>browser.css.supports.interpolate-size</code> differs, and <code>browser-viewport-width-changes-layout</code> matches when <code>browser.viewport.width</code> differs. On the fixture page, Chromium's <code>panel</code> is 45 px tall and Firefox's is 0 px at 1280x800, and the footer below it sits at <code>y</code> 221 and 176:</p>
+<pre><code class="language-sh">drift diagnose fixtures/sites/viewport/capsules/firefox-1280x800.json \
+  fixtures/sites/viewport/capsules/chromium-1280x800.json --detail summary
+</code></pre>
+<pre><code>browser.css.supports.interpolate-size differs most (tier known); this ranks differences and does not
+confirm a cause.
+</code></pre>
+<p>Before the two rules existed, the same pair printed <code>6 changes differ with the same support, and browser.css.supports.corner-shape ranks first only by hand-set weights, so the data does not name one cause.</code> Firefox against WebKit at one viewport has identical boxes, and <code>diagnose</code> still says it does not name a cause. Of the 72 ordered pairs of the nine fixture capsules, the candidates in tier <code>known</code> were exactly the expected causes in all 72 (see <code>ViewportDiagnosisTest</code> and the Browser layout paragraph of the Technical Report).</p>
+<p>The scripts capture the engines Playwright ships. Playwright's WebKit is not a Safari release: it supports <code>corner-shape</code>, which Browser Compat Data marks <code>preview</code> for Safari. Treat <code>CSS.supports</code> and the boxes as the measurement and Browser Compat Data as a citation for the property.</p>
 <h2 id="run">Run</h2>
 <p><code>drift run [--out DIR] [--label TEXT] [--tail-lines N] [--tools] [--project] [--force] -- COMMAND...</code> runs a command, captures the environment before it starts and writes a capsule directory. The command's output passes through to standard output as it arrives (standard error is merged into it), and the command's exit code is the exit code of <code>drift run</code>. One line goes to standard error: <code>drift: exit 3 after 9 ms; capsule in red-run</code>.</p>
 <pre><code class="language-sh">TZ=Asia/Tokyo drift run --out red-run --label red -- sh -c 'if [ &quot;$TZ&quot; != UTC ]; then echo &quot;Error: unexpected timezone $TZ&quot;; exit 3; fi; echo ok'
@@ -1398,6 +1498,7 @@ tool.python.version 3.11.2; the command names a python tool
 </tbody>
 </table></div>
 <p>If <code>sh test.sh</code> really runs Python, name it: <code>--run &quot;python3 test.py&quot;</code>.</p>
+<p><strong>Tags that do not exist.</strong> The tag is composed from the capsule, and <code>core</code> carries the tags that Docker Hub publishes for the images it composes (<code>ImageTags.kt</code>, written by <code>./gradlew :tools:imageTags</code> and committed). When the composed tag is not on the list, the base is the same version on the nearest Debian release that has it, or else the nearest published version with the same suffix, and the toolchain version entry in <code>manifest.json</code> is <code>PARTIAL</code> with the replaced tag in its detail. An npm that its Node cannot run (for example npm 10.9.0 on Node 18.16.0) is not pinned; the image keeps its bundled npm.</p>
 <p><strong>What is mirrored.</strong> <code>--detail detail</code> lists every attribute that is not mirrored, by reason.</p>
 <pre><code class="language-sh">drift reproduce fixtures/lab/node-alpine.json --run &quot;npm test&quot; --out repro-detail --detail detail 2&gt;/dev/null | sed -n 9,25p
 </code></pre>
@@ -1493,6 +1594,10 @@ FROM node:22.12.0-alpine3.20@sha256:00000000000000000000000000000000000000000000
 <tr>
 <td><code>--max-memory</code>, <code>--max-cpus</code></td>
 <td><code>docker --memory</code> and <code>--cpus</code> for arms whose capsule sets no limit</td>
+</tr>
+<tr>
+<td><code>--gate permille=N,salt=S,env=NAME</code></td>
+<td>set <code>NAME</code> to 1 on <code>N</code> of every 1000 trials and to 0 on the rest, in every arm, so a command that fails only when it reads 1 fails intermittently; <code>salt</code> defaults to 0 and <code>env</code> to <code>DRIFT_GATE</code></td>
 </tr>
 <tr>
 <td><code>--name TEXT</code></td>
@@ -1969,7 +2074,7 @@ contract: 0 hold, 0 break, 1 unverifiable
 </table></div>
 <p>Exit codes: <code>contract create</code> exits 0 when it wrote a contract and 3 when no set separates a red. <code>contract verify</code> exits 1 when an assertion breaks. Each exits 1 for a missing or malformed capsule or contract file. <code>contract create</code> also exits 1 when it cannot write the file, and <code>contract verify</code> exits 1 with neither or both of a capsule and <code>--capture</code>.</p>
 <h2 id="upgrade-check">Upgrade Check</h2>
-<p><code>drift upgrade-check</code> answers &quot;what breaks if we move to these versions&quot; from one capsule of today's environment. It sets the target versions on the matching attributes, evaluates every rule with the capsule as side <code>a</code> and the changed copy as side <code>b</code>, and prints the rules the move triggers in four groups. It runs offline with no model, and the same capsule and targets give the same bytes on the JVM and Native builds.</p>
+<p><code>drift upgrade-check</code> answers &quot;what breaks if we move to these versions&quot; from one capsule of today's environment. It sets the target versions on the matching attributes, evaluates every rule with the capsule as side <code>a</code> and the changed copy as side <code>b</code>, and prints the rules the move triggers in groups. It runs offline with no model, and the same capsule and targets give the same bytes on the JVM and Native builds.</p>
 <pre><code class="language-sh">drift upgrade-check [--json] [--to &lt;name=version,...&gt;] [--to-file &lt;file&gt;] [&lt;capsule&gt;]
 </code></pre>
 <p><code>&lt;capsule&gt;</code> is a capsule file or directory. Without it the command captures this machine with <code>--tools --project</code>. Capture the project with <code>drift capture --project</code> (see <a href="#project-facts">Project Facts</a>) so the dependency versions are in the capsule; a capsule without them puts every dependency rule under Unknown.</p>
@@ -2013,12 +2118,20 @@ contract: 0 hold, 0 break, 1 unverifiable
 <td><code>tool.composer.version</code></td>
 </tr>
 <tr>
+<td><code>dart</code></td>
+<td><code>tool.dart.version</code></td>
+</tr>
+<tr>
 <td><code>docker</code></td>
 <td><code>tool.docker.version</code></td>
 </tr>
 <tr>
 <td><code>drupal</code></td>
 <td><code>project.composer.drupal/core</code></td>
+</tr>
+<tr>
+<td><code>elixir</code></td>
+<td><code>tool.elixir.version</code></td>
 </tr>
 <tr>
 <td><code>git</code></td>
@@ -2035,6 +2148,10 @@ contract: 0 hold, 0 break, 1 unverifiable
 <tr>
 <td><code>java</code>, <code>jdk</code></td>
 <td><code>tool.java.version</code></td>
+</tr>
+<tr>
+<td><code>julia</code></td>
+<td><code>tool.julia.version</code></td>
 </tr>
 <tr>
 <td><code>kotlin</code></td>
@@ -2059,6 +2176,10 @@ contract: 0 hold, 0 break, 1 unverifiable
 <tr>
 <td><code>python</code></td>
 <td><code>tool.python.version</code></td>
+</tr>
+<tr>
+<td><code>r</code></td>
+<td><code>tool.r.version</code></td>
 </tr>
 <tr>
 <td><code>ruby</code></td>
@@ -2139,13 +2260,50 @@ Unknown (0)
 <td>the rule matches, but every clause that matched reads only a target key, so the evidence is the version crossing and nothing about the project; the change applies to those versions and the project may not use the affected feature</td>
 </tr>
 <tr>
+<td>Outside the tested range</td>
+<td>the rule matches and every symptom of the rule has the basis <code>range</code>: a compatibility table or release note lists the supported versions and states no failure outside them (the Kotlin Multiplatform compatibility table, the AGP maximum API level and minimum Gradle version, the Gradle JVM range); the group is printed only when it has findings</td>
+</tr>
+<tr>
 <td>Unknown</td>
 <td>the capsule has no current value for a target key, or the target is not a version the rule can compare, so the boundary cannot be judged</td>
 </tr>
 </tbody>
 </table></div>
 <p>Only rules that read a target key on side <code>b</code> and give a different verdict for the targets than for the capsule alone are listed. The line <code>73 of 298 rules read a target key</code> counts the rules that read one before that filter. Probe results and run facts describe today's environment, so side <code>b</code> has none, and a rule that reads one is unknown.</p>
-<p><code>--json</code> prints the same findings. A finding holds <code>rule</code>, <code>title</code>, <code>severity</code>, <code>basis</code>, <code>status</code>, <code>mechanism</code>, <code>crossings</code> (<code>key</code>, <code>from</code>, <code>to</code>, <code>was</code>, <code>now</code>), <code>missing</code>, <code>evidence</code> and <code>sources</code>, under the keys <code>will-break</code>, <code>may-break</code>, <code>version-boundary</code> and <code>unknown</code>, next to <code>targets</code>, <code>rules</code> and <code>touched</code>:</p>
+<p>Locked packages are checked apart from the rules. When a target is <code>php</code>, <code>node</code> or <code>python</code>, <code>upgrade-check</code> reads the runtime constraint each locked package records and lists a package whose constraint allows today's runtime and excludes the target under &quot;Will break: locked packages&quot;, with the package, its version, the lockfile and the constraint. <code>drift capture --project</code> records the constraint as <code>project.&lt;ecosystem&gt;.&lt;package&gt;.requires.&lt;runtime&gt;</code> for the formats that carry one, and no rule names the package:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Lockfile</th>
+<th>Constraint read</th>
+<th>Key</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>composer.lock</code></td>
+<td><code>require.php</code> of each package</td>
+<td><code>project.composer.&lt;package&gt;.requires.php</code></td>
+</tr>
+<tr>
+<td><code>package-lock.json</code></td>
+<td><code>engines.node</code> of each top-level <code>node_modules</code> entry</td>
+<td><code>project.npm.&lt;package&gt;.requires.node</code></td>
+</tr>
+<tr>
+<td><code>pnpm-lock.yaml</code></td>
+<td><code>engines: {node: ...}</code> of each <code>packages</code> entry</td>
+<td><code>project.npm.&lt;package&gt;.requires.node</code></td>
+</tr>
+<tr>
+<td><code>poetry.lock</code></td>
+<td><code>python-versions</code> of each package</td>
+<td><code>project.python.&lt;package&gt;.requires.python</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><code>yarn.lock</code>, <code>bun.lock</code>, <code>uv.lock</code>, <code>requirements.txt</code> and the Gradle and Maven files record no per-package constraint, so a move to a Node, Python or Java target lists them under &quot;Unchecked package constraints&quot;; the registry or the artifact would have the value and Drift does not fetch it. A constraint that is not a range Drift reads (<code>dev-master</code>) is listed there too, and so is every excluding package when the capture lacks today's runtime version. A constraint of <code>*</code> adds no key, and the keys of at most 200 packages per ecosystem are kept, like the version keys.</p>
+<p><code>--json</code> prints the same findings, with <code>will-break-packages</code> (<code>ecosystem</code>, <code>package</code>, <code>version</code>, <code>runtime</code>, <code>constraint</code>, <code>from</code>, <code>to</code>, <code>file</code>) and <code>unchecked-packages</code> (<code>file</code>, <code>runtime</code>, <code>reason</code>, <code>packages</code>). A finding holds <code>rule</code>, <code>title</code>, <code>severity</code>, <code>basis</code>, <code>status</code>, <code>mechanism</code>, <code>crossings</code> (<code>key</code>, <code>from</code>, <code>to</code>, <code>was</code>, <code>now</code>), <code>missing</code>, <code>evidence</code> and <code>sources</code>, under the keys <code>will-break</code>, <code>may-break</code>, <code>version-boundary</code>, <code>outside-range</code> and <code>unknown</code>, next to <code>targets</code>, <code>rules</code> and <code>touched</code>:</p>
 <pre><code class="language-sh">drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=8.3,drupal=11,symfony=7.1 --json \
   | jq -c '{rules, touched, willBreak: [.&quot;will-break&quot;[] | {rule}], versionBoundary: [.&quot;version-boundary&quot;[] | {rule, crossings: [.crossings[] | {key, from, to}]}]}'
 </code></pre>
@@ -2298,8 +2456,8 @@ identical-to-fixture
 <pre><code class="language-sh">drift atlas build fixtures/atlas/jvm.txt fixtures/atlas/macos.txt fixtures/atlas/wasm.txt --out atlas.json
 drift atlas build fixtures/atlas/*.txt fixtures/atlas/2.5.0-beta1/*.txt --out atlas-all.json
 </code></pre>
-<pre><code>dataset: 38 probes, 3 columns, 23 divergent, sha256 18e154bf26aba9464760e3e5ed1b8e02307e33f1c07fe3565bc20906c0c3d3e7
-dataset: 38 probes, 21 columns, 32 divergent, sha256 2d7e84b9b90a560a26301f77215ad15d9671c43a44273eaa24bda45369fad3af
+<pre><code>dataset: 38 probes, 3 columns, 23 divergent, sha256 c69fd560a487f6084b1e1296ed478aac18b58265c47e96e6a10fa3e1503e5ea4
+dataset: 38 probes, 21 columns, 32 divergent, sha256 8364183f0ffda6face1da93bd71142ac66761d85cc145818533eebffa574aae5
 </code></pre>
 <p>The summary goes to standard error. The sha256 is the hash of the dataset body; the file on disk has one more trailing newline. Building twice gives identical files, and the order of the arguments does not change the bytes. <code>--out</code> is required. <code>build</code> refuses a transcript that lacks a probe of the catalog, names an unknown probe, lacks a header (<code>bad transcript header in badt.txt: missing kotlin.target</code>) or duplicates a column (<code>fixtures/atlas/jvm.txt and fixtures/atlas/jvm.txt both record jvm@2.4.20</code>).</p>
 <p><strong>Show.</strong> Without <code>--probe</code>, <code>atlas show</code> prints the matrix: one row per probe, one letter per distinct output, and a repeated letter on a row marks a byte-identical transcript.</p>
@@ -2314,15 +2472,15 @@ kotlin.char.bmp-categories                platform-defined  A           B       
 kotlin.char.case-special                  unclassified      A           A             A
 a letter repeated on a row marks a byte-identical transcript
 divergent probes: 23 of 38
-  documented: 3 of 11
-  platform-defined: 3 of 3
-  unclassified: 17 of 24
+  documented: 3 of 10
+  platform-defined: 2 of 4
+  unclassified: 18 of 24
 </code></pre>
 <p>With more than one Kotlin version in the dataset the summary adds a line per version:</p>
 <pre><code class="language-sh">drift atlas show atlas-all.json | tail -3
 </code></pre>
 <pre><code>divergent probes per kotlin version:
-  2.4.20: 29
+  2.4.20: 32
   2.5.0-Beta1: 18
 </code></pre>
 <p><strong>Classification.</strong> Every probe carries one of three labels, written by hand from primary sources in <a href="https://github.com/gmitch215/Drift/blob/master/atlas/classification.yml"><code>atlas/classification.yml</code></a> and embedded in the dataset:</p>
@@ -2338,12 +2496,12 @@ divergent probes: 23 of 38
 <tr>
 <td><code>documented</code></td>
 <td>a Kotlin documentation page states the behavior</td>
-<td>11</td>
+<td>10</td>
 </tr>
 <tr>
 <td><code>platform-defined</code></td>
 <td>a JDK or ECMAScript page does</td>
-<td>3</td>
+<td>4</td>
 </tr>
 <tr>
 <td><code>unclassified</code></td>
@@ -2352,7 +2510,7 @@ divergent probes: 23 of 38
 </tr>
 </tbody>
 </table></div>
-<p>Each entry also has a <code>basis</code> (<code>verified</code> when the cited page states the contract, <code>inferred</code> when the page implies it), the references with a short quote, and the linked issue ids with the state read on the research date. <code>unclassified</code> is not a finding. The 13 divergent unclassified probes each have a repro draft under <a href="https://github.com/gmitch215/Drift/tree/master/atlas/repros"><code>atlas/repros/</code></a>.</p>
+<p>Each entry also has a <code>basis</code> (<code>verified</code> when the cited page states the contract, <code>inferred</code> when the page implies it), the references with a short quote, and the linked issue ids with the state read on the research date. <code>unclassified</code> is not a finding. The 24 divergent unclassified probes each have a repro draft under <a href="https://github.com/gmitch215/Drift/tree/master/atlas/repros"><code>atlas/repros/</code></a>.</p>
 <p><strong>Compare.</strong> <code>atlas compare DATASET TRANSCRIPT</code> places this device against each recorded column. <code>--detail summary</code> prints counts; <code>detail</code> adds the probes that differ.</p>
 <pre><code class="language-sh">drift atlas compare atlas.json tr/macos.txt
 drift atlas compare atlas-all.json tr/macos.txt | tail -21
@@ -2436,10 +2594,11 @@ controls: 13 lines are the same on every target
 <pre><code class="language-sh">drift atlas show atlas-all.json --probe kotlin.double.nan-bits | sed -n 8,17p | cut -c1-110
 </code></pre>
 <pre><code>classification: unclassified
-basis: inferred
+basis: verified
 reference: https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.2.3 &quot;IEEE 754 allows multiple d
 reference: https://webassembly.github.io/spec/core/exec/numerics.html &quot;Some operators are non-deterministic, b
 reference: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/to-raw-bits.html &quot;preserving NaN values exact 
+reference: https://tc39.es/ecma262/#sec-ecmascript-language-types-number-type &quot;are represented in ECMAScript a
 linked issues: KT-53258 (In Progress when read)
   searched: YouTrack: &quot;NaN toRawBits&quot;, &quot;Double toBits NaN canonical&quot;, &quot;NaN unaryMinus sign Native&quot;,
   &quot;Double.NaN raw bits negative&quot;, &quot;unaryMinus NaN&quot;, &quot;NaN sign bit&quot;, &quot;toRawBits&quot;. Pages read in full:
@@ -2458,7 +2617,7 @@ curl -s -o /dev/null -w '%{http_code} %{content_type}\n' http://localhost:PORT/p
 <pre><code>200 text/html; charset=utf-8
 </code></pre>
 <p><code>./gradlew docsSite</code> runs <code>dokkaGenerate</code> and <code>atlasSite</code> first, then assembles <code>build/site</code> (3,089 files): <code>README.md</code> as <code>index.html</code>, <code>ADVANCED_USAGE.md</code> as <code>advanced-usage.html</code> and <code>TECHNICAL_REPORT.md</code> as <code>technical-report.html</code>, each rendered into <code>assets/site-template.html</code>, the Atlas site under <code>atlas/</code>, the Dokka site under <code>engine/</code>, the icons from <code>assets/</code>, <code>CNAME</code> and <code>.nojekyll</code>. A relative link in the three Markdown files to a repository path that does not exist fails the render, and a link to one that does exist becomes a GitHub URL on <code>master</code>. <code>checkSiteLinks</code> runs after it and fails on a relative <code>href</code> or <code>src</code> that does not resolve inside <code>build/site</code>. It scanned 73,286 links and found none unresolved outside <code>engine/</code>, where Dokka leaves 14 unresolved; those are counted and printed and do not fail it.</p>
-<p>The <code>docs.yml</code> workflow runs <code>./gradlew dokkaGenerate atlasSite docsSite</code> and pushes <code>build/site</code> to the <code>gh-pages</code> branch. It builds on pushes to <code>master</code>, <code>ver/*</code>, <code>feat/*</code> and <code>renovate/*</code> and deploys only from <code>master</code>, with a <code>CNAME</code> file for <code>drift.gmitch215.dev</code>. It has not run yet.</p>
+<p>The <code>docs.yml</code> workflow runs <code>./gradlew dokkaGenerate atlasSite docsSite</code> and pushes <code>build/site</code> to the <code>gh-pages</code> branch. It builds on pushes to <code>master</code>, <code>ver/*</code>, <code>feat/*</code> and <code>renovate/*</code> and deploys only from <code>master</code>, with a <code>CNAME</code> file for <code>drift.gmitch215.dev</code>, where the site is live.</p>
 <h2 id="probe">Probe</h2>
 <p><code>probe cloudflare</code> runs the Kotlin probes in a Cloudflare Worker and writes the transcript in the Atlas format, the same file <code>atlas record</code> writes. The default run is local: <code>wrangler dev --local</code> serves the Worker on workerd at <code>127.0.0.1</code>, so it needs no network and no Cloudflare account. It needs Node and <code>wrangler</code> (on <code>PATH</code>, or through <code>npx wrangler</code>), and a directory that holds a built Worker.</p>
 <p>Drift has no HTTP client and cannot stop a process it started, so it hands the work to Node. It runs <code>node -e</code> with a short script that starts <code>wrangler dev</code>, waits for the <code>Ready on</code> line, requests the Worker once, prints the response between two marker lines and stops wrangler. Drift reads the output, checks that the text is a transcript, rewrites the <code>kotlin.target</code> header to <code>--target</code> and writes <code>&lt;out&gt;/&lt;target&gt;.txt</code>.</p>
@@ -2537,7 +2696,7 @@ wrote 38 probes for cloudflare-jvm on kotlin 2.4.20, 4 unavailable to tr/cloudfl
 </tr>
 <tr>
 <td><code>kotlin.regex.anchors-lines</code></td>
-<td>the build refuses <code>java.util.regex.Matcher.useAnchoringBounds</code>, which <code>Regex.matchAt</code> calls, so the <code>matchAt</code> lines are replaced by a thrown exception in the Worker's copy of the source</td>
+<td>the build refuses <code>java.util.regex.Matcher.useAnchoringBounds</code>, which <code>Regex.matchAt</code> calls, so the <code>matchAt</code> lines are replaced by a thrown exception in the Worker's copy of the source; TeaVM 0.15.0 declares that method in <code>TMatcher</code>, so the cause of the refusal is not confirmed</td>
 </tr>
 </tbody>
 </table></div>
@@ -3614,9 +3773,9 @@ jobs:
 <pre><code>Error: unexpected timezone Asia/Tokyo
 drift: exit 3 after 0 ms; capsule in drift-capsule
 drift: baseline is the latest green drift on master
-env.TZ differs most (tier difference); this this ranks differences and does not confirm a cause.
+env.TZ differs most (tier difference); this ranks differences and does not confirm a cause.
 </code></pre>
-<p>The component path above assumes the repository is mirrored to gitlab.com as <code>gmitch215/drift</code>; the mirror does not exist yet, and the component has not run on gitlab.com.</p>
+<p><code>.github/workflows/gitlab.yml</code> mirrors the repository to gitlab.com/gmitch215/Drift on every push. The component has not run on gitlab.com and is not published to the CI/CD catalog.</p>
 <h3 id="checking-the-scripts">Checking the Scripts</h3>
 <pre><code class="language-sh">.github/action/test-drift.sh drift
 .github/action/test-gitlab.sh drift

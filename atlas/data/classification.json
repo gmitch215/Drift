@@ -1,15 +1,18 @@
 {
 	"schema": 1,
 	"measured": {
-		"date": "2026-10-07",
+		"date": "2026-10-15",
 		"versions": [
 			"2.4.20",
 			"2.5.0-Beta1"
 		],
 		"issuesRead": [
 			"KT-13575",
+			"KT-17719",
 			"KT-18067",
 			"KT-21235",
+			"KT-24975",
+			"KT-30141",
 			"KT-44746",
 			"KT-49557",
 			"KT-50777",
@@ -25,9 +28,12 @@
 			"KT-68395",
 			"KT-69456",
 			"KT-71003",
+			"KT-72508",
+			"KT-72509",
 			"KT-78708",
 			"KT-80664",
 			"KT-81626",
+			"KT-82450",
 			"KT-88035",
 			"KT-88036",
 			"KT-88414",
@@ -117,7 +123,7 @@
 					]
 				]
 			},
-			"note": "JDK 17, 21, 25 columns split exactly as their Character Javadocs name Unicode 13.0, 15.0, 16.0 (verified). Native, Wasm, iOS, linux, mingw-wine and the browsers print the JDK 17 numbers (observed): that they use Unicode 13.0 tables is inferred; no FULL doc names the Native table version and KT-58195 (created 2023-04-24) says UnicodeData 12.0 for Native, which does not match the observed numbers (stale or other tables). Android prints its own numbers and the Android Character page read names no Unicode version. The Kotlin isLetter KDoc defines letters by category and names no version, so the version is left to the platform. cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on upper-checksum, lower-checksum, title-checksum, upper-changed, lower-changed, title-changed, upper-string-length-sum, lower-string-length-sum."
+			"note": "JDK 17, 21, 25 columns split exactly as their Character Javadocs name Unicode 13.0, 15.0, 16.0 (verified). Native, Wasm, iOS, linux, mingw-wine and the browsers print the JDK 17 numbers (observed): that they use Unicode 13.0 tables is inferred; no FULL doc names the Native table version and KT-58195 (created 2023-04-24) says UnicodeData 12.0 for Native, which does not match the observed numbers (stale or other tables). Android prints its own numbers and the Android Character page read names no Unicode version. js-ir is a sixth group: it prints its own upper-checksum, title-checksum, upper-changed and title-changed, and shares lower-checksum and lower-changed with android; the Unicode version of Node 26.8.2 was not read, so a platform table is the reading, not a verified cause. cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on upper-checksum, lower-checksum, title-checksum, upper-changed, lower-changed, title-changed, upper-string-length-sum, lower-string-length-sum."
 		},
 		{
 			"id": "kotlin.char.bmp-categories",
@@ -201,16 +207,16 @@
 			"classification": "unclassified",
 			"basis": "verified",
 			"causes": [
-				"a"
+				"f"
 			],
 			"downgradedFrom": "documented",
 			"references": [
 				{
 					"url": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/uppercase.html",
-					"quote": "Converts this character to upper case using Unicode mapping rules of the invariant locale."
+					"quote": "This function supports one-to-many and many-to-one character mapping, thus the length of the returned string can be different from the length of the original string."
 				}
 			],
-			"searched": "Not searched beyond the pages quoted above: the cloudflare-jvm lines were compared with the quoted pages only, and no tracker (Kotlin, TeaVM or bytebox) was queried for them.",
+			"searched": "No tracker was searched. Pages read in full: Kotlin String.uppercase (one-to-many mapping allowed) and Char.uppercaseChar (one-to-one only). Source read: TeaVM 0.15.0 (the version bytebox 1.0.3 pins) TString.toUpperCase and toLowerCase (lines 741 to 860) map each UTF-16 unit with TCharacter.toUpperCase and toLowerCase.",
 			"repro": "atlas/repros/kotlin.char.case-special.md",
 			"columns": {
 				"2.4.20": [
@@ -236,7 +242,7 @@
 					]
 				]
 			},
-			"note": "Downgraded from documented: the KDoc pages read say uppercase and lowercase use Unicode mapping rules and allow one-to-many mappings, and cloudflare-jvm prints one-to-one results on ten lines (upper-sharp-s is [df] where every other column prints [53, 53]). No page read explains the cloudflare-jvm lines. The Java classes on that column are TeaVM's class library. cloudflare-wasm prints what wasm prints."
+			"note": "Downgraded from documented: the Kotlin String.uppercase page says one-to-many mappings are supported, and cloudflare-jvm prints one-to-one results on ten lines (upper-sharp-s is [df] where every other column prints [53, 53]). The mechanism is in the class library: TeaVM 0.15.0 (the version bytebox 1.0.3 pins) maps one UTF-16 unit at a time (TString.toUpperCaseChars, toLowerCaseChars), so sharp s, ligatures, final sigma and the dotted capital I get no special casing. That makes the column a build tool difference that contradicts the page read, which is why the probe stays unclassified. js-ir prints what the majority prints. cloudflare-wasm prints what wasm prints."
 		},
 		{
 			"id": "kotlin.char.whitespace-set",
@@ -352,11 +358,13 @@
 		},
 		{
 			"id": "kotlin.collections.iterator-modification",
-			"classification": "platform-defined",
+			"classification": "unclassified",
 			"basis": "verified",
 			"causes": [
-				"b"
+				"b",
+				"g"
 			],
+			"downgradedFrom": "platform-defined",
 			"references": [
 				{
 					"url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayList.html",
@@ -379,6 +387,8 @@
 					"summary": "AbstractMutableList.SubList: addAll(index, emptyList()) on a stale sub list throws CME on Native/Wasm, returns false on JVM"
 				}
 			],
+			"searched": "Pages read in full: JDK 21 ArrayList and Android ArrayList (the fail-fast sentence), Kotlin ArrayList and MutableList pages (no sentence on fail-fast or ConcurrentModificationException; only a thread-safety paragraph). No tracker was searched for the js-ir lines. The JDK and Android sentences describe those two classes; no page read covers Kotlin/JS.",
+			"repro": "atlas/repros/kotlin.collections.iterator-modification.md",
 			"columns": {
 				"2.4.20": [
 					[
@@ -424,15 +434,20 @@
 				{
 					"line": "list-remove-last",
 					"cause": "b",
-					"columns": "jvm family throw; others ok"
+					"columns": "jvm family throw; android, native, wasm family and js-ir finish"
 				},
 				{
 					"line": "list-remove-second",
 					"cause": "b",
-					"columns": "android throws; others ok"
+					"columns": "android throws; the others finish"
+				},
+				{
+					"line": "list-add, list-remove-first, sublist-after-add, sublist-size-after-add",
+					"cause": "g",
+					"columns": "js-ir finishes with a value on all four; every other column throws ConcurrentModificationException"
 				}
 			],
-			"note": "Two lines differ, not one: list-remove-last (JVM throws, others and Android finish) and list-remove-second (Android throws ConcurrentModificationException, JVM and Native finish). The probe notes mention only the first. KT-88775 and KT-89031 are other iterator and sub list cases, not these two lines. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android print."
+			"note": "Downgraded from platform-defined: the JDK and Android ArrayList pages call fail-fast behavior best effort, which covers the jvm family, android, Native and Wasm lines, but js-ir never throws on this probe (all six lines finish with a value) and no page read says Kotlin/JS does not check for modification. list-remove-last (JVM throws, others finish) and list-remove-second (Android throws, others finish) are the two lines the earlier note named. KT-88775 and KT-89031 are other iterator and sub list cases, not these lines. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android prints."
 		},
 		{
 			"id": "kotlin.collections.sorting",
@@ -506,11 +521,11 @@
 				},
 				{
 					"url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Throwable.html",
-					"quote": "Returns a short description of this throwable. The result is the concatenation of: the name of the class of this object"
+					"quote": "the name of the class of this object"
 				},
 				{
-					"url": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/list-of.html",
-					"quote": "Returns a new read-only list of given elements."
+					"url": "https://kotlinlang.org/docs/js-reflection.html",
+					"quote": "In Kotlin/JS, the value of a ::class expression is a stripped-down KClass implementation that supports only: simpleName and isInstance() members."
 				}
 			],
 			"issues": [
@@ -532,7 +547,7 @@
 					"summary": "Wasm: Throwable.toString uses simple class name"
 				}
 			],
-			"searched": "YouTrack (KT project, text search, first 8 results of each query read): \"KClass toString\", \"Result toString exception\", \"Throwable toString Native\". Pages read in full: Kotlin Exception typealias page, JDK 21 Throwable.toString, Kotlin listOf. No page or issue gives the string form of kclass-list (a platform class name).",
+			"searched": "YouTrack (KT project, text search, first 8 results of each query read): \"KClass toString\", \"Result toString exception\", \"Throwable toString Native\". Pages read in full: Kotlin Exception typealias page, JDK 21 Throwable.toString, Kotlin listOf, Kotlin/JS reflection guide. No page or issue gives the string form of kclass-list (a platform class name) or the TeaVM class names.",
 			"repro": "atlas/repros/kotlin.collections.tostring-forms.md",
 			"columns": {
 				"2.4.20": [
@@ -585,36 +600,54 @@
 				{
 					"line": "result-failure",
 					"cause": "a",
-					"columns": "jvm family java.lang.IllegalStateException, others kotlin.",
-					"issue": "KT-78708 Fixed (expects the fully qualified name)"
+					"columns": "jvm family, android and cloudflare-jvm java.lang.IllegalStateException, others kotlin.",
+					"issue": "typealias page and Throwable.toString quoted; KT-78708 Fixed (expects the fully qualified name)"
 				},
 				{
 					"line": "kclass-int",
 					"cause": "c",
-					"columns": "jvm family \"int (Kotlin reflection is not available)\"",
+					"columns": "jvm family, android and cloudflare-jvm \"int (Kotlin reflection is not available)\", others class kotlin.Int",
 					"issue": "KT-69456 Open (meta: KClass.toString differs by platform)"
 				},
 				{
 					"line": "kclass-list",
 					"cause": "g",
-					"columns": "jvm family SingletonList, others ArrayList",
+					"columns": "jvm family and android SingletonList, native and wasm family ArrayList, cloudflare-jvm empty",
 					"issue": "none found; listOf KDoc promises no runtime class"
+				},
+				{
+					"line": "kclass-qualified",
+					"cause": "g",
+					"columns": "cloudflare-jvm java.lang.String, others kotlin.String",
+					"issue": "none found; TeaVM class library, not traced"
+				},
+				{
+					"line": "whole probe",
+					"cause": "a",
+					"columns": "js-ir refuses to compile: this reflection API is not supported in Kotlin/JS",
+					"issue": "Kotlin/JS reflection guide quoted"
 				}
 			],
-			"note": "Four lines, three causes; the probe stays unclassified because kclass-list has none. cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on kclass-qualified, kclass-list."
+			"note": "Five lines, four causes; the probe stays unclassified because kclass-list and kclass-qualified have none documented. js-ir is its own group: the probe does not compile there (the Kotlin/JS reflection guide limits ::class to simpleName and isInstance), so no js-ir value is shown for any line. The JVM exception name is documented by the typealias page and Throwable.toString; the Native and Wasm names are not on any page read. cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on kclass-qualified and kclass-list."
 		},
 		{
 			"id": "kotlin.double.equality-order",
-			"classification": "unclassified",
-			"basis": "verified",
-			"causes": [],
-			"downgradedFrom": "documented",
+			"classification": "platform-defined",
+			"basis": "inferred",
+			"causes": [
+				"b"
+			],
 			"references": [
 				{
 					"url": "https://kotlinlang.org/docs/numbers.html",
-					"quote": "NaN is considered equal to itself"
+					"quote": "println(0.0 == -0.0) // true"
+				},
+				{
+					"url": "https://tc39.es/ecma262/#sec-numeric-types-number-tostring",
+					"quote": "If x is either +0 or -0, return \"0\"."
 				}
 			],
+			"searched": "Pages read in full: Kotlin floating-point numbers page, ECMAScript Number::toString. The Kotlin/JS source for Double.toString was not read, so that Kotlin/JS prints through the ECMAScript rule is inferred from the output. No tracker was searched for these lines.",
 			"columns": {
 				"2.4.20": [
 					[
@@ -639,15 +672,14 @@
 					]
 				]
 			},
-			"searched": "Not searched beyond the numbers page quoted above; no tracker was queried for the js-ir lines.",
-			"repro": "atlas/repros/kotlin.double.equality-order.md",
-			"note": "Downgraded from documented: js-ir prints the zero lines (minOf, maxOf, distinct) as 0 where every other column prints 0.0 or -0.0, and distinct still keeps two elements. The numbers page (read) says generic and Any typed comparison uses equals and compareTo, with -0.0 less than 0.0. Whether js-ir keeps the sign of -0.0 is not shown by these lines: it may be the JavaScript number printing, or the value. kotlin.string.hashcode prints hash 0 for -0.0 on js-ir where the others print -2147483648."
+			"note": "Only js-ir differs, on three lines: minOf(0.0, -0.0) and maxOf(0.0, -0.0) print 0 and listOf(0.0, -0.0).distinct() prints [0, 0], where every other column prints 0.0, -0.0 and [0.0, -0.0]. ECMAScript Number::toString returns \"0\" for both zeros, which accounts for all three lines by printing alone. The equality and ordering lines (nan==nan, 0.0==-0.0, equals, compareTo, sets, lists) agree on every column, js-ir included. Whether js-ir holds the sign of -0.0 is not measured: distinct keeps two elements, which under the numbers page contract means one of them is -0.0, but that is an inference from the transcript. kotlin.string.hashcode prints double-neg-0 = 0 on js-ir against -2147483648 elsewhere. Earlier this entry was documented, then unclassified; the printing rule is why it is platform-defined now, with the sign left open."
 		},
 		{
 			"id": "kotlin.double.extremes",
 			"classification": "unclassified",
 			"basis": "verified",
 			"causes": [
+				"b",
 				"c"
 			],
 			"references": [
@@ -702,13 +734,34 @@
 					]
 				]
 			},
-			"note": "Wasm family only. KT-88414 Fixed 2026-08-30; Wasm equals JVM on the 2.5.0-Beta1 transcript. No Kotlin page specifies the Double.toString format. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, ios, jvm, jvm-17 and 5 more print."
+			"lines": [
+				{
+					"line": "min-value, max-value, min-normal",
+					"cause": "b",
+					"columns": "wasm family and js-ir print the ECMAScript digits and exponent form (5e-324, 1.7976931348623157e+308); jvm family, android, native and cloudflare-jvm print the JDK form (4.9E-324, 1.7976931348623157E308)",
+					"issue": "JDK 21 Double.toString and ECMAScript Number::toString both read; KT-88036 Open"
+				},
+				{
+					"line": "neg-zero, underflow, 2^53+1",
+					"cause": "b",
+					"columns": "js-ir prints 0, 0 and 9007199254740992 (ECMAScript prints a zero without sign or fraction)",
+					"issue": "ECMAScript Number::toString"
+				},
+				{
+					"line": "2^53+1, underflow",
+					"cause": "c",
+					"columns": "wasm family prints 9007199254740992.0 and 0.0; no spec gives the .0 on a value that prints in plain form",
+					"issue": "KT-88414 Fixed; equal to the JVM on 2.5.0-Beta1"
+				}
+			],
+			"note": "Three groups, three mechanisms. JDK digits (4.9E-324, E308) and ECMAScript digits (5e-324, e+308) are each what their platform page describes, so min-value, max-value and min-normal split by platform; js-ir also prints neg-zero and underflow as 0 and 2^53+1 as 9007199254740992. The wasm family prints the ECMAScript digits with a Kotlin layout (9007199254740992.0, 0.0) that no spec explains: KT-88414 Fixed, equal to the JVM on the 2.5.0-Beta1 wasm transcript. KT-88036 (Open) says the K/JS Double.MIN_VALUE.toString rounds, where the JDK form would not; js-ir is unchanged on 2.5.0-Beta1 (measured with the standalone compiler). No Kotlin page specifies the Double.toString format. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, ios, jvm, jvm-17 and 5 more print."
 		},
 		{
 			"id": "kotlin.double.nan-bits",
 			"classification": "unclassified",
-			"basis": "inferred",
+			"basis": "verified",
 			"causes": [
+				"b",
 				"d",
 				"g"
 			],
@@ -724,6 +777,10 @@
 				{
 					"url": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/to-raw-bits.html",
 					"quote": "preserving NaN values exact layout"
+				},
+				{
+					"url": "https://tc39.es/ecma262/#sec-ecmascript-language-types-number-type",
+					"quote": "are represented in ECMAScript as a single special NaN value"
 				}
 			],
 			"issues": [
@@ -782,30 +839,38 @@
 				{
 					"line": "0/0-raw",
 					"cause": "d",
-					"columns": "x86 hosts fff8 (jvm-17, jvm-21, jvm-25, linux, linux-ubuntu, mingw-wine, 3 browsers); arm64 hosts 7ff8",
+					"columns": "x86 hosts fff8 (jvm-17, jvm-21, jvm-25, linux, 3 browsers); arm64 hosts 7ff8 (jvm, android, ios, macos, linux-arm64, wasm, js-ir)",
 					"issue": "JLS 4.2.3 and Wasm numerics quoted; KT-53258 In Progress"
 				},
 				{
 					"line": "sqrt-neg-raw",
-					"cause": "d",
-					"columns": "x86: jvm-17/21/25, linux, linux-ubuntu, mingw-wine fff8; 3 browsers 7ff8 although x86; arm64 7ff8",
-					"issue": "browsers are not explained by the CPU alone"
+					"cause": "b",
+					"columns": "x86: jvm-17/21/25 and linux fff8; 3 browsers 7ff8 although x86; arm64 7ff8",
+					"issue": "the Wasm spec leaves the NaN sign non-deterministic for every operator except fneg, fabs and fcopysign, which allows both"
 				},
 				{
 					"line": "neg-nan-raw",
 					"cause": "g",
-					"columns": "Native (macos, ios, linux x3, mingw-wine) 7ff8; jvm family, android, wasm, browsers fff8",
+					"columns": "native (macos, ios, linux, linux-arm64) 7ff8; jvm family, android, wasm family fff8",
 					"issue": "KT-53258 lists constant folding as a candidate; not confirmed for this line"
+				},
+				{
+					"line": "float-payload-raw",
+					"cause": "b",
+					"columns": "js-ir 7fc00001; every other column 7f800001",
+					"issue": "ECMAScript folds all NaN payloads into one value"
 				}
 			],
-			"note": "Three lines differ at 2.4.20. 0/0-raw follows the CPU in every column (x86 fff8..., arm64 7ff8...; the browsers on x86 print fff8 like x86 JVM and Linux, Node on arm64 prints 7ff8; checked for Wasm with a hand-assembled f64.div module on Node arm64 and Node x64). sqrt-neg-raw follows the CPU on JVM and Native but not in the three x86 browsers (7ff8). neg-nan-raw follows the Kotlin target: Native 7ff8 on every host, JVM, Android and Wasm fff8 on every host; no FULL doc explains it. The source is the constant expression -Double.NaN; whether the compiler folds it was not checked. The ladder fixtures show Native neg-nan-raw fff8 on 1.6.21 and 7ff8 from 1.9.25 on macos and linux. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, jvm, wasm print."
+			"note": "Four lines differ at 2.4.20. 0/0-raw follows the CPU in every column (x86 fff8..., arm64 7ff8...; the browsers on x86 print fff8 like x86 JVM and Linux, Node on arm64 prints 7ff8; checked for Wasm with a hand-assembled f64.div module on Node arm64 and Node x64). sqrt-neg-raw follows the CPU on JVM and Native but not in the three x86 browsers (7ff8), which the Wasm NaN rule allows. neg-nan-raw follows the Kotlin target: Native 7ff8 on every host, JVM, Android and Wasm fff8 on every host; no page explains it, and the Wasm fneg rule (a deterministic sign flip) gives fff8 as the JVM does. The source is the constant expression -Double.NaN; whether the compiler folds it was not checked. float-payload-raw differs only on js-ir (7fc00001), which ECMAScript's single NaN value allows. The ladder fixtures show Native neg-nan-raw fff8 on 1.6.21 and 7ff8 from 1.9.25 on macos and linux. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, jvm, wasm print."
 		},
 		{
 			"id": "kotlin.double.parse",
 			"classification": "unclassified",
 			"basis": "verified",
 			"causes": [
-				"c"
+				"b",
+				"c",
+				"g"
 			],
 			"references": [
 				{
@@ -819,9 +884,19 @@
 					"state": "Fixed",
 					"resolved": "2026-08-30",
 					"summary": "[Wasm] Make FP parse and toString alighed with JVM and Native targets"
+				},
+				{
+					"id": "KT-72509",
+					"state": "Open",
+					"summary": "K/JS: String.toFloat/toDouble accepts hexadecimal integers"
+				},
+				{
+					"id": "KT-72508",
+					"state": "Open",
+					"summary": "Document floating number formats supported by String.toFloat/toDouble"
 				}
 			],
-			"searched": "YouTrack: \"Wasm Double toString\". KT-88414 read in full (Fixed, states Wasm used a different parser). Kotlin toDoubleOrNull page read in full: it gives no grammar.",
+			"searched": "YouTrack: \"Wasm Double toString\", \"toDouble JS\", \"Float JS precision\". KT-88414, KT-72509 and KT-72508 read in full. Kotlin toDoubleOrNull page read in full: it gives no grammar. Source read: Kotlin/JS numberConversions.kt at v2.4.20, lines 117 to 119 (toDoubleOrNull is +(this.asDynamic()) with a NaN guard) and 163 to 166 (isNaN accepts nan, +nan, -nan).",
 			"repro": "atlas/repros/kotlin.double.parse.md",
 			"columns": {
 				"2.4.20": [
@@ -849,13 +924,46 @@
 					]
 				]
 			},
-			"note": "Wasm family returns null for 0x1p3, 1d, 1f. KT-88414 Fixed; equal on 2.5.0-Beta1. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, ios, jvm, jvm-17 and 5 more print."
+			"lines": [
+				{
+					"line": "0x1p3, 1d, 1f",
+					"cause": "c",
+					"columns": "wasm family null; js-ir null; others 8.0, 1.0, 1.0",
+					"issue": "wasm: KT-88414 Fixed, equal on 2.5.0-Beta1 (its text does not name these strings)"
+				},
+				{
+					"line": "0x1p3, 1d, 1f",
+					"cause": "b",
+					"columns": "js-ir null",
+					"issue": "the ECMAScript StringToNumber grammar has no hex float and no d or f suffix, so the NaN guard returns null"
+				},
+				{
+					"line": "0x10",
+					"cause": "c",
+					"columns": "js-ir 16; others null",
+					"issue": "KT-72509 Open"
+				},
+				{
+					"line": "nan",
+					"cause": "g",
+					"columns": "js-ir NaN; others null",
+					"issue": "numberConversions.kt isNaN keeps the NaN from +\"nan\"; no tracker item or page found"
+				},
+				{
+					"line": "float-above-max, float-1e39",
+					"cause": "c",
+					"columns": "js-ir 3.4028236e+38 and 1e+39; others Infinity",
+					"issue": "Float is not limited to single precision range on Kotlin/JS (KT-24975)"
+				}
+			],
+			"note": "Wasm family and js-ir both return null for 0x1p3, 1d and 1f, for different reasons. Wasm: KT-88414 Fixed (Kotlin/Wasm used its own parser); equal on 2.5.0-Beta1. js-ir: the parser is ECMAScript StringToNumber behind a NaN guard, which has no hex float and no d or f suffix; the same route accepts 0x10 (KT-72509 Open) and the guard keeps the string nan (no tracker item). js-ir also prints Float values outside the single precision range (float-above-max, float-1e39) and 1e-400 as 0. js-ir lines are unchanged on 2.5.0-Beta1 (measured with the standalone compiler). KT-72508 (Open) says the toDouble pages give no accepted formats, so no line is documented. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, ios, jvm, jvm-17 and 5 more print."
 		},
 		{
 			"id": "kotlin.double.shortest-digits",
 			"classification": "unclassified",
 			"basis": "verified",
 			"causes": [
+				"b",
 				"c",
 				"e"
 			],
@@ -924,24 +1032,44 @@
 			},
 			"lines": [
 				{
-					"line": "2e23, 1e23, 8.41e21, 5e-324, 1e16/3",
+					"line": "2e23, 1e23, 8.41e21",
 					"cause": "e",
-					"columns": "jvm-17, android"
+					"columns": "jvm-17, android",
+					"issue": "JDK 19 release note JDK-4511638"
 				},
 				{
-					"line": "same lines",
+					"line": "2e23, 1e23, 8.41e21, 5e-324, 1e16/3",
 					"cause": "c",
 					"columns": "wasm family",
 					"issue": "KT-88414 Fixed"
+				},
+				{
+					"line": "2e23, 1e23, 8.41e21, 5e-324, 1e16/3",
+					"cause": "b",
+					"columns": "js-ir prints the ECMAScript shortest digits (2e+23, 5e-324, 3333333333333333.5)",
+					"issue": "ECMAScript Number::toString; matched by output, the Kotlin/JS source was not read"
+				},
+				{
+					"line": "5e-324",
+					"cause": "b",
+					"columns": "jvm family, native and android print 4.9E-324",
+					"issue": "JDK 21 Double.toString lets a one digit result pick a two digit decimal (JDK 19 and later rule)"
+				},
+				{
+					"line": "0.1f",
+					"cause": "c",
+					"columns": "js-ir 0.1; others 0.10000000149011612",
+					"issue": "Kotlin/JS does not round Float to single precision (KT-24975)"
 				}
 			],
-			"note": "Two groups of cells differ from the majority: jvm-17 and android print the pre-JDK-19 digits (1.9999999999999998E23 for 2e23), explained by the JDK 19 release note JDK-4511638 (verified for jvm-17; Android matching the old algorithm is observed, the Android Double page read carries the old spec text); Wasm family prints 1.9999999999999998e+23 and plain form (KT-88414, Fixed, equal on 2.5.0-Beta1). Android is still the odd column on 2.5.0-Beta1. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what ios, jvm, jvm-21, jvm-25 and 3 more print."
+			"note": "Three groups differ from the majority. jvm-17 and android print the pre-JDK-19 digits (1.9999999999999998E23 for 2e23): the JDK 19 release note JDK-4511638 explains jvm-17 (verified), and Android matching the old algorithm is observed, the Android Double page read carries the old spec text. The wasm family prints 1.9999999999999998e+23 and plain forms (KT-88414 Fixed, equal on 2.5.0-Beta1). js-ir prints the ECMAScript shortest digits (2e+23, 1e+23) and 0.1f as 0.1 because a Float is a double there; its lines are unchanged on 2.5.0-Beta1 (measured with the standalone compiler). Android is still the odd column on 2.5.0-Beta1. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what ios, jvm, jvm-21, jvm-25 and 3 more print."
 		},
 		{
 			"id": "kotlin.double.tostring-boundaries",
 			"classification": "unclassified",
 			"basis": "verified",
 			"causes": [
+				"b",
 				"c"
 			],
 			"references": [
@@ -986,14 +1114,30 @@
 					]
 				]
 			},
-			"note": "Wasm family only; 7 lines; equal on 2.5.0-Beta1. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, ios, jvm, jvm-17 and 5 more print."
+			"lines": [
+				{
+					"line": "1e-4, 9.999e-4, 1e7, 12345678, 1e21, 1e22, 1e-7",
+					"cause": "c",
+					"columns": "wasm family",
+					"issue": "KT-88414 Fixed; equal on 2.5.0-Beta1"
+				},
+				{
+					"line": "the seven lines above, 9999999, 100",
+					"cause": "b",
+					"columns": "js-ir prints the ECMAScript Number string form (no trailing .0, e+ exponent from 1e21)",
+					"issue": "matched by output; the Kotlin/JS Double.toString source was not read"
+				}
+			],
+			"note": "Wasm family: seven lines differ (1e-4 as 0.0001, 1e7 as 10000000.0, 1e21 as 1e+21 and so on); KT-88414 Fixed, equal on 2.5.0-Beta1. js-ir: nine of the eleven lines differ (the seven above plus 9999999 and 100 without .0); the strings are what ECMAScript Number::toString produces, and they are unchanged on 2.5.0-Beta1 (measured with the standalone compiler). 1e-3 and 0.5 agree everywhere. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, ios, jvm, jvm-17 and 5 more print."
 		},
 		{
 			"id": "kotlin.exceptions.messages",
 			"classification": "unclassified",
 			"basis": "inferred",
 			"causes": [
+				"c",
 				"e",
+				"f",
 				"g"
 			],
 			"issues": [
@@ -1001,9 +1145,27 @@
 					"id": "KT-88829",
 					"state": "Open",
 					"summary": "Wasm: null cast to a non-null type parameter throws ClassCastException instead of NullPointerException"
+				},
+				{
+					"id": "KT-17719",
+					"state": "Fixed",
+					"resolved": "2026-07-30",
+					"summary": "JS: integer division by zero does not throw exception"
+				},
+				{
+					"id": "KT-30141",
+					"state": "Fixed",
+					"resolved": "2019-03-18",
+					"summary": "JS: document Array.get behavior"
+				},
+				{
+					"id": "teavm#1249",
+					"state": "Open",
+					"summary": "Wasm GC: integer division traps instead of following JLS section 15.17",
+					"url": "https://github.com/konsoletyper/teavm/issues/1249"
 				}
 			],
-			"searched": "YouTrack: \"exception message Native\", \"NumberFormatException message\", \"ArithmeticException message\", \"ClassCastException Wasm\", \"StringIndexOutOfBoundsException Native\", \"IndexOutOfBoundsException message differs\", \"string index out of bounds Wasm message\". JDK 18, 19, 20 and 21 release notes searched for StringIndexOutOfBounds, \"index out of bounds\" and Preconditions: no entry found (a negative result for that query only). Kotlin Throwable page read in full: it names no message text.",
+			"searched": "YouTrack: \"exception message Native\", \"NumberFormatException message\", \"ArithmeticException message\", \"ClassCastException Wasm\", \"StringIndexOutOfBoundsException Native\", \"IndexOutOfBoundsException message differs\", \"string index out of bounds Wasm message\", \"JS index out of bounds\". KT-17719 and KT-30141 read in full. JDK 18, 19, 20 and 21 release notes searched for StringIndexOutOfBounds, \"index out of bounds\" and Preconditions: no entry found (a negative result for that query only); openjdk StringLatin1.java at jdk-17-ga (throws StringIndexOutOfBoundsException(index), line 48) and jdk-21-ga (checkIndex, line 46) read. ECMAScript searched for a message text clause: none. Kotlin Throwable page read in full: it names no message text.",
 			"repro": "atlas/repros/kotlin.exceptions.messages.md",
 			"columns": {
 				"2.4.20": [
@@ -1054,14 +1216,65 @@
 					]
 				]
 			},
-			"note": "No page read gives message text, so no line has a documented expectation. Class differences: Native string-index, substring and substring-range throw ArrayIndexOutOfBoundsException(null); Wasm throws IndexOutOfBoundsException; null-cast is ClassCastException on Wasm and NullPointerException elsewhere (KT-88829 Open is the generic-cast sibling, not this exact line). jvm-17 differs from jvm-21 in string-index, substring (message text) and removeFirst-empty (harness artefact: compiled on JDK 21, run on 17); no JDK release note for 18, 19, 20, 21 mentions the message change (searched). Android prints ART texts (length=3; index=10). cloudflare-wasm prints what wasm prints; cloudflare-jvm records the probe as unavailable (refused, the compiled module traps on integer division and a trap aborts the request (RuntimeError: divide by zero))."
+			"lines": [
+				{
+					"line": "string-index, substring, substring-range",
+					"cause": "e",
+					"columns": "jvm-17 prints the JDK 17 texts (String index out of range: 10); jvm, jvm-21, jvm-25 print Index 10 out of bounds for length 3",
+					"issue": "openjdk StringLatin1.java at jdk-17-ga and jdk-21-ga; the substring path was not read"
+				},
+				{
+					"line": "removeFirst-empty",
+					"cause": "g",
+					"columns": "jvm-17 NoSuchMethodError",
+					"issue": "harness artefact: the probe is compiled against the JDK 21 API and run on JDK 17"
+				},
+				{
+					"line": "string-index, substring, substring-range",
+					"cause": "g",
+					"columns": "native ArrayIndexOutOfBoundsException with a null message; wasm IndexOutOfBoundsException",
+					"issue": "none found"
+				},
+				{
+					"line": "null-cast",
+					"cause": "g",
+					"columns": "wasm ClassCastException; every other column NullPointerException",
+					"issue": "KT-88829 Open is the generic cast sibling, not this line"
+				},
+				{
+					"line": "int-div-zero, int-mod-zero, floorDiv-zero",
+					"cause": "c",
+					"columns": "js-ir ok:0 (no exception); long-div-zero Exception: division by zero",
+					"issue": "KT-17719 Fixed, fix version 2.5.0-Beta1; the 2.5.0-Beta1 js-ir transcript still prints ok:0 for the three Int lines and changes only long-div-zero to ArithmeticException"
+				},
+				{
+					"line": "array-index, string-index, substring",
+					"cause": "a",
+					"columns": "js-ir returns null or no exception",
+					"issue": "KT-30141 (Array.get): the tracker says the behavior is not specified; it does not cover String indexing"
+				},
+				{
+					"line": "negative-array, cast, null-cast, not-null-assert",
+					"cause": "g",
+					"columns": "js-ir prints the JS engine texts",
+					"issue": "none found; ECMAScript has no message clause"
+				},
+				{
+					"line": "whole probe",
+					"cause": "f",
+					"columns": "cloudflare-jvm unavailable: the compiled module traps on integer division and the trap aborts the request",
+					"issue": "teavm#1249 Open (Int division traps instead of throwing ArithmeticException)"
+				}
+			],
+			"note": "No page read gives message text, so no line has a documented expectation. jvm-17 differs from jvm-21 in string-index, substring and substring-range (JDK source: 17 throws StringIndexOutOfBoundsException(index), 21 calls checkIndex); removeFirst-empty on jvm-17 is a harness artefact (compiled on JDK 21, run on 17), not a platform difference. Native throws ArrayIndexOutOfBoundsException(null) on three string lines; Wasm throws IndexOutOfBoundsException and a ClassCastException on null-cast (KT-88829 Open is the generic-cast sibling, not this line). js-ir does not throw on int-div-zero, int-mod-zero, floorDiv-zero, array-index, string-index and substring. KT-17719 is Fixed for 2.5.0-Beta1, but the 2.5.0-Beta1 js-ir transcript from the standalone compiler still prints ok:0 for the three Int lines; only long-div-zero changed, from Exception to ArithmeticException (/ by zero). Android prints ART texts (length=3; index=10). cloudflare-wasm prints what wasm prints; cloudflare-jvm records the probe as unavailable: the module built with TeaVM 0.15.0 (the version bytebox 1.0.3 pins) traps on integer division (RuntimeError: divide by zero), which teavm#1249 reports."
 		},
 		{
 			"id": "kotlin.exceptions.tostring-cause",
 			"classification": "unclassified",
 			"basis": "verified",
 			"causes": [
-				"a"
+				"a",
+				"g"
 			],
 			"downgradedFrom": "documented",
 			"references": [
@@ -1086,7 +1299,7 @@
 					"summary": "Wasm: Throwable.toString uses simple class name"
 				}
 			],
-			"searched": "Not searched beyond the pages quoted above: the cloudflare-jvm lines were compared with the quoted pages only, and no tracker (Kotlin, TeaVM or bytebox) was queried for them.",
+			"searched": "YouTrack: \"JS exception toString class name\" (a title-only hit is not cited; no item describes the output). KT-78708 read in full. Pages read in full: Kotlin Exception page, Kotlin Throwable.toString, JDK 21 Throwable.toString. No tracker (TeaVM or bytebox) was searched for the cloudflare-jvm failure.",
 			"repro": "atlas/repros/kotlin.exceptions.tostring-cause.md",
 			"columns": {
 				"2.4.20": [
@@ -1127,14 +1340,42 @@
 					]
 				]
 			},
-			"note": "Downgraded from documented: the pages read explain the java.lang versus kotlin prefix (typealiases on the JVM), but on cloudflare-jvm the probe fails as a whole with a NullPointerException and is recorded as unavailable, which no page read covers. The cause inside TeaVM's class library was not isolated. cloudflare-wasm prints what wasm prints."
+			"lines": [
+				{
+					"line": "java.lang names",
+					"cause": "a",
+					"columns": "jvm family and android print java.lang.Exception and so on",
+					"issue": "the Exception page declares a typealias to java.lang.Exception on the JVM only"
+				},
+				{
+					"line": "kotlin names",
+					"cause": "a",
+					"columns": "native and wasm family print kotlin.Exception and so on",
+					"issue": "KT-78708 Fixed (Wasm toString expects the fully qualified name)"
+				},
+				{
+					"line": "bare names, probe16$ form",
+					"cause": "g",
+					"columns": "js-ir prints Exception, IllegalStateException and probe16$ProbeException: m",
+					"issue": "Throwable.toString says fully qualified if possible, which reads for the bare names; the probe16$ form is on no page read"
+				},
+				{
+					"line": "whole probe",
+					"cause": "g",
+					"columns": "cloudflare-jvm unavailable: NullPointerException",
+					"issue": "none found"
+				}
+			],
+			"note": "Downgraded from documented: the pages read explain the java.lang versus kotlin prefix (a typealias on the JVM, own classes on Native and Wasm), but two groups are not explained. js-ir prints bare names (Exception, IllegalStateException) and the user class as probe16$ProbeException: m; the Throwable.toString text says the name is fully qualified if possible, which reads for the bare names but not for the probe16$ form. On cloudflare-jvm the probe fails as a whole with a NullPointerException and is recorded as unavailable; no page or tracker item read covers the TeaVM class library there. cloudflare-wasm prints what wasm prints."
 		},
 		{
 			"id": "kotlin.float.tostring",
 			"classification": "unclassified",
 			"basis": "verified",
 			"causes": [
-				"c"
+				"b",
+				"c",
+				"g"
 			],
 			"references": [
 				{
@@ -1148,9 +1389,14 @@
 					"state": "Fixed",
 					"resolved": "2026-08-30",
 					"summary": "[Wasm] Make FP parse and toString alighed with JVM and Native targets"
+				},
+				{
+					"id": "KT-21235",
+					"state": "Open",
+					"summary": "Double.toString() produces a different result on js and jvm platform"
 				}
 			],
-			"searched": "YouTrack: \"Wasm Double toString\". KT-88414 read in full (Fixed). Pages read in full: ECMAScript Number::toString, JDK 21 Double.toString.",
+			"searched": "YouTrack: \"Wasm Double toString\", \"Float toString js\" (30 hits read by title), \"Float JS single precision rounding\" (no Float precision issue among the hits). KT-88414 and KT-21235 read; the Float page (Common declaration) says Float is a single-precision 32-bit IEEE 754 number. Pages read in full: ECMAScript Number::toString, JDK 21 Double.toString.",
 			"repro": "atlas/repros/kotlin.float.tostring.md",
 			"columns": {
 				"2.4.20": [
@@ -1178,14 +1424,36 @@
 					]
 				]
 			},
-			"note": "Wasm family only; 6 lines; equal on 2.5.0-Beta1. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, ios, jvm, jvm-17 and 5 more print."
+			"lines": [
+				{
+					"line": "1e7, 1e10, 16777217, min, max, 1e-4",
+					"cause": "c",
+					"columns": "wasm family",
+					"issue": "KT-88414 Fixed; equal on 2.5.0-Beta1"
+				},
+				{
+					"line": "1e7, 1e10, 16777217, min, max, 1e-4, 9999999",
+					"cause": "b",
+					"columns": "js-ir prints the ECMAScript form (10000000, 1.4e-45)",
+					"issue": "KT-21235 Open (text form of Double on js and jvm)"
+				},
+				{
+					"line": "1/3, 0.1+0.2, widen-0.1, widen-sum",
+					"cause": "g",
+					"columns": "js-ir shows double precision (0.3333333333333333, 0.30000000000000004, 0.1)",
+					"issue": "no tracker item found for a Float value on Kotlin/JS; the Float page promises single precision"
+				}
+			],
+			"note": "Three columns of divergence. Wasm family: six lines print another text form (1e7 as 10000000.0, 1e-4 as 0.0001); KT-88414 Fixed, and the wasm group equals the JVM group on 2.5.0-Beta1. js-ir: eleven lines differ, seven only in text form (ECMAScript Number::toString: plain decimal for 1e7, lowercase e) and four in value (1/3 prints 0.3333333333333333 where the JVM prints 0.33333334; a Float carries double precision on Kotlin/JS, which contradicts the Float page); js-ir is unchanged on 2.5.0-Beta1 (measured with the standalone compiler). cloudflare-jvm matches the JVM group. cloudflare-wasm prints what wasm prints."
 		},
 		{
 			"id": "kotlin.int.division-modulo",
 			"classification": "unclassified",
 			"basis": "verified",
 			"causes": [
-				"a"
+				"b",
+				"c",
+				"f"
 			],
 			"downgradedFrom": "documented",
 			"references": [
@@ -1194,7 +1462,14 @@
 					"quote": "Division between integer values always returns an integer result."
 				}
 			],
-			"searched": "Not searched beyond the pages quoted above: the cloudflare-jvm lines were compared with the quoted pages only, and no tracker (Kotlin, TeaVM or bytebox) was queried for them.",
+			"issues": [
+				{
+					"id": "KT-21235",
+					"state": "Open",
+					"summary": "Double.toString() produces a different result on js and jvm platform"
+				}
+			],
+			"searched": "YouTrack: KT-21235 and KT-88035 read by summary and state. TeaVM issues searched through the GitHub API (\"remainder NaN\", \"floating-point remainder\", \"double remainder\"): no item. Pages read in full: JLS 21 section 15.17.3, Kotlin Double.rem, ECMAScript Number::remainder and Number::toString. The TeaVM code for the double remainder was not read.",
 			"repro": "atlas/repros/kotlin.int.division-modulo.md",
 			"columns": {
 				"2.4.20": [
@@ -1222,23 +1497,49 @@
 					]
 				]
 			},
-			"note": "Downgraded from documented: cloudflare-jvm prints 5.0 for 5%0.0 where every other column prints NaN. The numbers page read covers integer division only; no page read states the remainder of a Double by zero. cloudflare-wasm prints what wasm prints."
+			"lines": [
+				{
+					"line": "5%0.0",
+					"cause": "f",
+					"columns": "cloudflare-jvm prints 5.0; every other column prints NaN",
+					"issue": "JLS 15.17.3: a zero divisor gives NaN; Double.rem KDoc: result has absolute value less than the divisor; no TeaVM issue found"
+				},
+				{
+					"line": "-0.0%5, 5%inf",
+					"cause": "b",
+					"columns": "js-ir prints 0 and 5; the values are right",
+					"issue": "ECMAScript Number::toString prints a zero as 0 and integers without a fraction; KT-21235 Open"
+				}
+			],
+			"note": "Downgraded from documented: cloudflare-jvm prints 5.0 for 5%0.0 where every other column prints NaN. The JLS (15.17.3) gives NaN for a zero divisor and the Kotlin Double.rem page says the result is less than the divisor in absolute value, so the TeaVM result breaks both; no TeaVM issue was found and the TeaVM code was not read. js-ir differs only in text: -0.0%5 prints 0 and 5%inf prints 5 (KT-21235 Open is the js and jvm Double.toString difference). The integer lines agree on every column. cloudflare-wasm prints what wasm prints."
 		},
 		{
 			"id": "kotlin.int.overflow",
 			"classification": "unclassified",
 			"basis": "verified",
 			"causes": [
-				"a"
+				"f"
 			],
 			"downgradedFrom": "documented",
 			"references": [
 				{
 					"url": "https://kotlinlang.org/docs/numbers.html",
 					"quote": "If the result of an operation falls outside that range, overflow occurs."
+				},
+				{
+					"url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-15.html#jls-15.17.2",
+					"quote": "Despite the overflow, no exception is thrown in this case."
 				}
 			],
-			"searched": "Not searched beyond the pages quoted above: the cloudflare-jvm lines were compared with the quoted pages only, and no tracker (Kotlin, TeaVM or bytebox) was queried for them.",
+			"issues": [
+				{
+					"id": "teavm#1249",
+					"state": "Open",
+					"summary": "Wasm GC: integer division traps instead of following JLS section 15.17",
+					"url": "https://github.com/konsoletyper/teavm/issues/1249"
+				}
+			],
+			"searched": "TeaVM issue 1249 read in full through the GitHub API (it names the divide result unrepresentable trap for Integer.MIN_VALUE / -1). Pages read in full: JLS 21 section 15.17.2, WebAssembly numerics (idiv_s is partial). The TeaVM code generator for integer division was not read.",
 			"repro": "atlas/repros/kotlin.int.overflow.md",
 			"columns": {
 				"2.4.20": [
@@ -1264,7 +1565,7 @@
 					]
 				]
 			},
-			"note": "Downgraded from documented: cloudflare-jvm records the probe as unavailable. The compiled module traps on the integer division by -1 (RuntimeError: divide result unrepresentable) and a trap aborts the request, so the probe is skipped, not run. Every other column is identical and matches the numbers page, which says nothing about a trap. cloudflare-wasm prints what wasm prints."
+			"note": "Downgraded from documented: cloudflare-jvm records the probe as unavailable. The compiled module traps on the integer division by -1 (RuntimeError: divide result unrepresentable) and a trap aborts the request, so the probe is skipped, not run. teavm#1249 (Open) describes the same trap: Integer.MIN_VALUE / -1 gives no result where JLS 15.17.2 says the result is the dividend with no exception. Every other column is identical and matches the numbers page, which says nothing about a trap. js-ir matches the majority on every line. cloudflare-wasm prints what wasm prints."
 		},
 		{
 			"id": "kotlin.int.radix",
@@ -1302,6 +1603,7 @@
 			"basis": "verified",
 			"causes": [
 				"a",
+				"b",
 				"c",
 				"d"
 			],
@@ -1389,35 +1691,43 @@
 					"line": "1^nan",
 					"cause": "c",
 					"columns": "native family 1.0, android 1.0, others NaN",
-					"issue": "KT-89072 Open (Native); Android: Android Math.pow doc"
+					"issue": "KT-89072 Open (Native; still 1.0 on 2.5.0-Beta1); Android: Android Math.pow doc"
 				},
 				{
 					"line": "1^inf, -1^inf",
 					"cause": "a",
 					"columns": "android 1.0, others NaN",
-					"issue": "Android Math.pow doc quoted"
+					"issue": "Android Math.pow doc quoted; it differs from the Kotlin pow KDoc"
 				},
 				{
 					"line": "2^-1074",
 					"cause": "c",
 					"columns": "wasm family 5e-324",
-					"issue": "KT-88414 Fixed"
+					"issue": "KT-88414 Fixed; equal on 2.5.0-Beta1"
 				},
 				{
 					"line": "10^-5 bits",
 					"cause": "d",
 					"columns": "jvm (arm64), jvm-21-arm64, wasm family end f0; others f1",
-					"issue": "JDK Math allows 1 ulp; jvm-21 x86 vs jvm-21-arm64 differ on the same JDK"
+					"issue": "JDK 21 Math allows a 1 ulp difference and says the functions need not return the same bits; jvm-21 x86 versus jvm-21-arm64 differ on the same JDK"
+				},
+				{
+					"line": "nan^0, 2^-1075, 2^-1074, inf^-1 and similar",
+					"cause": "b",
+					"columns": "js-ir prints the ECMAScript form (1, 0, 5e-324)",
+					"issue": "ECMAScript Number::toString; the values match the majority"
 				}
 			],
-			"note": "Downgraded from documented: the Kotlin KDoc states b.pow(NaN) is NaN, so Native violates a documented contract (open defect, not a documented difference). The Android column is also off the Kotlin contract, but its own Math.pow page documents the 1.0 results (verified). cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what jvm-17, jvm-21, jvm-25 print."
+			"note": "Downgraded from documented: the Kotlin KDoc states b.pow(NaN) is NaN, so Native violates a documented contract (open defect, KT-89072, not a documented difference). The Android column is also off the Kotlin contract, but its own Math.pow page documents the 1.0 results (verified). The 10^-5 bits line follows the CPU on one JDK and is inside the 1 ulp the JDK page allows. js-ir differs only in text form. The wasm 2^-1074 line is KT-88414 (Fixed, equal on 2.5.0-Beta1). cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what jvm-17, jvm-21, jvm-25 print."
 		},
 		{
 			"id": "kotlin.math.rounding",
 			"classification": "unclassified",
 			"basis": "verified",
 			"causes": [
-				"c"
+				"b",
+				"c",
+				"f"
 			],
 			"downgradedFrom": "documented",
 			"references": [
@@ -1431,9 +1741,16 @@
 					"id": "KT-89074",
 					"state": "Open",
 					"summary": "Kotlin/Native and Kotlin/Wasm: roundToInt, roundToLong do not follow contract"
+				},
+				{
+					"id": "teavm#1263",
+					"state": "Closed",
+					"resolved": "2026-10-04",
+					"summary": "classlib: Math.round differs from the JVM for ties, NaN and out-of-range values",
+					"url": "https://github.com/konsoletyper/teavm/issues/1263"
 				}
 			],
-			"searched": "YouTrack: \"roundToInt Native\". KT-89074 read in full (Open). Kotlin roundToInt KDoc read in full: the inputs are not ties and the results violate \"nearest integer\".",
+			"searched": "YouTrack: \"roundToInt Native\". KT-89074 read in full (Open). Kotlin roundToInt KDoc read in full: the inputs are not ties and the results violate \"nearest integer\". teavm#1263 read in full through the GitHub API. Source read: TeaVM 0.15.0 (the version bytebox 1.0.3 pins) TMath.java: rint(a) is round(a) (line 118), round(float) is (int) (a + signum(a) * 0.5f) (line 127) and round(double) is (long) (a + signum(a) * 0.5) (line 131).",
 			"repro": "atlas/repros/kotlin.math.rounding.md",
 			"columns": {
 				"2.4.20": [
@@ -1476,7 +1793,27 @@
 					]
 				]
 			},
-			"note": "Downgraded from documented: the KDoc says \"nearest integer\" and the inputs are not ties, so Native and Wasm results (1, 4503599627370498, 8388610) violate it. KT-89074 Open. Unchanged on 2.5.0-Beta1. cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on 0.5, 2.5, -0.5, -1.5, -2.5, 0.49999999999999994, 4503599627370497, float-neg-2.5."
+			"lines": [
+				{
+					"line": "roundToInt(0.49999999999999994), roundToLong(4503599627370497.0), roundToInt(8388609f)",
+					"cause": "c",
+					"columns": "native and wasm family print 1, 4503599627370498, 8388610",
+					"issue": "KT-89074 Open; unchanged on 2.5.0-Beta1"
+				},
+				{
+					"line": "round(0.5), round(2.5), round(-0.5), round(0.49999999999999994), round(4503599627370497.0), roundToInt, roundToLong",
+					"cause": "f",
+					"columns": "cloudflare-jvm rounds ties away from zero and shifts integer inputs",
+					"issue": "teavm#1263 closed 2026-10-04, after TeaVM 0.15.0; the measured build has the old formula"
+				},
+				{
+					"line": "round=0 and similar",
+					"cause": "b",
+					"columns": "js-ir prints 0 where the others print 0.0; the values match",
+					"issue": "ECMAScript Number::toString"
+				}
+			],
+			"note": "Downgraded from documented: the KDoc says \"nearest integer\" and the inputs are not ties, so the Native and Wasm results (1, 4503599627370498, 8388610) violate it (KT-89074 Open, unchanged on 2.5.0-Beta1). cloudflare-jvm differs on the round lines and the roundToInt and roundToLong lines (0.5, 2.5, -0.5, -1.5, -2.5, 0.49999999999999994, 4503599627370497, float-neg-2.5): TeaVM 0.15.0 (the version bytebox 1.0.3 pins) implements rint as round and round as the signum formula above, which rounds ties away from zero, and adding 0.5 in float or double precision moves the large integer inputs. teavm#1263 describes the round formula and was closed on 2026-10-04, after that release, so its fix is not in the measured build. js-ir differs only in text (round=0 against 0.0). cloudflare-wasm prints what wasm prints."
 		},
 		{
 			"id": "kotlin.math.transcendental-bits",
@@ -1485,7 +1822,8 @@
 			"causes": [
 				"b",
 				"d",
-				"f"
+				"f",
+				"g"
 			],
 			"downgradedFrom": "platform-defined",
 			"references": [
@@ -1502,7 +1840,7 @@
 					"quote": "Return an implementation-approximated Number value representing the inverse cosine"
 				}
 			],
-			"searched": "Not searched beyond the pages quoted above: the cloudflare-jvm lines were compared with the quoted pages only, and no tracker (Kotlin, TeaVM or bytebox) was queried for them.",
+			"searched": "YouTrack: \"project: KT log2\" and \"summary: expm1\" returned no item; \"Math\" returned two items that were not read in full and are not cited. Pages read in full: JDK 21 Math (the bit-for-bit sentence and the log10, expm1 and log1p sections), ECMAScript Math functions. Source read: Kotlin v2.4.20 MathJVM.kt line 392 (log2(x) is nativeMath.log(x) / LN2) and TeaVM 0.15.0 (the version bytebox 1.0.3 pins) TMath.java (log10 line 81, expm1 line 605, log1p line 609). Kotlin/Native libm and glibc were not read.",
 			"repro": "atlas/repros/kotlin.math.transcendental-bits.md",
 			"columns": {
 				"2.4.20": [
@@ -1555,7 +1893,39 @@
 					]
 				]
 			},
-			"note": "Downgraded from platform-defined: the Math pages read allow results to differ in the last bit, and cloudflare-jvm differs by far more on expm1-tiny (3ddb7ce000000000 against 3ddb7cdfd9dda4e3, about 6e8 ulps) and ln1p-tiny (3ddb7cdffffa18d8 against 3ddb7cdfd9d1d693); log10-1000 is one ulp below 3 (4007ffffffffffff). No page read allows the first two. cloudflare-wasm prints what wasm prints."
+			"lines": [
+				{
+					"line": "log2-10",
+					"cause": "b",
+					"columns": "jvm family, android, cloudflare-jvm 400a934f0979a372; native, wasm family, js-ir 400a934f0979a371",
+					"issue": "Kotlin/JVM log2 is log(x) / LN2; the common KDoc states no accuracy bound; both values are within 1 ulp"
+				},
+				{
+					"line": "tan1, asin-half, acos-half, cosh1, cbrt2, exp1",
+					"cause": "b",
+					"columns": "jvm, native, js-ir differ by 1 ulp",
+					"issue": "JDK Math: not defined to return the same bits; ECMAScript: implementation-approximated"
+				},
+				{
+					"line": "cbrt27",
+					"cause": "g",
+					"columns": "linux and linux-arm64 4008000000000001; others 4008000000000000",
+					"issue": "none found; within 1 ulp"
+				},
+				{
+					"line": "log10-1000",
+					"cause": "f",
+					"columns": "cloudflare-jvm 4007ffffffffffff; others 4008000000000000",
+					"issue": "TeaVM 0.15.0 log10 is log(a) / 2.302585092994046; JDK Math.log10 gives n for 10 to the n"
+				},
+				{
+					"line": "expm1-tiny, ln1p-tiny",
+					"cause": "f",
+					"columns": "cloudflare-jvm about 6e8 ulps off",
+					"issue": "TeaVM 0.15.0 expm1 is exp(x) - 1 and log1p is log(x + 1); the JDK pages say within 1 ulp"
+				}
+			],
+			"note": "Downgraded from platform-defined: the Math pages read allow results to differ in the last bit, which covers the JVM, Native, wasm and js-ir lines (JDK: not defined to return the same bits; ECMAScript: implementation-approximated), but cloudflare-jvm differs by far more on expm1-tiny (3ddb7ce000000000 against 3ddb7cdfd9dda4e3, about 6e8 ulps) and ln1p-tiny (3ddb7cdffffa18d8 against 3ddb7cdfd9d1d693), and log10-1000 is one ulp below 3 (4007ffffffffffff). TeaVM 0.15.0 (the version bytebox 1.0.3 pins) computes expm1 as exp(x) - 1, log1p as log(x + 1) and log10 as log(a) / 2.302585092994046, which explains the three lines and breaks the JDK bounds. js-ir is its own group on exp1, cosh1 and log2-10. The Native cbrt27 line has no explanation. cloudflare-wasm prints what wasm prints."
 		},
 		{
 			"id": "kotlin.numbers.float-conversions",
@@ -1563,7 +1933,8 @@
 			"basis": "verified",
 			"causes": [
 				"c",
-				"e"
+				"e",
+				"g"
 			],
 			"downgradedFrom": "documented",
 			"references": [
@@ -1582,6 +1953,11 @@
 					"state": "Fixed",
 					"resolved": "2026-08-30",
 					"summary": "[Wasm] Make FP parse and toString alighed with JVM and Native targets"
+				},
+				{
+					"id": "KT-24975",
+					"state": "Backlog",
+					"summary": "Enforce range of Float type in JS"
 				}
 			],
 			"searched": "YouTrack: \"ULong toDouble Native\", \"ULong.MAX_VALUE toDouble\", \"toDouble ULong\", \"ULong Double conversion rounding\", \"unsigned toDouble\", \"ULong toDouble Native precision\", \"UInt toFloat rounding\", \"ULong toFloat\"; GitHub commit search in JetBrains/kotlin, three phrasings, 0 results. Kotlin ULong.toDouble KDoc and JDK 19 release note read in full. No issue or commit explains the Native fix between 2.4.20 and 2.5.0-Beta1.",
@@ -1625,7 +2001,7 @@
 				},
 				{
 					"line": "ulong-max-double",
-					"cause": "c",
+					"cause": "g",
 					"columns": "native family 1.844674407370955E19",
 					"issue": "no issue found; fixed on 2.5.0-Beta1 (measured)"
 				},
@@ -1634,16 +2010,32 @@
 					"cause": "e",
 					"columns": "jvm-17",
 					"issue": "JDK-4511638, release 19"
+				},
+				{
+					"line": "long-max-double, long-max-float, int-max-float, 1e40-float, 1e-50-float",
+					"cause": "c",
+					"columns": "js-ir prints 9223372036854776000, 2147483647, 1e+40 and 1e-50 (JVM prints Infinity for 1e40-float and 0.0 for 1e-50-float)",
+					"issue": "KT-24975 Backlog: Float is a synonym for Double on JS and has the same domain"
 				}
 			],
-			"note": "Downgraded from documented: the ULong.toDouble KDoc says \"closest Double\", Native 2.4.20 printed 1.844674407370955E19 (not the closest double to 2^64-1) and prints 1.8446744073709552E19 on 2.5.0-Beta1; no YouTrack issue and no GitHub commit found for that fix (queries listed). Wasm lines: KT-88414. jvm-17 int-max-float 2.14748365E9 versus 2.1474836E9: JDK 19 note (Float.toString too). cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, jvm, jvm-21, jvm-25 print."
+			"note": "Downgraded from documented: the ULong.toDouble KDoc says \"closest Double\", Native 2.4.20 printed 1.844674407370955E19 (not the closest double to 2^64-1) and prints 1.8446744073709552E19 on 2.5.0-Beta1; no YouTrack issue and no GitHub commit found for that fix (queries listed). Wasm lines: KT-88414. jvm-17 int-max-float 2.14748365E9 versus 2.1474836E9: JDK 19 note (Float.toString too). js-ir keeps Float at double range and precision (1e40-float prints 1e+40, 1e-50-float prints 1e-50) and prints the large values without .0, as KT-24975 (Backlog) describes for Float on JS; js-ir is unchanged on 2.5.0-Beta1. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, jvm, jvm-21, jvm-25 print."
 		},
 		{
 			"id": "kotlin.numbers.type-checks",
 			"classification": "unclassified",
 			"basis": "inferred",
-			"causes": [],
-			"searched": "Not searched: the only column that differs is cloudflare-jvm, and no page or tracker issue was read for it.",
+			"causes": [
+				"c",
+				"g"
+			],
+			"issues": [
+				{
+					"id": "KT-24975",
+					"state": "Backlog",
+					"summary": "Enforce range of Float type in JS"
+				}
+			],
+			"searched": "YouTrack: KT-24975 read in full. Pages read in full: the Kotlin numbers page (no statement on Int versus Double at runtime on JS). Source read: Kotlin v2.4.20 ClassReference.kt (simpleNameOf maps java.lang.Integer to Int, line 202; getClassSimpleName line 268). The TeaVM class name path for a boxed Integer was not read.",
 			"repro": "atlas/repros/kotlin.numbers.type-checks.md",
 			"columns": {
 				"2.4.20": [
@@ -1671,7 +2063,27 @@
 					]
 				]
 			},
-			"note": "cloudflare-jvm prints Integer for the runtime class name of 1 (1-class) where every other column prints Int. No page was read for this line. cloudflare-wasm prints what wasm prints."
+			"lines": [
+				{
+					"line": "1-class",
+					"cause": "g",
+					"columns": "cloudflare-jvm Integer; every other column Int",
+					"issue": "the stdlib maps java.lang.Integer to Int; why TeaVM reports Integer was not traced"
+				},
+				{
+					"line": "1.5f-is-Double, 1.5f-class",
+					"cause": "c",
+					"columns": "js-ir true and Double; others false and Float",
+					"issue": "KT-24975 Backlog: Float is a synonym for Double on JS"
+				},
+				{
+					"line": "1.0-is-Int, 1-is-Double, 1==1.0, 1.0-as?-Int, 1.0-toString, 1.0-hash, 1.0-class",
+					"cause": "g",
+					"columns": "js-ir treats a whole number Double as an Int (true, true, true, 1, 1, 1, Int)",
+					"issue": "no page read states it; consistent with JS numbers carrying no type"
+				}
+			],
+			"note": "Two columns differ. cloudflare-jvm prints Integer for the runtime class name of 1 (1-class) where every other column prints Int; the stdlib source maps java.lang.Integer to Int, so the TeaVM name is a deviation whose path was not traced. js-ir differs on eleven lines: a whole number Double reports as Int (1.0-is-Int true, 1==1.0 true, 1.0-as?-Int prints 1, 1.0-toString prints 1, 1.0-hash prints 1, 1.0-class Int), 1-is-Double is true, and a Float reports as Double (KT-24975, Backlog, says Float is a synonym for Double on JS). The Int and Double lines have no source read; they are consistent with JS numbers being untyped. js-ir is unchanged on 2.5.0-Beta1. cloudflare-wasm prints what wasm prints."
 		},
 		{
 			"id": "kotlin.random.seeded",
@@ -1690,11 +2102,30 @@
 		},
 		{
 			"id": "kotlin.regex.anchors-lines",
-			"classification": "unclassified",
-			"basis": "inferred",
-			"causes": [],
-			"searched": "Not searched: the only column that differs is cloudflare-jvm, and no page or tracker issue was read for it.",
-			"repro": "atlas/repros/kotlin.regex.anchors-lines.md",
+			"classification": "platform-defined",
+			"basis": "verified",
+			"causes": [
+				"b",
+				"f"
+			],
+			"references": [
+				{
+					"url": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/",
+					"quote": "Note that the pattern syntax and the option set has differences on each platform."
+				},
+				{
+					"url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/regex/Pattern.html",
+					"quote": "but also matches just before the last line terminator if this is not followed by any other input character"
+				}
+			],
+			"issues": [
+				{
+					"id": "KT-82450",
+					"state": "Submitted",
+					"summary": "K/JS: The behavior of `Regex.matchEntire` and `Regex.matches` on the JS platform does not meet expectations and differs from other platforms"
+				}
+			],
+			"searched": "Pages read in full: Kotlin Regex page (pattern syntax and options differ on each platform), JDK 21 Pattern (line terminators, ^ and $), ECMAScript assertions ^ and $ and LineTerminator. KT-82450 read in full. Source read: TeaVM 0.15.0 (the version bytebox 1.0.3 pins) TMatcher.java declares useAnchoringBounds(boolean) at line 560. The Kotlin Regex.matchAt source was not read.",
 			"columns": {
 				"2.4.20": [
 					[
@@ -1721,14 +2152,42 @@
 					]
 				]
 			},
-			"note": "cloudflare-jvm records the probe as unavailable: the build refuses java.util.regex.Matcher.useAnchoringBounds, which Regex.matchAt calls, so the matchAt lines are replaced by a thrown UnsupportedOperationException in the Worker's copy of the source and the whole probe fails. Every other column is identical. No page or tracker issue was read for it. cloudflare-wasm prints what wasm prints."
+			"lines": [
+				{
+					"line": "dollar-before-lf, dollar-before-crlf, dollar-before-cr, dollar-before-nel, dollar-count-plain",
+					"cause": "b",
+					"columns": "js-ir false and 1; every other column that ran true and 2",
+					"issue": "Java $ also matches before a final line terminator; ECMAScript $ matches only at the end of input without the m flag"
+				},
+				{
+					"line": "caret-count-multiline",
+					"cause": "b",
+					"columns": "js-ir 3; every other column that ran 2",
+					"issue": "Java ^ does not match after a final line terminator; ECMAScript ^ with m does"
+				},
+				{
+					"line": "nel-multiline",
+					"cause": "b",
+					"columns": "js-ir 0; every other column that ran 1",
+					"issue": "Java counts U+0085 as a line terminator; ECMAScript LineTerminator is LF, CR, LS, PS"
+				},
+				{
+					"line": "whole probe",
+					"cause": "f",
+					"columns": "cloudflare-jvm unavailable",
+					"issue": "the build refuses Matcher.useAnchoringBounds, but TeaVM 0.15.0 TMatcher declares it, so the stated cause is not confirmed"
+				}
+			],
+			"note": "js-ir differs from every other column on seven lines: the four dollar-before lines, dollar-count-plain, caret-count-multiline and nel-multiline. Java Pattern and ECMAScript define $, ^ and the line terminator set differently (Java: $ also matches before a final line terminator, U+0085 is a terminator; ECMAScript: $ matches at the end of input only without m, ^ with m matches after a final terminator, no U+0085), and the Kotlin Regex page says the syntax differs on each platform. KT-82450 (Submitted) reports the same class of difference on JS. cloudflare-jvm records the probe as unavailable: the build replaces the matchAt lines with a thrown UnsupportedOperationException because Matcher.useAnchoringBounds is reported missing from the class library, yet TeaVM 0.15.0 (the version bytebox 1.0.3 pins) TMatcher declares it, so the cause of the refusal is not confirmed. The probe is unchanged on js-ir at 2.5.0-Beta1. cloudflare-wasm prints what wasm prints."
 		},
 		{
 			"id": "kotlin.regex.groups-replace",
 			"classification": "unclassified",
 			"basis": "verified",
 			"causes": [
-				"a"
+				"a",
+				"b",
+				"g"
 			],
 			"downgradedFrom": "documented",
 			"references": [
@@ -1737,7 +2196,7 @@
 					"quote": "Occurrences of ${name} or $index in the replacement string will be substituted"
 				}
 			],
-			"searched": "Not searched beyond the pages quoted above: the cloudflare-jvm lines were compared with the quoted pages only, and no tracker (Kotlin, TeaVM or bytebox) was queried for them.",
+			"searched": "Pages read in full: Kotlin Regex.replace (dollar-index and dollar-brace-name only), JDK 21 Pattern (no statement on what a repeated group captures), ECMAScript RepeatMatcher (captures inside a quantified group are reset on each iteration). No tracker was searched for regex group capture on JS or TeaVM. The TeaVM TPattern capture handling was not traced.",
 			"repro": "atlas/repros/kotlin.regex.groups-replace.md",
 			"columns": {
 				"2.4.20": [
@@ -1763,7 +2222,21 @@
 					]
 				]
 			},
-			"note": "Downgraded from documented: cloudflare-jvm prints [ab, ] and null for the group of a repeated alternation where every other column prints [ab, a] and a. The replace page read covers dollar-index and dollar-brace-name references only; no page read states what a repeated group captures. cloudflare-wasm prints what wasm prints."
+			"lines": [
+				{
+					"line": "group-in-repeat, group-in-repeat-null",
+					"cause": "b",
+					"columns": "js-ir [ab, ] and null; jvm family, android, native, wasm family [ab, a] and a",
+					"issue": "ECMAScript RepeatMatcher resets the captures of a quantified group on each iteration"
+				},
+				{
+					"line": "group-in-repeat, group-in-repeat-null",
+					"cause": "g",
+					"columns": "cloudflare-jvm [ab, ] and null (same as js-ir)",
+					"issue": "none found; the JVM result is observed, the Java page says nothing about repeated groups"
+				}
+			],
+			"note": "Downgraded from documented: js-ir and cloudflare-jvm print [ab, ] and null for the group of a repeated alternation where every other column prints [ab, a] and a. For js-ir the ECMAScript matcher explains it (the capture is reset when the group repeats). No page read explains the cloudflare-jvm result or says what the JVM behavior is for a repeated group. The replace page read covers dollar-index and dollar-brace-name references only. js-ir is unchanged on 2.5.0-Beta1. cloudflare-wasm prints what wasm prints."
 		},
 		{
 			"id": "kotlin.regex.syntax-support",
@@ -1845,6 +2318,7 @@
 			"basis": "inferred",
 			"causes": [
 				"a",
+				"b",
 				"e",
 				"g"
 			],
@@ -1934,39 +2408,69 @@
 			},
 			"lines": [
 				{
-					"line": "digit-arabic, digit-fullwidth, word-accent, word-greek, space-nbsp, space-em, space-nel, ic-sharp-s",
+					"line": "digit-arabic, digit-fullwidth, word-accent, word-greek, space-nel, ic-sharp-s",
 					"cause": "a",
-					"columns": "android true, others false"
+					"columns": "android true, others false",
+					"issue": "Android Pattern: Unicode character classes are always used"
+				},
+				{
+					"line": "space-nbsp, space-em",
+					"cause": "a",
+					"columns": "android true; js-ir true; others false",
+					"issue": "android: Pattern page; js-ir: ECMAScript WhiteSpace includes any Zs code point (cause b)"
 				},
 				{
 					"line": "boundary-accent",
 					"cause": "e",
-					"columns": "jvm-21, jvm-25, jvm true; jvm-17, native, wasm, android false"
+					"columns": "jvm, jvm-21, jvm-25, js-ir and cloudflare-jvm true; jvm-17, native, wasm family and android false",
+					"issue": "JDK 19 release note on \\b; js-ir: ECMAScript word characters are ASCII; cloudflare-jvm not read"
 				},
 				{
-					"line": "ic-final-sigma, ic-deseret",
+					"line": "dot-nel",
+					"cause": "b",
+					"columns": "js-ir true; every other column false",
+					"issue": "ECMAScript LineTerminator has no U+0085; the . production was not printed (unverified)"
+				},
+				{
+					"line": "ic-final-sigma",
 					"cause": "g",
-					"columns": "native family and wasm family false; jvm family and android true"
+					"columns": "native and wasm family false; jvm family, android, cloudflare-jvm and js-ir true",
+					"issue": "none found"
+				},
+				{
+					"line": "ic-deseret",
+					"cause": "g",
+					"columns": "native, wasm family and cloudflare-jvm false; jvm family, android and js-ir true",
+					"issue": "none found"
 				},
 				{
 					"line": "ic-dotless-i",
 					"cause": "g",
-					"columns": "native, wasm and android false; jvm family true"
+					"columns": "jvm family true; native, wasm family, android, cloudflare-jvm and js-ir false",
+					"issue": "Kotlin String.equals (upper then lower) and simple case folding disagree; KT-53212 As Designed keeps the JVM result"
 				},
 				{
 					"line": "ic-dotted-i",
 					"cause": "g",
-					"columns": "android false; all others true"
+					"columns": "android, cloudflare-jvm and js-ir false; jvm family, native and wasm family true",
+					"issue": "same conflict as ic-dotless-i"
+				},
+				{
+					"line": "ic-kelvin, letter-deseret, upper-deseret",
+					"cause": "g",
+					"columns": "cloudflare-jvm false, PatternSyntaxException, PatternSyntaxException; every other column true",
+					"issue": "none found; TeaVM regex not read"
 				}
 			],
-			"note": "Three groups of lines. Android: Unicode classes always on (documented). jvm-17 versus jvm-21 and jvm-25 on boundary-accent: JDK 19 note on \\b (consistent with the note; Native, Wasm and Android match JDK 17). Native and Wasm versus JVM on ic-final-sigma, ic-dotless-i, ic-deseret: unexplained. KT-51859 says UNICODE_CASE is always on in Native, which does not predict these three lines. cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on letter-deseret, upper-deseret, ic-kelvin."
+			"note": "Four groups of lines. Android: Unicode classes always on (documented). js-ir: ECMAScript \\d, \\w and \\b are ASCII, \\s covers every Zs code point (space-nbsp and space-em true, space-nel false) and . matches U+0085 (dot-nel true); these follow the ECMAScript definitions, which the Kotlin Regex page leaves to the platform. jvm-17 versus jvm-21 and jvm-25 on boundary-accent: JDK 19 note on \\b (Native, Wasm and Android match JDK 17). Native and Wasm versus JVM on ic-final-sigma, ic-dotless-i, ic-deseret: unexplained; KT-51859 says UNICODE_CASE is always on in Native, which does not predict these lines, and KT-53212 (As Designed) keeps the JVM dotless i result. ic-dotted-i is false on android, js-ir and cloudflare-jvm. cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on letter-deseret, upper-deseret, ic-kelvin."
 		},
 		{
 			"id": "kotlin.string.compare-order",
 			"classification": "unclassified",
 			"basis": "verified",
 			"causes": [
-				"a"
+				"a",
+				"f"
 			],
 			"downgradedFrom": "documented",
 			"references": [
@@ -1977,9 +2481,13 @@
 				{
 					"url": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/compare-to.html",
 					"quote": "If ignoreCase is true, the result of Char.uppercaseChar().lowercaseChar() on each character is compared."
+				},
+				{
+					"url": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/equals.html",
+					"quote": "If ignoreCase is true, the result of Char.uppercaseChar().lowercaseChar() on each character is compared."
 				}
 			],
-			"searched": "Not searched beyond the pages quoted above: the cloudflare-jvm lines were compared with the quoted pages only, and no tracker (Kotlin, TeaVM or bytebox) was queried for them.",
+			"searched": "No tracker was searched. Pages read in full: Kotlin Comparable.compareTo, String.compareTo and String.equals (ignoreCase). Source read: TeaVM 0.15.0 (the version bytebox 1.0.3 pins) TString.equalsIgnoreCase (line 687) and compareToIgnoreCase (line 260), which lower-case each UTF-16 unit and never upper-case first.",
 			"repro": "atlas/repros/kotlin.string.compare-order.md",
 			"columns": {
 				"2.4.20": [
@@ -2018,28 +2526,28 @@
 					]
 				]
 			},
-			"note": "Downgraded from documented: cloudflare-jvm differs in value, not only in magnitude: dotless-i-vs-I and final-sigma print false where every other column prints true, and compare-ignore-case-sigma is -1 where the others print 0. The ignoreCase page read says Char.uppercaseChar().lowercaseChar() is compared, which the other columns follow. cloudflare-wasm prints what wasm prints."
+			"lines": [
+				{
+					"line": "dotless-i-vs-I, final-sigma, compare-ignore-case-sigma",
+					"cause": "f",
+					"columns": "cloudflare-jvm false, false and -1; every other column true, true and 0",
+					"issue": "the ignoreCase page says uppercaseChar().lowercaseChar() is compared; TeaVM 0.15.0 compares toLowerCase only"
+				},
+				{
+					"line": "compare-ignore-case-sharp-s, compare-ignore-case-upper-lower",
+					"cause": "a",
+					"columns": "108 and -6 on jvm family, android, js-ir and cloudflare-jvm; 1 and -1 on native and wasm family",
+					"issue": "compareTo promises only the sign, not the magnitude"
+				}
+			],
+			"note": "Downgraded from documented: cloudflare-jvm differs in value, not only in magnitude: dotless-i-vs-I and final-sigma print false where every other column prints true, and compare-ignore-case-sigma is -1 where the others print 0. The ignoreCase pages say Char.uppercaseChar().lowercaseChar() is compared, which the other columns follow; TeaVM 0.15.0 (the version bytebox 1.0.3 pins) lower-cases each unit and never upper-cases first, which gives the three values. The two magnitude lines (108 and -6 against 1 and -1 on native and wasm) are the part that the compareTo page documents, since it promises only a sign. js-ir matches the JVM family. cloudflare-wasm prints what wasm prints."
 		},
 		{
 			"id": "kotlin.string.hashcode",
 			"classification": "unclassified",
 			"basis": "inferred",
 			"causes": [],
-			"issues": [
-				{
-					"id": "KT-44746",
-					"state": "Fixed",
-					"resolved": "2021-02-09",
-					"summary": "Different hashCode() results for Kotlin/Native stdlib"
-				},
-				{
-					"id": "KT-61028",
-					"state": "Fixed",
-					"resolved": "2023-08-07",
-					"summary": "Behavioural changes to the Native stdlib API"
-				}
-			],
-			"searched": "Searched the Kotlin/JS IR column (fixtures/atlas/js-ir.txt) against the other 2.4.20 columns; the tracker issues below were read for the older-version change (ladder). No Kotlin doc page was read for the Double and Float hash values.",
+			"searched": "Pages read in full: Kotlin Any.hashCode (it states the contract, not the values for Double or Float). KT-44746 (Native String.hashCode through identityHashCode) and KT-61028 (Boolean.hashCode on JS and Wasm) were read and do not cover the Double and Float lines. The Kotlin/JS source for Double.hashCode and Float.hashCode was not located.",
 			"repro": "atlas/repros/kotlin.string.hashcode.md",
 			"columns": {
 				"2.4.20": [
@@ -2065,7 +2573,7 @@
 					]
 				]
 			},
-			"note": "The js-ir column prints different Double and Float hash codes from every other 2.4.20 column (for example double-1.5 = -1089994752 against 1073217536). Every other column agrees. Changed across older versions (ladder): KT-44746 Fixed (Available in 1.5.0-M1), KT-61028 Fixed (Available in 1.9.20). Not researched further."
+			"note": "The js-ir column prints different Double and Float hash codes from every other 2.4.20 column (for example double-1.5 = -1089994752 against 1073217536, double-neg-0 = 0 against -2147483648, double-nan = 2131230720 against 2146959360, float-1.5 = -1089994752 against 1069547520). Every other column agrees on every line, and the 2.5.0-Beta1 transcripts of android, ios, jvm, macos and wasm are identical to each other. js-ir is unchanged on 2.5.0-Beta1. The Any.hashCode page promises only that equal objects have equal hash codes, so the values are neither documented nor shown to be wrong. No cause found; KT-44746 and KT-61028 do not cover these lines."
 		},
 		{
 			"id": "kotlin.string.padding",
@@ -2113,7 +2621,7 @@
 					"summary": "String.lastIndexOf(\"\") doesn't return length"
 				}
 			],
-			"searched": "YouTrack: \"indexOf empty string startIndex Wasm\", \"indexOf empty string startIndex greater than length\", \"indexOf startIndex Wasm\", \"indexOf empty string\", \"Wasm String.indexOf\". Pages read in full: Kotlin indexOf KDoc, JDK 21 String.indexOf. KT-63088 and KT-50777 read in full: they point to the JVM behavior and do not cover Wasm.",
+			"searched": "YouTrack: \"indexOf empty string startIndex Wasm\", \"indexOf empty string startIndex greater than length\", \"indexOf startIndex Wasm\", \"indexOf empty string\", \"Wasm String.indexOf\". Pages read in full: Kotlin CharSequence.indexOf (no rule for a start index past the end), JDK 21 String.indexOf(String, int). KT-63088 (description and comment; the comment's evidence is images) and KT-50777 (about lastIndexOf) read. Source read: Kotlin Strings.kt (the common indexOf loop is bounded by the receiver length) and TeaVM 0.15.0 (the version bytebox 1.0.3 pins) TString.indexOf(TString, int) (line 392; the loop runs to length minus the length of the argument). The Kotlin/Wasm nativeIndexOf and ECMAScript indexOf were not read.",
 			"repro": "atlas/repros/kotlin.string.split-replace-lines.md",
 			"columns": {
 				"2.4.20": [
@@ -2150,23 +2658,32 @@
 					]
 				]
 			},
-			"note": "Downgraded from documented: the cited doc covers lines(), the divergent line is indexOf(\"\", 10) on a 3-char string (3 on every column except the Wasm family: -1). The Kotlin indexOf KDoc gives no rule for startIndex past the end. JDK 21 gives the formula that yields 3 and an API note that says -1 for fromIndex past the end; KT-63088 (Answered) points to the JDK behavior. Unchanged on 2.5.0-Beta1. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what wasm, wasm-chromium, wasm-firefox, wasm-webkit print."
+			"note": "Downgraded from documented: the divergent line is indexOf(\"\", 10) on a 3-char string (3 on android, ios, js-ir, jvm, linux and macos; -1 on the wasm family and cloudflare-jvm). The JDK 21 String.indexOf page contradicts itself here: its formula (k >= Math.min(fromIndex, length) and startsWith) gives 3, and its API note (it returns -1 when fromIndex is larger than the length) says -1. The JVM follows the formula; the -1 columns follow the note, and the Kotlin common loop and TeaVM 0.15.0 both iterate over an empty range for a start index past the end. The Kotlin indexOf KDoc gives no rule for that case. KT-63088 (Answered) asks about the same call and its answer comment rests on screenshots; KT-50777 is about lastIndexOf, which agrees on every column. Unchanged on 2.5.0-Beta1. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what wasm, wasm-chromium, wasm-firefox, wasm-webkit print."
 		},
 		{
 			"id": "kotlin.string.supplementary",
 			"classification": "unclassified",
 			"basis": "verified",
 			"causes": [
-				"a"
+				"a",
+				"f"
 			],
 			"downgradedFrom": "documented",
 			"references": [
 				{
 					"url": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-comparable/compare-to.html",
 					"quote": "Returns zero if this object is equal to the specified other object, a negative number if it's less than other"
+				},
+				{
+					"url": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/reversed.html",
+					"quote": "Returns a string with characters in reversed order."
+				},
+				{
+					"url": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/lowercase.html",
+					"quote": "Returns a copy of this string converted to lower case using Unicode mapping rules of the invariant locale."
 				}
 			],
-			"searched": "Not searched beyond the pages quoted above: the cloudflare-jvm lines were compared with the quoted pages only, and no tracker (Kotlin, TeaVM or bytebox) was queried for them.",
+			"searched": "No tracker was searched. Pages read in full: Kotlin Comparable.compareTo, String.reversed (\"characters\", no statement on surrogate pairs) and String.lowercase. Source read: TeaVM 0.15.0 (the version bytebox 1.0.3 pins) TAbstractStringBuilder.reverse (line 746; swaps char units), TString.toLowerCase (line 741) and toUpperCase (line 808); both scan UTF-16 units and return the string unchanged when no unit changes.",
 			"repro": "atlas/repros/kotlin.string.supplementary.md",
 			"columns": {
 				"2.4.20": [
@@ -2205,7 +2722,27 @@
 					]
 				]
 			},
-			"note": "Downgraded from documented: cloudflare-jvm reverses a surrogate pair into [de00, d83d] and does not change the case of the Deseret letters (deseret-lower [d801, dc00], deseret-upper-of-lower [d801, dc28]), where every other column keeps the pair and maps it. The compareTo page read covers only the sign of a comparison. cloudflare-wasm prints what wasm prints."
+			"lines": [
+				{
+					"line": "compare-emoji-vs-ffff, compare-emoji-vs-e000",
+					"cause": "a",
+					"columns": "-10178 and -1987 on jvm family, android and cloudflare-jvm; -1 and -1 on native, wasm family and js-ir",
+					"issue": "compareTo promises only the sign, not the magnitude"
+				},
+				{
+					"line": "reversed",
+					"cause": "f",
+					"columns": "cloudflare-jvm [de00, d83d]; every other column [d83d, de00]",
+					"issue": "the reversed page does not say whether a surrogate pair stays together; TeaVM 0.15.0 swaps char units"
+				},
+				{
+					"line": "deseret-lower, deseret-upper-of-lower",
+					"cause": "f",
+					"columns": "cloudflare-jvm leaves the Deseret letter unchanged; every other column maps it",
+					"issue": "the lowercase page says Unicode mapping rules; TeaVM 0.15.0 returns the string unchanged when no UTF-16 unit changes"
+				}
+			],
+			"note": "Downgraded from documented: cloudflare-jvm reverses a surrogate pair into [de00, d83d] and does not change the case of the Deseret letters (deseret-lower [d801, dc00], deseret-upper-of-lower [d801, dc28]), where every other column keeps the pair and maps it. The compareTo page read covers the compare-emoji magnitude lines (jvm family and cloudflare-jvm return the UTF-16 unit difference, the others -1), which promise only a sign. The reversed page is silent on pairs, so that line is unclassified rather than a violation; the lowercase page says Unicode mapping, which the cloudflare-jvm Deseret lines contradict. js-ir matches the native group. cloudflare-wasm prints what wasm prints."
 		},
 		{
 			"id": "kotlin.time.duration-format",

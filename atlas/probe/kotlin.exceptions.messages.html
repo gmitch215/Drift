@@ -540,19 +540,22 @@ radix = err:IllegalArgumentException:radix 37 was not in valid range 2..36
 lateinit = err:UninitializedPropertyAccessException:lateinit property name has not been initialized
 iterator-end = err:NoSuchElementException:null</pre>
 <h2>Classification</h2>
-<p>unclassified, basis inferred; causes: JDK version, unexplained.</p>
+<p>unclassified, basis inferred; causes: Kotlin issue, JDK version, build tool, unexplained.</p>
 <p>No explanation was found in the sources searched.</p>
 <h3>Notes</h3>
-<p>No page read gives message text, so no line has a documented expectation. Class differences: Native string-index, substring and substring-range throw ArrayIndexOutOfBoundsException(null); Wasm throws IndexOutOfBoundsException; null-cast is ClassCastException on Wasm and NullPointerException elsewhere (KT-88829 Open is the generic-cast sibling, not this exact line). jvm-17 differs from jvm-21 in string-index, substring (message text) and removeFirst-empty (harness artefact: compiled on JDK 21, run on 17); no JDK release note for 18, 19, 20, 21 mentions the message change (searched). Android prints ART texts (length=3; index=10). cloudflare-wasm prints what wasm prints; cloudflare-jvm records the probe as unavailable (refused, the compiled module traps on integer division and a trap aborts the request (RuntimeError: divide by zero)).</p>
-<p class="muted">Read on 2026-10-07.</p>
+<p>No page read gives message text, so no line has a documented expectation. jvm-17 differs from jvm-21 in string-index, substring and substring-range (JDK source: 17 throws StringIndexOutOfBoundsException(index), 21 calls checkIndex); removeFirst-empty on jvm-17 is a harness artefact (compiled on JDK 21, run on 17), not a platform difference. Native throws ArrayIndexOutOfBoundsException(null) on three string lines; Wasm throws IndexOutOfBoundsException and a ClassCastException on null-cast (KT-88829 Open is the generic-cast sibling, not this line). js-ir does not throw on int-div-zero, int-mod-zero, floorDiv-zero, array-index, string-index and substring. KT-17719 is Fixed for 2.5.0-Beta1, but the 2.5.0-Beta1 js-ir transcript from the standalone compiler still prints ok:0 for the three Int lines; only long-div-zero changed, from Exception to ArithmeticException (/ by zero). Android prints ART texts (length=3; index=10). cloudflare-wasm prints what wasm prints; cloudflare-jvm records the probe as unavailable: the module built with TeaVM 0.15.0 (the version bytebox 1.0.3 pins) traps on integer division (RuntimeError: divide by zero), which teavm#1249 reports.</p>
+<p class="muted">Read on 2026-10-15.</p>
 <h2>Issues</h2>
 <table>
-<caption>Tracker state on 2026-10-07</caption>
+<caption>Tracker state on 2026-10-15</caption>
 <tr><th scope="col">Issue</th><th scope="col">State when read</th><th scope="col">Resolved</th><th scope="col">Summary</th></tr>
 <tr><th scope="row"><a href="https://youtrack.jetbrains.com/issue/KT-88829">KT-88829</a></th><td>Open</td><td></td><td>Wasm: null cast to a non-null type parameter throws ClassCastException instead of NullPointerException</td></tr>
+<tr><th scope="row"><a href="https://youtrack.jetbrains.com/issue/KT-17719">KT-17719</a></th><td>Fixed</td><td>2026-07-30</td><td>JS: integer division by zero does not throw exception</td></tr>
+<tr><th scope="row"><a href="https://youtrack.jetbrains.com/issue/KT-30141">KT-30141</a></th><td>Fixed</td><td>2019-03-18</td><td>JS: document Array.get behavior</td></tr>
+<tr><th scope="row"><a href="https://github.com/konsoletyper/teavm/issues/1249">teavm#1249</a></th><td>Open</td><td></td><td>Wasm GC: integer division traps instead of following JLS section 15.17</td></tr>
 </table>
 <h2>What was searched</h2>
-<p>YouTrack: &quot;exception message Native&quot;, &quot;NumberFormatException message&quot;, &quot;ArithmeticException message&quot;, &quot;ClassCastException Wasm&quot;, &quot;StringIndexOutOfBoundsException Native&quot;, &quot;IndexOutOfBoundsException message differs&quot;, &quot;string index out of bounds Wasm message&quot;. JDK 18, 19, 20 and 21 release notes searched for StringIndexOutOfBounds, &quot;index out of bounds&quot; and Preconditions: no entry found (a negative result for that query only). Kotlin Throwable page read in full: it names no message text.</p>
+<p>YouTrack: &quot;exception message Native&quot;, &quot;NumberFormatException message&quot;, &quot;ArithmeticException message&quot;, &quot;ClassCastException Wasm&quot;, &quot;StringIndexOutOfBoundsException Native&quot;, &quot;IndexOutOfBoundsException message differs&quot;, &quot;string index out of bounds Wasm message&quot;, &quot;JS index out of bounds&quot;. KT-17719 and KT-30141 read in full. JDK 18, 19, 20 and 21 release notes searched for StringIndexOutOfBounds, &quot;index out of bounds&quot; and Preconditions: no entry found (a negative result for that query only); openjdk StringLatin1.java at jdk-17-ga (throws StringIndexOutOfBoundsException(index), line 48) and jdk-21-ga (checkIndex, line 46) read. ECMAScript searched for a message text clause: none. Kotlin Throwable page read in full: it names no message text.</p>
 <h2>Repro draft</h2>
 <div class="draft">
 <p><strong>Draft for human review; not filed.</strong></p>
@@ -564,9 +567,9 @@ This text was written by an agent from measured transcripts and pages it read. A
 
 Question: Which exception class and message does each common failure produce?
 
-Classification now: unclassified (was unclassified); cause letters: e g; basis: inferred.
+Classification now: unclassified (was unclassified); cause letters: c, e, f, g; basis: inferred.
 
-Measured: Kotlin 2.4.20 on 17 columns (js-ir on Node 26.8.2 arm64, android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, jvm 21 arm64 in a container, linux x64, linux arm64 and linux-ubuntu Native, mingw Native under wine); Kotlin 2.5.0-Beta1 on jvm, macos, wasm, android and ios. Single run per cell; no spread measured.
+Measured: Kotlin 2.4.20 on 16 columns of fixtures/atlas (js-ir on Node 26.8.2 arm64, android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, linux x64, linux arm64, and cloudflare-wasm and cloudflare-jvm on workerd 1.20261001.1 under wrangler 4.146.0 on macOS arm64); Kotlin 2.5.0-Beta1 on android, ios, jvm, macos and wasm (fixtures/atlas/2.5.0-beta1) and on js-ir (fixtures/atlas-ladder/2.5.0-beta1, the standalone compiler). cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM 0.15.0), so its Java classes are not a JDK. The rows also carry the transcripts in fixtures/atlas-extra (jvm-21-arm64, linux-ubuntu, mingw-wine). Single run per cell; no spread measured.
 
 Helpers (not shown below): `line(label, v)` prints `label = v`; `outcome(label) { }` prints `ok:&lt;value&gt;` or `err:&lt;ExceptionClass&gt;`; `failure(label) { }` prints `err:&lt;Class&gt;:&lt;message&gt;`; `bits(d)` prints `d.toRawBits()` as unsigned hex.
 
@@ -586,259 +589,233 @@ failure(&quot;list-index&quot;) { listOf(1)[3] }
 failure(&quot;array-index&quot;) { arrayOf(1)[5] }
 failure(&quot;string-index&quot;) { &quot;abc&quot;[10] }
 failure(&quot;substring&quot;) { &quot;abc&quot;.substring(5) }
+failure(&quot;toUInt&quot;) { &quot;-1&quot;.toUInt() }
+failure(&quot;toUByte&quot;) { &quot;256&quot;.toUByte() }
+failure(&quot;substring-range&quot;) { &quot;abc&quot;.substring(2, 1) }
+failure(&quot;subList&quot;) { listOf(1, 2).subList(1, 5) }
+failure(&quot;removeAt&quot;) { mutableListOf(1).removeAt(1) }
+failure(&quot;negative-array&quot;) { IntArray(zero - 1) }
+failure(&quot;negative-list&quot;) { List(zero - 1) { 0 } }
+failure(&quot;first-empty&quot;) { emptyList&lt;Int&gt;().first() }
+failure(&quot;last-empty&quot;) { emptyList&lt;Int&gt;().last() }
+failure(&quot;single-many&quot;) { listOf(1, 2).single() }
+failure(&quot;removeFirst-empty&quot;) { mutableListOf&lt;Int&gt;().removeFirst() }
+failure(&quot;require&quot;) { require(false) }
+failure(&quot;require-message&quot;) { require(false) { &quot;custom&quot; } }
+failure(&quot;check&quot;) { check(false) }
+failure(&quot;error&quot;) { error(&quot;boom&quot;) }
+failure(&quot;checkNotNull&quot;) { checkNotNull(null as Int?) }
+failure(&quot;not-null-assert&quot;) { (null as String?)!! }
+failure(&quot;todo&quot;) { TODO() }
+failure(&quot;todo-message&quot;) { TODO(&quot;later&quot;) }
+failure(&quot;cast&quot;) { (1 as Any) as String }
+failure(&quot;null-cast&quot;) { (null as Any?) as String }
+failure(&quot;getValue&quot;) { emptyMap&lt;Int, Int&gt;().getValue(1) }
+failure(&quot;repeat-negative&quot;) { &quot;a&quot;.repeat(zero - 1) }
+failure(&quot;chunked-zero&quot;) { listOf(1).chunked(zero) }
+failure(&quot;step-zero&quot;) { 1..3 step zero }
+failure(&quot;random-empty&quot;) { Random(1).nextInt(5, 5) }
+failure(&quot;radix&quot;) { 255.toString(37) }
+failure(&quot;lateinit&quot;) { Holder().name }
+failure(&quot;iterator-end&quot;) { listOf(1).iterator().apply { next() }.next() }
 ```
 
 Results at 2.4.20, one row per distinct output (columns that agree share a row):
 
 - `toInt`
-  - `err:NumberFormatException:For input string: &quot;x&quot;`: android, jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
-  - `err:NumberFormatException:null`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
-  - `err:NumberFormatException:Invalid number format: 'x'`: wasm+3browsers
+  - `err:NumberFormatException:For input string: &quot;x&quot;`: android+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
+  - `err:NumberFormatException:Invalid number format: 'x'`: cloudflare-wasm+js-ir+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NumberFormatException:null`: ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine
+  - `(absent)`: cloudflare-jvm
 - `toInt-empty`
-  - `err:NumberFormatException:For input string: &quot;&quot;`: android, jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
-  - `err:NumberFormatException:null`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
-  - `err:NumberFormatException:Invalid number format: ''`: wasm+3browsers
+  - `err:NumberFormatException:For input string: &quot;&quot;`: android+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
+  - `err:NumberFormatException:Invalid number format: ''`: cloudflare-wasm+js-ir+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NumberFormatException:null`: ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine
+  - `(absent)`: cloudflare-jvm
 - `toLong`
-  - `err:NumberFormatException:For input string: &quot;9999999999999999999&quot;`: android, jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
-  - `err:NumberFormatException:null`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
-  - `err:NumberFormatException:Invalid number format: '9999999999999999999'`: wasm+3browsers
+  - `err:NumberFormatException:For input string: &quot;9999999999999999999&quot;`: android+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
+  - `err:NumberFormatException:Invalid number format: '9999999999999999999'`: cloudflare-wasm+js-ir+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NumberFormatException:null`: ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine
+  - `(absent)`: cloudflare-jvm
 - `toDouble`
-  - `err:NumberFormatException:For input string: &quot;x&quot;`: android, jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
-  - `err:NumberFormatException:null`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
-  - `err:NumberFormatException:Invalid number format: 'x'`: wasm+3browsers
-- `int-div-zero`
-  - `err:ArithmeticException:divide by zero`: android
-  - `err:ArithmeticException:null`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
-  - `err:ArithmeticException:/ by zero`: jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
-  - `err:ArithmeticException:Division by zero`: wasm+3browsers
-  - `ok:0`: js-ir
-- `long-div-zero`
-  - `err:ArithmeticException:divide by zero`: android
-  - `err:ArithmeticException:null`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
-  - `err:ArithmeticException:/ by zero`: jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
-  - `err:ArithmeticException:Division by zero`: wasm+3browsers
-  - `err:Exception:division by zero`: js-ir
-- `int-mod-zero`
-  - `err:ArithmeticException:divide by zero`: android
-  - `err:ArithmeticException:null`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
-  - `err:ArithmeticException:/ by zero`: jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
-  - `err:ArithmeticException:Division by zero`: wasm+3browsers
-  - `ok:0`: js-ir
-- `floorDiv-zero`
-  - `err:ArithmeticException:divide by zero`: android
-  - `err:ArithmeticException:null`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
-  - `err:ArithmeticException:/ by zero`: jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
-  - `err:ArithmeticException:Division by zero`: wasm+3browsers
-  - `ok:0`: js-ir
-- `list-index`
-  - `err:IndexOutOfBoundsException:Index: 3, Size: 1`: android, jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
-  - `err:IndexOutOfBoundsException:index: 3, size: 1`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine, wasm+3browsers
-- `array-index`
-  - `err:ArrayIndexOutOfBoundsException:length=1; index=5`: android
-  - `err:ArrayIndexOutOfBoundsException:null`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
-  - `err:ArrayIndexOutOfBoundsException:Index 5 out of bounds for length 1`: jvm+jvm-21+jvm-21-arm64+jvm-25, jvm-17
-  - `err:IndexOutOfBoundsException:null`: wasm+3browsers
-  - `ok:null`: js-ir
-- `string-index`
-  - `err:StringIndexOutOfBoundsException:length=3; index=10`: android
-  - `err:ArrayIndexOutOfBoundsException:null`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
-  - `err:StringIndexOutOfBoundsException:Index 10 out of bounds for length 3`: jvm+jvm-21+jvm-21-arm64+jvm-25
-  - `err:IndexOutOfBoundsException:null`: wasm+3browsers
-  - `err:StringIndexOutOfBoundsException:String index out of range: 10`: jvm-17
-  - `ok:\u0000`: js-ir
-- `substring`
-  - `err:StringIndexOutOfBoundsException:length=3; index=5`: android
-  - `err:ArrayIndexOutOfBoundsException:null`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
-  - `err:StringIndexOutOfBoundsException:Range [5, 3) out of bounds for length 3`: jvm+jvm-21+jvm-21-arm64+jvm-25
-  - `err:IndexOutOfBoundsException:startIndex: 5 &gt; endIndex: 3`: wasm+3browsers
-  - `err:StringIndexOutOfBoundsException:begin 5, end 3, length 3`: jvm-17
-  - `ok:`: js-ir
-- also differing, not expanded: `substring-range`, `subList`, `removeAt`, `negative-array`, `negative-list`, `removeFirst-empty`, `cast`, `null-cast`
-
-On 2.5.0-Beta1 the cells group as: jvm; macos+ios; wasm; android.
-
-Existing tracker issues (read through the YouTrack REST API on 2026-10-07; nothing was posted): KT-88829 Open.
-
-What is known: No page read gives message text, so no line has a documented expectation. Class differences: Native string-index, substring and substring-range throw ArrayIndexOutOfBoundsException(null); Wasm throws IndexOutOfBoundsException; null-cast is ClassCastException on Wasm and NullPointerException elsewhere (KT-88829 Open is the generic-cast sibling, not this exact line). jvm-17 differs from jvm-21 in string-index, substring (message text) and removeFirst-empty (harness artefact: compiled on JDK 21, run on 17); no JDK release note for 18, 19, 20, 21 mentions the message change (searched). Android prints ART texts (length=3; index=10).
-
-What is NOT known: the intended behavior where no page read states one; whether the divergent column is a defect or by design; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device of the same target differs (one device per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies; the ladder agent re-compiled the displayed text and matched 37 of 38 probes on JVM and macOS Native).
-
-## Cloudflare columns
-
-Recorded 2026-10-12 on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local, macOS arm64), one run per cell. cloudflare-wasm is the Kotlin/Wasm probe module with a hand-written Worker entry; cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 plugin (TeaVM), so its Java classes are not a JDK. These rows are not part of the results above.
-
-Rows for the differing lines of this draft:
-
-- `toInt`
-  - `err:NumberFormatException:For input string: &quot;x&quot;`: android+jvm-17+jvm-21+jvm-25+jvm
+  - `err:NumberFormatException:For input string: &quot;x&quot;`: android+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
+  - `err:NumberFormatException:Invalid number format: 'x'`: cloudflare-wasm+js-ir+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NumberFormatException:null`: ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine
   - `(absent)`: cloudflare-jvm
-  - `err:NumberFormatException:Invalid number format: 'x'`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `err:NumberFormatException:null`: ios+linux-arm64+linux+macos
-- `toInt-empty`
-  - `err:NumberFormatException:For input string: &quot;&quot;`: android+jvm-17+jvm-21+jvm-25+jvm
-  - `(absent)`: cloudflare-jvm
-  - `err:NumberFormatException:Invalid number format: ''`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `err:NumberFormatException:null`: ios+linux-arm64+linux+macos
-- `toLong`
-  - `err:NumberFormatException:For input string: &quot;9999999999999999999&quot;`: android+jvm-17+jvm-21+jvm-25+jvm
-  - `(absent)`: cloudflare-jvm
-  - `err:NumberFormatException:Invalid number format: '9999999999999999999'`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `err:NumberFormatException:null`: ios+linux-arm64+linux+macos
-- `toDouble`
-  - `err:NumberFormatException:For input string: &quot;x&quot;`: android+jvm-17+jvm-21+jvm-25+jvm
-  - `(absent)`: cloudflare-jvm
-  - `err:NumberFormatException:Invalid number format: 'x'`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `err:NumberFormatException:null`: ios+linux-arm64+linux+macos
 - `toUInt`
-  - `err:NumberFormatException:Invalid number format: '-1'`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NumberFormatException:Invalid number format: '-1'`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `toUByte`
-  - `err:NumberFormatException:Invalid number format: '256'`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NumberFormatException:Invalid number format: '256'`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `int-div-zero`
-  - `err:ArithmeticException:divide by zero`: android
-  - `(absent)`: cloudflare-jvm
+  - `err:ArithmeticException:null`: ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine
+  - `err:ArithmeticException:/ by zero`: jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
   - `err:ArithmeticException:Division by zero`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `err:ArithmeticException:null`: ios+linux-arm64+linux+macos
-  - `err:ArithmeticException:/ by zero`: jvm-17+jvm-21+jvm-25+jvm
+  - `err:ArithmeticException:divide by zero`: android
+  - `ok:0`: js-ir
+  - `(absent)`: cloudflare-jvm
 - `long-div-zero`
-  - `err:ArithmeticException:divide by zero`: android
-  - `(absent)`: cloudflare-jvm
+  - `err:ArithmeticException:null`: ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine
+  - `err:ArithmeticException:/ by zero`: jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
   - `err:ArithmeticException:Division by zero`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `err:ArithmeticException:null`: ios+linux-arm64+linux+macos
-  - `err:ArithmeticException:/ by zero`: jvm-17+jvm-21+jvm-25+jvm
+  - `err:ArithmeticException:divide by zero`: android
+  - `err:Exception:division by zero`: js-ir
+  - `(absent)`: cloudflare-jvm
 - `int-mod-zero`
-  - `err:ArithmeticException:divide by zero`: android
-  - `(absent)`: cloudflare-jvm
+  - `err:ArithmeticException:null`: ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine
+  - `err:ArithmeticException:/ by zero`: jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
   - `err:ArithmeticException:Division by zero`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `err:ArithmeticException:null`: ios+linux-arm64+linux+macos
-  - `err:ArithmeticException:/ by zero`: jvm-17+jvm-21+jvm-25+jvm
+  - `err:ArithmeticException:divide by zero`: android
+  - `ok:0`: js-ir
+  - `(absent)`: cloudflare-jvm
 - `floorDiv-zero`
-  - `err:ArithmeticException:divide by zero`: android
-  - `(absent)`: cloudflare-jvm
+  - `err:ArithmeticException:null`: ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine
+  - `err:ArithmeticException:/ by zero`: jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
   - `err:ArithmeticException:Division by zero`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `err:ArithmeticException:null`: ios+linux-arm64+linux+macos
-  - `err:ArithmeticException:/ by zero`: jvm-17+jvm-21+jvm-25+jvm
+  - `err:ArithmeticException:divide by zero`: android
+  - `ok:0`: js-ir
+  - `(absent)`: cloudflare-jvm
 - `list-index`
-  - `err:IndexOutOfBoundsException:Index: 3, Size: 1`: android+jvm-17+jvm-21+jvm-25+jvm
+  - `err:IndexOutOfBoundsException:index: 3, size: 1`: cloudflare-wasm+ios+js-ir+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:IndexOutOfBoundsException:Index: 3, Size: 1`: android+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
   - `(absent)`: cloudflare-jvm
-  - `err:IndexOutOfBoundsException:index: 3, size: 1`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
 - `array-index`
+  - `err:ArrayIndexOutOfBoundsException:null`: ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine
+  - `err:ArrayIndexOutOfBoundsException:Index 5 out of bounds for length 1`: jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
+  - `err:IndexOutOfBoundsException:null`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `err:ArrayIndexOutOfBoundsException:length=1; index=5`: android
+  - `ok:null`: js-ir
   - `(absent)`: cloudflare-jvm
-  - `err:IndexOutOfBoundsException:null`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `err:ArrayIndexOutOfBoundsException:null`: ios+linux-arm64+linux+macos
-  - `err:ArrayIndexOutOfBoundsException:Index 5 out of bounds for length 1`: jvm-17+jvm-21+jvm-25+jvm
 - `string-index`
-  - `err:StringIndexOutOfBoundsException:length=3; index=10`: android
-  - `(absent)`: cloudflare-jvm
+  - `err:ArrayIndexOutOfBoundsException:null`: ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine
   - `err:IndexOutOfBoundsException:null`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `err:ArrayIndexOutOfBoundsException:null`: ios+linux-arm64+linux+macos
+  - `err:StringIndexOutOfBoundsException:Index 10 out of bounds for length 3`: jvm-21-arm64+jvm-21+jvm-25+jvm
   - `err:StringIndexOutOfBoundsException:String index out of range: 10`: jvm-17
-  - `err:StringIndexOutOfBoundsException:Index 10 out of bounds for length 3`: jvm-21+jvm-25+jvm
+  - `err:StringIndexOutOfBoundsException:length=3; index=10`: android
+  - `ok:\u0000`: js-ir
+  - `(absent)`: cloudflare-jvm
 - `substring`
-  - `err:StringIndexOutOfBoundsException:length=3; index=5`: android
-  - `(absent)`: cloudflare-jvm
+  - `err:ArrayIndexOutOfBoundsException:null`: ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine
   - `err:IndexOutOfBoundsException:startIndex: 5 &gt; endIndex: 3`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `err:ArrayIndexOutOfBoundsException:null`: ios+linux-arm64+linux+macos
+  - `err:StringIndexOutOfBoundsException:Range [5, 3) out of bounds for length 3`: jvm-21-arm64+jvm-21+jvm-25+jvm
   - `err:StringIndexOutOfBoundsException:begin 5, end 3, length 3`: jvm-17
-  - `err:StringIndexOutOfBoundsException:Range [5, 3) out of bounds for length 3`: jvm-21+jvm-25+jvm
+  - `err:StringIndexOutOfBoundsException:length=3; index=5`: android
+  - `ok:`: js-ir
+  - `(absent)`: cloudflare-jvm
 - `substring-range`
-  - `err:StringIndexOutOfBoundsException:begin 2, end 1, length 3`: android+jvm-17
-  - `(absent)`: cloudflare-jvm
+  - `err:ArrayIndexOutOfBoundsException:null`: ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine
   - `err:IndexOutOfBoundsException:startIndex: 2 &gt; endIndex: 1`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `err:ArrayIndexOutOfBoundsException:null`: ios+linux-arm64+linux+macos
-  - `err:StringIndexOutOfBoundsException:Range [2, 1) out of bounds for length 3`: jvm-21+jvm-25+jvm
+  - `err:StringIndexOutOfBoundsException:Range [2, 1) out of bounds for length 3`: jvm-21-arm64+jvm-21+jvm-25+jvm
+  - `err:StringIndexOutOfBoundsException:begin 2, end 1, length 3`: android+jvm-17
+  - `ok:b`: js-ir
+  - `(absent)`: cloudflare-jvm
 - `subList`
-  - `err:IndexOutOfBoundsException:toIndex = 5`: android+jvm-17+jvm-21+jvm-25+jvm
+  - `err:IndexOutOfBoundsException:fromIndex: 1, toIndex: 5, size: 2`: cloudflare-wasm+ios+js-ir+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:IndexOutOfBoundsException:toIndex = 5`: android+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
   - `(absent)`: cloudflare-jvm
-  - `err:IndexOutOfBoundsException:fromIndex: 1, toIndex: 5, size: 2`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
 - `removeAt`
-  - `err:IndexOutOfBoundsException:Index 1 out of bounds for length 1`: android+jvm-17+jvm-21+jvm-25+jvm
+  - `err:IndexOutOfBoundsException:index: 1, size: 1`: cloudflare-wasm+ios+js-ir+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:IndexOutOfBoundsException:Index 1 out of bounds for length 1`: android+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
   - `(absent)`: cloudflare-jvm
-  - `err:IndexOutOfBoundsException:index: 1, size: 1`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
 - `negative-array`
-  - `err:NegativeArraySizeException:-1`: android+jvm-17+jvm-21+jvm-25+jvm
-  - `(absent)`: cloudflare-jvm
+  - `err:IllegalArgumentException:null`: ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine
+  - `err:NegativeArraySizeException:-1`: android+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
   - `err:IllegalArgumentException:Negative array size`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `err:IllegalArgumentException:null`: ios+linux-arm64+linux+macos
-- `negative-list`
-  - `err:IllegalArgumentException:Illegal Capacity: -1`: android+jvm-17+jvm-21+jvm-25+jvm
+  - `err:null:Invalid typed array length: -1`: js-ir
   - `(absent)`: cloudflare-jvm
-  - `err:IllegalArgumentException:capacity must be non-negative.`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+- `negative-list`
+  - `err:IllegalArgumentException:capacity must be non-negative.`: cloudflare-wasm+ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:IllegalArgumentException:Illegal Capacity: -1`: android+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
+  - `err:IllegalArgumentException:Negative initial capacity: -1`: js-ir
+  - `(absent)`: cloudflare-jvm
 - `first-empty`
-  - `err:NoSuchElementException:List is empty.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NoSuchElementException:List is empty.`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `last-empty`
-  - `err:NoSuchElementException:List is empty.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NoSuchElementException:List is empty.`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `single-many`
-  - `err:IllegalArgumentException:List has more than one element.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:IllegalArgumentException:List has more than one element.`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `removeFirst-empty`
-  - `err:NoSuchElementException:null`: android+jvm-21+jvm-25+jvm
-  - `(absent)`: cloudflare-jvm
-  - `err:NoSuchElementException:List is empty.`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NoSuchElementException:List is empty.`: cloudflare-wasm+ios+js-ir+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NoSuchElementException:null`: android+jvm-21-arm64+jvm-21+jvm-25+jvm
   - `err:NoSuchMethodError:'java.lang.Object java.util.List.removeFirst()'`: jvm-17
+  - `(absent)`: cloudflare-jvm
 - `require`
-  - `err:IllegalArgumentException:Failed requirement.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:IllegalArgumentException:Failed requirement.`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `require-message`
-  - `err:IllegalArgumentException:custom`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:IllegalArgumentException:custom`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `check`
-  - `err:IllegalStateException:Check failed.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:IllegalStateException:Check failed.`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `error`
-  - `err:IllegalStateException:boom`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:IllegalStateException:boom`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `checkNotNull`
-  - `err:IllegalStateException:Required value was null.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:IllegalStateException:Required value was null.`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `not-null-assert`
-  - `err:NullPointerException:null`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NullPointerException:null`: android+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NullPointerException:undefined`: js-ir
   - `(absent)`: cloudflare-jvm
 - `todo`
-  - `err:NotImplementedError:An operation is not implemented.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NotImplementedError:An operation is not implemented.`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `todo-message`
-  - `err:NotImplementedError:An operation is not implemented: later`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NotImplementedError:An operation is not implemented: later`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `cast`
-  - `err:ClassCastException:java.lang.Integer cannot be cast to java.lang.String`: android
-  - `(absent)`: cloudflare-jvm
+  - `err:ClassCastException:class kotlin.Int cannot be cast to class kotlin.String`: ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine
   - `err:ClassCastException:Cannot cast instance of kotlin.Int to kotlin.String: incompatible types`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `err:ClassCastException:class kotlin.Int cannot be cast to class kotlin.String`: ios+linux-arm64+linux+macos
-  - `err:ClassCastException:class java.lang.Integer cannot be cast to class java.lang.String (java.lang.Integer and java.lang.String are in module java.base of loader 'bootstrap')`: jvm-17+jvm-21+jvm-25+jvm
-- `null-cast`
-  - `err:NullPointerException:null cannot be cast to non-null type kotlin.String`: android+jvm-17+jvm-21+jvm-25+jvm
+  - `err:ClassCastException:class java.lang.Integer cannot be cast to class java.lang.String (java.lang.Integer and java.lang.String are in module java.base of loader 'bootstrap')`: jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
+  - `err:ClassCastException:java.lang.Integer cannot be cast to java.lang.String`: android
+  - `err:ClassCastException:undefined`: js-ir
   - `(absent)`: cloudflare-jvm
+- `null-cast`
+  - `err:NullPointerException:null`: ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine
+  - `err:NullPointerException:null cannot be cast to non-null type kotlin.String`: android+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
   - `err:ClassCastException:Cannot cast null to kotlin.String: target type is non-nullable`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `err:NullPointerException:null`: ios+linux-arm64+linux+macos
+  - `err:ClassCastException:undefined`: js-ir
+  - `(absent)`: cloudflare-jvm
 - `getValue`
-  - `err:NoSuchElementException:Key 1 is missing in the map.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NoSuchElementException:Key 1 is missing in the map.`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `repeat-negative`
-  - `err:IllegalArgumentException:Count 'n' must be non-negative, but was -1.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:IllegalArgumentException:Count 'n' must be non-negative, but was -1.`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `chunked-zero`
-  - `err:IllegalArgumentException:size 0 must be greater than zero.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:IllegalArgumentException:size 0 must be greater than zero.`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `step-zero`
-  - `err:IllegalArgumentException:Step must be positive, was: 0.`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:IllegalArgumentException:Step must be positive, was: 0.`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `random-empty`
-  - `err:IllegalArgumentException:Random range is empty: [5, 5).`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:IllegalArgumentException:Random range is empty: [5, 5).`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `radix`
-  - `err:IllegalArgumentException:radix 37 was not in valid range 2..36`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:IllegalArgumentException:radix 37 was not in valid range 2..36`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `lateinit`
-  - `err:UninitializedPropertyAccessException:lateinit property name has not been initialized`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:UninitializedPropertyAccessException:lateinit property name has not been initialized`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `(absent)`: cloudflare-jvm
 - `iterator-end`
-  - `err:NoSuchElementException:null`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NoSuchElementException:null`: android+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `err:NoSuchElementException:undefined`: js-ir
   - `(absent)`: cloudflare-jvm
+
+On 2.5.0-Beta1 (android, ios, jvm, macos and wasm from fixtures/atlas/2.5.0-beta1, js-ir from fixtures/atlas-ladder/2.5.0-beta1) the cells group as: android; ios+macos; js-ir; jvm; wasm.
+
+Docs read (FULL text):
+
+Existing tracker issues (state read through the YouTrack REST API and the GitHub API on 2026-10-15; nothing was posted): KT-88829 Open; KT-17719 Fixed; KT-30141 Fixed; teavm#1249 Open.
+
+What is known: No page read gives message text, so no line has a documented expectation. jvm-17 differs from jvm-21 in string-index, substring and substring-range (JDK source: 17 throws StringIndexOutOfBoundsException(index), 21 calls checkIndex); removeFirst-empty on jvm-17 is a harness artefact (compiled on JDK 21, run on 17), not a platform difference. Native throws ArrayIndexOutOfBoundsException(null) on three string lines; Wasm throws IndexOutOfBoundsException and a ClassCastException on null-cast (KT-88829 Open is the generic-cast sibling, not this line). js-ir does not throw on int-div-zero, int-mod-zero, floorDiv-zero, array-index, string-index and substring. KT-17719 is Fixed for 2.5.0-Beta1, but the 2.5.0-Beta1 js-ir transcript from the standalone compiler still prints ok:0 for the three Int lines; only long-div-zero changed, from Exception to ArithmeticException (/ by zero). Android prints ART texts (length=3; index=10). cloudflare-wasm prints what wasm prints; cloudflare-jvm records the probe as unavailable: the module built with TeaVM 0.15.0 (the version bytebox 1.0.3 pins) traps on integer division (RuntimeError: divide by zero), which teavm#1249 reports.
+
+What is NOT known: whether the divergent column is a defect or by design where no page read states the intended behavior; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device, runtime or workerd release of the same target differs (one run per cell); whether a TeaVM or bytebox release other than 0.15.0 and 1.0.3 changes the cloudflare-jvm column; whether the displayed snippet and the executed probe body are identical (they are two hand-written copies).
 </pre>
 </div>
 <h2>Kotlin versions measured</h2>

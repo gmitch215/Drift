@@ -197,11 +197,11 @@ lower-string-length-sum = 65537</pre>
 <blockquote><p>A character is considered to be a letter if its category is CharCategory.UPPERCASE_LETTER</p>
 <footer><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/is-letter.html">https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/is-letter.html</a></footer></blockquote>
 <h3>Notes</h3>
-<p>JDK 17, 21, 25 columns split exactly as their Character Javadocs name Unicode 13.0, 15.0, 16.0 (verified). Native, Wasm, iOS, linux, mingw-wine and the browsers print the JDK 17 numbers (observed): that they use Unicode 13.0 tables is inferred; no FULL doc names the Native table version and KT-58195 (created 2023-04-24) says UnicodeData 12.0 for Native, which does not match the observed numbers (stale or other tables). Android prints its own numbers and the Android Character page read names no Unicode version. The Kotlin isLetter KDoc defines letters by category and names no version, so the version is left to the platform. cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on upper-checksum, lower-checksum, title-checksum, upper-changed, lower-changed, title-changed, upper-string-length-sum, lower-string-length-sum.</p>
-<p class="muted">Read on 2026-10-07.</p>
+<p>JDK 17, 21, 25 columns split exactly as their Character Javadocs name Unicode 13.0, 15.0, 16.0 (verified). Native, Wasm, iOS, linux, mingw-wine and the browsers print the JDK 17 numbers (observed): that they use Unicode 13.0 tables is inferred; no FULL doc names the Native table version and KT-58195 (created 2023-04-24) says UnicodeData 12.0 for Native, which does not match the observed numbers (stale or other tables). Android prints its own numbers and the Android Character page read names no Unicode version. js-ir is a sixth group: it prints its own upper-checksum, title-checksum, upper-changed and title-changed, and shares lower-checksum and lower-changed with android; the Unicode version of Node 26.8.2 was not read, so a platform table is the reading, not a verified cause. cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on upper-checksum, lower-checksum, title-checksum, upper-changed, lower-changed, title-changed, upper-string-length-sum, lower-string-length-sum.</p>
+<p class="muted">Read on 2026-10-15.</p>
 <h2>Issues</h2>
 <table>
-<caption>Tracker state on 2026-10-07</caption>
+<caption>Tracker state on 2026-10-15</caption>
 <tr><th scope="col">Issue</th><th scope="col">State when read</th><th scope="col">Resolved</th><th scope="col">Summary</th></tr>
 <tr><th scope="row"><a href="https://youtrack.jetbrains.com/issue/KT-58195">KT-58195</a></th><td>Open</td><td></td><td>Native: Use the same unicode version for regex canonicalization</td></tr>
 </table>

@@ -312,23 +312,23 @@ kclass-qualified = ok:kotlin.String
 <p>No explanation was found in the sources searched.</p>
 <blockquote><p>actual typealias Exception = java.lang.Exception</p>
 <footer><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-exception/">https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-exception/</a></footer></blockquote>
-<blockquote><p>Returns a short description of this throwable. The result is the concatenation of: the name of the class of this object</p>
+<blockquote><p>the name of the class of this object</p>
 <footer><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Throwable.html">https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Throwable.html</a></footer></blockquote>
-<blockquote><p>Returns a new read-only list of given elements.</p>
-<footer><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/list-of.html">https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/list-of.html</a></footer></blockquote>
+<blockquote><p>In Kotlin/JS, the value of a ::class expression is a stripped-down KClass implementation that supports only: simpleName and isInstance() members.</p>
+<footer><a href="https://kotlinlang.org/docs/js-reflection.html">https://kotlinlang.org/docs/js-reflection.html</a></footer></blockquote>
 <h3>Notes</h3>
-<p>Four lines, three causes; the probe stays unclassified because kclass-list has none. cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on kclass-qualified, kclass-list.</p>
-<p class="muted">Read on 2026-10-07.</p>
+<p>Five lines, four causes; the probe stays unclassified because kclass-list and kclass-qualified have none documented. js-ir is its own group: the probe does not compile there (the Kotlin/JS reflection guide limits ::class to simpleName and isInstance), so no js-ir value is shown for any line. The JVM exception name is documented by the typealias page and Throwable.toString; the Native and Wasm names are not on any page read. cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on kclass-qualified and kclass-list.</p>
+<p class="muted">Read on 2026-10-15.</p>
 <h2>Issues</h2>
 <table>
-<caption>Tracker state on 2026-10-07</caption>
+<caption>Tracker state on 2026-10-15</caption>
 <tr><th scope="col">Issue</th><th scope="col">State when read</th><th scope="col">Resolved</th><th scope="col">Summary</th></tr>
 <tr><th scope="row"><a href="https://youtrack.jetbrains.com/issue/KT-88414">KT-88414</a></th><td>Fixed</td><td>2026-08-30</td><td>[Wasm] Make FP parse and toString alighed with JVM and Native targets</td></tr>
 <tr><th scope="row"><a href="https://youtrack.jetbrains.com/issue/KT-69456">KT-69456</a></th><td>Open</td><td></td><td>Unify KClass.toString() on different platforms</td></tr>
 <tr><th scope="row"><a href="https://youtrack.jetbrains.com/issue/KT-78708">KT-78708</a></th><td>Fixed</td><td>2025-10-03</td><td>Wasm: Throwable.toString uses simple class name</td></tr>
 </table>
 <h2>What was searched</h2>
-<p>YouTrack (KT project, text search, first 8 results of each query read): &quot;KClass toString&quot;, &quot;Result toString exception&quot;, &quot;Throwable toString Native&quot;. Pages read in full: Kotlin Exception typealias page, JDK 21 Throwable.toString, Kotlin listOf. No page or issue gives the string form of kclass-list (a platform class name).</p>
+<p>YouTrack (KT project, text search, first 8 results of each query read): &quot;KClass toString&quot;, &quot;Result toString exception&quot;, &quot;Throwable toString Native&quot;. Pages read in full: Kotlin Exception typealias page, JDK 21 Throwable.toString, Kotlin listOf, Kotlin/JS reflection guide. No page or issue gives the string form of kclass-list (a platform class name) or the TeaVM class names.</p>
 <h2>Repro draft</h2>
 <div class="draft">
 <p><strong>Draft for human review; not filed.</strong></p>
@@ -340,9 +340,9 @@ This text was written by an agent from measured transcripts and pages it read. A
 
 Question: What do these values print through toString?
 
-Classification now: unclassified (was unclassified); cause letters: a c g; basis: verified.
+Classification now: unclassified (was unclassified); cause letters: a, c, g; basis: verified.
 
-Measured: Kotlin 2.4.20 on 16 columns (android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, jvm 21 arm64 in a container, linux x64, linux arm64 and linux-ubuntu Native, mingw Native under wine); Kotlin 2.5.0-Beta1 on jvm, macos, wasm, android and ios. Single run per cell; no spread measured.
+Measured: Kotlin 2.4.20 on 16 columns of fixtures/atlas (js-ir on Node 26.8.2 arm64, android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, linux x64, linux arm64, and cloudflare-wasm and cloudflare-jvm on workerd 1.20261001.1 under wrangler 4.146.0 on macOS arm64); Kotlin 2.5.0-Beta1 on android, ios, jvm, macos and wasm (fixtures/atlas/2.5.0-beta1) and on js-ir (fixtures/atlas-ladder/2.5.0-beta1, the standalone compiler). cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM 0.15.0), so its Java classes are not a JDK. The rows also carry the transcripts in fixtures/atlas-extra (jvm-21-arm64, linux-ubuntu, mingw-wine). Single run per cell; no spread measured.
 
 Helpers (not shown below): `line(label, v)` prints `label = v`; `outcome(label) { }` prints `ok:&lt;value&gt;` or `err:&lt;ExceptionClass&gt;`; `failure(label) { }` prints `err:&lt;Class&gt;:&lt;message&gt;`; `bits(d)` prints `d.toRawBits()` as unsigned hex.
 
@@ -353,58 +353,153 @@ line(&quot;list-doubles&quot;, listOf(1.0, 2.5f, 1e10))
 line(&quot;result-failure&quot;, Result.failure&lt;Int&gt;(IllegalStateException(&quot;x&quot;)))
 line(&quot;kclass-int&quot;, Int::class)
 line(&quot;kclass-list&quot;, listOf(1)::class.simpleName)
+line(&quot;nested&quot;, mapOf(&quot;k&quot; to listOf(1, 2), &quot;e&quot; to emptyList&lt;Int&gt;()))
+line(&quot;pair-null&quot;, Pair(1, null))
+line(&quot;triple&quot;, Triple('a', &quot;b&quot;, 1L))
+line(&quot;array-content&quot;, arrayOf(1, null).contentToString())
+line(&quot;array-deep&quot;, arrayOf&lt;Any&gt;(arrayOf(1), intArrayOf(2)).contentDeepToString())
+line(&quot;char-array&quot;, charArrayOf('a', 'b').contentToString())
+line(&quot;range-step&quot;, 1..3 step 2)
+line(&quot;empty-range&quot;, 1..0)
+line(&quot;down-to&quot;, 3 downTo 1 step 2)
+line(&quot;char-range&quot;, 'a'..'c')
+line(&quot;long-range&quot;, 1L..3L)
+line(&quot;unit&quot;, Unit)
+line(&quot;null&quot;, null)
+line(&quot;result-success&quot;, Result.success(1))
+line(&quot;set-null&quot;, setOf(null))
+line(&quot;map-null-value&quot;, mapOf(1 to null))
+line(&quot;char-list&quot;, listOf('a', 'b'))
+line(&quot;string-list&quot;, listOf(&quot;a b&quot;, &quot;&quot;))
+line(&quot;regex&quot;, Regex(&quot;a+&quot;))
+line(&quot;regex-option&quot;, Regex(&quot;a&quot;, RegexOption.IGNORE_CASE))
+line(&quot;enum&quot;, Classification.DOCUMENTED)
+line(&quot;uint&quot;, 5u)
+line(&quot;ulong-max&quot;, ULong.MAX_VALUE)
+line(&quot;ubyte&quot;, 200.toUByte())
+line(&quot;char-plus&quot;, 'a' + 1)
+line(&quot;char-minus&quot;, 'c' - 'a')
+line(&quot;kclass-simple&quot;, String::class.simpleName)
+outcome(&quot;kclass-qualified&quot;) { String::class.qualifiedName }
 ```
 
 Results at 2.4.20, one row per distinct output (columns that agree share a row):
 
 - `list-doubles`
-  - `[1.0, 2.5, 1.0E10]`: android+jvm+jvm-17+jvm-21+jvm-21-arm64+jvm-25, ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine
-  - `[1.0, 2.5, 10000000000.0]`: wasm+3browsers
+  - `[1.0, 2.5, 1.0E10]`: android+cloudflare-jvm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine
+  - `[1.0, 2.5, 10000000000.0]`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `nested`
+  - `{k=[1, 2], e=[]}`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `pair-null`
+  - `(1, null)`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `triple`
+  - `(a, b, 1)`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `array-content`
+  - `[1, null]`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `array-deep`
+  - `[[1], [2]]`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `char-array`
+  - `[a, b]`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `range-step`
+  - `1..3 step 2`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `empty-range`
+  - `1..0`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `down-to`
+  - `3 downTo 1 step 2`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `char-range`
+  - `a..c`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `long-range`
+  - `1..3`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `unit`
+  - `kotlin.Unit`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `null`
+  - `null`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `result-success`
+  - `Success(1)`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
 - `result-failure`
-  - `Failure(java.lang.IllegalStateException: x)`: android+jvm+jvm-17+jvm-21+jvm-21-arm64+jvm-25
-  - `Failure(kotlin.IllegalStateException: x)`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine, wasm+3browsers
+  - `Failure(kotlin.IllegalStateException: x)`: cloudflare-wasm+ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `Failure(java.lang.IllegalStateException: x)`: android+cloudflare-jvm+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
+  - `(absent)`: js-ir
+- `set-null`
+  - `[null]`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `map-null-value`
+  - `{1=null}`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `char-list`
+  - `[a, b]`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `string-list`
+  - `[a b, ]`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `regex`
+  - `a+`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `regex-option`
+  - `a`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `enum`
+  - `DOCUMENTED`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `uint`
+  - `5`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `ulong-max`
+  - `18446744073709551615`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `ubyte`
+  - `200`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `char-plus`
+  - `b`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `char-minus`
+  - `2`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
 - `kclass-int`
-  - `int (Kotlin reflection is not available)`: android+jvm+jvm-17+jvm-21+jvm-21-arm64+jvm-25
-  - `class kotlin.Int`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine, wasm+3browsers
+  - `class kotlin.Int`: cloudflare-wasm+ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `int (Kotlin reflection is not available)`: android+cloudflare-jvm+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
+  - `(absent)`: js-ir
+- `kclass-simple`
+  - `String`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `(absent)`: js-ir
+- `kclass-qualified`
+  - `ok:kotlin.String`: android+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `ok:java.lang.String`: cloudflare-jvm
+  - `(absent)`: js-ir
 - `kclass-list`
-  - `SingletonList`: android+jvm+jvm-17+jvm-21+jvm-21-arm64+jvm-25
-  - `ArrayList`: ios+macos+linux+linux-arm64+linux-ubuntu+mingw-wine, wasm+3browsers
+  - `ArrayList`: cloudflare-wasm+ios+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `SingletonList`: android+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm
+  - ``: cloudflare-jvm
+  - `(absent)`: js-ir
 
-On 2.5.0-Beta1 the cells group as: jvm+android; macos+wasm+ios.
+On 2.5.0-Beta1 (android, ios, jvm, macos and wasm from fixtures/atlas/2.5.0-beta1, js-ir from fixtures/atlas-ladder/2.5.0-beta1) the cells group as: android+jvm; ios+macos+wasm; js-ir.
 
 Docs read (FULL text):
 - https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-exception/ : &quot;actual typealias Exception = java.lang.Exception&quot;
-- https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Throwable.html : &quot;Returns a short description of this throwable. The result is the concatenation of: the name of the class of this object&quot;
-- https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/list-of.html : &quot;Returns a new read-only list of given elements.&quot;
+- https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Throwable.html : &quot;the name of the class of this object&quot;
+- https://kotlinlang.org/docs/js-reflection.html : &quot;In Kotlin/JS, the value of a ::class expression is a stripped-down KClass implementation that supports only: simpleName and isInstance() members.&quot;
 
-Existing tracker issues (read through the YouTrack REST API on 2026-10-07; nothing was posted): KT-88414 Fixed; KT-69456 Open; KT-78708 Fixed.
+Existing tracker issues (state read through the YouTrack REST API and the GitHub API on 2026-10-15; nothing was posted): KT-88414 Fixed; KT-69456 Open; KT-78708 Fixed.
 
-What is known: Four lines, three causes; the probe stays unclassified because kclass-list has none.
+What is known: Five lines, four causes; the probe stays unclassified because kclass-list and kclass-qualified have none documented. js-ir is its own group: the probe does not compile there (the Kotlin/JS reflection guide limits ::class to simpleName and isInstance), so no js-ir value is shown for any line. The JVM exception name is documented by the typealias page and Throwable.toString; the Native and Wasm names are not on any page read. cloudflare-wasm prints what wasm prints; cloudflare-jvm differs from every other column on kclass-qualified and kclass-list.
 
-What is NOT known: the intended behavior where no page read states one; whether the divergent column is a defect or by design; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device of the same target differs (one device per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies; the ladder agent re-compiled the displayed text and matched 37 of 38 probes on JVM and macOS Native).
-
-## Cloudflare columns
-
-Recorded 2026-10-12 on workerd 1.20261001.1 under wrangler 4.146.0 (wrangler dev --local, macOS arm64), one run per cell. cloudflare-wasm is the Kotlin/Wasm probe module with a hand-written Worker entry; cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 plugin (TeaVM), so its Java classes are not a JDK. These rows are not part of the results above.
-
-Rows for the differing lines of this draft:
-
-- `list-doubles`
-  - `[1.0, 2.5, 1.0E10]`: android+cloudflare-jvm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos
-  - `[1.0, 2.5, 10000000000.0]`: cloudflare-wasm+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-- `result-failure`
-  - `Failure(java.lang.IllegalStateException: x)`: android+cloudflare-jvm+jvm-17+jvm-21+jvm-25+jvm
-  - `Failure(kotlin.IllegalStateException: x)`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-- `kclass-int`
-  - `int (Kotlin reflection is not available)`: android+cloudflare-jvm+jvm-17+jvm-21+jvm-25+jvm
-  - `class kotlin.Int`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-- `kclass-qualified`
-  - `ok:kotlin.String`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `ok:java.lang.String`: cloudflare-jvm
-- `kclass-list`
-  - `SingletonList`: android+jvm-17+jvm-21+jvm-25+jvm
-  - ``: cloudflare-jvm
-  - `ArrayList`: cloudflare-wasm+ios+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+What is NOT known: whether the divergent column is a defect or by design where no page read states the intended behavior; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device, runtime or workerd release of the same target differs (one run per cell); whether a TeaVM or bytebox release other than 0.15.0 and 1.0.3 changes the cloudflare-jvm column; whether the displayed snippet and the executed probe body are identical (they are two hand-written copies).
 </pre>
 </div>
 <h2>Kotlin versions measured</h2>

@@ -185,7 +185,7 @@ descending = [3, 2, 1]
 <footer><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html">https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html</a></footer></blockquote>
 <h3>Notes</h3>
 <p>Only the four lines with a broken comparator differ, and the zero lines on js-ir (it prints 0 for -0.0; see kotlin.double.equality-order) (always-positive, always-negative, parity, broken-40); stability and total-order lines are identical. The JDK Comparator Javadoc says the implementor must keep signum(compare(x, y)) == -signum(compare(y, x)); all four comparators break it. No FULL page says the result for a contract-violating comparator is undefined, so &quot;documented&quot; rests on the precondition being broken (inference). No YouTrack match for this behavior. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what ios, linux, linux-arm64, macos and 4 more print.</p>
-<p class="muted">Read on 2026-10-07.</p>
+<p class="muted">Read on 2026-10-15.</p>
 <h2>Kotlin versions measured</h2>
 <p>2.4.20, 2.5.0-Beta1</p>
 <h2>How it was measured</h2>

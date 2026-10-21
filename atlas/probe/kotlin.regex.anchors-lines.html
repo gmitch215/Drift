@@ -40,7 +40,7 @@ blockquote{margin:.5rem 0;padding-left:1rem;border-left:3px solid var(--line)}
 <main id="main">
 <h1>kotlin.regex.anchors-lines</h1>
 <p>How do ^, $ and line terminators behave, including from a start index?</p>
-<p><strong>unclassified</strong> (basis: inferred); differs between targets</p>
+<p><strong>platform-defined</strong> (basis: verified); differs between targets</p>
 <h2>Source</h2>
 <pre><code>fun count(pattern: String, input: String, vararg options: RegexOption) =
     Regex(pattern, options.toSet()).findAll(input).count()
@@ -151,123 +151,22 @@ lookbehind-from-index = b
 matchAt-lookbehind = b
 matchAt-caret = null</pre>
 <h2>Classification</h2>
-<p>unclassified, basis inferred.</p>
-<p>No explanation was found in the sources searched.</p>
+<p>platform-defined, basis verified; causes: platform-defined, build tool.</p>
+<blockquote><p>Note that the pattern syntax and the option set has differences on each platform.</p>
+<footer><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/">https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/</a></footer></blockquote>
+<blockquote><p>but also matches just before the last line terminator if this is not followed by any other input character</p>
+<footer><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/regex/Pattern.html">https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/regex/Pattern.html</a></footer></blockquote>
 <h3>Notes</h3>
-<p>cloudflare-jvm records the probe as unavailable: the build refuses java.util.regex.Matcher.useAnchoringBounds, which Regex.matchAt calls, so the matchAt lines are replaced by a thrown UnsupportedOperationException in the Worker's copy of the source and the whole probe fails. Every other column is identical. No page or tracker issue was read for it. cloudflare-wasm prints what wasm prints.</p>
-<p class="muted">Read on 2026-10-07.</p>
+<p>js-ir differs from every other column on seven lines: the four dollar-before lines, dollar-count-plain, caret-count-multiline and nel-multiline. Java Pattern and ECMAScript define $, ^ and the line terminator set differently (Java: $ also matches before a final line terminator, U+0085 is a terminator; ECMAScript: $ matches at the end of input only without m, ^ with m matches after a final terminator, no U+0085), and the Kotlin Regex page says the syntax differs on each platform. KT-82450 (Submitted) reports the same class of difference on JS. cloudflare-jvm records the probe as unavailable: the build replaces the matchAt lines with a thrown UnsupportedOperationException because Matcher.useAnchoringBounds is reported missing from the class library, yet TeaVM 0.15.0 (the version bytebox 1.0.3 pins) TMatcher declares it, so the cause of the refusal is not confirmed. The probe is unchanged on js-ir at 2.5.0-Beta1. cloudflare-wasm prints what wasm prints.</p>
+<p class="muted">Read on 2026-10-15.</p>
+<h2>Issues</h2>
+<table>
+<caption>Tracker state on 2026-10-15</caption>
+<tr><th scope="col">Issue</th><th scope="col">State when read</th><th scope="col">Resolved</th><th scope="col">Summary</th></tr>
+<tr><th scope="row"><a href="https://youtrack.jetbrains.com/issue/KT-82450">KT-82450</a></th><td>Submitted</td><td></td><td>K/JS: The behavior of `Regex.matchEntire` and `Regex.matches` on the JS platform does not meet expectations and differs from other platforms</td></tr>
+</table>
 <h2>What was searched</h2>
-<p>Not searched: the only column that differs is cloudflare-jvm, and no page or tracker issue was read for it.</p>
-<h2>Repro draft</h2>
-<div class="draft">
-<p><strong>Draft for human review; not filed.</strong></p>
-<pre>Draft for human review. Not filed.
-
-# kotlin.regex.anchors-lines
-
-This text was written by an agent from measured transcripts and pages it read. A person must rerun the probe, read the pages named below and rewrite it in their own words before anything is posted; the Kotlin maintainers do not want generated reports. The columns cloudflare-wasm and cloudflare-jvm named below are measured transcripts in fixtures/atlas; the tools/cloudflare build in this repository produces them.
-
-Question: How do ^, $ and line terminators behave, including from a start index?
-
-Classification now: unclassified (was unclassified); cause letters: none; basis: inferred.
-
-Measured: Kotlin 2.4.20 on 16 columns of fixtures/atlas (js-ir on Node 26.8.2 arm64, android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, linux x64, linux arm64, and cloudflare-wasm and cloudflare-jvm on workerd 1.20261001.1 under wrangler 4.146.0 on macOS arm64). cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM), so its Java classes are not a JDK. Single run per cell; no spread measured.
-
-Helpers (not shown below): `line(label, v)` prints `label = v`; `outcome(label) { }` prints `ok:&lt;value&gt;` or `err:&lt;ExceptionClass&gt;`; `failure(label) { }` prints `err:&lt;Class&gt;:&lt;message&gt;`; `bits(d)` prints `d.toRawBits()` as unsigned hex.
-
-Code for the differing lines (from the displayed probe source):
-
-```kotlin
-line(&quot;dollar-before-lf&quot;, Regex(&quot;^a$&quot;).containsMatchIn(&quot;a\n&quot;))
-line(&quot;dollar-before-crlf&quot;, Regex(&quot;^a$&quot;).containsMatchIn(&quot;a\r\n&quot;))
-line(&quot;dollar-before-cr&quot;, Regex(&quot;^a$&quot;).containsMatchIn(&quot;a\r&quot;))
-line(&quot;dollar-before-nel&quot;, Regex(&quot;^a$&quot;).containsMatchIn(&quot;a\u0085&quot;))
-line(&quot;caret-count-multiline&quot;, count(&quot;^&quot;, &quot;a\nb\n&quot;, RegexOption.MULTILINE))
-line(&quot;dollar-count-multiline&quot;, count(&quot;$&quot;, &quot;a\nb\n&quot;, RegexOption.MULTILINE))
-line(&quot;dollar-count-plain&quot;, count(&quot;$&quot;, &quot;a\n&quot;))
-line(&quot;crlf-multiline&quot;, count(&quot;^b$&quot;, &quot;a\r\nb\r\nc&quot;, RegexOption.MULTILINE))
-line(&quot;cr-multiline&quot;, count(&quot;^b$&quot;, &quot;a\rb&quot;, RegexOption.MULTILINE))
-line(&quot;nel-multiline&quot;, count(&quot;^b$&quot;, &quot;a\u0085b&quot;, RegexOption.MULTILINE))
-line(&quot;ls-multiline&quot;, count(&quot;^b$&quot;, &quot;a\u2028b&quot;, RegexOption.MULTILINE))
-line(&quot;dot-star-lines&quot;, Regex(&quot;.*&quot;).findAll(&quot;a\nb&quot;).map { it.value }.toList())
-line(&quot;word-boundaries&quot;, count(&quot;\\b&quot;, &quot;ab cd&quot;))
-line(&quot;caret-from-index&quot;, Regex(&quot;^b&quot;).find(&quot;ab&quot;, 1) != null)
-line(&quot;lookbehind-from-index&quot;, Regex(&quot;(?&lt;=a)b&quot;).find(&quot;ab&quot;, 1)?.value)
-line(&quot;matchAt-lookbehind&quot;, Regex(&quot;(?&lt;=a)b&quot;).matchAt(&quot;ab&quot;, 1)?.value)
-line(&quot;matchAt-caret&quot;, Regex(&quot;^b&quot;).matchAt(&quot;ab&quot;, 1)?.value)
-```
-
-Results at 2.4.20, one row per distinct output (columns that agree share a row):
-
-- `dollar-before-lf`
-  - `true`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `(absent)`: cloudflare-jvm
-  - `false`: js-ir
-- `dollar-before-crlf`
-  - `true`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `(absent)`: cloudflare-jvm
-  - `false`: js-ir
-- `dollar-before-cr`
-  - `true`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `(absent)`: cloudflare-jvm
-  - `false`: js-ir
-- `dollar-before-nel`
-  - `true`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `(absent)`: cloudflare-jvm
-  - `false`: js-ir
-- `caret-count-multiline`
-  - `2`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `(absent)`: cloudflare-jvm
-  - `3`: js-ir
-- `dollar-count-multiline`
-  - `3`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `(absent)`: cloudflare-jvm
-- `dollar-count-plain`
-  - `2`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `(absent)`: cloudflare-jvm
-  - `1`: js-ir
-- `crlf-multiline`
-  - `1`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `(absent)`: cloudflare-jvm
-- `cr-multiline`
-  - `1`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `(absent)`: cloudflare-jvm
-- `nel-multiline`
-  - `1`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `(absent)`: cloudflare-jvm
-  - `0`: js-ir
-- `ls-multiline`
-  - `1`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `(absent)`: cloudflare-jvm
-- `dot-star-lines`
-  - `[a, , b, ]`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `(absent)`: cloudflare-jvm
-- `word-boundaries`
-  - `4`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `(absent)`: cloudflare-jvm
-- `caret-from-index`
-  - `false`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `(absent)`: cloudflare-jvm
-- `lookbehind-from-index`
-  - `b`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `(absent)`: cloudflare-jvm
-- `matchAt-lookbehind`
-  - `b`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `(absent)`: cloudflare-jvm
-- `matchAt-caret`
-  - `null`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
-  - `(absent)`: cloudflare-jvm
-
-Docs read (FULL text):
-
-
-Existing tracker issues: none read. No tracker was queried for the cloudflare columns.
-
-What is known: cloudflare-jvm records the probe as unavailable: the build refuses java.util.regex.Matcher.useAnchoringBounds, which Regex.matchAt calls, so the matchAt lines are replaced by a thrown UnsupportedOperationException in the Worker's copy of the source and the whole probe fails. Every other column is identical. No page or tracker issue was read for it. cloudflare-wasm prints what wasm prints.
-
-What is NOT known: why the cloudflare-jvm output differs (TeaVM's class library, the bytebox build or the Worker runtime were not examined line by line); whether it is a defect or by design; whether a different bytebox or TeaVM release changes the result; whether a different workerd release differs (one runtime version per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies).
-</pre>
-</div>
+<p>Pages read in full: Kotlin Regex page (pattern syntax and options differ on each platform), JDK 21 Pattern (line terminators, ^ and $), ECMAScript assertions ^ and $ and LineTerminator. KT-82450 read in full. Source read: TeaVM 0.15.0 (the version bytebox 1.0.3 pins) TMatcher.java declares useAnchoringBounds(boolean) at line 560. The Kotlin Regex.matchAt source was not read.</p>
 <h2>Kotlin versions measured</h2>
 <p>2.4.20, 2.5.0-Beta1</p>
 <h2>How it was measured</h2>

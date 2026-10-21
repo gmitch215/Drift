@@ -169,13 +169,19 @@ line(&quot;1L-hash&quot;, l.hashCode())</code></pre>
 1-hash = 1
 1L-hash = 1</pre>
 <h2>Classification</h2>
-<p>unclassified, basis inferred.</p>
+<p>unclassified, basis inferred; causes: Kotlin issue, unexplained.</p>
 <p>No explanation was found in the sources searched.</p>
 <h3>Notes</h3>
-<p>cloudflare-jvm prints Integer for the runtime class name of 1 (1-class) where every other column prints Int. No page was read for this line. cloudflare-wasm prints what wasm prints.</p>
-<p class="muted">Read on 2026-10-07.</p>
+<p>Two columns differ. cloudflare-jvm prints Integer for the runtime class name of 1 (1-class) where every other column prints Int; the stdlib source maps java.lang.Integer to Int, so the TeaVM name is a deviation whose path was not traced. js-ir differs on eleven lines: a whole number Double reports as Int (1.0-is-Int true, 1==1.0 true, 1.0-as?-Int prints 1, 1.0-toString prints 1, 1.0-hash prints 1, 1.0-class Int), 1-is-Double is true, and a Float reports as Double (KT-24975, Backlog, says Float is a synonym for Double on JS). The Int and Double lines have no source read; they are consistent with JS numbers being untyped. js-ir is unchanged on 2.5.0-Beta1. cloudflare-wasm prints what wasm prints.</p>
+<p class="muted">Read on 2026-10-15.</p>
+<h2>Issues</h2>
+<table>
+<caption>Tracker state on 2026-10-15</caption>
+<tr><th scope="col">Issue</th><th scope="col">State when read</th><th scope="col">Resolved</th><th scope="col">Summary</th></tr>
+<tr><th scope="row"><a href="https://youtrack.jetbrains.com/issue/KT-24975">KT-24975</a></th><td>Backlog</td><td></td><td>Enforce range of Float type in JS</td></tr>
+</table>
 <h2>What was searched</h2>
-<p>Not searched: the only column that differs is cloudflare-jvm, and no page or tracker issue was read for it.</p>
+<p>YouTrack: KT-24975 read in full. Pages read in full: the Kotlin numbers page (no statement on Int versus Double at runtime on JS). Source read: Kotlin v2.4.20 ClassReference.kt (simpleNameOf maps java.lang.Integer to Int, line 202; getClassSimpleName line 268). The TeaVM class name path for a boxed Integer was not read.</p>
 <h2>Repro draft</h2>
 <div class="draft">
 <p><strong>Draft for human review; not filed.</strong></p>
@@ -187,9 +193,9 @@ This text was written by an agent from measured transcripts and pages it read. A
 
 Question: Can a boxed number be mistaken for another numeric type?
 
-Classification now: unclassified (was unclassified); cause letters: none; basis: inferred.
+Classification now: unclassified (was unclassified); cause letters: c, g; basis: inferred.
 
-Measured: Kotlin 2.4.20 on 15 columns of fixtures/atlas (android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, linux x64, linux arm64, and cloudflare-wasm and cloudflare-jvm on workerd 1.20261001.1 under wrangler 4.146.0 on macOS arm64). cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM), so its Java classes are not a JDK. Single run per cell; no spread measured.
+Measured: Kotlin 2.4.20 on 16 columns of fixtures/atlas (js-ir on Node 26.8.2 arm64, android emulator arm64 API 37, ios simulator arm64, jvm Temurin 21 arm64, macos arm64 Native, wasm on Node 26.8.2 arm64, wasm in Chromium, Firefox and WebKit on x86-64 Linux, jvm 17, 21 and 25 on x86-64, linux x64, linux arm64, and cloudflare-wasm and cloudflare-jvm on workerd 1.20261001.1 under wrangler 4.146.0 on macOS arm64); Kotlin 2.5.0-Beta1 on android, ios, jvm, macos and wasm (fixtures/atlas/2.5.0-beta1) and on js-ir (fixtures/atlas-ladder/2.5.0-beta1, the standalone compiler). cloudflare-jvm is the probes compiled as Kotlin/JVM and turned into a WasmGC Worker by the bytebox 1.0.3 Gradle plugin (TeaVM 0.15.0), so its Java classes are not a JDK. The rows also carry the transcripts in fixtures/atlas-extra (jvm-21-arm64, linux-ubuntu, mingw-wine). Single run per cell; no spread measured.
 
 Helpers (not shown below): `line(label, v)` prints `label = v`; `outcome(label) { }` prints `ok:&lt;value&gt;` or `err:&lt;ExceptionClass&gt;`; `failure(label) { }` prints `err:&lt;Class&gt;:&lt;message&gt;`; `bits(d)` prints `d.toRawBits()` as unsigned hex.
 
@@ -197,22 +203,59 @@ Code for the differing lines (from the displayed probe source):
 
 ```kotlin
 line(&quot;1-class&quot;, i::class.simpleName)
+line(&quot;1.0-is-Int&quot;, d is Int)
+line(&quot;1-is-Double&quot;, i is Double)
+line(&quot;1.5f-is-Double&quot;, f is Double)
+line(&quot;1.0-class&quot;, d::class.simpleName)
+line(&quot;1.5f-class&quot;, f::class.simpleName)
+line(&quot;1==1.0&quot;, i == d)
+line(&quot;1.0-as?-Int&quot;, d as? Int)
+line(&quot;1.0-toString&quot;, d.toString())
+line(&quot;1.0-hash&quot;, d.hashCode())
 ```
 
 Results at 2.4.20, one row per distinct output (columns that agree share a row):
 
+- `1.0-is-Int`
+  - `false`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `true`: js-ir
+- `1-is-Double`
+  - `false`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `true`: js-ir
+- `1.5f-is-Double`
+  - `false`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `true`: js-ir
+- `1.0-class`
+  - `Double`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `Int`: js-ir
 - `1-class`
-  - `Int`: android+cloudflare-wasm+ios+jvm-17+jvm-21+jvm-25+jvm+linux-arm64+linux+macos+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `Int`: android+cloudflare-wasm+ios+js-ir+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
   - `Integer`: cloudflare-jvm
+- `1.5f-class`
+  - `Float`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `Double`: js-ir
+- `1==1.0`
+  - `false`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `true`: js-ir
+- `1.0-as?-Int`
+  - `null`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `1`: js-ir
+- `1.0-toString`
+  - `1.0`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `1`: js-ir
+- `1.0-hash`
+  - `1072693248`: android+cloudflare-jvm+cloudflare-wasm+ios+jvm-17+jvm-21-arm64+jvm-21+jvm-25+jvm+linux-arm64+linux-ubuntu+linux+macos+mingw-wine+wasm-chromium+wasm-firefox+wasm-webkit+wasm
+  - `1`: js-ir
+
+On 2.5.0-Beta1 (android, ios, jvm, macos and wasm from fixtures/atlas/2.5.0-beta1, js-ir from fixtures/atlas-ladder/2.5.0-beta1) the cells group as: android+ios+jvm+macos+wasm; js-ir.
 
 Docs read (FULL text):
 
+Existing tracker issues (state read through the YouTrack REST API and the GitHub API on 2026-10-15; nothing was posted): KT-24975 Backlog.
 
-Existing tracker issues: none read. No tracker was queried for the cloudflare columns.
+What is known: Two columns differ. cloudflare-jvm prints Integer for the runtime class name of 1 (1-class) where every other column prints Int; the stdlib source maps java.lang.Integer to Int, so the TeaVM name is a deviation whose path was not traced. js-ir differs on eleven lines: a whole number Double reports as Int (1.0-is-Int true, 1==1.0 true, 1.0-as?-Int prints 1, 1.0-toString prints 1, 1.0-hash prints 1, 1.0-class Int), 1-is-Double is true, and a Float reports as Double (KT-24975, Backlog, says Float is a synonym for Double on JS). The Int and Double lines have no source read; they are consistent with JS numbers being untyped. js-ir is unchanged on 2.5.0-Beta1. cloudflare-wasm prints what wasm prints.
 
-What is known: cloudflare-jvm prints Integer for the runtime class name of 1 (1-class) where every other column prints Int. No page was read for this line. cloudflare-wasm prints what wasm prints.
-
-What is NOT known: why the cloudflare-jvm output differs (TeaVM's class library, the bytebox build or the Worker runtime were not examined line by line); whether it is a defect or by design; whether a different bytebox or TeaVM release changes the result; whether a different workerd release differs (one runtime version per column); whether the displayed snippet and the executed probe body are identical (they are two hand-written copies).
+What is NOT known: whether the divergent column is a defect or by design where no page read states the intended behavior; whether a newer compiler or stdlib than 2.5.0-Beta1 changes the result; whether a different device, runtime or workerd release of the same target differs (one run per cell); whether a TeaVM or bytebox release other than 0.15.0 and 1.0.3 changes the cloudflare-jvm column; whether the displayed snippet and the executed probe body are identical (they are two hand-written copies).
 </pre>
 </div>
 <h2>Kotlin versions measured</h2>
