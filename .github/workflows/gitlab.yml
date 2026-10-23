@@ -26,13 +26,21 @@ jobs:
         shell: bash
 
     steps:
-      - name: Require GitLab Token
+      - name: Check GitLab Token
+        id: token
         env:
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
-        run: test -n "$GITLAB_TOKEN" || { echo "::error::the GITLAB_TOKEN secret is not set"; exit 1; }
+        run: |
+          if [ -n "$GITLAB_TOKEN" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::the GITLAB_TOKEN secret is not available; skipping the mirror"
+          fi
       - name: Clone Repository
+        if: steps.token.outputs.present == 'true'
         run: git clone --bare "https://github.com/${GITHUB_REPOSITORY}.git" mirror
       - name: Push to GitLab
+        if: steps.token.outputs.present == 'true'
         working-directory: mirror
         env:
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
