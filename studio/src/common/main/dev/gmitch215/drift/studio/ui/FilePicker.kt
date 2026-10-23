@@ -8,6 +8,11 @@ fun interface FilePicker {
     fun pick(extension: String, onPicked: (PickedFile) -> Unit)
 }
 
+/** Hands [text] to the user as a file called [name]; returns why it could not, else null. */
+fun interface FileSaver {
+    fun save(name: String, text: String): String?
+}
+
 /** A chosen file: its bytes, or [problem] when they could not be read. */
 class PickedFile(val name: String, val bytes: ByteArray?, val problem: String? = null)
 

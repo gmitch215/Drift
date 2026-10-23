@@ -32,6 +32,20 @@ val fileDialogPicker = CasePicker { onOpened ->
     dialog.file?.let { onOpened(loadCase(File(dialog.directory, it).path)) }
 }
 
+val fileDialogSaver = FileSaver { name, text ->
+    val dialog = FileDialog(null as Frame?, "Save a File", FileDialog.SAVE)
+    dialog.file = name
+    dialog.isVisible = true
+    dialog.file?.let {
+        try {
+            File(dialog.directory, it).writeText(text)
+            null
+        } catch (e: java.io.IOException) {
+            e.message ?: "write error"
+        }
+    }
+}
+
 val fileDialogFilePicker = FilePicker { extension, onPicked ->
     val dialog = FileDialog(null as Frame?, "Choose a File", FileDialog.LOAD)
     dialog.setFilenameFilter { _, name -> name.endsWith(extension) }

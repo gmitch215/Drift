@@ -33,7 +33,13 @@ fun main(args: Array<String>) {
             title = "Drift Studio",
             icon = icon?.let { BitmapPainter(it.toComposeImageBitmap()) },
         ) {
-            StudioApp(case = opened, picker = fileDialogPicker, files = fileDialogFilePicker)
+            StudioApp(
+                measure = Devices.measurer(Runtime.version().feature().toString()),
+                case = opened,
+                picker = fileDialogPicker,
+                files = fileDialogFilePicker,
+                saver = fileDialogSaver,
+            )
         }
     }
 }

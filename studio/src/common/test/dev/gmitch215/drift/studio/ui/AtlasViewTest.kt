@@ -2,13 +2,19 @@ package dev.gmitch215.drift.studio.ui
 
 import dev.gmitch215.drift.fixtures.AtlasFixtures
 import dev.gmitch215.drift.hash.Sha256
+import dev.gmitch215.drift.host.FakeHost
+import dev.gmitch215.drift.scan.atlas.Atlas
+import dev.gmitch215.drift.scan.atlas.ColumnKey
+import dev.gmitch215.drift.scan.atlas.Dataset
+import dev.gmitch215.drift.scan.atlas.Transcripts
+import dev.gmitch215.drift.scan.probe.ProbeRunner
 import dev.gmitch215.drift.scan.probe.kotlin.KotlinCatalog
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
-private const val FULL_MACOS = "4551accde5e8ac6f7f313f9fd62154a1e2745af49c506d2e38d54a4713cf3eff"
+private const val FULL_MACOS = "4b67160836ebbd089370d7ee1ea9c408cb33f70138fed1d7437a11663a6f88a0"
 
 private const val DETAIL_BETA = "b0ddddade8b62da7d7c6cf1f283544f482a98678ab8061430938c7c7530aecda"
 
@@ -218,14 +224,80 @@ class AtlasViewTest {
     }
 
     @Test
-    fun thisDeviceIsMeasuredHere() {
-        val device = Devices.measure(dataset)
-        assertTrue(device.label.startsWith("this "), device.label)
+    fun deviceIdNamesPlatformRuntimeAndOsFamilyOnly() {
+        assertEquals("jvm-21-linux", Devices.id(FakeHost("jvm", "linux"), "21"))
+        assertEquals("jvm-macos", Devices.id(FakeHost("jvm", "macos")))
+        assertEquals("jvm-21-windows", Devices.id(FakeHost("jvm", "windows"), "21"))
+        assertEquals("wasm-chromium-153", Devices.id(FakeHost("wasm", "unknown"), "chromium-153"))
+        assertEquals("wasm", Devices.id(FakeHost("wasm", "unknown"), ""))
+        assertEquals("android", Devices.id(FakeHost("android", "android")))
+        assertEquals("linux-arm64", Devices.id(FakeHost("linux-arm64", "linux")))
+        assertEquals("macos", Devices.id(FakeHost("macos", "macos")))
+    }
+
+    @Test
+    fun browserIdReadsEngineMajorVersionAndOsFromTheUserAgent() {
+        val chrome = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " +
+            "(KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36"
+        val firefox = "Mozilla/5.0 (X11; Linux x86_64; rv:155.0) Gecko/20100101 Firefox/155.0"
+        val safari = "Mozilla/5.0 (iPhone; CPU iPhone OS 26_5 like Mac OS X) " +
+            "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1"
+        val android = "Mozilla/5.0 (Linux; Android 16; Pixel 9) AppleWebKit/537.36 " +
+            "(KHTML, like Gecko) Chrome/153.0.0.0 Mobile Safari/537.36"
+        val windows = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+            "(KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36 Edg/153.0.0.0"
+        assertEquals("chromium-153-macos", Devices.browser(chrome))
+        assertEquals("firefox-155-linux", Devices.browser(firefox))
+        assertEquals("webkit-26-ios", Devices.browser(safari))
+        assertEquals("chromium-153-android", Devices.browser(android))
+        assertEquals("chromium-153-windows", Devices.browser(windows))
+        assertEquals("", Devices.browser("curl/8.0"))
+    }
+
+    @Test
+    fun aDeviceColumnIsAnAtlasTranscriptThatReadsBackAndJoinsTheDataset() {
+        val host = FakeHost("jvm", "linux")
+        val id = Devices.id(host, "21")
+        val text = Atlas.record(host, id)
+        val column = Transcripts.read(id, text)
+        assertEquals(id, column.target)
+        assertEquals(KotlinCatalog.all.size, column.cells.size)
+        for (result in ProbeRunner.run(host, KotlinCatalog.all.map { it.probe })) {
+            assertEquals(result.transcript, column.cells.getValue(result.id).transcript)
+        }
+        assertEquals(
+            listOf("# kotlin.version = ${column.version}", "# kotlin.target = $id"),
+            text.lines().takeWhile { !it.startsWith("@@ ") },
+        )
+        assertTrue(host.ran.isEmpty())
+        val device = Devices.of(id, text, dataset)
         assertEquals(KotlinCatalog.all.size, device.measured)
-        assertTrue(device.transcript.startsWith("# kotlin.version = "))
-        assertEquals("this JVM", Devices.label("jvm"))
-        assertEquals("this browser (wasm)", Devices.label("wasm"))
-        assertEquals("this device (linuxX64)", Devices.label("linuxX64"))
+        val names = AtlasFixtures.names.filter { it.endsWith(".txt") }.sorted()
+        val recorded = names.map { Transcripts.read(it, AtlasFixtures.text(it)) }
+        val joined = Dataset.build(recorded + column)
+        assertTrue(ColumnKey(id, column.version) in joined.columns)
+    }
+
+    @Test
+    fun kotlinProbesNeedNoProcessFilesOrEnvironment() {
+        assertEquals(38, KotlinCatalog.all.size)
+        assertTrue(KotlinCatalog.all.all { it.probe.needs.isEmpty() })
+    }
+
+    @Test
+    fun rowsSayWhichColumnsAgreeAndDifferAndTheDrillRepeatsIt() {
+        val v = view(device = macos)
+        val row = v.rows.first { it.id == "kotlin.double.nan-bits" }
+        assertEquals(listOf("linux-arm64", "macos", "ios"), row.agrees)
+        assertEquals(v.targets - row.agrees.toSet(), row.differs)
+        assertTrue(view().rows.all { it.agrees.isEmpty() && it.differs.isEmpty() })
+        val lines = AtlasView.drill(AtlasState(dataset, device = macos), row.id)
+        assertTrue("same as this device: ios, linux-arm64, macos" in lines)
+        val differs = lines.first { it.startsWith("differs from this device: ") }
+        assertEquals(
+            row.differs.toSet(),
+            differs.removePrefix("differs from this device: ").split(", ").toSet(),
+        )
     }
 
     @Test

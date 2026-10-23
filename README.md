@@ -9,7 +9,7 @@
         <img src="https://img.shields.io/github/stars/gmitch215/Drift?style=flat" alt="stars">
         <img src="https://img.shields.io/github/commit-activity/t/gmitch215/Drift?color=violet" alt="commit activity">
     </div>
-    <p style="text-align: center;" data-shared-ratio>Shared code 91.8%: host 43.7%, core 100.0%, scan 100.0%, cli 72.5%, studio 95.3%, bench 81.6%</p>
+    <p style="text-align: center;" data-shared-ratio>Shared code 91.8%: host 43.7%, core 100.0%, scan 100.0%, cli 72.5%, studio 94.4%, bench 81.6%</p>
 </div>
 
 ---

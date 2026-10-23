@@ -21,7 +21,13 @@ data class AtlasState(
     val level: DetailLevel = DetailLevel.SUMMARY,
     val device: Device? = null,
     val selected: String? = null,
+    val progress: Progress? = null,
 )
+
+/** Probes finished and the total of a run on this device. */
+data class Progress(val done: Int, val total: Int) {
+    val fraction: Float get() = if (total == 0) 0f else done.toFloat() / total
+}
 
 data class CellView(val target: String, val short: String, val lines: List<String>)
 
@@ -55,6 +61,8 @@ data class RowView(
     val device: CellView?,
     val deviceVerdict: String?,
     val notes: List<String>,
+    val agrees: List<String> = emptyList(),
+    val differs: List<String> = emptyList(),
 )
 
 data class AtlasView(
@@ -147,6 +155,12 @@ data class AtlasView(
                 if (device != null && own != null) {
                     add("${device.label}:")
                     own.forEach { add("  ${ascii(it)}") }
+                    val matched = cmp.matches.filter { it.version == v }.map { it.target }
+                    val differed = cmp.differs.filter { it.version == v }.map { it.target }
+                    val same = matched.joinToString(", ").ifEmpty { "none" }
+                    val other = differed.joinToString(", ").ifEmpty { "none" }
+                    add("same as this device: $same")
+                    add("differs from this device: $other")
                 }
                 addAll(cited(p))
             }
@@ -212,6 +226,8 @@ data class AtlasView(
                     DetailLevel.DETAIL -> listOf(p.question)
                     DetailLevel.FULL -> listOf(p.question) + cited(p)
                 },
+                agrees = targets.filter { ColumnKey(it, v) in cmp?.matches.orEmpty() },
+                differs = targets.filter { ColumnKey(it, v) in cmp?.differs.orEmpty() },
             )
         }
 

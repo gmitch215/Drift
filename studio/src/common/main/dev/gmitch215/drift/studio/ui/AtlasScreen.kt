@@ -27,24 +27,29 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.gmitch215.drift.scan.atlas.Dataset
+import kotlinx.coroutines.launch
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.TimeSource
 
 const val ATLAS_FOOTER =
     "Cells are recorded results for each listed Kotlin version. The device column is measured " +
-        "when Studio opens. A difference between targets says nothing yet about a cause."
+        "when Studio opens and again each time you run it. Nothing is sent anywhere. A " +
+        "difference between targets says nothing yet about a cause."
 
 private const val ABOUT =
     "The same Kotlin code can behave differently on different targets, such as the JVM, native " +
@@ -81,11 +86,12 @@ fun interface CasePicker {
 fun StudioApp(
     dataset: Dataset = AtlasData.dataset,
     samples: List<Sample> = samples(),
-    measure: (Dataset) -> Device = { Devices.measure(it) },
+    measure: DeviceMeasure = Devices.measurer(),
     dark: Boolean = isSystemInDarkTheme(),
     case: CaseView? = null,
     picker: CasePicker? = null,
     files: FilePicker? = null,
+    saver: FileSaver? = null,
     startOnAtlas: Boolean = false,
 ) {
     var opened by remember { mutableStateOf(case) }
@@ -148,7 +154,7 @@ fun StudioApp(
 
                     Tab.CASE -> opened?.let { CaseScreen(it) }
 
-                    Tab.ATLAS -> AtlasScreen(dataset, measure)
+                    Tab.ATLAS -> AtlasScreen(dataset, measure, saver)
 
                     Tab.INVESTIGATION -> StudioScreen(samples)
 
@@ -169,26 +175,43 @@ fun StudioApp(
 @Composable
 fun AtlasScreen(
     dataset: Dataset = AtlasData.dataset,
-    measure: (Dataset) -> Device = { Devices.measure(it) },
+    measure: DeviceMeasure = Devices.measurer(),
+    saver: FileSaver? = null,
 ) {
     var state by remember { mutableStateOf(AtlasState(dataset)) }
     var predict by remember { mutableStateOf(PredictState(dataset)) }
     var mode by remember { mutableStateOf(Mode.MATRIX) }
     var millis by remember { mutableStateOf<Long?>(null) }
     var failure by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
 
-    LaunchedEffect(dataset) {
-        withFrameNanos { }
+    suspend fun run() {
+        failure = null
         val start = TimeSource.Monotonic.markNow()
         try {
-            val device = measure(dataset)
+            val device = measure.measure(dataset) { done, total ->
+                state = state.copy(progress = Progress(done, total))
+            }
             millis = start.elapsedNow().inWholeMilliseconds
             state = state.copy(device = device)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             failure = e.message ?: e::class.simpleName ?: "unknown error"
+        } finally {
+            state = state.copy(progress = null)
         }
+    }
+
+    fun start() {
+        if (state.progress != null) return
+        state = state.copy(progress = Progress(0, 0))
+        scope.launch { run() }
+    }
+
+    LaunchedEffect(dataset) {
+        withFrameNanos { }
+        start()
     }
 
     val palette = LocalPalette.current
@@ -233,7 +256,7 @@ fun AtlasScreen(
                 }
             }
             when (mode) {
-                Mode.MATRIX -> MatrixPane(state, millis, failure) { state = it }
+                Mode.MATRIX -> MatrixPane(state, millis, failure, saver, ::start) { state = it }
 
                 Mode.PREDICT -> Box(Modifier.widthIn(max = ContentWidth)) {
                     PredictPane(predict) { predict = it }
@@ -251,6 +274,8 @@ private fun MatrixPane(
     state: AtlasState,
     millis: Long?,
     failure: String?,
+    saver: FileSaver?,
+    onRun: () -> Unit,
     update: (AtlasState) -> Unit,
 ) {
     val palette = LocalPalette.current
@@ -279,33 +304,25 @@ private fun MatrixPane(
             Modifier.testTag("count"),
         )
         if (view.hidden > 0) Muted("${view.hidden} identical probes hidden", style = Type.body)
-        DevicePanel(view, millis, failure)
+        DevicePanel(view, millis, failure, state.progress, onRun)
     }
     val scroll = rememberScrollState()
     Column {
         Row(Modifier.fillMaxWidth().padding(top = Space.s)) {
             Spacer(Modifier.width(NAME_WIDTH))
             Row(Modifier.weight(1f).horizontalScroll(scroll)) {
+                Muted("Device", Modifier.width(CELL_WIDTH * 4))
                 view.groups.forEach {
                     Muted(
                         it.name,
                         Modifier.width(CELL_WIDTH * it.targets.size).testTag("group:${it.name}"),
                     )
                 }
-                Muted("Device", Modifier.width(CELL_WIDTH * 4))
             }
         }
         Row(Modifier.fillMaxWidth().padding(bottom = Space.s)) {
             StudioText("Probe", Modifier.width(NAME_WIDTH), Type.body, weight = FontWeight.SemiBold)
             Row(Modifier.weight(1f).horizontalScroll(scroll)) {
-                view.targets.forEach {
-                    StudioText(
-                        it,
-                        Modifier.width(CELL_WIDTH),
-                        Type.monoSmall,
-                        weight = FontWeight.SemiBold,
-                    )
-                }
                 StudioText(
                     view.deviceLabel ?: "this device",
                     Modifier.width(CELL_WIDTH).testTag("device-header"),
@@ -318,6 +335,14 @@ private fun MatrixPane(
                     Type.monoSmall,
                     weight = FontWeight.SemiBold,
                 )
+                view.targets.forEach {
+                    StudioText(
+                        it,
+                        Modifier.width(CELL_WIDTH),
+                        Type.monoSmall,
+                        weight = FontWeight.SemiBold,
+                    )
+                }
             }
         }
         Rule()
@@ -349,14 +374,6 @@ private fun MatrixPane(
                         }
                     }
                     Row(Modifier.weight(1f).horizontalScroll(scroll)) {
-                        r.cells.forEach {
-                            StudioText(
-                                it.short,
-                                Modifier.width(CELL_WIDTH).padding(vertical = Space.xs)
-                                    .testTag("cell:${r.id}:${it.target}"),
-                                Type.monoSmall,
-                            )
-                        }
                         val device = r.device?.short.orEmpty()
                         StudioText(
                             device,
@@ -370,6 +387,16 @@ private fun MatrixPane(
                                 .testTag("vs:${r.id}"),
                             Type.small,
                         )
+                        r.cells.forEach {
+                            Row(Modifier.width(CELL_WIDTH).padding(vertical = Space.xs)) {
+                                SameMark(r, it.target)
+                                StudioText(
+                                    it.short,
+                                    Modifier.testTag("cell:${r.id}:${it.target}"),
+                                    Type.monoSmall,
+                                )
+                            }
+                        }
                     }
                 }
                 r.notes.forEach {
@@ -392,7 +419,40 @@ private fun MatrixPane(
             }
         }
     }
-    state.device?.let { Export(it) }
+    state.device?.let { Export(it, saver) }
+}
+
+@Composable
+private fun SameMark(row: RowView, target: String) {
+    val same = target in row.agrees
+    if (!same && target !in row.differs) return
+    StudioText(
+        if (same) "=" else "!=",
+        Modifier.width(MARK_WIDTH).testTag("mark:${row.id}:$target").semantics {
+            contentDescription = if (same) "same as this device" else "differs from this device"
+        },
+        Type.monoSmall,
+        weight = if (same) null else FontWeight.SemiBold,
+    )
+}
+
+@Composable
+private fun RunBar(progress: Progress) {
+    val palette = LocalPalette.current
+    Muted(
+        if (progress.total == 0) "Starting" else "${progress.done} of ${progress.total} probes run",
+        Modifier.testTag("run-progress"),
+        Type.body,
+    )
+    Box(
+        Modifier.fillMaxWidth().height(4.dp).background(palette.hairline, BarShape)
+            .semantics { progressBarRangeInfo = ProgressBarRangeInfo(progress.fraction, 0f..1f) },
+    ) {
+        Box(
+            Modifier.fillMaxWidth(progress.fraction).height(4.dp)
+                .background(palette.accent, BarShape),
+        )
+    }
 }
 
 @Composable
@@ -410,7 +470,13 @@ private fun Marker(divergent: Boolean) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun DevicePanel(view: AtlasView, millis: Long?, failure: String?) {
+private fun DevicePanel(
+    view: AtlasView,
+    millis: Long?,
+    failure: String?,
+    progress: Progress?,
+    onRun: () -> Unit,
+) {
     Panel {
         Column(verticalArrangement = Arrangement.spacedBy(Space.xs)) {
             Muted("This Device")
@@ -438,21 +504,53 @@ private fun DevicePanel(view: AtlasView, millis: Long?, failure: String?) {
                         perTarget.forEach { Muted(it, style = Type.monoSmall) }
                     }
                     millis?.let { Muted("measured in $it ms") }
+                    Muted(
+                        "In the table, = means the same as this device and != means different.",
+                        style = Type.body,
+                    )
                 }
+            }
+            if (progress == null) {
+                Choice(
+                    "Run on This Device",
+                    null,
+                    Modifier.padding(top = Space.xs).testTag("run"),
+                    Role.Button,
+                    onRun,
+                )
+            } else {
+                RunBar(progress)
             }
         }
     }
 }
 
 @Composable
-private fun Export(device: Device) {
+private fun Export(device: Device, saver: FileSaver?) {
     val palette = LocalPalette.current
     var shown by remember { mutableStateOf(false) }
+    var problem by remember { mutableStateOf<String?>(null) }
     Column(verticalArrangement = Arrangement.spacedBy(Space.s)) {
         Muted(
             "The raw measurement of this device, for adding it to the Atlas build.",
             style = Type.body,
         )
+        if (saver != null) {
+            Choice(
+                "Save Device Transcript",
+                null,
+                Modifier.testTag("export-save"),
+                Role.Button,
+            ) { problem = saver.save("${device.label}.txt", device.transcript) }
+            problem?.let {
+                StudioText(
+                    "Could not save the transcript: $it",
+                    Modifier.testTag("export-problem"),
+                    Type.body,
+                    palette.danger,
+                )
+            }
+        }
         Choice(
             "Show Device Transcript",
             null,
@@ -539,4 +637,6 @@ private fun PredictPane(state: PredictState, update: (PredictState) -> Unit) {
 
 private val NAME_WIDTH = 260.dp
 
-private val CELL_WIDTH = 160.dp
+private val CELL_WIDTH = 184.dp
+
+private val MARK_WIDTH = 24.dp

@@ -1,21 +1,33 @@
 package dev.gmitch215.drift.studio.ui
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.v2.runComposeUiTest
+import androidx.compose.ui.unit.dp
 import dev.gmitch215.drift.fixtures.AtlasFixtures
+import dev.gmitch215.drift.host.FakeHost
+import dev.gmitch215.drift.scan.atlas.ColumnKey
 import dev.gmitch215.drift.scan.atlas.Dataset
+import dev.gmitch215.drift.scan.atlas.Transcripts
 import dev.gmitch215.drift.scan.probe.kotlin.KotlinCatalog
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -25,13 +37,15 @@ import kotlin.test.assertTrue
 class AtlasScreenTest {
     private val dataset = AtlasData.dataset
     private val boundaries = "kotlin.double.tostring-boundaries"
-    private val fixture = { d: Dataset ->
+    private val fixture = DeviceMeasure { d, _ ->
         Devices.of("this JVM", AtlasFixtures.text("macos.txt"), d)
     }
 
-    private fun ComposeUiTest.show(measure: (Dataset) -> Device = fixture) {
+    private fun ComposeUiTest.show(measure: DeviceMeasure = fixture) {
         setContent { AtlasScreen(dataset, measure) }
-        waitUntil { onAllNodesWithText("Measuring this device").fetchSemanticsNodes().isEmpty() }
+        waitUntil(timeoutMillis = 30_000) {
+            onAllNodesWithText("Measuring this device").fetchSemanticsNodes().isEmpty()
+        }
     }
 
     private fun wasm(v: AtlasView) =
@@ -60,9 +74,9 @@ class AtlasScreenTest {
     @Test
     fun studioAppMeasuresThroughTheFunctionItIsGiven() = runComposeUiTest {
         var calls = 0
-        val counted = { d: Dataset ->
+        val counted = DeviceMeasure { d, p ->
             calls++
-            fixture(d)
+            fixture.measure(d, p)
         }
         setContent { StudioApp(dataset, measure = counted) }
         onNodeWithTag("home:atlas").performScrollTo().performClick()
@@ -73,9 +87,9 @@ class AtlasScreenTest {
     @Test
     fun studioAppStartsOnTheAtlasAndMeasuresWhenAsked() = runComposeUiTest {
         var calls = 0
-        val counted = { d: Dataset ->
+        val counted = DeviceMeasure { d, p ->
             calls++
-            fixture(d)
+            fixture.measure(d, p)
         }
         setContent { StudioApp(dataset, measure = counted, startOnAtlas = true) }
         waitUntil { onAllNodesWithText("Measuring this device").fetchSemanticsNodes().isEmpty() }
@@ -137,10 +151,11 @@ class AtlasScreenTest {
     }
 
     @Test
-    fun thisDeviceColumnIsLiveAndLabelledForTheJvm() = runComposeUiTest {
-        show(measure = { Devices.measure(it) })
-        onNodeWithTag("device-header").assertTextEquals("this JVM")
-        val own = Devices.measure(dataset)
+    fun thisDeviceColumnIsLiveAndLabelledWithACoarsePlatformId() = runComposeUiTest {
+        show(measure = Devices.measurer("21"))
+        val own = runBlocking { Devices.measure(dataset, runtime = "21") }
+        onNodeWithTag("device-header").assertTextEquals(own.label)
+        assertTrue(Regex("jvm-21(-[a-z]+)?").matches(own.label), own.label)
         assertEquals(KotlinCatalog.all.size, own.measured)
         val expected = AtlasView.of(AtlasState(dataset, device = own))
             .rows.first { it.id == boundaries }
@@ -150,6 +165,111 @@ class AtlasScreenTest {
         onNodeWithTag("export-text").assertDoesNotExist()
         onNodeWithTag("export").performScrollTo().performClick()
         onNodeWithTag("export-text").assertExists()
+    }
+
+    @Test
+    fun measuringRunsEveryKotlinProbeWithoutTouchingProcessesFilesOrTheEnvironment() {
+        val host = FakeHost("jvm", "linux", env = mapOf("USER" to "someone"))
+        val seen = mutableListOf<Progress>()
+        val device = runBlocking {
+            Devices.measure(dataset, host, "21") { done, total -> seen += Progress(done, total) }
+        }
+        assertEquals("jvm-21-linux", device.label)
+        assertEquals(KotlinCatalog.all.size, device.measured)
+        assertEquals(KotlinCatalog.all.size, seen.size)
+        assertEquals(Progress(1, 38), seen.first())
+        assertEquals(Progress(38, 38), seen.last())
+        assertTrue(host.ran.isEmpty())
+        assertTrue("someone" !in device.transcript)
+    }
+
+    @Test
+    fun runOnThisDeviceShowsProgressThenKeepsTheColumnAndAgreementMarks() = runComposeUiTest {
+        val gates = mutableListOf<CompletableDeferred<Unit>>()
+        val gated = DeviceMeasure { d, progress ->
+            val gate = CompletableDeferred<Unit>().also { gates += it }
+            progress(1, 3)
+            gate.await()
+            progress(3, 3)
+            fixture.measure(d, progress)
+        }
+        setContent { AtlasScreen(dataset, gated) }
+        waitUntil { onAllNodesWithText("1 of 3 probes run").fetchSemanticsNodes().isNotEmpty() }
+        onNodeWithTag("run").assertDoesNotExist()
+        gates[0].complete(Unit)
+        waitUntil { onAllNodesWithTag("run").fetchSemanticsNodes().isNotEmpty() }
+        onNodeWithTag("device-header").assertTextEquals("this JVM")
+        val own = Devices.of("this JVM", AtlasFixtures.text("macos.txt"), dataset)
+        val v = AtlasView.of(AtlasState(dataset, device = own))
+        val same = v.rows.first { "macos" in it.agrees }
+        val other = v.rows.first { it.differs.isNotEmpty() }
+        onNodeWithTag("mark:${same.id}:macos")
+            .assertContentDescriptionEquals("same as this device").assertTextEquals("=")
+        onNodeWithTag("mark:${other.id}:${other.differs.first()}")
+            .assertContentDescriptionEquals("differs from this device").assertTextEquals("!=")
+        onNodeWithTag("run").performScrollTo().performClick()
+        waitUntil { onAllNodesWithText("1 of 3 probes run").fetchSemanticsNodes().isNotEmpty() }
+        onNodeWithTag("device-header").assertTextEquals("this JVM")
+        onNodeWithTag("run").assertDoesNotExist()
+        gates[1].complete(Unit)
+        waitUntil { onAllNodesWithTag("run").fetchSemanticsNodes().isNotEmpty() }
+        assertEquals(2, gates.size)
+    }
+
+    @Test
+    fun theActionAndTheColumnAreReachableAtPhoneWidth() = runComposeUiTest {
+        setContent { Box(Modifier.width(360.dp)) { AtlasScreen(dataset, fixture) } }
+        waitUntil { onAllNodesWithText("Measuring this device").fetchSemanticsNodes().isEmpty() }
+        onNodeWithTag("run").performScrollTo().assertIsDisplayed()
+        assertTrue(onNodeWithTag("run").getUnclippedBoundsInRoot().right <= 360.dp)
+        onNodeWithTag("device-header").assertTextEquals("this JVM")
+        onNodeWithTag("row:$boundaries").performScrollTo().assertIsDisplayed()
+        onNodeWithTag("cell:$boundaries:device").assertIsDisplayed()
+        onNodeWithTag("cell:$boundaries:ios").performScrollTo().assertIsDisplayed()
+        onNodeWithTag("mark:$boundaries:ios").assertIsDisplayed()
+        onNodeWithTag("export").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun savingHandsTheColumnTextToTheSaverAndReadsBackThroughTheDatasetReader() = runComposeUiTest {
+        var saved: Pair<String, String>? = null
+        setContent {
+            AtlasScreen(dataset, Devices.measurer("21"), { name, text ->
+                saved = name to text
+                null
+            })
+        }
+        waitUntil(timeoutMillis = 30_000) {
+            onAllNodesWithTag("export-save").fetchSemanticsNodes().isNotEmpty()
+        }
+        onNodeWithTag("export-save").performScrollTo().performClick()
+        val (name, text) = saved!!
+        val column = Transcripts.read(name, text)
+        assertEquals("${column.target}.txt", name)
+        assertTrue(Regex("jvm-21(-[a-z]+)?").matches(column.target), column.target)
+        assertEquals(KotlinCatalog.all.size, column.cells.size)
+        val recorded = AtlasFixtures.names.filter { it.endsWith(".txt") }
+            .map { Transcripts.read(it, AtlasFixtures.text(it)) }
+        val joined = Dataset.build(recorded + column)
+        assertTrue(ColumnKey(column.target, column.version) in joined.columns)
+        onNodeWithTag("export-problem").assertDoesNotExist()
+    }
+
+    @Test
+    fun aSaveThatFailsSaysWhy() = runComposeUiTest {
+        setContent { AtlasScreen(dataset, fixture, { _, _ -> "disk full" }) }
+        waitUntil { onAllNodesWithTag("export-save").fetchSemanticsNodes().isNotEmpty() }
+        onNodeWithTag("export-save").performScrollTo().performClick()
+        onNodeWithTag("export-problem")
+            .assertTextEquals("Could not save the transcript: disk full")
+    }
+
+    @Test
+    fun openingStudioToTheDeviceColumnTakesOneClickFromHome() = runComposeUiTest {
+        setContent { StudioApp(dataset, measure = fixture) }
+        onNodeWithTag("home:atlas").performScrollTo().performClick()
+        waitUntil { onAllNodesWithText("Measuring this device").fetchSemanticsNodes().isEmpty() }
+        onNodeWithTag("device-header").assertTextEquals("this JVM")
     }
 
     @Test
@@ -201,7 +321,7 @@ class AtlasScreenTest {
 
     @Test
     fun aFailedMeasurementIsShownAndTheRecordedMatrixStays() = runComposeUiTest {
-        setContent { AtlasScreen(dataset) { error("no engine") } }
+        setContent { AtlasScreen(dataset, { _, _ -> error("no engine") }) }
         onNodeWithTag("device-error").assertTextEquals(
             "Could not measure this device: no engine. The recorded columns are unaffected.",
         )
