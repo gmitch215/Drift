@@ -5,7 +5,7 @@ measured:
   issuesRead: [KT-13575, KT-17719, KT-18067, KT-21235, KT-24975, KT-30141, KT-44746, KT-49557,
     KT-50777, KT-51859, KT-53212, KT-53258, KT-57189, KT-58195, KT-58678, KT-61028, KT-63088,
     KT-68310, KT-68395, KT-69456, KT-71003, KT-72508, KT-72509, KT-78708, KT-80664, KT-81626,
-    KT-82450, KT-88035, KT-88036, KT-88414, KT-88775, KT-88829, KT-89031, KT-89072, KT-89074,
+    KT-82450, KT-88035, KT-88036, KT-88082, KT-88414, KT-88775, KT-88829, KT-89031, KT-89072, KT-89074,
     KT-89187]
 probes:
 - id: kotlin.char.bmp-case-mapping
@@ -389,7 +389,7 @@ probes:
 - id: kotlin.double.nan-bits
   classification: unclassified
   basis: verified
-  causes: [b, d, g]
+  causes: [b, c, d]
   references:
   - url: https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.2.3
     quote: IEEE 754 allows multiple distinct NaN values for each of its binary32 and binary64 floating-point
@@ -433,9 +433,11 @@ probes:
     issue: the Wasm spec leaves the NaN sign non-deterministic for every operator except fneg, fabs and
       fcopysign, which allows both
   - line: neg-nan-raw
-    cause: g
+    cause: c
     columns: native (macos, ios, linux, linux-arm64) 7ff8; jvm family, android, wasm family fff8
-    issue: KT-53258 lists constant folding as a candidate; not confirmed for this line
+    issue: KT-88082 (Fixed) covers constant folding of a NaN expression, removed in 2.5.0-Beta2. The
+      Native 2.4.20 value comes from folding -Double.NaN before code generation, and 2.5.0-Beta2 prints
+      fff8 like the other targets.
   - line: float-payload-raw
     cause: b
     columns: js-ir 7fc00001; every other column 7f800001
@@ -444,9 +446,10 @@ probes:
     the browsers on x86 print fff8 like x86 JVM and Linux, Node on arm64 prints 7ff8; checked for Wasm with
     a hand-assembled f64.div module on Node arm64 and Node x64). sqrt-neg-raw follows the CPU on JVM and
     Native but not in the three x86 browsers (7ff8), which the Wasm NaN rule allows. neg-nan-raw follows
-    the Kotlin target: Native 7ff8 on every host, JVM, Android and Wasm fff8 on every host; no page explains
-    it, and the Wasm fneg rule (a deterministic sign flip) gives fff8 as the JVM does. The source is the
-    constant expression -Double.NaN; whether the compiler folds it was not checked. float-payload-raw differs
+    the Kotlin target: Native 7ff8 on every host, JVM, Android and Wasm fff8 on every host; KT-88082 explains the
+    Native value, and the Wasm fneg rule (a deterministic sign flip) gives fff8 as the JVM does. The
+    source is the constant expression -Double.NaN; KT-88082 shows the compiler folded it before code
+    generation, and 2.5.0-Beta2 stopped that folding. float-payload-raw differs
     only on js-ir (7fc00001), which ECMAScript''s single NaN value allows. The ladder fixtures show Native
     neg-nan-raw fff8 on 1.6.21 and 7ff8 from 1.9.25 on macos and linux. cloudflare-wasm prints what wasm
     prints; cloudflare-jvm prints what android, jvm, wasm print.'
@@ -669,8 +672,10 @@ probes:
   - line: int-div-zero, int-mod-zero, floorDiv-zero
     cause: c
     columns: 'js-ir ok:0 (no exception); long-div-zero Exception: division by zero'
-    issue: KT-17719 Fixed, fix version 2.5.0-Beta1; the 2.5.0-Beta1 js-ir transcript still prints ok:0 for
-      the three Int lines and changes only long-div-zero to ArithmeticException
+    issue: KT-17719 Fixed, fix version 2.5.0-Beta1. The integer division check is opt-in until language
+      version 2.6 (JsIntegerDivisionCheck(sinceVersion = KOTLIN_2_6), -Xinteger-division-check defaults
+      off), so the unchanged ok:0 on 2.5.0-Beta1 follows from the default setting; only long-div-zero
+      changes, to ArithmeticException
   - line: array-index, string-index, substring
     cause: a
     columns: js-ir returns null or no exception
@@ -691,8 +696,10 @@ probes:
     17), not a platform difference. Native throws ArrayIndexOutOfBoundsException(null) on three string lines;
     Wasm throws IndexOutOfBoundsException and a ClassCastException on null-cast (KT-88829 Open is the generic-cast
     sibling, not this line). js-ir does not throw on int-div-zero, int-mod-zero, floorDiv-zero, array-index,
-    string-index and substring. KT-17719 is Fixed for 2.5.0-Beta1, but the 2.5.0-Beta1 js-ir transcript
-    from the standalone compiler still prints ok:0 for the three Int lines; only long-div-zero changed,
+    string-index and substring. KT-17719 is Fixed for 2.5.0-Beta1. Its integer division check is opt-in:
+    -Xinteger-division-check is off by default until language version 2.6
+    (JsIntegerDivisionCheck(sinceVersion = KOTLIN_2_6)). The 2.5.0-Beta1 js-ir transcript from the
+    standalone compiler therefore still prints ok:0 for the three Int lines; only long-div-zero changed,
     from Exception to ArithmeticException (/ by zero). Android prints ART texts (length=3; index=10). cloudflare-wasm
     prints what wasm prints; cloudflare-jvm records the probe as unavailable: the module built with TeaVM
     0.15.0 (the version bytebox 1.0.3 pins) traps on integer division (RuntimeError: divide by zero), which

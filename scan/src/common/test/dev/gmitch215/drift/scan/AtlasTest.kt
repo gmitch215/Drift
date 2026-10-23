@@ -459,7 +459,7 @@ class AtlasTest {
 }
 
 private const val BOTH_SHA =
-    "b96ea2ed44bf242f80492e77362d4e5708d73215cf2358eb3cc008d0a33a3fc8"
+    "82a3ce21b3842ca75f2ae93cf1ec8281375cf4f6a840576b1cdaf1e406b8c615"
 
 private const val HEAD_TARGET = "# kotlin.target = x\n"
 
@@ -477,7 +477,7 @@ private const val VERSION_DIFF_FULL_SHA =
     "f4686e67cfa432962ee7623e446c06d37ab8ecdfb7008540a0796c571c7f93ad"
 
 private const val DATASET_SHA =
-    "c69fd560a487f6084b1e1296ed478aac18b58265c47e96e6a10fa3e1503e5ea4"
+    "52cdbb80cf4e6b84ca62191a33efb5f214ae7b1dd38316226777d0e1b4f16f1e"
 
 private const val COMPARE_DETAIL_SHA =
     "566dc95c2feaef903c7d1bcc06dfd3f0279879db0465b2eb0248a26d4aedfc75"

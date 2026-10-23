@@ -242,7 +242,7 @@ class AtlasCommandTest {
     private companion object {
         val ARM = setOf("aarch64", "arm64")
         const val DATASET_SHA =
-            "c69fd560a487f6084b1e1296ed478aac18b58265c47e96e6a10fa3e1503e5ea4"
+            "52cdbb80cf4e6b84ca62191a33efb5f214ae7b1dd38316226777d0e1b4f16f1e"
         const val COMPARE_DETAIL_SHA =
             "566dc95c2feaef903c7d1bcc06dfd3f0279879db0465b2eb0248a26d4aedfc75"
         const val COMPARE_FULL_SHA =
