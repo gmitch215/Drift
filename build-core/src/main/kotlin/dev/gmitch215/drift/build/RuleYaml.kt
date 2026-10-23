@@ -8,9 +8,8 @@ class RuleYamlException(message: String) : RuntimeException(message)
 
 /** Reads a hand-written rule file and writes the JSON text that `Rule.fromJson` parses. */
 object RuleYaml {
-    private val load = Load(
-        LoadSettings.builder().setSchema(FailsafeSchema()).setAllowDuplicateKeys(false).build(),
-    )
+    private val settings =
+        LoadSettings.builder().setSchema(FailsafeSchema()).setAllowDuplicateKeys(false).build()
 
     /** Every scalar stays a string except the top-level `schema`, which becomes an integer. */
     fun toJson(yaml: String, name: String, requireId: Boolean = true): String {
@@ -31,8 +30,9 @@ object RuleYaml {
     }
 
     /** The parsed document: maps, lists and strings only. */
+    // a Load keeps parser state, so tasks running in parallel each need their own
     fun load(yaml: String, name: String): Any? = try {
-        load.loadFromString(yaml)
+        Load(settings).loadFromString(yaml)
     } catch (e: RuntimeException) {
         throw RuleYamlException("$name: ${e.message}")
     }

@@ -1,5 +1,6 @@
 package dev.gmitch215.drift.build
 
+import java.util.concurrent.Executors
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -58,6 +59,22 @@ class RuleYamlTest {
         for (yaml in bad) {
             val e = assertFailsWith<RuleYamlException> { RuleYaml.toJson(yaml, "bad.yml") }
             assertTrue(e.message!!.startsWith("bad.yml: "), e.message)
+        }
+    }
+
+    @Test
+    fun parsingFromManyThreadsGivesTheSingleThreadedOutput() {
+        val body = (0 until 40).joinToString("\n") { "k$it:\n  - a$it\n  - b: v$it" }
+        val yaml = "schema: 1\nid: x\n$body\n"
+        val expected = RuleYaml.toJson(yaml, "x.yml")
+        val pool = Executors.newFixedThreadPool(16)
+        try {
+            val runs = List(16) {
+                pool.submit<List<String>> { List(300) { RuleYaml.toJson(yaml, "x.yml") } }
+            }
+            for (run in runs) assertTrue(run.get().all { it == expected })
+        } finally {
+            pool.shutdown()
         }
     }
 }
