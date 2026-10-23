@@ -22,6 +22,14 @@ class Sha256Test {
     }
 
     @Test
+    fun rawBytesFormatAsLowercaseHex() {
+        assertEquals(
+            "56cf8b6ea0b1b7dda3a88534b3d494f0fee24e53f791bdf9b6bcf883f63abd65",
+            Sha256.hex(byteArrayOf(0x00, 0xff.toByte(), 0x7f, 0x80.toByte())),
+        )
+    }
+
+    @Test
     fun blockBoundaries() {
         val expected = mapOf(
             55 to "9f4390f8d30c2dd92ec9f095b65e2b9ae9b0a925a5258e241c9f1e910f734318",

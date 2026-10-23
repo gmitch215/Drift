@@ -20,15 +20,7 @@ object Sha256 {
         0x90befffau.toInt(), 0xa4506cebu.toInt(), 0xbef9a3f7u.toInt(), 0xc67178f2u.toInt(),
     )
 
-    fun hex(data: ByteArray): String {
-        val h = digest(data)
-        val sb = StringBuilder()
-        for (b in h) {
-            val v = b.toInt() and 0xff
-            sb.append(HEX[v shr 4]).append(HEX[v and 15])
-        }
-        return sb.toString()
-    }
+    fun hex(data: ByteArray): String = digest(data).toHexString()
 
     fun hex(text: String): String = hex(text.encodeToByteArray())
 
@@ -105,6 +97,4 @@ object Sha256 {
         }
         return out
     }
-
-    private const val HEX = "0123456789abcdef"
 }
