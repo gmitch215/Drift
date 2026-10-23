@@ -102,6 +102,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-konan-
             ${{ runner.os }}-konan-
+      - name: Diagnose Rule Embedding
+        if: runner.os == 'Windows'
+        run: |
+          git config --show-origin --get-all core.autocrlf || true
+          git ls-files --eol rules | awk '{print $1, $2}' | sort | uniq -c
+          ./gradlew :core:embedRules --stacktrace
       - name: Run Tests
         run: ./gradlew ${{ matrix.tasks }} ${{ matrix.link }} --continue
       - name: Check Executable
