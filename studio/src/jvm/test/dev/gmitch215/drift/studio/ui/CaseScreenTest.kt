@@ -11,10 +11,15 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.v2.runComposeUiTest
+import dev.gmitch215.drift.case.CaseFile
+import dev.gmitch215.drift.lab.Archive
+import dev.gmitch215.drift.lab.ArchiveOpen
+import dev.gmitch215.drift.lab.SolveCertificate
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -103,6 +108,24 @@ class CaseScreenTest {
         )
         assertEquals("No conclusion.", stuck.sureness)
         assertTrue(stuck.next.startsWith("Drift has no next experiment to suggest."))
+    }
+
+    @Test
+    fun aCaseWhoseIsolationWasNotMeasuredSaysSoInPlainWords() {
+        val opened = assertIs<ArchiveOpen.Opened>(Archive.open(File(path).readBytes()))
+        val files = opened.case.files.toMutableMap()
+        val certificate = files.getValue(SolveCertificate.CERTIFICATE)
+        files[SolveCertificate.CERTIFICATE] = certificate.replaceFirst(
+            "\"kind\":\"confirmed\"",
+            "\"kind\":\"confirmed-effect\"",
+        )
+        val effect = CaseStory.of(CaseFile(files))
+        val opening = "Setting the time zone (TZ) to the failing values"
+        assertTrue(effect.headline.startsWith(opening), effect.headline)
+        assertTrue(effect.headline.contains("did not capture both containers"))
+        val sure = "The effect is confirmed; the cause is not isolated."
+        assertTrue(effect.sureness.startsWith(sure), effect.sureness)
+        assertTrue(effect.next.contains("where the containers can be captured"))
     }
 
     @Test

@@ -297,12 +297,125 @@ class VerifyTest {
     }
 
     @Test
+    fun aConfirmedVerdictOverAnUnmeasuredDiffFailsAtTheVerdictCheck() {
+        val files = archive(LabCases.unmeasured).toMutableMap()
+        val cert = SolveCertificate.CERTIFICATE
+        edit(files, cert, listOf("verdict", "kind"), JsonString("confirmed"))
+        edit(files, cert, listOf("verdict", "label"), JsonString("CONFIRMED"))
+        edit(files, cert, listOf("verdict", "notIsolated"), JsonArray(emptyList()))
+        val failure = firstFailure(finish(files))
+        assertEquals("verdict", failure.id)
+        assertTrue("measured diff" in failure.detail, failure.detail)
+    }
+
+    @Test
+    fun anIsolationClaimTheRecordedDiffsDoNotSupportIsCaught() {
+        val files = archive(LabCases.unmeasured).toMutableMap()
+        val claim = JsonString("measured")
+        edit(files, SolveCertificate.CERTIFICATE, listOf("conditions", "isolation"), claim)
+        val failure = firstFailure(finish(files))
+        assertEquals("verdict", failure.id)
+        assertEquals("predicted", failure.expected)
+    }
+
+    @Test
+    fun aWrongCountOfCapturedAttributesIsCaught() {
+        val files = archive(LabCases.confirmed).toMutableMap()
+        edit(files, SolveCertificate.CERTIFICATE, listOf("conditions", "isolatedAmong"), JsonInt(3))
+        val failure = firstFailure(finish(files))
+        assertEquals("verdict", failure.id)
+        assertEquals("3", failure.recorded)
+    }
+
+    @Test
+    fun aCertificateWithoutTheIsolationFieldsIsReadFromItsRecordedDiffs() {
+        val files = archive(LabCases.confirmed).toMutableMap()
+        val cert = parse(files.getValue(SolveCertificate.CERTIFICATE))
+        val conditions = cert.fields.getValue("conditions") as JsonObject
+        val legacy = JsonObject(conditions.fields - "isolation" - "isolatedAmong")
+        edit(files, SolveCertificate.CERTIFICATE, listOf("conditions"), legacy)
+        assertTrue(finish(files).ok)
+    }
+
+    @Test
+    fun anUnmeasuredEffectVerifiesAndTheRecordedIsolationIsPredicted() {
+        val packed = assertIs<ArchivePack.Packed>(Archive.pack(LabCases.unmeasured))
+        val report = Verify.open(packed.bytes)
+        assertTrue(report.ok, report.text())
+        assertTrue(report.verdict!!.startsWith("CONFIRMED EFFECT (isolation not measured)"))
+    }
+
+    @Test
+    fun aRewrittenTrialScheduleIsCaughtEvenWithItsChainResealed() {
+        val files = archive(LabCases.confirmed).toMutableMap()
+        val (path, at) = supported(files)
+        val order = (get(parse(files.getValue(path)), listOf("schedule", "order")) as JsonString)
+        val fake = JsonString("CT".repeat(order.value.length / 2))
+        assertNotEquals(order, fake)
+        edit(files, path, listOf("schedule", "order"), fake)
+        val cert = SolveCertificate.CERTIFICATE
+        edit(files, cert, listOf("experiments", at, "schedule", "order"), fake)
+        reseal(files)
+        val failure = firstFailure(finish(files))
+        assertEquals("rules", failure.id)
+        assertTrue("trial schedule" in failure.detail, failure.detail)
+    }
+
+    @Test
+    fun aWidenedPilotCapOrALoweredPilotMinimumIsCaught() {
+        val cert = SolveCertificate.CERTIFICATE
+        val cap = archive(LabCases.confirmed).toMutableMap()
+        edit(cap, cert, listOf("pilot", "max"), JsonInt(31))
+        val capped = firstFailure(finish(cap))
+        assertEquals("rules", capped.id)
+        assertEquals("30", capped.expected)
+        val min = archive(LabCases.confirmed).toMutableMap()
+        edit(min, cert, listOf("pilot", "min"), JsonInt(3))
+        val lowered = firstFailure(finish(min))
+        assertEquals("rules", lowered.id)
+        assertTrue("pilot trials per arm" in lowered.detail, lowered.detail)
+    }
+
+    @Test
+    fun aRewrittenFamilySizeOrBoundIsCaught() {
+        val cert = SolveCertificate.CERTIFICATE
+        val size = archive(LabCases.confirmed).toMutableMap()
+        edit(size, cert, listOf("family", "size"), JsonInt(1))
+        val resized = firstFailure(finish(size))
+        assertEquals("rules", resized.id)
+        assertTrue("family" in resized.detail, resized.detail)
+        val bound = archive(LabCases.confirmed).toMutableMap()
+        edit(bound, cert, listOf("family", "falseConfirmedBound"), JsonInt(1))
+        assertEquals("rules", firstFailure(finish(bound)).id)
+    }
+
+    @Test
+    fun aCertificateWithItsFamilyRemovedFailsTheRuleAlphaCheck() {
+        val files = archive(LabCases.confirmed).toMutableMap()
+        val certificate = parse(files.getValue(SolveCertificate.CERTIFICATE))
+        files[SolveCertificate.CERTIFICATE] =
+            CanonicalJson.encode(JsonObject(certificate.fields - "family"))
+        assertEquals("rules", firstFailure(finish(files)).id)
+    }
+
+    @Test
+    fun aStatementDroppingTheRateBoundOfANotReproducedRunIsCaught() {
+        val files = archive(LabCases.notSeen).toMutableMap()
+        val text = files.getValue(SolveCertificate.CERTIFICATE)
+        assertTrue("below 10% at 95%" in text)
+        files[SolveCertificate.CERTIFICATE] = text.replace("below 10% at 95%", "small")
+        assertEquals("verdict", firstFailure(finish(files)).id)
+    }
+
+    @Test
     fun aStatementQuotingAnotherPValueIsCaught() {
         val files = archive(LabCases.confirmed).toMutableMap()
         val text = files.getValue(SolveCertificate.CERTIFICATE)
-        assertTrue("exact one-sided p 0.003968" in text)
+        val quoted = "exact one-sided p " + text.substringAfter("exact one-sided p ")
+            .substringBefore(")")
+        assertTrue(quoted in text && quoted != "exact one-sided p 0.000001")
         files[SolveCertificate.CERTIFICATE] = text.replace(
-            "exact one-sided p 0.003968",
+            quoted,
             "exact one-sided p 0.000001",
         )
         assertEquals("verdict", firstFailure(finish(files)).id)
@@ -364,7 +477,7 @@ class VerifyTest {
         reseal(files)
         val failure = firstFailure(finish(files))
         assertEquals("rules", failure.id)
-        assertEquals("50000", failure.expected)
+        assertEquals("4166", failure.expected, "the plan's alpha over a family of 12")
         assertEquals("200000", failure.recorded)
     }
 

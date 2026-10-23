@@ -375,7 +375,10 @@ object Ingest {
             ),
             "honesty" to JsonArray(SolveCertificate.honesty.map(::JsonString)),
         )
-        files[SolveCertificate.CERTIFICATE] = CanonicalJson.encode(updated)
+        val carried = listOf("pilot", "family").mapNotNull { key -> base[key]?.let { key to it } }
+        files[SolveCertificate.CERTIFICATE] = CanonicalJson.encode(
+            JsonObject(updated.fields + carried),
+        )
         files[CaseFile.MANIFEST] = CaseFile.manifest(files)
         return CaseFile(files)
     }
@@ -395,7 +398,8 @@ object Ingest {
     ): JsonValue {
         val old = certificate?.get("verdict") as? JsonObject
         val kind = (old?.get("kind") as? JsonString)?.value
-        if (kind == VerdictKind.CONFIRMED.id || kind == VerdictKind.BUNDLE.id) return old
+        val confirmedKinds = listOf(VerdictKind.CONFIRMED, VerdictKind.BUNDLE, VerdictKind.EFFECT)
+        if (old != null && confirmedKinds.any { it.id == kind }) return old
         val ingested = summaries.map { it as JsonObject }.filter {
             (it["role"] as? JsonString)?.value ==
                 "ingested"

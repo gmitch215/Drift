@@ -39,10 +39,28 @@ object SolveCertificate {
         val diff: MeasuredDiff,
     )
 
+    /**
+     * The level of one forward test. The family is the [rounds] forward experiments a search may
+     * run. Holm's first threshold is alpha over the family size; the search stops at its first
+     * rejection, so every test uses that threshold and the family-wise bound is alpha.
+     */
+    fun alphaPerTest(alpha: Long, rounds: Int): Long = alpha / rounds
+
+    /** Whether the effect and its agreeing experiment both have a measured diff. */
+    fun measured(effect: MeasuredDiff, partner: ExperimentRun?): Boolean =
+        effect.source == MeasuredDiff.MEASURED &&
+            partner?.diff?.source == MeasuredDiff.MEASURED
+
     val honesty = listOf(
         "Experiments ran in containers built from the capsules, not on the original host.",
         "A bundle is never one cause: a CONFIRMED EFFECT (bundle) names every attribute that " +
             "differed between the arms and says which were not isolated.",
+        "Isolation holds among the attributes the capsules captured (isolatedAmong); a cause " +
+            "that no capsule shows is not excluded, and a verdict whose arms were not both " +
+            "captured says isolation was not measured.",
+        "The bound on a false CONFIRMED holds per search (family.falseConfirmedBound), not per " +
+            "experiment; each forward experiment is tested at the plan's alpha divided by the " +
+            "family size.",
         "Candidate weights and the prior are hand-set and uncalibrated; the posteriors order " +
             "experiments and are not measurements.",
         "Only experiments that ran are recorded, each with every trial; nothing here was " +
@@ -102,6 +120,11 @@ object SolveCertificate {
                 "trials" to JsonInt(trials.toLong()),
                 "seconds" to JsonInt(seconds),
             ),
+            "pilot" to obj(
+                "min" to JsonInt(options.pilot.toLong()),
+                "max" to JsonInt(PilotRule.max(options.pilot, options.budget.maxTrials).toLong()),
+            ),
+            "family" to family(plan.options.alpha, options.maxRounds),
             "verdict" to verdict.toJson(),
             "conditions" to (confirmation?.let { conditions(it, verdict) } ?: JsonNull),
             "posteriors" to JsonArray(
@@ -132,6 +155,18 @@ object SolveCertificate {
         return CaseFile(files)
     }
 
+    private fun family(alpha: Long, rounds: Int): JsonObject {
+        val each = alphaPerTest(alpha, rounds)
+        return obj(
+            "method" to JsonString("holm"),
+            "size" to JsonInt(rounds.toLong()),
+            "alpha" to JsonInt(alpha),
+            "alphaPerTest" to JsonInt(each),
+            "falseConfirmedBound" to JsonInt(each * rounds),
+            "scope" to JsonString("per search, over every forward experiment it may run"),
+        )
+    }
+
     fun resultPath(n: Int) = "results/" + n.toString().padStart(4, '0') + ".json"
 
     /** Chains the run records from [head], the head of the observation chain. */
@@ -149,7 +184,12 @@ object SolveCertificate {
         return sealed to prev
     }
 
-    private fun summary(r: ExperimentRun, file: String): JsonObject = obj(
+    private fun summary(r: ExperimentRun, file: String): JsonObject {
+        val record = summaryOf(r, file)
+        return r.schedule?.let { JsonObject(record.fields + ("schedule" to it.toJson())) } ?: record
+    }
+
+    private fun summaryOf(r: ExperimentRun, file: String): JsonObject = obj(
         "seq" to JsonInt(r.seq.toLong()),
         "id" to JsonString(r.id),
         "role" to JsonString(r.kind),
@@ -173,11 +213,17 @@ object SolveCertificate {
     )
 
     private fun conditions(c: Confirmed, verdict: SolveVerdict): JsonObject {
-        val confirmed = verdict.kind == VerdictKind.CONFIRMED || verdict.kind == VerdictKind.BUNDLE
+        val confirmed = verdict.kind == VerdictKind.CONFIRMED ||
+            verdict.kind == VerdictKind.BUNDLE || verdict.kind == VerdictKind.EFFECT
         val agree = c.reverse?.outcome == Outcome.SUPPORTED ||
             c.replicate?.outcome == Outcome.SUPPORTED
+        val measured = measured(c.diff, c.reverse ?: c.replicate)
         return obj(
             "confirmed" to JsonBool(confirmed),
+            "isolation" to JsonString(
+                if (measured) MeasuredDiff.MEASURED else MeasuredDiff.PREDICTED,
+            ),
+            "isolatedAmong" to (if (measured) JsonInt(c.diff.compared.toLong()) else JsonNull),
             "effect" to obj(
                 "experiment" to JsonString(c.forward.id),
                 "outcome" to (c.forward.outcome?.let { JsonString(it.id) } ?: JsonNull),

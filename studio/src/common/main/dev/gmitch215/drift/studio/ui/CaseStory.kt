@@ -60,6 +60,11 @@ class CaseStory(
                         "Drift could not tell which one matters, because they changed " +
                         "at the same time."
 
+                "confirmed-effect" ->
+                    "Setting ${things(members)} to the failing values reproduces the failure. " +
+                        "Drift did not capture both containers, so it cannot say that nothing " +
+                        "else changed."
+
                 "narrowed" -> strings(verdict["candidates"]).let {
                     if (it.isEmpty()) {
                         "Drift could not confirm a cause."
@@ -102,6 +107,9 @@ class CaseStory(
                 "confirmed-bundle" ->
                     listOfNotNull("The effect is confirmed for the whole group.", put, back)
 
+                "confirmed-effect" ->
+                    listOfNotNull("The effect is confirmed; the cause is not isolated.", put, back)
+
                 "narrowed" -> listOfNotNull(
                     "Not sure.",
                     put?.let { "$it That is not a clear enough result to call." }
@@ -130,6 +138,10 @@ class CaseStory(
                 "confirmed-bundle" ->
                     "$back and run the failing job again. To find which one matters, change " +
                         "them one at a time."
+
+                "confirmed-effect" ->
+                    "$back and run the failing job again. To isolate the cause, run Drift again " +
+                        "where the containers can be captured."
 
                 else ->
                     "Drift has no next experiment to suggest. The technical details show " +

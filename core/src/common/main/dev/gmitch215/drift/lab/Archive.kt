@@ -78,7 +78,8 @@ object Archive {
         val verdict = certificate.require("verdict").obj()
         val kind = verdict.require("kind").string()
         val conditions = certificate["conditions"] as? JsonObject
-        if (conditions == null || (kind != "confirmed" && kind != "confirmed-bundle")) return null
+        val confirmedKinds = listOf(VerdictKind.CONFIRMED, VerdictKind.BUNDLE, VerdictKind.EFFECT)
+        if (conditions == null || confirmedKinds.none { it.id == kind }) return null
         val search = conditions.require("minimalSet").obj()
         return CanonicalJson.encode(
             obj(

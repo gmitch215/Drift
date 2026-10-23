@@ -17,9 +17,8 @@ object SolveRender {
         out.blank()
         out.text("Experiments (failures of trials, raw counts):")
         for (run in r.runs) out.text(line(run), 2)
-        val confirmed = r.verdict.kind == VerdictKind.CONFIRMED ||
-            r.verdict.kind == VerdictKind.BUNDLE
-        if (confirmed) {
+        val confirmed = listOf(VerdictKind.CONFIRMED, VerdictKind.BUNDLE, VerdictKind.EFFECT)
+        if (r.verdict.kind in confirmed) {
             out.text("Mechanism: ${r.verdict.mechanism ?: "unexplained (no rule or probe agreed)"}")
         }
         if (r.verdict.notIsolated.isNotEmpty()) {

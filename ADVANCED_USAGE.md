@@ -915,6 +915,7 @@ The capsule says `os.arch=x86_64`, so the arms ran as `linux/amd64` containers o
 | --- | --- |
 | `CONFIRMED` | a minimal set of attributes, all set directly, reproduces the failure forward and removes it in reverse |
 | `CONFIRMED EFFECT (bundle)` | the same, but the arms also differ in attributes nobody set; each member is named |
+| `CONFIRMED EFFECT (isolation not measured)` | the effect and its reverse or replicate agree, but an arm was not captured inside its container, so what differed between the arms is predicted and not measured |
 | `NARROWED` | an experiment was supported or stayed inconclusive, but the conditions above are not met |
 | `STUCK` | no experiment was supported; the reason is `not-reproduced`, `uncontrollable`, `no-candidates`, `budget` or `executor` |
 
@@ -1595,8 +1596,8 @@ drift atlas build fixtures/atlas/*.txt fixtures/atlas/2.5.0-beta1/*.txt --out at
 ```
 
 ```
-dataset: 38 probes, 3 columns, 23 divergent, sha256 c69fd560a487f6084b1e1296ed478aac18b58265c47e96e6a10fa3e1503e5ea4
-dataset: 38 probes, 21 columns, 32 divergent, sha256 8364183f0ffda6face1da93bd71142ac66761d85cc145818533eebffa574aae5
+dataset: 38 probes, 3 columns, 23 divergent, sha256 52cdbb80cf4e6b84ca62191a33efb5f214ae7b1dd38316226777d0e1b4f16f1e
+dataset: 38 probes, 21 columns, 32 divergent, sha256 a8dac9357ee8f42ed67eb6b0e605f8e705da3fdc0272f83b9c05aab6c78c1c29
 ```
 
 The summary goes to standard error. The sha256 is the hash of the dataset body; the file on disk has one more trailing newline. Building twice gives identical files, and the order of the arguments does not change the bytes. `--out` is required. `build` refuses a transcript that lacks a probe of the catalog, names an unknown probe, lacks a header (`bad transcript header in badt.txt: missing kotlin.target`) or duplicates a column (`fixtures/atlas/jvm.txt and fixtures/atlas/jvm.txt both record jvm@2.4.20`).
@@ -2790,7 +2791,7 @@ Set `DRIFT_RUNNER_LABEL` in the job to record the runner. Do not use `--keep-ide
 | 0 | the command ran, including `diagnose` with no cause found, `solve` or `ingest` with any verdict (`STUCK` included) unless `--exit-status` is given, `drift` or `drift case` alone (they print help), `install` and `uninstall` (also with `--dry-run`), `uninstall` with no receipt, and `serve` after Ctrl+C or SIGTERM on a native build |
 | 3 | `contract create` found no assertion set that separates a red capsule from the greens |
 | the command's own | `run`: the exit code of the command it ran (0 included); a command the shell cannot find gives 127 |
-| 10 | `solve --exit-status` or `ingest --exit-status` ended `CONFIRMED EFFECT (bundle)` |
+| 10 | `solve --exit-status` or `ingest --exit-status` ended `CONFIRMED EFFECT (bundle)` or `CONFIRMED EFFECT (isolation not measured)` |
 | 11 | the same, ended `NARROWED` |
 | 12 | the same, ended `STUCK` |
 | 1 | usage error from the parser: unknown command or flag, missing argument or option, bad `--detail` value, `--json` with `--detail` |

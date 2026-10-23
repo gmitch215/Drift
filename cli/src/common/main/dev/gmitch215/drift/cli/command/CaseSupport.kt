@@ -108,7 +108,7 @@ internal fun loadCapsuleSource(host: Host, path: String): Capsule =
 
 internal fun verdictExitCode(kind: VerdictKind): Int = when (kind) {
     VerdictKind.CONFIRMED -> 0
-    VerdictKind.BUNDLE -> 10
+    VerdictKind.BUNDLE, VerdictKind.EFFECT -> 10
     VerdictKind.NARROWED -> 11
     VerdictKind.STUCK -> 12
 }

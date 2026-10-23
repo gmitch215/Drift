@@ -59,6 +59,20 @@ object LabCases {
         )
     }
 
+    val unmeasured: CaseFile by lazy {
+        solve(
+            red(),
+            FakeExecutor(
+                capsules = { null },
+                behave = { arm, _ -> trial(has(arm, "env.TZ", "America/New_York")) },
+            ),
+        )
+    }
+
+    val notSeen: CaseFile by lazy {
+        solve(red(), FakeExecutor(behave = { _, _ -> trial(false) }))
+    }
+
     val bundle: CaseFile by lazy {
         val cause = { arm: RunConfig -> has(arm, "tool.node.version", "24.1.0") }
         val capture = { arm: RunConfig ->

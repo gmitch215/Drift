@@ -252,6 +252,9 @@ object Verify {
         val flips: List<String> = summary.require("flips").array().map { it.string() }
         val recordedOutcome: String? = (result["outcome"] as? JsonString)?.value
         val derived: Pair<Arm, Arm> = arms(result)
+        val diff: JsonObject? = summary["diff"] as? JsonObject
+        val diffSource: String? = (diff?.get("source") as? JsonString)?.value
+        val void: Boolean get() = diffSource == MeasuredDiff.VOID
 
         val more: Arm get() = if (reverse) derived.first else derived.second
         val less: Arm get() = if (reverse) derived.second else derived.first
@@ -498,8 +501,80 @@ object Verify {
         private fun spec(r: RunView): JsonObject? =
             case.text("experiments/${r.id}.json")?.let { case.json("experiments/${r.id}.json") }
 
+        private val hashes: Pair<String, String> by lazy {
+            val (passing, failing) = pair()
+            passing.hash() to failing.hash()
+        }
+
+        private fun schedule(r: RunView): Check? {
+            val recorded = r.result["schedule"]
+            if (recorded == null && r.summary["schedule"] == null) return null
+            val derived = TrialSchedule(
+                TrialSchedule.seed(hashes.first, hashes.second, r.id),
+                r.derived.first.size,
+            ).toJson()
+            val copies = listOf("result" to recorded, "certificate" to r.summary["schedule"])
+            for ((where, value) in copies) {
+                if (enc(derived) != enc(value)) {
+                    return fail(
+                        "rules",
+                        "experiment ${r.id} trial schedule in the $where",
+                        enc(derived),
+                        enc(value),
+                    )
+                }
+            }
+            return null
+        }
+
+        private fun pilot(r: RunView): Check? {
+            val declared = cert["pilot"] as? JsonObject ?: return null
+            val min = declared.require("min").long().toInt()
+            val max = declared.require("max").long().toInt()
+            val maxTrials = cert.require("budget").obj().require("maxTrials").long().toInt()
+            val cap = PilotRule.max(min, maxTrials)
+            if (max != cap) return fail("rules", "the cap of the pilot", cap, max)
+            val statuses = r.result.require("arms").array()[1].obj().require("trials").array()
+                .map { it.obj().require("status").string() }
+            if (statuses.isEmpty()) return null
+            val first = statuses.indexOf("fail").takeIf { it >= 0 }
+            val expected = PilotRule.trials(min, max, first)
+            if (r.derived.first.size != expected || r.derived.second.size != expected) {
+                return fail(
+                    "rules",
+                    "experiment ${r.id} pilot trials per arm",
+                    expected,
+                    "${r.derived.first.size} and ${r.derived.second.size}",
+                )
+            }
+            return null
+        }
+
+        private fun family(alpha: Long): Pair<Long?, Check?> {
+            val family = cert["family"] as? JsonObject ?: return null to null
+            val size = family.require("size").long()
+            val forward = runs.count { it.role == "forward" }.toLong()
+            if (size < 1 || size > Int.MAX_VALUE || forward > size) {
+                return null to fail("rules", "forward experiments within the family", size, forward)
+            }
+            val each = SolveCertificate.alphaPerTest(alpha, size.toInt())
+            val expected = listOf(
+                "alpha" to alpha,
+                "alphaPerTest" to each,
+                "falseConfirmedBound" to each * size,
+            )
+            for ((key, want) in expected) {
+                if (family.require(key).long() != want) {
+                    return null to fail("rules", "family $key", want, family.require(key).long())
+                }
+            }
+            return each to null
+        }
+
         fun rules(): Check {
             val alpha = options.require("alpha").long()
+            val (each, broken) = family(alpha)
+            broken?.let { return it }
             val rate = Trials.rate(
                 options.require("failures").long().toInt(),
                 options.require("runs").long().toInt(),
@@ -507,6 +582,7 @@ object Verify {
             var checked = 0
             for (r in runs) {
                 val tag = "experiment ${r.id}"
+                schedule(r)?.let { return it }
                 if (r.role == PILOT) {
                     if (r.recordedOutcome != null || r.result["specSha256"] != JsonNull) {
                         return fail(
@@ -516,6 +592,7 @@ object Verify {
                             r.recordedOutcome,
                         )
                     }
+                    pilot(r)?.let { return it }
                     continue
                 }
                 val specText = case.text("experiments/${r.id}.json")
@@ -555,11 +632,12 @@ object Verify {
                     )
                 }
                 val ruleAlpha = rule.require("alpha").long()
-                if (ruleAlpha != alpha) {
-                    return fail("rules", "$tag alpha is not the plan's", alpha, ruleAlpha)
+                val wanted = if (r.role == "ingested") alpha else each ?: alpha
+                if (ruleAlpha != wanted) {
+                    return fail("rules", "$tag alpha is not the plan's", wanted, ruleAlpha)
                 }
                 val perArm = rule.require("perArm").long().toInt()
-                val threshold = Trials.threshold(perArm, alpha)
+                val threshold = Trials.threshold(perArm, ruleAlpha)
                 if (threshold == null || threshold.toLong() != rule.require("threshold").long()) {
                     return fail(
                         "rules",
@@ -641,7 +719,7 @@ object Verify {
             val alpha = options.require("alpha").long()
             val expected = mutableListOf("prior" to belief)
             for (r in runs) {
-                if (r.role !in UPDATING) continue
+                if (r.role !in UPDATING || r.void) continue
                 val outcome = r.recordedOutcome
                 if (outcome != "supported" && outcome != "refuted") continue
                 val table = OutcomeTable.binary(
@@ -812,12 +890,13 @@ object Verify {
                 return fail("verdict", "verdict label", kind.label, v.require("label").string())
             }
             val conditions = cert["conditions"] as? JsonObject
-            val forwardSupported =
-                runs.any { it.role == "forward" && it.recordedOutcome == "supported" }
+            val forwardSupported = runs.any {
+                it.role == "forward" && it.recordedOutcome == "supported" && !it.void
+            }
             val forwardInconclusive =
                 runs.any { it.role == "forward" && it.recordedOutcome == "inconclusive" }
             when (kind) {
-                VerdictKind.CONFIRMED, VerdictKind.BUNDLE ->
+                VerdictKind.CONFIRMED, VerdictKind.BUNDLE, VerdictKind.EFFECT ->
                     confirmed(v, kind, conditions)?.let { return it }
 
                 VerdictKind.NARROWED -> {
@@ -926,6 +1005,7 @@ object Verify {
                     strings(v["members"]).toString(),
                 )
             }
+            isolation(kind, conditions, effect, carrier, partner)?.let { return it }
             val notIsolated = strings(v["notIsolated"])
             if (kind == VerdictKind.CONFIRMED && notIsolated.isNotEmpty()) {
                 return fail(
@@ -956,6 +1036,60 @@ object Verify {
                         "the statement quotes the recorded figures",
                         needle,
                         "absent",
+                    )
+                }
+            }
+            return null
+        }
+
+        private fun isolation(
+            kind: VerdictKind,
+            conditions: JsonObject,
+            effect: JsonObject,
+            carrier: RunView,
+            partner: RunView,
+        ): Check? {
+            val effectSource = ((effect["diff"] as? JsonObject)?.get("source") as? JsonString)
+                ?.value
+            if (effectSource != carrier.diffSource) {
+                return fail(
+                    "verdict",
+                    "the diff source of the effect is that of its experiment",
+                    carrier.diffSource,
+                    effectSource,
+                )
+            }
+            val measured = carrier.diffSource == MeasuredDiff.MEASURED &&
+                partner.diffSource == MeasuredDiff.MEASURED
+            if (kind == VerdictKind.CONFIRMED && !measured) {
+                return fail(
+                    "verdict",
+                    "${kind.label} without a measured diff from both arms",
+                    MeasuredDiff.MEASURED,
+                    "${carrier.diffSource} and ${partner.diffSource}",
+                )
+            }
+            if (kind == VerdictKind.EFFECT && measured) {
+                return fail(
+                    "verdict",
+                    "isolation not measured although both diffs were measured",
+                    "a diff that was not measured",
+                    MeasuredDiff.MEASURED,
+                )
+            }
+            val derived = if (measured) MeasuredDiff.MEASURED else MeasuredDiff.PREDICTED
+            if ("isolation" in conditions.fields) {
+                val recorded = (conditions["isolation"] as? JsonString)?.value
+                if (recorded != derived) {
+                    return fail("verdict", "isolation of the certificate", derived, recorded)
+                }
+                val among = if (measured) carrier.diff?.get("compared") else JsonNull
+                if (enc(conditions["isolatedAmong"]) != enc(among)) {
+                    return fail(
+                        "verdict",
+                        "attributes the isolation holds among",
+                        enc(among),
+                        enc(conditions["isolatedAmong"]),
                     )
                 }
             }
@@ -994,6 +1128,11 @@ object Verify {
                         "${control.failures} of ${control.trials} against " +
                             "${treatment.failures} of ${treatment.trials}",
                     )
+                }
+                val bound = "below ${PilotRule.upperPercent(treatment.trials)}% at 95%"
+                val quoted = bound in v.require("statement").string()
+                if (cert["pilot"] != null && treatment.failures == 0 && !quoted) {
+                    return fail("verdict", "the statement quotes the rate bound", bound, "absent")
                 }
             }
             return null

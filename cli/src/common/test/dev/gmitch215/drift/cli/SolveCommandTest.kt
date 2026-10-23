@@ -149,10 +149,11 @@ class SolveCommandTest {
     @Test
     fun exitStatusIsOptInAndMapsTheVerdict() {
         assertEquals(
-            listOf(0, 10, 11, 12),
+            listOf(0, 10, 10, 11, 12),
             listOf(
                 VerdictKind.CONFIRMED,
                 VerdictKind.BUNDLE,
+                VerdictKind.EFFECT,
                 VerdictKind.NARROWED,
                 VerdictKind.STUCK,
             ).map(::verdictExitCode),

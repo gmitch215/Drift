@@ -50,21 +50,34 @@ class ArmRun(
 
 /**
  * The attributes that differ between two arms: [MeasuredDiff.source] is `measured` when both arms
- * were captured inside their containers and `predicted` otherwise; [MeasuredDiff.probes] lists the
- * probe ids whose transcripts differ.
+ * were captured inside their containers and the treatment capsule shows every requested value,
+ * `predicted` when an arm has no capsule, and `void` when both were captured but the treatment
+ * capsule lacks a requested value ([MeasuredDiff.unreached] names those paths).
+ * [MeasuredDiff.compared] counts the attribute paths of the two capsules; [MeasuredDiff.probes]
+ * lists the probe ids whose transcripts differ.
  */
 data class MeasuredDiff(
     val source: String,
     val changed: List<String>,
     val ignored: List<String>,
     val probes: List<String>,
+    val compared: Int = 0,
+    val unreached: List<String> = emptyList(),
 ) {
     fun toJson(): JsonObject = obj(
         "source" to JsonString(source),
         "changed" to JsonArray(changed.map(::JsonString)),
         "ignored" to JsonArray(ignored.map(::JsonString)),
         "probes" to JsonArray(probes.map(::JsonString)),
+        "compared" to JsonInt(compared.toLong()),
+        "unreached" to JsonArray(unreached.map(::JsonString)),
     )
+
+    companion object {
+        const val MEASURED = "measured"
+        const val PREDICTED = "predicted"
+        const val VOID = "void"
+    }
 }
 
 /**
@@ -84,12 +97,14 @@ class ExperimentRun(
     val outcome: Outcome?,
     val p: PValue?,
     val diff: MeasuredDiff?,
+    val schedule: TrialSchedule? = null,
 ) {
     val reverse: Boolean get() = kind == "reverse"
+    val void: Boolean get() = diff?.source == MeasuredDiff.VOID
 
     fun toJson(): JsonObject {
         val rule = spec?.rule
-        return obj(
+        val record = obj(
             "kind" to JsonString("result"),
             "seq" to JsonInt(seq.toLong()),
             "experiment" to JsonString(id),
@@ -109,6 +124,7 @@ class ExperimentRun(
             "p" to (p?.let { pJson(it) } ?: JsonNull),
             "diff" to (diff?.toJson() ?: JsonNull),
         )
+        return schedule?.let { JsonObject(record.fields + ("schedule" to it.toJson())) } ?: record
     }
 
     companion object {
@@ -131,6 +147,7 @@ class ExperimentRun(
 enum class VerdictKind(val id: String, val label: String) {
     CONFIRMED("confirmed", "CONFIRMED"),
     BUNDLE("confirmed-bundle", "CONFIRMED EFFECT (bundle)"),
+    EFFECT("confirmed-effect", "CONFIRMED EFFECT (isolation not measured)"),
     NARROWED("narrowed", "NARROWED"),
     STUCK("stuck", "STUCK"),
 }

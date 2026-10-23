@@ -246,6 +246,6 @@ class IngestTest {
     }
 
     companion object {
-        const val GOLDEN = "ab0b3c3bcc801e51e577e0573f8851ecc3d1522366ca6281e45801153fa308b0"
+        const val GOLDEN = "dc4c7011911fffd056e1735a44535d1e502e508c7eef93397bf83ad41dc8687a"
     }
 }

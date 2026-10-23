@@ -109,10 +109,10 @@ class Solver(
         var first: Plan? = null
         try {
             val pilot = runPilot(green, red)
+            val pilotTrials = 2L * pilot.control.trials.size
             secondsPerTrial = maxOf(
                 1L,
-                (pilot.control.seconds + pilot.treatment.seconds + 2L * options.pilot - 1) /
-                    (2L * options.pilot),
+                (pilot.control.seconds + pilot.treatment.seconds + pilotTrials - 1) / pilotTrials,
             )
             val seen = pilot.treatment.counts
             val control = pilot.control.counts
@@ -120,7 +120,8 @@ class Solver(
                 throw Halt(
                     StuckWhy.NOT_REPRODUCED,
                     "the failure does not reproduce in the container built from the failing " +
-                        "capsule: 0 of ${seen.trials} trials failed",
+                        "capsule: 0 of ${seen.trials} trials failed, so the failure rate is " +
+                        "below ${PilotRule.upperPercent(seen.trials)}% at 95%",
                 )
             }
             if (control.failures >= 2 && control.failures >= seen.failures) {
@@ -221,7 +222,8 @@ class Solver(
         val left = config(green, "passing baseline")
         val right = config(red, "failing baseline")
         baseline = left.reproduction!!
-        return execute("p0", "pilot", emptyList(), null, left, right, options.pilot, null)
+        val cap = PilotRule.max(options.pilot, options.budget.maxTrials)
+        return execute("p0", "pilot", emptyList(), null, left, right, options.pilot, null, cap)
     }
 
     // #endregion
@@ -377,7 +379,9 @@ class Solver(
     }
 
     private fun finish(h: Halt): SolveVerdict {
-        val supported = runs.lastOrNull { it.kind == "forward" && it.outcome == Outcome.SUPPORTED }
+        val supported = runs.lastOrNull {
+            it.kind == "forward" && it.outcome == Outcome.SUPPORTED && !it.void
+        }
         if (supported != null) {
             return SolveVerdict(
                 VerdictKind.NARROWED,
@@ -482,7 +486,21 @@ class Solver(
             "(exact one-sided p ${p(minimalRun)})"
         val base = "${minimalRun.control.failures} of ${minimalRun.control.trials.size}"
         val set = minimal.joinToString(", ")
-        val v = if (diff.isolated(arms?.primaries.orEmpty())) {
+        val v = if (!SolveCertificate.measured(diff, reverse ?: replicate)) {
+            SolveVerdict(
+                VerdictKind.EFFECT,
+                null,
+                "effect confirmed, isolation not measured: setting $set to the failing values " +
+                    "moved the failure count from $base to $counts and " +
+                    "${confirmedBy(reverse, replicate)}. The attributes that differ between " +
+                    "the arms were predicted from the interventions and not captured in the " +
+                    "containers, so the effect is not attributed to $set alone",
+                set = minimal,
+                members = diff.changed,
+                notIsolated = diff.changed,
+                mechanism = mech,
+            )
+        } else if (diff.isolated(arms?.primaries.orEmpty())) {
             val kind = if (minimal.size == 1) {
                 "this dimension"
             } else {
@@ -642,7 +660,7 @@ class Solver(
             plan.options.rate,
             left,
             options.trialMinutes,
-            plan.options.alpha,
+            SolveCertificate.alphaPerTest(plan.options.alpha, options.maxRounds),
             plan.options.power,
         )
     }
@@ -685,6 +703,7 @@ class Solver(
         right: RunConfig,
         perArm: Int,
         predicted: ArmDiff?,
+        cap: Int = perArm,
     ): ExperimentRun {
         val folders = listOf("control", "treatment")
         val capsules = listOf(left, right).mapIndexed { i, config ->
@@ -692,7 +711,10 @@ class Solver(
         }
         val records = listOf(mutableListOf<TrialRecord>(), mutableListOf())
         val seconds = longArrayOf(0, 0)
-        for (i in 0 until perArm) {
+        val seed = TrialSchedule.seed(green.hash(), red.hash(), id)
+        val schedule = TrialSchedule(seed, cap)
+        for (i in 0 until cap) {
+            if (i >= perArm && records[1].any { it.status == TrialStatus.FAIL }) break
             if (spentTrials + 2 > options.budget.maxTrials ||
                 spentSeconds >= options.budget.maxMinutes * 60
             ) {
@@ -702,7 +724,9 @@ class Solver(
                         "${options.budget.maxMinutes} minutes ran out during $id",
                 )
             }
-            for ((side, config) in listOf(left, right).withIndex()) {
+            val sides = if (schedule.treatmentFirst[i]) listOf(1, 0) else listOf(0, 1)
+            for (side in sides) {
+                val config = if (side == 0) left else right
                 val raw = trial(config, i, id)
                 records[side] += classify(i, raw)
                 seconds[side] += raw.seconds
@@ -720,9 +744,17 @@ class Solver(
         val p = ExperimentRun.pValue(more, less)
         val run = ExperimentRun(
             runs.size + 1, id, kind, flips, spec, control, treatment, outcome, p,
-            diffOf(capsules[0], capsules[1], predicted),
+            diffOf(capsules[0], capsules[1], predicted, right),
+            TrialSchedule(seed, records[0].size),
         )
         runs += run
+        if (run.void) {
+            throw Halt(
+                StuckWhy.EXECUTOR,
+                "experiment $id is void: the treatment capsule does not show the requested " +
+                    "value of ${run.diff!!.unreached.joinToString(", ")}",
+            )
+        }
         return run
     }
 
@@ -759,17 +791,33 @@ class Solver(
         return TrialRecord(index, status, raw.exit, tail)
     }
 
-    private fun diffOf(c: Capsule?, t: Capsule?, predicted: ArmDiff?): MeasuredDiff? {
+    private fun diffOf(
+        c: Capsule?,
+        t: Capsule?,
+        predicted: ArmDiff?,
+        requested: RunConfig,
+    ): MeasuredDiff? {
         if (c != null && t != null) {
             val d = CapsuleDiff.diff(c, t)
+            val unreached = unreached(t, requested)
             return MeasuredDiff(
-                "measured",
+                if (unreached.isEmpty()) MeasuredDiff.MEASURED else MeasuredDiff.VOID,
                 d.changes.map { it.path }.sorted(),
                 d.ignored.map { it.path }.sorted(),
                 d.probes.filter { it.status == ProbeChangeStatus.DIFFERENT }.map { it.id }.sorted(),
+                (c.attributes.map { it.path } + t.attributes.map { it.path }).toSet().size,
+                unreached,
             )
         }
-        return predicted?.let { MeasuredDiff("predicted", it.changed, it.ignored, emptyList()) }
+        return predicted?.let {
+            MeasuredDiff(MeasuredDiff.PREDICTED, it.changed, it.ignored, emptyList())
+        }
+    }
+
+    private fun unreached(captured: Capsule, requested: RunConfig): List<String> {
+        fun value(c: Capsule, path: String) = c.attributes.firstOrNull { it.path == path }?.value
+        return requested.edited.values.flatten().distinct().sorted()
+            .filter { value(captured, it) != value(requested.capsule, it) }
     }
 
     // #endregion

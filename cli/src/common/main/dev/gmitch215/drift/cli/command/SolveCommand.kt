@@ -70,7 +70,7 @@ class SolveCommand(
     )
     private val exitStatus by option(
         "--exit-status",
-        help = "exit 0 CONFIRMED, 10 CONFIRMED EFFECT (bundle), 11 NARROWED, 12 STUCK",
+        help = "exit 0 CONFIRMED, 10 CONFIRMED EFFECT, 11 NARROWED, 12 STUCK",
     ).flag()
     private val name by option("--name", help = "case name (default: both capsule labels)")
 

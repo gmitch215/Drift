@@ -5,11 +5,16 @@ import dev.gmitch215.drift.case.MemoryCaseFiles
 import dev.gmitch215.drift.fixtures.LabFixtures
 import dev.gmitch215.drift.hash.Sha256
 import dev.gmitch215.drift.json.CanonicalJson
+import dev.gmitch215.drift.json.JsonArray
+import dev.gmitch215.drift.json.JsonInt
+import dev.gmitch215.drift.json.JsonNull
 import dev.gmitch215.drift.json.JsonObject
+import dev.gmitch215.drift.json.JsonString
 import dev.gmitch215.drift.lab.Budget
 import dev.gmitch215.drift.lab.FailWhen
 import dev.gmitch215.drift.lab.FakeExecutor
 import dev.gmitch215.drift.lab.Outcome
+import dev.gmitch215.drift.lab.PilotRule
 import dev.gmitch215.drift.lab.RawTrial
 import dev.gmitch215.drift.lab.RunConfig
 import dev.gmitch215.drift.lab.SolveCertificate
@@ -17,7 +22,9 @@ import dev.gmitch215.drift.lab.SolveOptions
 import dev.gmitch215.drift.lab.SolveResult
 import dev.gmitch215.drift.lab.Solver
 import dev.gmitch215.drift.lab.StuckWhy
+import dev.gmitch215.drift.lab.TrialSchedule
 import dev.gmitch215.drift.lab.VerdictKind
+import dev.gmitch215.drift.lab.Verify
 import dev.gmitch215.drift.model.Attribute
 import dev.gmitch215.drift.model.Capsule
 import dev.gmitch215.drift.plan.Belief
@@ -25,6 +32,7 @@ import dev.gmitch215.drift.plan.Decision
 import dev.gmitch215.drift.plan.Frame
 import dev.gmitch215.drift.plan.Hypothesis
 import dev.gmitch215.drift.plan.Options
+import dev.gmitch215.drift.plan.PlanWeights
 import dev.gmitch215.drift.plan.Planner
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -210,8 +218,8 @@ class SolveTest {
         val r = solve(executor = FakeExecutor(behave = { _, _ -> trial(false) }))
         assertEquals(VerdictKind.STUCK, r.verdict.kind)
         assertEquals(StuckWhy.NOT_REPRODUCED, r.verdict.why)
-        assertEquals(2 * options.pilot, r.trials)
-        assertTrue("0 of ${options.pilot}" in r.verdict.statement)
+        assertEquals(2 * 30, r.trials)
+        assertTrue("0 of 30" in r.verdict.statement)
     }
 
     @Test
@@ -324,6 +332,275 @@ class SolveTest {
         assertEquals(VerdictKind.NARROWED, r.verdict.kind, r.verdict.statement)
         assertTrue(r.verdict.candidates.isNotEmpty())
         assertNotNull(r.verdict.next)
+    }
+
+    // #endregion
+
+    // #region isolation
+
+    private fun conditions(r: SolveResult) =
+        SolveCertificate.certificate(r.case)!!.fields.getValue("conditions") as JsonObject
+
+    @Test
+    fun anExecutorThatReturnsNoCapsuleConfirmsTheEffectButNotTheIsolation() {
+        val r = solve(executor = FakeExecutor(capsules = { null }, behave = failsWhen(culprit)))
+        assertEquals("confirmed-effect", r.verdict.kind.id, r.verdict.statement)
+        assertTrue("isolation not measured" in r.verdict.statement, r.verdict.statement)
+        assertEquals(listOf("env.TZ"), r.verdict.set)
+        assertTrue(r.verdict.notIsolated.isNotEmpty())
+        assertEquals(JsonString("predicted"), conditions(r).fields["isolation"])
+        assertEquals(JsonNull, conditions(r).fields["isolatedAmong"])
+        assertTrue(r.runs.filter { it.kind != "pilot" }.all { it.diff!!.source == "predicted" })
+    }
+
+    @Test
+    fun aMeasuredConfirmationStatesTheCapturedAttributesItHoldsOver() {
+        val r = solve()
+        assertEquals(VerdictKind.CONFIRMED, r.verdict.kind, r.verdict.statement)
+        val c = conditions(r)
+        assertEquals(JsonString("measured"), c.fields["isolation"])
+        val among = (c.fields["isolatedAmong"] as JsonInt).value
+        val forward = r.runs.first { it.kind == "forward" }
+        assertEquals((forward.diff!!.toJson().fields["compared"] as JsonInt).value, among)
+        assertTrue(among >= red().attributes.size, "$among")
+    }
+
+    @Test
+    fun aStaleCapsuleFromAnotherRunVoidsTheExperimentInsteadOfConfirming() {
+        var first: Capsule? = null
+        val stale = { arm: RunConfig ->
+            val seen = first ?: arm.capsule
+            first = seen
+            if (arm.interventions.isEmpty()) arm.capsule else seen
+        }
+        val r = solve(executor = FakeExecutor(capsules = stale, behave = failsWhen(culprit)))
+        assertNotEquals(VerdictKind.CONFIRMED, r.verdict.kind, r.verdict.statement)
+        assertEquals(VerdictKind.STUCK, r.verdict.kind, r.verdict.statement)
+        assertEquals(StuckWhy.EXECUTOR, r.verdict.why)
+        assertTrue("is void" in r.verdict.statement, r.verdict.statement)
+        assertEquals("void", r.runs.last().diff!!.source)
+        assertTrue(r.runs.none { it.kind == "reverse" })
+    }
+
+    private val wrongZone = { arm: RunConfig ->
+        val zone = "Europe/Paris"
+        if (has(arm, "env.TZ", tz)) with(arm.capsule, arm.label, "env.TZ" to zone) else arm.capsule
+    }
+
+    @Test
+    fun aCapsuleWhoseValueDiffersFromTheRequestVoidsTheExperiment() {
+        val r = solve(executor = FakeExecutor(capsules = wrongZone, behave = failsWhen(culprit)))
+        assertNotEquals(VerdictKind.CONFIRMED, r.verdict.kind, r.verdict.statement)
+        assertEquals(StuckWhy.EXECUTOR, r.verdict.why, r.verdict.statement)
+        assertTrue("env.TZ" in r.verdict.statement, r.verdict.statement)
+        val void = r.runs.last()
+        assertEquals("void", void.diff!!.source)
+        assertEquals(
+            JsonArray(listOf(JsonString("env.TZ"))),
+            void.diff.toJson().fields["unreached"],
+        )
+    }
+
+    @Test
+    fun aVoidExperimentNeitherSupportsNorRulesOutACandidate() {
+        val r = solve(executor = FakeExecutor(capsules = wrongZone, behave = failsWhen(culprit)))
+        val cert = SolveCertificate.certificate(r.case)!!
+        val posteriors = (cert.fields.getValue("posteriors") as JsonArray).items
+        val void = r.runs.last()
+        assertEquals("void", void.diff!!.source)
+        val steps = posteriors.map { ((it as JsonObject).fields["after"] as JsonString).value }
+        assertTrue(steps.none { it.startsWith("${void.id} ") }, "$steps")
+        assertTrue(Verify.run(r.case).ok, Verify.run(r.case).text())
+    }
+
+    @Test
+    fun anExtraChangedAttributeMakesTheEffectABundleNeverOneCause() {
+        val extra = { arm: RunConfig ->
+            if (has(arm, "env.TZ", tz)) {
+                with(arm.capsule, arm.label, "kernel.release" to "6.8.0-new")
+            } else {
+                arm.capsule
+            }
+        }
+        val r = solve(executor = FakeExecutor(capsules = extra, behave = failsWhen(culprit)))
+        assertEquals(VerdictKind.BUNDLE, r.verdict.kind, r.verdict.statement)
+        assertTrue("kernel.release" in r.verdict.notIsolated)
+        assertEquals(JsonString("measured"), conditions(r).fields["isolation"])
+    }
+
+    // #endregion
+
+    // #region trial order
+
+    private fun controlFirst(label: String) =
+        label.endsWith("unchanged") || label.startsWith("passing")
+
+    @Test
+    fun everyBlockOfTwoTrialsRunsEachArmFirstOnce() {
+        val executor = FakeExecutor(behave = failsWhen(culprit))
+        solve(executor = executor)
+        val experiments = mutableListOf<MutableList<Boolean>>()
+        for ((opener, _) in executor.ran.chunked(2)) {
+            if (opener.second == 0) experiments += mutableListOf<Boolean>()
+            experiments.last() += controlFirst(opener.first)
+        }
+        assertTrue(experiments.size >= 3, "${experiments.size}")
+        for (order in experiments) {
+            for (block in order.chunked(2).filter { it.size == 2 }) {
+                assertNotEquals(block[0], block[1], "$order")
+            }
+        }
+    }
+
+    @Test
+    fun aDriftThatFollowsTheRunOrderIsNotConfirmedUnderACounterbalancedSchedule() {
+        var calls = 0
+        val reverseLabel = red().label
+        val drift = { arm: RunConfig, _: Int ->
+            calls++
+            val second = calls % 2 == 0
+            trial(if (arm.label.startsWith(reverseLabel)) !second else second)
+        }
+        val r = solve(executor = FakeExecutor(behave = drift))
+        assertEquals(VerdictKind.STUCK, r.verdict.kind, r.verdict.statement)
+        assertEquals(StuckWhy.NOT_REPRODUCED, r.verdict.why)
+        assertTrue("fails as often" in r.verdict.statement, r.verdict.statement)
+    }
+
+    @Test
+    fun theScheduleIsFixedBySeedAndBalancedInBlocksOfTwo() {
+        val seed = TrialSchedule.seed("a", "b", "x1")
+        val order = TrialSchedule(seed, 7)
+        assertEquals(order.treatmentFirst, TrialSchedule(seed, 7).treatmentFirst)
+        assertEquals(14, order.text.length)
+        for (block in order.treatmentFirst.chunked(2).filter { it.size == 2 }) {
+            assertNotEquals(block[0], block[1])
+        }
+        val orders = (1..8).map { TrialSchedule(TrialSchedule.seed("a", "b", "x$it"), 8).text }
+        assertTrue(orders.toSet().size > 1, "the seed picks which arm opens a block")
+        assertNotEquals(seed, TrialSchedule.seed("b", "a", "x1"))
+        assertEquals(0, TrialSchedule(seed, 0).treatmentFirst.size)
+    }
+
+    @Test
+    fun theCertificateRecordsTheSeedAndOrderOfEveryExperiment() {
+        val r = solve()
+        val cert = SolveCertificate.certificate(r.case)!!
+        val summaries = (cert.fields.getValue("experiments") as JsonArray).items
+        assertEquals(r.runs.size, summaries.size)
+        for ((run, summary) in r.runs.zip(summaries)) {
+            val seed = TrialSchedule.seed(green.hash(), red().hash(), run.id)
+            val expected = TrialSchedule(seed, run.control.trials.size).toJson()
+            assertEquals(expected, (summary as JsonObject).fields["schedule"], run.id)
+            val file = CanonicalJson.parse(r.case.text(SolveCertificate.resultPath(run.seq))!!)
+            assertEquals(expected, (file as JsonObject).fields["schedule"], run.id)
+        }
+    }
+
+    // #endregion
+
+    // #region the pilot
+
+    private fun draw(seed: Long, i: Int): Int {
+        var z = seed + (i + 1) * -7046029254386353131L
+        z = (z xor (z ushr 30)) * -4658895280553007687L
+        z = (z xor (z ushr 27)) * -7723592293110705685L
+        z = z xor (z ushr 31)
+        return ((z ushr 1) % 100).toInt()
+    }
+
+    private fun intermittent(seed: Long, percent: Int) =
+        { arm: RunConfig, i: Int -> trial(culprit(arm) && draw(seed, i) < percent) }
+
+    private val roomy = options.copy(budget = Budget(1000, 600))
+
+    @Test
+    fun theAdaptivePilotFindsAFailureThatShowsAtTenPercent() {
+        val r = solve(o = roomy, executor = FakeExecutor(behave = intermittent(14, 10)))
+        val pilot = r.runs.first()
+        assertEquals("pilot", pilot.kind)
+        assertEquals(11, pilot.treatment.trials.size, "the first failure is at index 10")
+        assertEquals(1, pilot.treatment.failures)
+        assertEquals(StuckWhy.BUDGET, r.verdict.why, "found, but too rare to size an arm")
+        assertTrue("target power" in r.verdict.statement, r.verdict.statement)
+        assertTrue(Verify.run(r.case).ok, Verify.run(r.case).text())
+    }
+
+    @Test
+    fun theAdaptivePilotFindsAFailureThatShowsAtThirtyPercent() {
+        val r = solve(o = roomy, executor = FakeExecutor(behave = intermittent(23, 30)))
+        val pilot = r.runs.first()
+        assertEquals(10, pilot.treatment.trials.size, "the first failure is at index 9")
+        assertNotEquals(StuckWhy.NOT_REPRODUCED, r.verdict.why, r.verdict.statement)
+        assertTrue(Verify.run(r.case).ok, Verify.run(r.case).text())
+    }
+
+    @Test
+    fun aPilotThatSeesNoFailureStopsAtTheCapAndStatesTheRateBound() {
+        val r = solve(executor = FakeExecutor(behave = { _, _ -> trial(false) }))
+        assertEquals(StuckWhy.NOT_REPRODUCED, r.verdict.why)
+        assertEquals(30, r.runs.single().treatment.trials.size)
+        assertTrue("below 10% at 95%" in r.verdict.statement, r.verdict.statement)
+        assertTrue(Verify.run(r.case).ok, Verify.run(r.case).text())
+        val tight = options.copy(budget = Budget(40, 60))
+        val small = solve(o = tight, executor = FakeExecutor { _, _ -> trial(false) })
+        assertEquals(10, small.runs.single().treatment.trials.size)
+        assertTrue("below 30% at 95%" in small.verdict.statement, small.verdict.statement)
+    }
+
+    @Test
+    fun thePilotRuleIsIntegerArithmeticOverTheCapAndTheFirstFailure() {
+        assertEquals(10, PilotRule.upperPercent(30))
+        assertEquals(38, PilotRule.upperPercent(8))
+        assertEquals(100, PilotRule.upperPercent(3))
+        assertEquals(100, PilotRule.upperPercent(1))
+        assertEquals(30, PilotRule.max(6, 400))
+        assertEquals(6, PilotRule.max(6, 18))
+        assertEquals(25, PilotRule.max(8, 100))
+        assertEquals(6, PilotRule.trials(6, 30, 2))
+        assertEquals(11, PilotRule.trials(6, 30, 10))
+        assertEquals(30, PilotRule.trials(6, 30, null))
+    }
+
+    // #endregion
+
+    // #region the family
+
+    private fun family(r: SolveResult) =
+        SolveCertificate.certificate(r.case)!!.fields.getValue("family") as JsonObject
+
+    private fun forwardPerArm(r: SolveResult) =
+        r.runs.first { it.kind == "forward" }.treatment.trials.size
+
+    @Test
+    fun theCertificateStatesTheFamilyAndTheFalseConfirmedBoundPerSearch() {
+        val f = family(solve())
+        assertEquals(JsonString("holm"), f.fields["method"])
+        assertEquals(JsonInt(options.maxRounds.toLong()), f.fields["size"])
+        val alpha = (f.fields["alpha"] as JsonInt).value
+        val each = (f.fields["alphaPerTest"] as JsonInt).value
+        val bound = (f.fields["falseConfirmedBound"] as JsonInt).value
+        assertEquals(PlanWeights.ALPHA, alpha)
+        assertEquals(alpha / options.maxRounds, each)
+        assertEquals(each * options.maxRounds, bound)
+        assertTrue(bound <= alpha, "the bound over the whole search stays within alpha")
+        assertTrue("per search" in ((f.fields["scope"] as JsonString).value))
+    }
+
+    @Test
+    fun everyExperimentRuleTestsAtTheFamilyShareOfAlpha() {
+        val r = solve()
+        val rules = r.runs.mapNotNull { it.spec?.rule }
+        assertTrue(rules.isNotEmpty())
+        for (rule in rules) assertEquals(PlanWeights.ALPHA / options.maxRounds, rule.alpha)
+    }
+
+    @Test
+    fun aLargerFamilyNeedsMoreTrialsPerArmAndIsRecorded() {
+        val wide = solve(o = roomy.copy(maxRounds = 40))
+        assertEquals(JsonInt(40), family(wide).fields["size"])
+        assertTrue(forwardPerArm(wide) > forwardPerArm(solve()), "${forwardPerArm(wide)}")
+        assertTrue(Verify.run(wide.case).ok, Verify.run(wide.case).text())
     }
 
     // #endregion
@@ -475,6 +752,6 @@ class SolveTest {
     // #endregion
 
     companion object {
-        const val GOLDEN = "74a13381182b5d60ff7e21e5e5a6b8f3ece7432c240380a64725aa72538c9e3a"
+        const val GOLDEN = "bf2f1377ebc0661e9ef937ebcee9c0b3f60179c33c674f7fc57098b4cefd0549"
     }
 }
