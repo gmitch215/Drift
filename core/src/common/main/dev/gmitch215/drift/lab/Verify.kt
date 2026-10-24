@@ -1061,7 +1061,7 @@ object Verify {
             }
             val measured = carrier.diffSource == MeasuredDiff.MEASURED &&
                 partner.diffSource == MeasuredDiff.MEASURED
-            if (kind == VerdictKind.CONFIRMED && !measured) {
+            if ((kind == VerdictKind.CONFIRMED || kind == VerdictKind.BUNDLE) && !measured) {
                 return fail(
                     "verdict",
                     "${kind.label} without a measured diff from both arms",

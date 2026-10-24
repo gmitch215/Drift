@@ -574,15 +574,16 @@ class VerifyTest {
     }
 
     @Test
-    fun theFlagshipBlindCaseIsPinnedAndVerifies() {
+    fun theFlagshipBlindCaseIsPinnedAndFailsTheMeasuredIsolationRule() {
         val bytes = FlagshipCFixtures.bytes("INC-13.driftcase")
         assertEquals(
             "b4b20bdcb4d3c5e44687564c570fc0be77de505e84607a936720ec18def65aeb",
             Sha256.hex(bytes),
         )
         val report = Verify.open(bytes)
-        assertTrue(report.ok, report.text())
+        assertFalse(report.ok)
         assertTrue(report.verdict!!.startsWith("CONFIRMED EFFECT (bundle)"))
+        assertTrue("without a measured diff from both arms" in report.text(), report.text())
         val opened = assertIs<ArchiveOpen.Opened>(Archive.open(bytes))
         val again = assertIs<ArchivePack.Packed>(Archive.pack(opened.case))
         assertTrue(again.bytes.contentEquals(bytes))
