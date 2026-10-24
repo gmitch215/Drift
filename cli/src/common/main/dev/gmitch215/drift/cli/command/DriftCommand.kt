@@ -1,6 +1,8 @@
 package dev.gmitch215.drift.cli.command
 
+import com.github.ajalt.clikt.completion.CompletionCommand
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.output.MordantHelpFormatter
@@ -35,8 +37,11 @@ class DriftCommand(
             CaptureCommand(host),
             RunCommand(host, files),
             ImportCommand(host, files),
+            CiCommand(host, files),
+            HandsoffCommand(host, files),
             BisectCommand(host, files),
             DiagnoseCommand(host, files),
+            CompareCommand(host),
             NextCommand(files),
             CaseCommand(files),
             ReproduceCommand(host, files),
@@ -54,8 +59,32 @@ class DriftCommand(
             ContractCommand(host, files),
             TriageCommand(host, files),
             UpgradeCheckCommand(host, files),
+            DoctorCommand(host),
+            HelpCommand(),
+            CompletionCommand(
+                name = "completion",
+                help = "Print a shell completion script for bash, zsh or fish",
+                epilog = examples("completion"),
+            ),
         )
     }
 
+    override fun help(context: Context) = INTRO
+
     override fun run() = Unit
 }
+
+private const val INTRO = "Drift compares a run that passed with a run that failed, ranks what " +
+    "differs and, with Docker, tests which difference causes the failure.\n\n" +
+    "Start with one of these:$LINE" +
+    "drift ci: check this repository's CI$LINE" +
+    "drift doctor: check that this machine can run Drift$LINE" +
+    "drift diagnose: compare the capsules of a passing and a failing run\n\n" +
+    "Commands by task:$LINE" +
+    "Investigate: ci, handsoff, diagnose, bisect, contract, upgrade-check, triage$LINE" +
+    "Capture: capture, run, compare, import$LINE" +
+    "Lab: solve, reproduce, ingest, next, case, pack, verify, report, open$LINE" +
+    "Atlas: atlas, probe$LINE" +
+    "Utilities: doctor, help, completion, install, uninstall, serve\n\n" +
+    "Run drift help TERM to learn what capsule, diagnose, solve, certificate, verify, Atlas " +
+    "or probe mean, and drift COMMAND --help for examples. Manual: https://drift.gmitch215.dev"
