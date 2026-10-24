@@ -1,0 +1,32 @@
+handsoff plan: repo (root packages/app)
+files read: 1; nothing was run and no network call was made
+
+result: ready
+
+ecosystems
+  node
+    files        packages/app/package.json
+    manager      npm (packageManager, packages/app/package.json:5)
+    lockfiles    none
+    pin          node >=20 (engines.node, packages/app/package.json:7)
+    script       test = node --test (packages/app/package.json:10) -> npm run test
+not read: any ecosystem not listed above (for example Cargo, Gemfile, .NET project files)
+
+ci
+  files        none found
+  job          none read; jobs found: 0
+
+plan
+  would run, in order
+    1. npm run test  (script test, packages/app/package.json:10)
+  where        a rootless container, never the host
+  image        not chosen (--from-ci CASE builds one from the failing capsule)
+  network      install step only; this plan makes no call and starts nothing
+  will not
+    pass secrets or the environment of this machine
+    mount the home directory
+    start the services the job names
+    run anything on the host
+  by hand
+    cd packages/app
+    npm run test

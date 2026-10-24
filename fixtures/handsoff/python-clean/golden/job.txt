@@ -1,0 +1,42 @@
+handsoff plan: repo
+files read: 6; nothing was run and no network call was made
+
+result: ready
+
+ecosystems
+  python
+    files        pyproject.toml, requirements.txt
+    manager      pip
+    lockfiles    requirements.txt
+    pin          python 3.12.4 (.python-version:1)
+    pin          python >=3.11 (requires-python, pyproject.toml:4)
+    install      python -m pip install -r requirements.txt (default for requirements.txt)
+    tox environment py312 (tox.ini:2) (no documented command)
+    nox session  tests (noxfile.py:4) -> nox -s tests
+not read: any ecosystem not listed above (for example Cargo, Gemfile, .NET project files)
+
+ci
+  files        .gitlab-ci.yml
+  job          test (.gitlab-ci.yml:1)
+  runs on      not set
+  image        python:3.12
+  services     none
+  steps, in order
+    step 1 [script]  python -m pip install -r requirements.txt  (.gitlab-ci.yml:4)
+    step 2 [script]  pytest  (.gitlab-ci.yml:5)
+
+plan
+  would run, in order
+    1. python -m pip install -r requirements.txt  (.gitlab-ci.yml:4)
+    2. pytest  (.gitlab-ci.yml:5)
+  where        a rootless container, never the host
+  image        python:3.12 (the image the job names)
+  network      install step only; this plan makes no call and starts nothing
+  will not
+    pass secrets or the environment of this machine
+    mount the home directory
+    start the services the job names
+    run anything on the host
+  by hand
+    python -m pip install -r requirements.txt
+    pytest

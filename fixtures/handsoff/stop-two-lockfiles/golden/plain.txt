@@ -1,0 +1,24 @@
+handsoff plan: repo
+files read: 4; nothing was run and no network call was made
+
+result: stopped, 1 question to answer
+
+ecosystems
+  node
+    files        package.json
+    lockfiles    package-lock.json, yarn.lock
+    pin          node 20.11.0 (.nvmrc:1)
+    pin          node >=20 (engines.node, package.json:6)
+    script       test = node --test (package.json:9) (no documented command)
+not read: any ecosystem not listed above (for example Cargo, Gemfile, .NET project files)
+
+ci
+  files        none found
+  job          none read; jobs found: 0
+
+stop 1 of 1: two-lockfiles
+  what: node has 2 lockfiles: package-lock.json, yarn.lock
+  question: Which lockfile do installs follow? Pass --lockfile with one of them.
+  answer with: --lockfile FILE
+
+no plan is printed until these are answered; Drift does not guess past a stop

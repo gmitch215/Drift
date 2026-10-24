@@ -1,0 +1,25 @@
+handsoff plan: repo
+files read: 3; nothing was run and no network call was made
+
+result: stopped, 1 question to answer
+
+ecosystems
+  node
+    files        package.json
+    lockfiles    package-lock.json
+    pin          node 18 (.nvmrc:1)
+    pin          node >=20 (engines.node, package.json:6)
+    install      npm ci (default for package-lock.json)
+    script       test = node --test (package.json:9) -> npm run test
+not read: any ecosystem not listed above (for example Cargo, Gemfile, .NET project files)
+
+ci
+  files        none found
+  job          none read; jobs found: 0
+
+stop 1 of 1: runtime-version
+  what: node pins disagree: 18 (.nvmrc:1) and >=20 (engines.node, package.json:6)
+  question: Which node version should be used? Pass --runtime node=VERSION.
+  answer with: --runtime NAME=VERSION
+
+no plan is printed until these are answered; Drift does not guess past a stop

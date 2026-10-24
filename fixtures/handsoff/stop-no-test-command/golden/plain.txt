@@ -1,0 +1,24 @@
+handsoff plan: repo
+files read: 2; nothing was run and no network call was made
+
+result: stopped, 1 question to answer
+
+ecosystems
+  jdk
+    files        build.gradle.kts, settings.gradle.kts
+    manager      gradle
+    lockfiles    none
+    pin          java 21 (gradle toolchain, build.gradle.kts:7)
+    note         Gradle tasks and Maven goals are not read
+not read: any ecosystem not listed above (for example Cargo, Gemfile, .NET project files)
+
+ci
+  files        none found
+  job          none read; jobs found: 0
+
+stop 1 of 1: no-test-command
+  what: the repository names no test command Drift can run
+  question: Which command runs the tests? Pass --test-command COMMAND.
+  answer with: --test-command COMMAND
+
+no plan is printed until these are answered; Drift does not guess past a stop

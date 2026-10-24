@@ -29,6 +29,12 @@ val embedProjects = tasks.register<EmbedFixtures>("embedProjects") {
     outputDir = layout.buildDirectory.dir("generated/projects")
 }
 
+val embedHandsoff = tasks.register<EmbedFixtures>("embedHandsoff") {
+    fixtures = rootProject.layout.projectDirectory.dir("fixtures/handsoff")
+    objectName = "HandsoffFixtures"
+    outputDir = layout.buildDirectory.dir("generated/handsoff")
+}
+
 val embedLayouts = tasks.register<EmbedFixtures>("embedLayouts") {
     fixtures = rootProject.layout.projectDirectory.dir("fixtures/sites/viewport/capsules")
     objectName = "LayoutFixtures"
@@ -60,6 +66,7 @@ kotlin {
             kotlin.srcDir(embedAtlas)
             kotlin.srcDir(embedVariants)
             kotlin.srcDir(embedProjects)
+            kotlin.srcDir(embedHandsoff)
             kotlin.srcDir(embedLayouts)
         }
     }

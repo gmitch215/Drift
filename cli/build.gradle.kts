@@ -29,6 +29,12 @@ val embedCi = tasks.register<EmbedFixtures>("embedCi") {
     outputDir = layout.buildDirectory.dir("generated/ci")
 }
 
+val embedHandsoff = tasks.register<EmbedFixtures>("embedHandsoff") {
+    fixtures = rootProject.layout.projectDirectory.dir("fixtures/handsoff")
+    objectName = "HandsoffFixtures"
+    outputDir = layout.buildDirectory.dir("generated/handsoff")
+}
+
 val embedSet = tasks.register<EmbedFixtures>("embedSet") {
     fixtures = rootProject.layout.projectDirectory.dir("fixtures/set")
     objectName = "SetFixtures"
@@ -64,6 +70,9 @@ kotlin {
     }
 
     sourceSets {
+        commonMain {
+            kotlin.srcDir(embedAtlas)
+        }
         commonMain.dependencies {
             implementation(project(":core"))
             implementation(project(":host"))
@@ -72,9 +81,9 @@ kotlin {
         }
         commonTest {
             kotlin.srcDir(embedFixtures)
-            kotlin.srcDir(embedAtlas)
             kotlin.srcDir(embedVariants)
             kotlin.srcDir(embedCi)
+            kotlin.srcDir(embedHandsoff)
             kotlin.srcDir(embedSet)
         }
         macosMain { kotlin.srcDir("src/posix/main") }

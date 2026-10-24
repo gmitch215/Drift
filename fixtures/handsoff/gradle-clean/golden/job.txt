@@ -1,0 +1,40 @@
+handsoff plan: repo
+files read: 5; nothing was run and no network call was made
+
+result: ready
+
+ecosystems
+  jdk
+    files        build.gradle.kts, settings.gradle.kts
+    manager      gradle wrapper
+    lockfiles    none
+    pin          java 21 (gradle toolchain, build.gradle.kts:7)
+    pin          gradle 8.14 (gradle wrapper, gradle/wrapper/gradle-wrapper.properties:1)
+    note         Gradle tasks and Maven goals are not read
+not read: any ecosystem not listed above (for example Cargo, Gemfile, .NET project files)
+
+ci
+  files        .github/workflows/build.yml
+  job          build (.github/workflows/build.yml:4)
+  runs on      ubuntu-latest
+  image        not set
+  services     none
+  actions, not run
+    .github/workflows/build.yml:7  actions/checkout@v4
+    .github/workflows/build.yml:8  actions/setup-java@v4  (distribution: temurin, java-version: 21)
+  steps, in order
+    step 3 [Test]  ./gradlew test  (.github/workflows/build.yml:13)
+
+plan
+  would run, in order
+    1. ./gradlew test  (.github/workflows/build.yml:13)
+  where        a rootless container, never the host
+  image        not chosen (--from-ci CASE builds one from the failing capsule)
+  network      install step only; this plan makes no call and starts nothing
+  will not
+    pass secrets or the environment of this machine
+    mount the home directory
+    start the services the job names
+    run anything on the host
+  by hand
+    ./gradlew test

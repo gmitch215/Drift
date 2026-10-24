@@ -1,0 +1,35 @@
+handsoff plan: repo
+files read: 4; nothing was run and no network call was made
+
+result: ready
+
+ecosystems
+  node
+    files        package.json
+    lockfiles    package-lock.json
+    pin          node 20.11.0 (.nvmrc:1)
+    pin          node >=20 (engines.node, package.json:6)
+    install      npm ci (default for package-lock.json)
+    script       test = node --test (package.json:9) -> npm run test
+not read: any ecosystem not listed above (for example Cargo, Gemfile, .NET project files)
+
+ci
+  files        .github/workflows/ci.yml
+  job          none read; jobs found: 1
+    .github/workflows/ci.yml: test
+
+plan
+  would run, in order
+    1. npm ci  (default for package-lock.json)
+    2. npm run test  (script test, package.json:9)
+  where        a rootless container, never the host
+  image        not chosen (--from-ci CASE builds one from the failing capsule)
+  network      install step only; this plan makes no call and starts nothing
+  will not
+    pass secrets or the environment of this machine
+    mount the home directory
+    start the services the job names
+    run anything on the host
+  by hand
+    npm ci
+    npm run test

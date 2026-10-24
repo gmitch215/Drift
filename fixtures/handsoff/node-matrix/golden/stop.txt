@@ -1,0 +1,27 @@
+handsoff plan: repo
+files read: 4; nothing was run and no network call was made
+
+result: stopped, 1 question to answer
+
+ecosystems
+  node
+    files        package.json
+    lockfiles    package-lock.json
+    pin          node 20.11.0 (.nvmrc:1)
+    pin          node >=20 (engines.node, package.json:6)
+    install      npm ci (default for package-lock.json)
+    script       test = node --test (package.json:9) -> npm run test
+not read: any ecosystem not listed above (for example Cargo, Gemfile, .NET project files)
+
+ci
+  files        .github/workflows/ci.yml
+  job          none read; jobs found: 1
+    .github/workflows/ci.yml: test
+  note         job test (.github/workflows/ci.yml:4) was found; its steps are read once the question is answered
+
+stop 1 of 1: matrix-cell
+  what: test has 3 matrix cells and none was chosen
+  question: Which cell? Axes are os: ubuntu-latest, macos-latest; node: 18, 20.
+  answer with: --cell KEY=VALUE
+
+no plan is printed until these are answered; Drift does not guess past a stop

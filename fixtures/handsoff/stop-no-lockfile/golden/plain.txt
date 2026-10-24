@@ -1,0 +1,24 @@
+handsoff plan: repo
+files read: 2; nothing was run and no network call was made
+
+result: stopped, 1 question to answer
+
+ecosystems
+  node
+    files        package.json
+    lockfiles    none
+    pin          node 20.11.0 (.nvmrc:1)
+    pin          node >=20 (engines.node, package.json:6)
+    script       test = node --test (package.json:9) (no documented command)
+not read: any ecosystem not listed above (for example Cargo, Gemfile, .NET project files)
+
+ci
+  files        none found
+  job          none read; jobs found: 0
+
+stop 1 of 1: no-lockfile
+  what: node has a manifest (package.json) and no lockfile, so the install resolves versions on the day it runs
+  question: Is an unlocked install acceptable? Pass --accept-no-lockfile to say so.
+  answer with: --accept-no-lockfile
+
+no plan is printed until these are answered; Drift does not guess past a stop
