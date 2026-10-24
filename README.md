@@ -9,21 +9,100 @@
         <img src="https://img.shields.io/github/stars/gmitch215/Drift?style=flat" alt="stars">
         <img src="https://img.shields.io/github/commit-activity/t/gmitch215/Drift?color=violet" alt="commit activity">
     </div>
-    <p style="text-align: center;" data-shared-ratio>Shared code 91.8%: host 43.7%, core 100.0%, scan 100.0%, cli 72.5%, studio 94.4%, bench 81.6%</p>
+    <p style="text-align: center;" data-shared-ratio>Shared code 93.0%: host 59.3%, core 100.0%, scan 100.0%, cli 76.5%, studio 95.0%, bench 81.7%</p>
 </div>
 
 ---
 
 Drift diagnoses a program that passes in one environment and fails in another. It records each
 environment, ranks what differs between a passing run and a failing one, proposes the
-experiment that would remove the most uncertainty, runs it, and writes a certificate that a second
-command can verify. It is written in Kotlin Multiplatform and runs as a command line tool, a desktop
-app, a web app, an Android app and an iOS app from the same shared code.
+experiment that would remove the most uncertainty, runs it, and writes a record of the result that a
+second command can check. It is written in Kotlin Multiplatform (one Kotlin codebase built for
+several platforms) and runs as a command line tool, a desktop app, a web app, an Android app and an
+iOS app from the same shared code. The apps are called Studio.
+
+---
+
+## Terms
+
+| Term | Meaning |
+| --- | --- |
+| Capsule | A file that records one environment: the operating system, tool versions, environment variables (secret values hidden) and the results of small checks. |
+| Diagnose | Compare the capsule of a run that passed with the capsule of a run that failed, and rank what differs. |
+| Solve | Run the failing command in containers that differ in one setting, under a rule written down before the first run, to see which difference causes the failure. This part of Drift is the Lab. |
+| Certificate | The record of every run in a solve and its verdict, kept in a `.driftcase` file. |
+| Verify | Recompute every count and verdict in a `.driftcase` file from the file itself. It does not run anything again. |
+| Atlas | A table of what small Kotlin programs print on each target, a platform Kotlin builds for, such as the JVM, native code or WebAssembly. |
+| Probe | One of those small programs. |
+
+---
+
+## Quick Start
+
+The commands run from a clone of this repository, because they read the files in `fixtures/`.
+Output below is from Linux x64.
+
+### Command Line
+
+Install the executable, or build it from source if no release is published yet (see
+[Install and Run](#install-and-run)), and check it runs:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh | sh
+drift --version
+```
+
+```
+drift version 1.0.0 (linux)
+```
+
+Diagnose a CI run (an automated test run on a server) that went from passing to failing.
+`fixtures/drangler` holds the capsules of both runs:
+
+```sh
+G=fixtures/drangler/capsules/36702683742.json
+R=fixtures/drangler/capsules/36995781138.json
+drift diagnose --detail summary $G $R
+```
+
+```
+9 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
+so the data does not name one cause.
+```
+
+Nine attributes differ and the data cannot separate them, so Drift names no single cause.
+`--detail detail` adds the ranked candidates and the next experiment to run. The Try It section
+continues from here.
+
+### Studio
+
+Studio runs in a browser at <https://drift.gmitch215.dev/atlas/>, with nothing to install. To serve
+the same build from your machine, see [Studio on the Web](#studio-on-the-web).
+
+1. On the Home screen, choose **Show a Sample**. Studio compares the same two CI runs as the command
+   above and shows the same result: Drift cannot name one cause, and nine differences tie for the
+   top place.
+2. Choose the **Atlas** tab. Its rows are probes, and its columns are targets.
+3. Choose **Run on This Device**. The This Device panel counts how many probes behave like each
+   target, and the Device column shows what your browser printed for each probe.
+
+---
+
+## What You Need
+
+Every command except `drift solve` runs with the executable alone. `solve` needs Docker, because it
+builds and runs containers, and `docker info` must succeed. `drift reproduce` writes a `Dockerfile`
+and a `run.sh` without Docker; running `run.sh` needs it. `drift serve` needs a Studio web build
+directory, which `./gradlew :cli:stageStudio` writes and the release archives do not hold. Building
+from source needs JDK 21. Studio in a browser needs only the browser.
 
 ---
 
 ## Table of Contents
 
+- [Terms](#terms)
+- [Quick Start](#quick-start)
+- [What You Need](#what-you-need)
 - [What It Does](#what-it-does)
 - [The Kotlin Portability Atlas](#the-kotlin-portability-atlas)
 - [Install and Run](#install-and-run)
@@ -62,7 +141,7 @@ log. `drift diagnose --against BASELINE` compares a saved passing run with the c
 failing ones, and `drift bisect plan` and `drift bisect apply` narrow a green and red pair one test
 at a time. None of them opens a network connection.
 
-`drift capture --project` adds the dependency versions, imports and call sites of the working directory to a capsule. `drift upgrade-check --to php=8.3,drupal=11` lists what a move to other versions breaks, from one capsule and the rule catalog (298 rules). `drift triage` reads an issue body offline and says which environment facts and rules it names. `drift contract` writes what a program needs from an environment and checks other capsules against it. Studio has a screen for each of the last three.
+`drift capture --project` adds the dependency versions, imports and call sites of the working directory to a capsule. `drift upgrade-check --to php=8.3,drupal=11` lists what a move to other versions breaks, from one capsule and the rule catalog (426 rules). `drift triage` reads an issue body offline and says which environment facts and rules it names. `drift contract` writes what a program needs from an environment and checks other capsules against it. Studio has a screen for each of the last three.
 
 The repository also holds a GitHub Action (`action.yml`) and a GitLab CI/CD component
 (`templates/drift.yml`) that run these steps in a pipeline; see
@@ -311,38 +390,41 @@ unavailable there.
 
 ## Try It
 
-The examples run from the repository root against the files in `fixtures/`. They assume the `drift`
-alias from the command line section.
+The examples run from the repository root against the files in `fixtures/`. They assume `drift` is
+on your path, or the `drift` alias from the Command Line section. Each one needs only the
+executable, except where it says otherwise. Output is from Linux x64.
 
-**Capture this machine.**
+**Capture this machine.** The capsule is JSON, so the digest changes with the machine.
 
 ```sh
 drift capture --label ci > ci.json
-shasum -a 256 ci.json
+sha256sum ci.json
 ```
 
-**Diagnose a real failure.** `fixtures/drangler` holds capsules from a CI run that went from passing
-to failing. `--detail` prints text instead of JSON, at three levels (`summary`, `detail`, `full`).
+On macOS, use `shasum -a 256` for the second command.
+
+**Diagnose a real failure.** The Quick Start printed the one-line summary. `--detail` prints text
+instead of JSON, at three levels (`summary`, `detail`, `full`). The first lines of `detail`:
 
 ```sh
 G=fixtures/drangler/capsules/36702683742.json
 R=fixtures/drangler/capsules/36995781138.json
-drift diagnose --detail summary $G $R
+drift diagnose --detail detail $G $R | head -9
 ```
 
 ```
 9 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
 so the data does not name one cause.
+
+Candidates, best first. Scores come from hand-set weights (hand-set-1, uncalibrated); they order
+  candidates and are not probabilities.
+  1. tool.node.version (tier difference, basis inferred, in bundle-1)
+      evidence: attribute tool.node.version; no run history behind it
+  2. ci.provisioner.build-date (tier difference, basis inferred, in bundle-1)
+      evidence: attribute ci.provisioner.build-date; no run history behind it
 ```
 
-Use `--detail detail` for the ranked candidates, the bundle and the proposed next experiment.
-
-**Reproduce an environment.** This writes a `Dockerfile`, `run.sh` and `manifest.json` into `repro/`.
-The manifest lists what a container cannot mirror.
-
-```sh
-drift reproduce fixtures/lab/node-alpine.json --run "npm test" --out repro
-```
+The full output also lists the bundle and the proposed next experiment.
 
 **Verify a packed case.** `fixtures/lab/cases` holds four solved cases. `verify` runs 14 checks on the
 archive itself.
@@ -357,6 +439,33 @@ experiments are not re-run; the recorded results are taken as given
 verify: ok
 ```
 
+**Reproduce an environment.** This writes a `Dockerfile`, `run.sh` and `manifest.json` into `repro/`
+and does not run Docker. The manifest lists what a container cannot mirror.
+
+```sh
+drift reproduce fixtures/lab/node-alpine.json --run "npm test" --out repro
+```
+
+```
+wrote 3 files to repro
+23 attributes: 10 mirrored, 4 partially mirrored, 9 not mirrored; base image node:22.12.0-alpine3.20
+This is not the original environment. Attributes that are not mirrored are listed with their reasons
+  at --detail detail.
+```
+
+**Record the Atlas for this machine.** The transcript holds one section per probe. Where an
+executable was linked changes three lines of `kotlin.math.transcendental-bits` (`tan1`, `asin-half`
+and `acos-half`, in the last digit), and the Linux executable used here differs from
+`fixtures/atlas/linux.txt` in exactly those lines.
+
+```sh
+drift atlas record --out tr
+```
+
+```
+wrote 38 probes for linux on kotlin 2.4.20 to tr/linux.txt
+```
+
 **Install into a scratch directory.** `--dry-run` prints every change and makes none. Without it, the
 same command installs, and `drift uninstall` removes what the receipt lists.
 
@@ -368,14 +477,15 @@ drift install --dir "$PWD/scratch-bin" --no-modify-path --dry-run
 dry run: nothing is changed
 scope: user
 create directory /path/to/scratch-bin
-write /path/to/scratch-bin/drift (mode 0755, 9866776 bytes)
+write /path/to/scratch-bin/drift (mode 0755, 12102072 bytes)
 create directory ~/.config
 create directory ~/.config/drift
 PATH is not modified
 write receipt ~/.config/drift/install-receipt.json
 ```
 
-**Serve Studio.** Stage the web build once, then serve it on a free port and fetch the page headers:
+**Serve Studio.** This needs a Studio web build. Stage it once, then serve it on a free port and fetch
+the page headers:
 
 ```sh
 ./gradlew :cli:stageStudio
@@ -404,15 +514,29 @@ X-Content-Type-Options: nosniff
 Cross-Origin-Resource-Policy: same-origin
 ```
 
-**Record the Atlas for this machine.** The transcript is byte-identical to the one in the repository
-for the same target and Kotlin version.
+**Flagship cases.** `fixtures/cases` holds the longer cases that the technical report describes.
+Case B is one Kotlin program that prints different results on Native and Wasm; case C holds six
+incidents, among them Lombok on JDK 21. Verifying them reads the packed certificate and starts no
+container:
 
 ```sh
-drift atlas record --out tr
+drift verify fixtures/cases/b/resume-offset.driftcase | tail -3
 ```
 
 ```
-wrote 38 probes for macos on kotlin 2.4.20 to tr/macos.txt
+verdict: CONFIRMED: this dimension causes the failure: runtime.platform. Setting it to the failing values moved the failure count from 0 of 5 to 5 of 5 (exact one-sided p 0.003968) and back from 5 of 5 to 0 of 5 when the failing side was set to the passing values (p 0.003968)
+experiments are not re-run; the recorded results are taken as given
+verify: ok
+```
+
+```sh
+drift verify fixtures/cases/c/INC-11.driftcase | tail -3
+```
+
+```
+verdict: CONFIRMED EFFECT (bundle): the arms differ in 2 attributes, so the effect is the bundle's and not one member's: env.JAVA_VERSION, tool.java.version. Setting tool.java.version moved the failure count from 0 of 5 to 5 of 5 (exact one-sided p 0.003968) and back from 5 of 5 to 0 of 5 when the failing side was set to the passing values (p 0.003968). No bundle-splitting arm was possible: only tool.java.version can be set on its own; the other members travel with the base image.
+experiments are not re-run; the recorded results are taken as given
+verify: ok
 ```
 
 ---
@@ -471,8 +595,8 @@ No real Android or iOS device has been tried, and the iOS build is a simulator b
 What a result does and does not show:
 
 - The ranking weights are hand-set. On the development benchmark the ranker beats a random order at
-  top-1 (21 of 45, P = 0.018) and top-3 (29 of 45, P = 0.009), and a `plausible` tier candidate is
-  more often wrong than right (14 of 25).
+  top-1 (46 of 105, P = 0.0012) and top-3 (67 of 105, P = 0.00002), and a `plausible` tier candidate
+  is more often wrong than right (40 of 62).
 - `upgrade-check` was scored once, on a PHP 7.4 to 8.3 move of one library: 0 true positives and 12
   false positives, and what did break had no rule.
 - The `triage` claim check is experimental: it flags none of 67 labelled issue threads and fires once in
@@ -504,8 +628,13 @@ The measurements and their instruments are in the
 
 ## Documentation
 
+- [MANUAL.md](./MANUAL.md) walks through each Studio screen, with screenshots. Read it first if you
+  will use Studio rather than the command line.
+- [ADVANCED_USAGE.md](./ADVANCED_USAGE.md) covers every command and flag, with output from real
+  runs. Read it when you want to use a command beyond the Quick Start, or need to know what a flag
+  or exit code does.
 - [TECHNICAL_REPORT.md](./TECHNICAL_REPORT.md) describes the design, the evidence and the numbers.
-- [ADVANCED_USAGE.md](./ADVANCED_USAGE.md) covers every command and flag, with output from real runs.
+  Read it when you want to know how Drift reaches a result and how well it was measured.
 - Engine documentation for the modules is generated with Dokka by `./gradlew :dokkaGenerate` into
   `build/dokka/html`, and `docsSite` copies it to `engine/`. It describes how the code is
   organized. Drift ships as an application, and the modules are not a public API or a published

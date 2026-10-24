@@ -1,6 +1,6 @@
 # Advanced Usage: The Full CLI
 
-This guide covers every `drift` command and flag for people who have already run `drift capture`. It shows scripting patterns, the JSON and text output levels, cases, reproduction, the Lab (`solve`, `ingest`, `pack`, `report`, `verify`), CI commands (`run`, `import`, `diagnose --against`, `bisect plan`, `bisect apply`), portability contracts (`contract create`, `contract verify`), issue triage (`triage`), upgrade preflight (`upgrade-check`), the Atlas, and the commands that install and serve Drift (`install`, `uninstall`, `serve`, `install.sh`, `install.ps1`). For the design and the measurements behind the commands, see [TECHNICAL_REPORT.md](./TECHNICAL_REPORT.md).
+This guide covers every `drift` command and flag for people who have already run `drift capture`. It shows scripting patterns, the JSON and text output levels, cases, reproduction, the Lab (`solve`, `ingest`, `pack`, `report`, `verify`), hands-off planning (`handsoff plan`), CI commands (`run`, `import`, `diagnose --against`, `bisect plan`, `bisect apply`), portability contracts (`contract create`, `contract verify`), issue triage (`triage`), upgrade preflight (`upgrade-check`), the Atlas, and the commands that install and serve Drift (`install`, `uninstall`, `serve`, `install.sh`, `install.ps1`). For the design and the measurements behind the commands, see [TECHNICAL_REPORT.md](./TECHNICAL_REPORT.md).
 
 Every example below was run with the macOS release executable (`drift version 1.0.0 (macos)`) from a directory that holds `fixtures/` and `bench/`, against the files in [`fixtures/`](./fixtures/) and [`bench/data/`](./bench/data/). Output is copied from those runs; a line that holds only `...` marks output cut for length. Where a command prints to standard error, the example says so. The offline run in [Offline](#offline) used the Linux arm64 executable inside a Docker container. The `install`, `uninstall` and `serve` examples ran with a scratch home directory and a scratch prefix, never the real profile, registry or trust store. Their output shows the scratch home as `/home/you`, the scratch work directory as `/work` and the scratch release directory as `/release`. The Windows and Linux builds and the `.ps1` script were not run for this guide, and the sections say where a statement comes from a recorded run of someone else's.
 
@@ -14,8 +14,11 @@ The executable is `cli/build/bin/macosArm64/releaseExecutable/drift.kexe`; the R
 | [`diagnose`](#diagnose) | two capsules | JSON or text, optionally a case directory | no |
 | [`diagnose --against`](#against-a-baseline) | a baseline and a capsule, or this machine | JSON or text, optionally a case directory | no |
 | [`diagnose --set`](#over-a-set-of-capsules) | two or more capsules, each passing or failing | JSON or text | no |
+| [`compare`](#compare-two-sets-of-runs) | two capsule directories written by `run --repeat` | text or JSON | no |
 | [`run`](#run) | this machine, a command | a capsule directory | no |
 | [`import`](#import) | a saved GitHub Actions or GitLab CI log | a capsule directory | no |
+| [`ci`](#ci) | the git checkout, `gh` or `glab` | a case directory and two capsule directories under `.drift/ci` | no |
+| [`handsoff plan`](#handsoff) | a checkout, optionally a case from `ci` | text or JSON, optionally `--out FILE` | no |
 | [`bisect plan`](#bisect) | two capsules | a plan file | no |
 | [`bisect apply`](#bisect) | a plan file | the plan file | no |
 | [`next`](#next-and-case-show) | a case directory | text | no |
@@ -31,6 +34,7 @@ The executable is `cli/build/bin/macosArm64/releaseExecutable/drift.kexe`; the R
 | [`contract verify`](#verify) | a contract, a capsule or this machine | text or JSON | no |
 | [`upgrade-check`](#upgrade-check) | a capsule or this machine, target versions | text or JSON | no |
 | [`atlas record`](#atlas) | this machine | a transcript | no |
+| [`atlas here`](#atlas) | this machine, the recorded columns | text, optionally a transcript | no |
 | [`probe cloudflare`](#probe) | a built Worker directory | a transcript | no |
 | [`triage`](#triage) | an issue body (a file or standard input) | text or JSON | no |
 | [`atlas build`](#atlas) | transcripts | a dataset | no |
@@ -40,6 +44,9 @@ The executable is `cli/build/bin/macosArm64/releaseExecutable/drift.kexe`; the R
 | [`install`](#install-and-uninstall) | this executable | a copy of it, shell profiles or the registry, a receipt | no |
 | [`uninstall`](#install-and-uninstall) | the receipt | removes what `install` wrote | no |
 | [`serve`](#serve) | a Studio web build directory | nothing (a local web server) | no |
+| [`doctor`](#doctor) | this machine | text or JSON | no |
+| [`help`](#help-and-completion) | nothing | text | no |
+| [`completion`](#help-and-completion) | nothing | a shell script on standard output | no |
 
 ## Environment and Configuration
 
@@ -491,8 +498,145 @@ Symptoms come from the tail, not from the whole output, and only the last 128 Ki
 | `--tools` | also run the toolchain scanners, as `capture --tools` does |
 | `--project` | also read the project facts, as `capture --project` does |
 | `--force` | replace the files of an earlier run in `--out` |
+| `--repeat N` | run the command N times and record every run (default 1, see Repeated Runs) |
+| `--warmup W` | run the command W times first without recording them (default 0) |
 
 Put `--` before the command so that its own flags are not read as `drift` flags; arguments after the first word of the command are passed through either way. A program that does not exist makes the shell report exit code 127, which `drift run` passes through. The command is started directly when the host can (the JVM build) and through `sh` on the native builds. The Windows build was not run for this guide.
+
+### Repeated Runs
+
+`--repeat N` runs the command N times after `--warmup W` unrecorded runs and stores one sample per recorded run in `run.json`: the exit code and the wall time in milliseconds, plus user CPU time, system CPU time and peak memory where the host measures them. A measurement the host cannot make is left out of the sample, never written as zero. Without `--repeat` (or with `--repeat 1`) nothing changes: no samples are stored and the output is the single line shown above.
+
+```sh
+drift run --out fast --label fast --repeat 10 --warmup 1 -- sh -c 'sleep 0.1'
+GOMAXPROCS=1 drift run --out slow --label slow --repeat 10 --warmup 1 -- sh -c 'sleep 0.3'
+drift diagnose fast slow --detail summary
+```
+
+```
+drift: 10 runs, 10 passed (100%)
+drift: wall time median 110 ms, min 100 ms, max 111 ms
+drift: cpu time median 0 ms user, 0 ms system
+drift: exit 0; capsule in fast
+drift: 10 runs, 10 passed (100%)
+drift: wall time median 302 ms, min 302 ms, max 302 ms
+drift: cpu time median 0 ms user, 0 ms system
+drift: exit 0; capsule in slow
+env.GOMAXPROCS differs most (tier difference); this ranks differences and does not confirm a cause.
+
+Wall time: the second run is 2.7 times slower than the first (median 302 ms over 10 samples against median 110 ms over 10 samples; the smallest second sample, 302 ms, is above the largest first sample, 111 ms).
+```
+
+That run is a demonstration of the output format. The two commands cost a known, different time, and the one environment difference between the two captures is a variable set for the demonstration, so the ranking says nothing about why a real program is slow. The numbers came from the Linux x64 build in a container; the 10 ms steps in the wall times are the host's polling interval.
+
+With several runs the command's output is printed once, from the first failing run or else the last run, and the exit code is that of the first failing run. `tail.log` and the symptoms come from the same run, the step duration and `durationMs` in `result.json` are the median wall time, and the run's outcome is `fail` when any run failed.
+
+| Host | Measured per run |
+| --- | --- |
+| Linux and macOS native builds | wall time, user and system CPU time, peak memory |
+| JVM build, Wasm build | wall time only |
+
+Peak memory comes from `wait4`, and a child that starts through `posix_spawn` begins with its parent's high-water mark. Drift therefore records a peak only when it is above its own peak resident size at the moment it started the command, and leaves it out otherwise. A small command that uses less memory than Drift itself has no peak sample. The macOS build applies the same rule, and it was not run for this guide.
+
+#### Flaky Commands
+
+When the recorded runs mix passes and failures, the summary names what `History` makes of them. `History` calls two or more changes of outcome `FLAKY`; one change (passes, then failures that never recover) is `REGRESSION` or `RECOVERED`, and the summary says it is not flaky by that rule.
+
+```sh
+drift run --out flaky --label flaky --repeat 20 -- sh -c 'n=$(cat count 2>/dev/null || echo 0); n=$((n+1)); echo $n > count; [ $((n % 3)) -ne 0 ]'
+```
+
+```
+drift: 20 runs, 14 passed (70%), 6 failed; history state FLAKY
+drift: wall time median 10 ms, min 10 ms, max 10 ms
+drift: cpu time median 0 ms user, 0 ms system
+drift: exit 1; capsule in flaky
+```
+
+`drift diagnose` over a directory with mixed samples says so, and without `--runs` and `--failures` it takes the sample count and the failed samples as the runs seen on the failing side:
+
+```
+The second run is intermittent: 6 of 20 samples failed (history state FLAKY). A difference between two captures can explain a failure rate, and it does not say which runs fail.
+```
+
+#### Slower and More Memory
+
+`drift diagnose FIRST SECOND` reads the samples of both `run.json` files when both have them. Wall times differ only when the ranges do not overlap: the smallest sample of the larger side is above the largest sample of the smaller side. Then the second run gets a `slower` symptom whose value is the ratio of the two medians in tenths (`2.7 times slower`), and peak memory gets a `memory` symptom (`2.0 times more peak memory`) by the same rule when both sides measured it. The symptoms condition the ranking as the failure: the probe of the CPU limit counts as mechanistic evidence for `slower`, the probe of the memory limit for `memory`, and the attribute weights stay as they are. When the ranges overlap, the output says `no difference larger than the run to run spread` with both ranges and adds no symptom. A first run that is the slower one gets a line and no symptom. A side with fewer than two samples has no spread and is not compared. The JSON output carries a `performance` object, and only when a run has samples; its `ranges` list holds the minimum, median and maximum of each side. The Studio Investigation result draws them as range bars when a diagnosis carries them; the built-in sample investigations carry none.
+
+Each limit below is printed only when it applies:
+
+| Line | When |
+| --- | --- |
+| different hardware | the captures differ in `hw.cpu.model`, `cpu.count` or `os.arch` |
+| fewer than 5 samples | either side has fewer than 5 samples |
+| the command starts a JVM | the command starts with `java`, `javac`, `kotlin`, `kotlinc`, `gradle`, `gradlew`, `mvn`, `mvnw` or `sbt` and the shorter median is under 5000 ms |
+| Wasm in Node or a browser | a capture is Wasm and the two captures differ in `runtime.platform` or in having `browser.` facts |
+
+None of these lines names a cause. Drift does not count allocations, compare times across different hardware or model JIT behaviour; for a benchmark use `kotlinx-benchmark` or `hyperfine`.
+
+### Compare Two Sets of Runs
+
+`drift compare RUNA RUNB [--json]` reads the `run.json` of two capsule directories written by `drift run --repeat` and compares their stored samples. It runs offline and keeps nothing: the same two directories give the same bytes on every target. Each side needs at least two samples. For wall time, and for CPU time and peak memory where both sides measured them, it prints the sample count, the minimum, median and maximum of each side, the ratio of the medians (B over A), a Mann-Whitney U test, Cliff's delta, a bootstrap interval of the ratio and one verdict sentence. CPU time is left out when both medians are 0 ms.
+
+```sh
+drift run --out fast --label fast --repeat 10 --warmup 1 -- sh -c 'sleep 0.1'
+drift run --out slow --label slow --repeat 10 --warmup 1 -- sh -c 'sleep 0.3'
+drift compare fast slow
+```
+
+```
+A: fast (fast)
+B: slow (slow)
+Wall time (ms): A 10 samples, B 10 samples
+  A: min 100, median 110, max 110
+  B: min 301, median 302, max 302
+  ratio of medians, B over A: 2.7
+  Mann-Whitney U 0; exact p below 0.0001
+  Cliff's delta +1000 permille (large; positive means B is larger)
+  bootstrap interval of the ratio, 2000 resamples, 95 percent: 2.7 to 2.7
+  B is 2.7 times slower than A; exact p below 0.0001; the interval of the ratio of B to A is 2.7 to 2.7.
+```
+
+With the arguments swapped, the verdict reads `A is 2.7 times slower than B` and Cliff's delta is `-1000`. The numbers came from the Linux x64 build in a container. The 10 ms steps in the wall times are the polling interval of the native host.
+
+The same command recorded twice gives the control:
+
+```
+A: fast (fast)
+B: again (again)
+Wall time (ms): A 10 samples, B 10 samples
+  A: min 100, median 110, max 110
+  B: min 110, median 110, max 111
+  ratio of medians, B over A: 1.0
+  Mann-Whitney U 22.5; exact p 0.0217
+  Cliff's delta +550 permille (large; positive means B is larger)
+  bootstrap interval of the ratio, 2000 resamples, 95 percent: 1.0 to 1.0
+  No difference larger than the run to run spread (exact p 0.0217; the interval of the ratio of B to A is 1.0 to 1.0).
+```
+
+Here the rank test alone would have called a difference: one side has a few samples at 100 ms where the other has 110 ms, a single polling step. A verdict names a direction only when both the exact p-value is at most 0.05 and the interval of the ratio lies on one side of 1, so this pair has no verdict. Three repetitions of this control gave exact p-values of 0.25, 0.09 and 0.0217.
+
+**The statistics.** All of them use whole numbers, so every target prints the same digits, and none reads a clock or a random source.
+
+| Statistic | How it is computed |
+| --- | --- |
+| Mann-Whitney U | counted from pairs; a tie counts half; the line shows the smaller of the two U values |
+| Exact two-sided p | every split of the pooled values into groups of the two sizes is counted in `Long` arithmetic, with ties taking the midrank of their group; a split counts when its rank sum is at least as far from the mean as the observed one |
+| Cliff's delta | pairs where B is larger minus pairs where B is smaller, over all pairs, in permille; the labels are negligible below 147, small below 330, medium below 474 and large above, the thresholds published by Romano and others (2006) for the absolute value |
+| Bootstrap interval | 2000 resamples of each side with replacement, the ratio of the resampled medians in permille, and the 51st and 1950th ratios in sorted order as a 95 percent interval |
+
+The count of splits is `C(n+m, n)`, which fits in a `Long` only up to 30 samples per side. Above that the line says `exact test not computed above 30 samples per side`, and the verdict rests on the interval alone; there is no normal approximation. The bootstrap uses xorshift64 (shifts 13, 7 and 17) seeded from the first 16 hex digits of the SHA-256 of the sorted samples of both sides, so shuffling the samples within a side changes nothing. A ratio of 1.1 or more is written in times (`2.7 times slower`); a smaller one is written as the excess in percent (`0.5 percent slower`). When the two sides are too small for any split to reach 0.05, the verdict says what the lowest possible p-value is: with 3 samples on each side it is 0.1000.
+
+The verdict is a statement about samples from one host. `drift diagnose` keeps its own rule, which names a `slower` symptom only when the ranges do not overlap, and `compare` does not change it. The two agree when the sides are clearly apart or clearly the same. They disagree with 3 samples a side that are completely separated (the range rule fires, and the exact test cannot go below 0.1) and with 10 samples a side that overlap but shift consistently, as in a synthetic shift of 5 percent (the exact test and the interval fire, the range rule does not). The same limits as in `diagnose` are printed under the metrics: different hardware, fewer than 5 samples, a short JVM run and Wasm in Node against a browser.
+
+**Cgroup counters.** On Linux, `drift run --repeat` reads the counters of its own cgroup v2 before and after each recorded run: `nr_throttled` from `cpu.stat`, and `max`, `oom` and `oom_kill` from `memory.events`. The growth of each counter is stored in the sample as `cgroup` (`throttled`, `memoryMax`, `oom`, `oomKill`). A counter that cannot be read is left out, never written as zero. `compare` then says which side was throttled or short of memory:
+
+```
+CPU throttled 102 times in B, none in A.
+Throttling by the container is a cause to check before blaming the code.
+```
+
+That pair came from a command that runs 4 busy loops against one that runs 24, in a container limited to 8 CPUs (`cpu.max` of `800000 100000`). The wall times differ by 0.5 percent because both commands stop after one second, the CPU time doubles and the second command was throttled in every run. The counters belong to the whole cgroup, so another process in the same container adds to them, and they say nothing outside a cgroup v2 host. With `--json`, the output carries `exactExtreme` and `exactTotal` for the p-value, `deltaPermille`, `intervalLowPermille` and `intervalHighPermille`, and `direction` as `second larger`, `first larger` or `none`.
 
 ## Import
 
@@ -562,6 +706,237 @@ deploy/deploy skipped null
 
 The GitLab fixtures are written by hand in the shape of the real format; the field names of the pipeline and job JSON were checked against the GitLab REST documentation, not against a real pipeline.
 
+## CI
+
+`drift ci [--commit SHA | --run ID] [--good SHA|ID] [--job NAME] [--remote NAME] [--provider github|gitlab] [--out DIR] [--detail summary|detail|full] [--json]` answers "what is wrong with my CI" from inside a git checkout. With no flag it does what the [Import](#import) and [diagnose](#diagnose) steps do by hand:
+
+1. Reads the checkout root, the `origin` remote (parsed to a host and an `owner/name` path, with any credentials in the URL dropped), the branch and `HEAD`. `github.com` and the host in `GH_HOST` are GitHub; `gitlab.com` and the host in `GITLAB_HOST` are GitLab. Any other host stops with a message that lists the two providers and the `drift import` route.
+2. Takes the latest failed run on the current branch. `--commit` takes the failed run of that commit, `--run` names one. The passing run is the latest successful run of the same workflow that started before the failing one, on the same branch first and on any branch if there is none; `--good` takes a commit or a run id instead (nine or more digits is a run id).
+3. Asks `gh` (`gh run list`, `gh run view --json`, `gh run view --log --job`) or `glab` (`glab api` on the pipelines, jobs and trace endpoints) for the two runs, so your own login does the authentication and Drift holds no token. It compares one job: the first failed job of the failing run and the job of the same name in the passing run. `--job` picks another.
+4. Imports both logs with the code behind `drift import`, ranks the pair as `diagnose` does, and writes the case to `.drift/ci/<short-sha>` in the checkout root, with the two capsule directories in `capsules/passing` and `capsules/failing` below it. `--out` changes the directory. It never edits a tracked file or `.gitignore`; when git does not ignore the directory it prints the line to add.
+
+Everything it does is available as the existing commands: `drift diagnose .drift/ci/<sha>/capsules/passing .drift/ci/<sha>/capsules/failing`, `drift case show .drift/ci/<sha>` and `drift next .drift/ci/<sha>` read what it wrote.
+
+The output below replays recorded `git` and `gh` answers from public runs of this repository ([`fixtures/ci/live`](./fixtures/ci/live)); a live run prints the same layout for your own runs.
+
+```sh
+drift ci
+```
+
+```
+drift ci: gmitch215/Drift, branch master, HEAD c775d8f
+
+Failing  Build Project, run 40042665061 (c775d8f, 2026-10-23, branch master)
+         https://github.com/gmitch215/Drift/actions/runs/40042665061
+Passing  Build Project, run 38452229524 (da0505e, 2026-10-13, branch master)
+         https://github.com/gmitch215/Drift/actions/runs/38452229524
+Job      Test Project (linux-x64), failed in step Run Tests
+         Other failed jobs: Test Project (macos-arm64), Test Project (windows-x64), Test Project
+         (linux-arm64). Pass --job NAME to compare one of them.
+
+Environment differences, best first (3 of 4):
+  1. ci.provisioner.build-date: 2026-10-02T22:28:27Z -> 2026-10-12T17:48:21Z (tier difference)
+  2. ci.provisioner.version: 20261002.596 -> 20261012.601 (tier difference)
+  3. ci.runner.image.version: 20261004.327.1 -> 20261012.334.1 (tier difference)
+
+Result: 4 changes differ with the same support, and ci.provisioner.build-date ranks first only by
+hand-set weights, so the data does not name one cause.
+Confidence: low, 4 changes tie and the data cannot separate them.
+
+This compares the runner environment of the two jobs, not your code. It cannot find an ordinary code
+regression, so a failure that comes from a code change shows up as no cause or a weak difference.
+Read the code change next: git diff --stat da0505e c775d8f
+
+Saved to .drift/ci/c775d8f
+Next: drift case show .drift/ci/c775d8f
+Then: drift next .drift/ci/c775d8f
+...
+```
+
+In that run the log shows the `bench` tests failing, which is a code problem. The runner image did change between the two runs, and four environment attributes moved together, so nothing in the data ties one of them to the failure; the report says only that. The limits paragraph appears whenever the best candidate is tied, has no rule or probe behind it, or there is no difference at all. After it, `drift ci` prints the instrumented-rerun route (`drift run --tools --project` on both commits, with `TEST_COMMAND` where your test command goes, which Drift does not guess) and the line for `.gitignore`.
+
+| Flag | Effect |
+| --- | --- |
+| `--commit SHA` | take the failed run of this commit (4 to 40 hex digits) |
+| `--run ID` | take this run as the failing run; it must have failed |
+| `--good SHA\|ID` | take the passing run of this commit, or this run id |
+| `--job NAME` | compare this job in both runs (default: the first failed job) |
+| `--remote NAME` | the git remote that names the repository (default `origin`) |
+| `--provider github\|gitlab` | override the provider chosen from the host |
+| `--out DIR` | write the case here (default `.drift/ci/<short-sha>` in the checkout root) |
+| `--detail LEVEL` | also print the full ranking and plan, as `diagnose --detail` does |
+| `--json` | print canonical JSON (the comparison and the ranking) instead of text |
+
+When the failing and passing runs are for the same commit (a rerun that passed), the two capsule labels read `<sha>@<run id>` so they differ. GitLab jobs have no steps, so the Job line shows no step name.
+
+Each failure ends in one sentence and exit code 1, and never prints a response from the service:
+
+| Cause | Message says |
+| --- | --- |
+| `gh` or `glab` missing | where to install it, then to log in |
+| not logged in | the login command for that host |
+| no network, a timeout, rate limiting | check the connection, or wait and run again |
+| no failed run, or HEAD detached | pass `--commit` or `--run` |
+| no passing run | pass `--good`, or compare two `drift run --tools --project` captures by hand |
+| log expired or deleted | choose a newer run |
+
+`import` masks attribute values and symptom text with the same redaction `capture` uses before anything is written, and `drift ci` stores only the capsule and run files, never the log. Limits: the provider tools list at most 20 failed runs, 50 GitHub passing runs, 100 GitLab pipelines and 100 GitLab jobs per request; an `env:` block is read only from the first step of a GitHub log; and the GitLab pair in [`fixtures/ci/live/gitlab`](./fixtures/ci/live/gitlab) comes from the public `gitlab-org/cli` project because this repository has no GitLab pipelines.
+
+## Handsoff
+
+`drift handsoff plan [CHECKOUT]` reads a local checkout and prints what a hands-off run of it would do: which tools it uses, which commands CI ran, where they would run, and what the run would leave out. It is step one of a longer path and runs nothing. It reads files, starts no program from the repository and makes no network call. The one process it starts is `ls -1` on `.github/workflows` (a `Host` has no directory listing); `--workflow FILE` skips even that. The only file it writes is the one `--out` names.
+
+`CHECKOUT` defaults to the current directory. The plan below is for this repository, with the job `lint` of `build.yml`. It ran on the Linux JVM build in a copy of the tree, with the checkout path shown as `.`.
+
+```sh
+drift handsoff plan . --workflow .github/workflows/build.yml --job lint
+```
+
+```
+handsoff plan: .
+files read: 5; nothing was run and no network call was made
+
+result: ready
+
+ecosystems
+  jdk
+    files        build.gradle.kts, settings.gradle.kts
+    manager      gradle wrapper
+    lockfiles    none
+    pin          gradle 9.8.0 (gradle wrapper, gradle/wrapper/gradle-wrapper.properties:3)
+    note         Gradle tasks and Maven goals are not read
+not read: any ecosystem not listed above (for example Cargo, Gemfile, .NET project files)
+
+ci
+  files        .github/workflows/build.yml
+  job          lint (.github/workflows/build.yml:15)
+  runs on      ubuntu-24.04
+  image        not set
+  services     none
+  actions, not run
+    .github/workflows/build.yml:24  actions/checkout@v6
+    .github/workflows/build.yml:25  actions/setup-java@v5  (distribution: temurin, java-version: 21, cache: gradle)
+    .github/workflows/build.yml:31  actions/cache@v5  (path: ~/.konan/caches ~/.konan/dependencies ~/.konan/kotlin-native-prebuilt-*, key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}, restore-keys: ${{ runner.os }}-${{ runner.arch }}-konan- ${{ runner.os }}-konan-)
+    .github/workflows/build.yml:42  gradle/actions/wrapper-validation@v5
+  steps, in order
+    step 5 [Check Style and Coverage Rules]  ./gradlew spotlessCheck checkLineLength sharedRatio :build-core:check  (.github/workflows/build.yml:44)
+    step 6 [Compile Every Target]  ./gradlew compileKotlinJvm compileKotlinLinuxX64 compileKotlinLinuxArm64 compileKotlinMingwX64 compileKotlinWasmJs  (.github/workflows/build.yml:46)
+    step 7 [Stop Gradle]  ./gradlew --stop  (.github/workflows/build.yml:48)
+  note         expressions other than matrix.* are shown as written and are not evaluated
+
+plan
+  would run, in order
+    1. ./gradlew spotlessCheck checkLineLength sharedRatio :build-core:check  (.github/workflows/build.yml:44)
+    2. ./gradlew compileKotlinJvm compileKotlinLinuxX64 compileKotlinLinuxArm64 compileKotlinMingwX64 compileKotlinWasmJs  (.github/workflows/build.yml:46)
+    3. ./gradlew --stop  (.github/workflows/build.yml:48)
+  where        a rootless container, never the host
+  image        not chosen (--from-ci CASE builds one from the failing capsule)
+  network      install step only; this plan makes no call and starts nothing
+  will not
+    pass secrets or the environment of this machine
+    mount the home directory
+    start the services the job names
+    run anything on the host
+  by hand
+    ./gradlew spotlessCheck checkLineLength sharedRatio :build-core:check
+    ./gradlew compileKotlinJvm compileKotlinLinuxX64 compileKotlinLinuxArm64 compileKotlinMingwX64 compileKotlinWasmJs
+    ./gradlew --stop
+```
+
+The plan states what is known and prints `not set` or `not chosen` for the rest. The root build files of this repository pin no JDK (the workflow does), so without `--job` the same command stops on the runtime version. With a job chosen, its `setup-java` input counts as the pin. `--from-ci DIR` takes a case that [`drift ci`](#ci) wrote and uses the job that failed there; when that case holds a capsule, the image comes from the same code as [`drift reproduce`](#reproduce) and the plan says which attributes picked it.
+
+### Stops
+
+A stop is a place where the checkout is ambiguous. Each one prints what is ambiguous, the one question to answer and the flag that answers it, the plan section is left out, and the exit code is 1. The command never guesses past a stop. The test command rules run only when no other stop is left, because most of them depend on the answers to the others.
+
+| Stop | Fires when | Answer with |
+| --- | --- | --- |
+| `two-lockfiles` | an ecosystem has more than one lockfile (`package-lock.json` with `yarn.lock`, `poetry.lock` with `uv.lock`) | `--lockfile FILE` |
+| `no-lockfile` | `package.json` with dependencies, `composer.json` with packages, a `go.mod` with requirements, a Python manifest with dependencies, and no lockfile | `--accept-no-lockfile` |
+| `package-manager` | `packageManager` names one tool and the lockfile belongs to another | `--lockfile FILE` |
+| `runtime-version` | no version of the runtime is pinned, a pin is a name that moves (`lts/*`, `latest`, `stable`, `node`), or two pins disagree | `--runtime NAME=VERSION` |
+| `monorepo` | `package.json` `workspaces`, `pnpm-workspace.yaml` or `go.work` declares several roots | `--root DIR` |
+| `no-test-command` | the repository names no test command Drift can run, or the chosen job has no `run:` step | `--test-command COMMAND` |
+| `several-test-commands` | the repository names more than one | `--test-command COMMAND` |
+| `matrix-cell` | the chosen job has a matrix and `--cell` does not select exactly one cell, or the matrix is computed | `--cell KEY=VALUE` |
+| `ci-config` | the job is not found, matches several jobs, the CI file uses YAML this reader does not follow, or `--from-ci` does not name a case | `--job NAME`, `--workflow FILE` |
+| `nothing-found` | no manifest of a supported ecosystem is in the directory | the `CHECKOUT` argument or `--root DIR` |
+
+Two pins disagree when both are exact versions that differ on the components both state (`18` and `20.11.0`), or when an exact version fails a constraint (`18` against `>=20`). Two constraints are not compared, and a form the comparer does not read (a caret on `0.x`, a name) is reported and not compared. `lts/*`, `latest`, `stable`, `node` and `system` move with the day or the machine, so they stop.
+
+```
+stop 1 of 1: two-lockfiles
+  what: node has 2 lockfiles: package-lock.json, yarn.lock
+  question: Which lockfile do installs follow? Pass --lockfile with one of them.
+  answer with: --lockfile FILE
+```
+
+That excerpt comes from [`fixtures/handsoff/stop-two-lockfiles`](./fixtures/handsoff/stop-two-lockfiles). Each fixture directory holds a small `repo/` and, under `golden/`, the plan printed for it; the stop fixtures also hold the plan with the stop answered.
+
+### Reading the CI file
+
+Drift reads `.github/workflows/*.yml` and `.gitlab-ci.yml`. Without `--job` it lists the jobs it found and reads none. With `--job` (an id or a name) it prints the job's `run:` steps in order with the line of each, its `setup-*` actions and their `with:` values, the runner label or image, the `container:` image and the `services`. A GitLab job also gets its `before_script`, `script` and `after_script` as steps, `extends` resolved inside the file, `default:` values, and the `image`, `services` and `tags` it inherits.
+
+A matrix is never expanded. The plan reads one cell: the one `--cell` selects, or the one whose job name matches the failing job of a `--from-ci` case. `include` and `exclude` follow the GitHub rules for the chosen cell, and GitLab `parallel: matrix` cells are read the same way. Only `matrix.*` expressions are replaced; any other `${{ }}` text stays as written, and the plan says so. Steps with an `if:` condition are listed with the condition, and the plan does not decide whether they run.
+
+Drift ships no YAML library in common code, so a small reader handles block mappings and sequences, plain and quoted scalars, block scalars and one-line flow collections. Anchors, aliases, merge keys, tags, tab indentation, multi-line flow collections and a second document in one file are not read. A file that uses one is named in a note with the line, and a job that lives in it stops as `ci-config`. GitLab `include:` is not followed, and the plan says so.
+
+### Ecosystems
+
+| Ecosystem | Files read | Pins read | Lockfiles |
+| --- | --- | --- | --- |
+| node | `package.json`, `pnpm-workspace.yaml` | `.nvmrc`, `.node-version`, `.tool-versions`, `engines.node`, `devEngines.runtime`, `volta.node`, `packageManager` (names the manager) | `package-lock.json`, `npm-shrinkwrap.json`, `yarn.lock`, `pnpm-lock.yaml`, `bun.lock`, `bun.lockb` |
+| python | `pyproject.toml`, `requirements.txt`, `Pipfile`, `setup.py`, `setup.cfg`, `tox.ini`, `noxfile.py` | `.python-version`, `.tool-versions`, `requires-python`, `python` under `[tool.poetry.dependencies]` | `poetry.lock`, `uv.lock`, `Pipfile.lock`, and `requirements.txt` when every line is pinned with `==` |
+| jdk | `build.gradle.kts`, `build.gradle`, `settings.gradle.kts`, `settings.gradle`, `pom.xml` | `.java-version`, `.sdkmanrc`, `.tool-versions`, a Gradle toolchain (`jvmToolchain`, `JavaLanguageVersion.of`), a Maven compiler level (read as `>=N`), the Gradle and Maven wrapper versions | `gradle.lockfile` (no lockfile rule: Gradle and Maven lock only by opt-in) |
+| php | `composer.json` | `require.php`, `config.platform.php`, `.tool-versions` | `composer.lock` |
+| go | `go.mod`, `go.work` | the `go` line (read as `>=N`), `toolchain`, `.tool-versions` | `go.sum` |
+| make, just | `Makefile`, `GNUmakefile`, `makefile`; `justfile`, `Justfile`, `.justfile` | none | none |
+
+Not read: Cargo, Gemfile, .NET project files and solutions, Elixir, Dart, Deno, Swift, Scala, Julia and R. A root file that marks one of them is named in the output as found and not read. Subdirectories are not searched except for workspaces that a manifest declares, and `--root DIR` plans one directory at a time (its lockfile has to be in that directory too). Gradle tasks, Maven goals and Composer scripts are not read.
+
+### Commands from the repository
+
+The plan prefers a command the repository names: a CI `run:` step, a `package.json` script, a Makefile target, a justfile recipe, a nox session. For the rest it uses one default per lockfile, and only where an official page that was fetched documents the command. The pages were read through a summarizing fetch tool, not as full text.
+
+| Source | Command | Page |
+| --- | --- | --- |
+| `package-lock.json`, `npm-shrinkwrap.json` | `npm ci` | https://docs.npmjs.com/cli/v10/commands/npm-ci |
+| `pnpm-lock.yaml` | `pnpm install --frozen-lockfile` | https://pnpm.io/cli/install |
+| `yarn.lock` with `__metadata:` | `yarn install --immutable` | https://yarnpkg.com/cli/install |
+| `yarn.lock` with `# yarn lockfile v1` | `yarn install --frozen-lockfile` | https://classic.yarnpkg.com/en/docs/cli/install |
+| `composer.lock` | `composer install` | https://getcomposer.org/doc/03-cli.md |
+| `go.mod` | `go mod download` | https://go.dev/ref/mod |
+| `requirements.txt` | `python -m pip install -r requirements.txt` | https://pip.pypa.io/en/stable/user_guide/ |
+| `poetry.lock` | `poetry install` | https://python-poetry.org/docs/cli/ |
+| `uv.lock` | `uv sync` | https://docs.astral.sh/uv/concepts/projects/sync/ |
+| script `NAME` in `package.json` | `npm run NAME`, `pnpm run NAME` or `yarn run NAME`, by the manager | https://docs.npmjs.com/cli/v10/commands/npm-run-script, https://pnpm.io/cli/run, https://yarnpkg.com/cli/run |
+| nox session | `nox -s SESSION` | https://nox.thea.codes/en/stable/usage.html |
+| justfile recipe | `just RECIPE` | https://just.systems/man/en/ |
+| Makefile target | `make TARGET` | https://www.gnu.org/software/make/manual/html_node/Goals.html |
+
+Everything else prints as not detected. A tox environment is listed with the line it came from and no command, because the tox pages returned no text when fetched. `bun.lock` and `bun.lockb` count as lockfiles and have no install command, and Composer scripts and Go tests have no run command. A script, target or recipe named `test` is the test command (a nox session named `test` or `tests` also counts); any other name is listed and not planned.
+
+### Handsoff Flags
+
+| Flag | Effect |
+| --- | --- |
+| `CHECKOUT` | the directory to read (default `.`) |
+| `--root DIR` | plan this directory of the checkout; the CI files are still read from the checkout root |
+| `--job NAME` | the CI job, by id or name |
+| `--workflow FILE` | the CI file, from the checkout root; starts no process |
+| `--from-ci DIR` | a case written by `drift ci`; its failing job is the job (path relative to the working directory) |
+| `--cell KEY=VALUE` | choose a matrix cell; repeat for each key |
+| `--lockfile FILE` | the lockfile an install follows |
+| `--accept-no-lockfile` | go ahead although a manifest has no lockfile |
+| `--test-command COMMAND` | the test command, used as written; with a job chosen it is used only when the job has no `run:` step |
+| `--runtime NAME=VERSION` | a version of `node`, `python`, `java`, `php` or `go`; it ends the version stop for that tool |
+| `--json` | print canonical JSON instead of text |
+| `--out FILE` | also write the report to this file |
+
+The text and the JSON hold the same facts in the same order for the same checkout. Exit code 0 means a plan was printed; exit code 1 means a stop or a bad flag value.
+
+Limits: this step plans and never runs, so it cannot say whether a command works. It does not expand a matrix, evaluate expressions other than `matrix.*`, follow GitLab `include:`, search subdirectories, read Rust, Ruby or .NET projects, or emulate services. Containers are the default place in the plan; running in one is a later step.
+
 ## Bisect
 
 `drift bisect plan GREEN RED --out PLAN` lists the static attributes that differ between two capsules (files or directories) and writes a plan. `drift bisect apply PLAN --step N --green|--red` records what happened when you ran your test on step N, and prints the next step or the minimal set. Drift never runs the test: a step names attributes to set to their red values in the green environment, and you run whatever applies them (a container flag, a version pin, an environment variable).
@@ -597,7 +972,7 @@ Only static attributes are flipped. Volatile attributes and probe differences ar
 
 ## Offline
 
-Nothing in `run`, `import`, `diagnose --against` or `bisect` opens a network connection. This run used the Linux arm64 executable in a container with `--network none`, whose network namespace holds the loopback device and the kernel's default tunnel devices, all `down` or `unknown` in `/sys/class/net/*/operstate`:
+Nothing in `run`, `import`, `diagnose --against` or `bisect` opens a network connection, and the default path of every command stays offline: `--ssh` on `capture` and `diagnose` is the one explicit opt-in that connects to another machine (see [Remote Capture over SSH](#remote-capture-over-ssh)). This run used the Linux arm64 executable in a container with `--network none`, whose network namespace holds the loopback device and the kernel's default tunnel devices, all `down` or `unknown` in `/sys/class/net/*/operstate`:
 
 ```sh
 docker run --rm --network none -v "$PWD/n:/n" -w /n debian:bookworm-slim sh /n.sh
@@ -630,6 +1005,119 @@ exit "${status:-0}"
 ```
 
 This shape was not run in a CI service for this guide.
+
+## Remote Capture over SSH
+
+`drift capture --ssh HOST` captures another machine, and `drift diagnose --ssh A --ssh B` captures two and diagnoses them. Both are opt-in: every other command, and both of these without `--ssh`, stay offline (see [Offline](#offline)). The remote machine needs an SSH server, a POSIX shell and your key in its `authorized_keys`. Drift installs nothing there and writes nothing there.
+
+```sh
+drift capture --ssh build-02 --label build-02 > build-02.json
+drift capture --ssh build-02 --out caps/build-02
+drift diagnose --ssh ci-green --ssh ci-red --detail summary
+```
+
+None of the three was run for this guide, because no ssh connection was made; [Checks for This Section](#checks-for-this-section) says what was. HOST is a name from your own `~/.ssh/config`, or `[user@]name` with letters, digits, `.`, `_` and `-`. The first `--ssh` of `diagnose` is the passing machine and the second is the failing one, as with `drift diagnose A B`.
+
+| Flag | Effect |
+| --- | --- |
+| `capture --ssh HOST` | capture HOST over ssh with read-only commands |
+| `capture --out DIR` | write `capsule.json` into `DIR` instead of printing the capsule; works with or without `--ssh` |
+| `diagnose --ssh HOST` | give it twice; capture both machines, write the two capsules and the case to `.drift/ssh/A-B/` in the working directory, and diagnose them with the same code as `drift diagnose A B` |
+| `diagnose --case DIR` | with `--ssh`, write the capsules and the case to `DIR` instead (and refuse a `DIR` that already holds a case) |
+
+The case frame is always `environment`, because two machines have no commits. `.drift/ssh/A-B/` takes each host text with every character outside letters, digits, `.`, `_` and `-` turned into `_`, and a second run over the same pair overwrites it. Drift prints the path on standard error, edits no tracked file, and prints a note after the result that says what a read-only capture cannot show:
+
+```
+note: this compares what a read-only capture shows on each machine: system files and the environment of a non-login ssh session. No repository code ran, so the ranking names differences and cannot confirm which one causes a failure.
+```
+
+### What Drift Runs
+
+Drift starts the system `ssh` through the same process interface that `drift ci` uses for `gh`. It has no SSH library and no new dependency. The first command of a capture, as the tests record it, is this one (the last argument is one word that holds the quoted remote command; `mktemp -d /tmp/drift-ssh.XXXXXX` picks the control directory, and the test's stand-in answered `/tmp/drift-ssh.AbC123`):
+
+```
+ssh -T -n -o BatchMode=yes -o StrictHostKeyChecking=yes -o ForwardAgent=no -o ForwardX11=no -o ClearAllForwardings=yes -o ConnectTimeout=10 -o LogLevel=ERROR -o ControlMaster=auto -o ControlPersist=30 -o ControlPath=/tmp/drift-ssh.AbC123/m -- me@build-02 "'uname' '-sm'"
+```
+
+The remote side runs only the commands below, each with every argument in single quotes. Any other command is refused inside Drift with an error, and there is no flag to widen the list in this version.
+
+| Remote command | Used for |
+| --- | --- |
+| `uname -sm` | the remote `os.name` and `os.arch`; also the first check that the connection works |
+| `uname -r`, `getconf _NPROCESSORS_ONLN`, `sw_vers -productVersion` | `kernel.release`, `cpu.count`, and `os.version` on macOS |
+| `readlink /etc/localtime` | `tz.system-zone` |
+| `env` | the `env.*` attributes |
+| `cat` of one of: `/etc/os-release`, `/etc/timezone`, `/etc/crypto-policies/config`, `/proc/self/cgroup`, `/proc/cmdline`, `/proc/sys/kernel/apparmor_restrict_unprivileged_userns`, `/sys/fs/cgroup/cpu.max`, `/sys/fs/cgroup/memory.max`, `/sys/fs/cgroup/memory/memory.limit_in_bytes`, `/usr/share/zoneinfo/tzdata.zi`, `/usr/share/zoneinfo/+VERSION` | the OS release, cgroup, kernel command line, crypto policy and time zone database facts |
+
+A Linux capture makes 17 ssh calls that run 15 distinct commands (`env` runs twice and `cat /sys/fs/cgroup/memory.max` twice); a 16th command, `cat /etc/timezone`, runs only when `/etc/localtime` is not a link. The facts never run `df`, `mount`, `find` or `ls`, and never read a path outside the list.
+
+### Safety Rules
+
+Drift passes `-o BatchMode=yes`, so ssh never asks for a password, and it never calls `sshpass` or `sudo`. It passes `-o StrictHostKeyChecking=yes`, so a host key that is not already in your `known_hosts` fails the connection. Drift never runs `ssh-keyscan`, never edits `known_hosts`, and never uses `accept-new`, `StrictHostKeyChecking=no` or `UserKnownHostsFile=/dev/null`. Your own `~/.ssh/config`, agent and keys do the authentication, and Drift stores no credential and no host key. It passes `ForwardAgent=no`, `ForwardX11=no` and `ClearAllForwardings=yes` so your config cannot turn forwarding on.
+
+The host text must match `[user@]name`, with letters, digits, `.`, `_` and `-` (or a bracketed IPv6 address after the `@`), no part may start with `-`, and Drift passes it after `--`. Anything else is refused before ssh runs, so a host argument cannot become an ssh option. A host argument in brackets reaches ssh without them.
+
+Each remote command has a 30 second limit, ssh itself has `ConnectTimeout=10`, and Drift keeps at most 1 MiB of output from one command. A command that sends more stops the capture with an error. After any ssh failure, Drift runs no further remote command.
+
+Before the first remote command Drift prints one line on standard error:
+
+```
+drift: running read-only fact commands on me@build-02 over ssh; it reads system files and the environment, runs no repository code, uses no sudo and stores no credentials
+```
+
+Drift reuses one connection for the whole capture. It makes a private directory with `mktemp -d` (mode 0700), puts the control socket in it, closes the connection with `ssh -O exit` at the end and removes the directory. If it cannot make the directory, or the local machine is Windows, it runs without connection reuse.
+
+`--tools`, `--probes` and `--project` run many more commands, so `capture --ssh` refuses them. Both refusals below are real output from the JVM build in a Linux container (`drift capture --ssh build-02 --tools`, then `drift capture --ssh=-oProxyCommand=id`), and each exits 1 before any `ssh` starts:
+
+```
+Usage: drift [<options>] <command> [<args>]...
+
+Error: --tools, --probes and --project run many more commands and are not available with --ssh in this version
+```
+
+```
+Usage: drift [<options>] <command> [<args>]...
+
+Error: -oProxyCommand=id is not a host name: use [user@]name with letters, digits, '.', '_' and '-', and no leading '-'
+```
+
+### What the Capsule Holds
+
+The remote capsule comes from the same `Capture` code as a local one, reading the remote machine through the commands above, so it diffs the same way. Three things differ. It has no `kotlin.version`, `kotlin.target` or `drift.platform`, because those describe the Drift build on your machine. It has no `runtime.platform` unless the remote environment sets `DRIFT_RUNTIME_PLATFORM`. It has `capture.transport` with the value `ssh`, so a remote and a local capsule never look the same by accident. The `env.*` attributes come from a non-login ssh session, which loads less of the remote shell profile than a terminal does, and that can differ from what a test sees when you log in. The account name, host name and home path are anonymized as in a local capture; `--keep-identifiers` keeps them.
+
+`os.name` comes from `uname -s` in the same vocabulary as a local capture (`linux`, `macos`, `freebsd`, and `unknown` for other names). A Windows remote, or a host that does not answer `uname`, is refused with a message. No hardware facts are read over ssh.
+
+### When ssh Fails
+
+Every failure exits 1, prints nothing on standard output, and prints a plain message. The left column is what OpenSSH prints, written from memory of its messages and not captured from a run for this guide.
+
+| ssh says | Drift prints |
+| --- | --- |
+| `No ED25519 host key is known for HOST and you have requested strict checking.` | `HOST is not in your known_hosts, so Drift will not connect. Check its fingerprint with its owner and add the key yourself, for example by connecting once with ssh. Drift never adds host keys` |
+| `WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!` | `the host key of HOST does not match your known_hosts, so Drift refuses to connect: the host may have been replaced or intercepted. Ask its owner before you change known_hosts` |
+| `Permission denied (publickey).` | `ssh could not log in to HOST without a prompt. Drift never asks for a password; use a key or agent that your own ssh config selects for this host` |
+| `Connection refused` | `HOST refused the connection; check the name, the port in your ssh config and that sshd is running` |
+| `Could not resolve hostname` | `cannot resolve the name HOST; check it and your ssh config` |
+| `Connection timed out`, or no answer in 30 seconds | `ssh to HOST timed out` |
+| any other text | `ssh to HOST failed: ` and the first line, cut to 200 characters |
+
+Two more stops have their own messages: `cannot start ssh; install an OpenSSH client and make sure it is on the path`, and, on a build that cannot start programs (the web and iOS builds), `this build cannot start other programs, so it cannot run ssh; use the desktop command line`. The Studio app does not call ssh.
+
+### Risks
+
+| Risk | Control | What is left |
+| --- | --- | --- |
+| First contact with an unknown host | `StrictHostKeyChecking=yes` against your `known_hosts`; Drift never adds a key | a key you add without checking its fingerprint |
+| A changed host key | ssh refuses and Drift reports it without retrying | none beyond the line above |
+| A secret in the capsule | `env` values are masked by name and by token shape, as in a local capture | a secret under a variable name that the masks do not match |
+| Remote code runs | only the fixed commands above, no repository code, no `sudo` | each new flag that adds commands needs its own review |
+| Option injection through the host text | strict pattern, `--`, every remote argument quoted | none known |
+| Output flood from the remote | 1 MiB per command and a 30 second limit | a slow link can still take a while |
+| Remote profile prints text on login | `uname -sm` uses its last line and `env` keeps only `NAME=value` lines | a banner in the middle of a file read can add a stray line to that file's text |
+
+### Checks for This Section
+
+The tests run the whole capture against a stand-in for `ssh` that records each argument list, so no test opens a connection. They check the exact command line above, that hostile host text and hostile quoted arguments (`;`, `$()`, backticks, quotes, newlines, a leading `-`, a 100,000 character string) never reach a remote shell unquoted, that every command outside the list is refused before ssh runs, the output bound, the timeout, each failure in the table above, the capsule without `kotlin.*` and with `capture.transport`, and the refusal of `--tools`, `--probes` and `--project`. No ssh connection was made for this guide. The one live check is `drift capture --ssh paisley-park --label paisley`, run on the Mac against a machine whose host key is already in `known_hosts`. It is read-only and changes nothing on the remote.
 
 ## Next and Case Show
 
@@ -711,7 +1199,7 @@ This is not the original environment. Attributes that are not mirrored are liste
   at --detail detail.
 # drift reproduce: capsule 540e5c225a8ee48280f38e3c96a68e4d43ee1b2879e9d2d7d21f1c8fcb006531; manifest.json says what is not mirrored
 FROM node:22.12.0-alpine3.20
-RUN apk add --no-cache gcompat tzdata
+RUN apk add --no-cache gcompat libgcc tzdata
 RUN npm install -g npm@10.9.2
 WORKDIR /work
 ```
@@ -723,9 +1211,9 @@ shasum -a 256 repro/*
 ```
 
 ```
-67b596a58c76f708d69be46e3a99d00a84e4007142697cae8cc0fb76dfbf1d9c  repro/Dockerfile
-33592f2de94cedfb387f9311810f65a72939566ee7183a8dee0da32f3cf7b878  repro/manifest.json
-14e096545016d3c998c10ff787a0ec456f1dab2fbeba38516b090f22d9abd280  repro/run.sh
+f47eacf4b6acd22940547256bfcf3a0d34914a52bc0fd6b8254a6192797f7305  repro/Dockerfile
+d58f19006418c668478e69e5b452646bd0491691c4a4d02721199cb50f8e3012  repro/manifest.json
+2697a96f2b1eb65ec1ad9ebcd6294570fd47d3537312e18ecbdc145333dcef56  repro/run.sh
 ```
 
 `run.sh` builds the image (tagged `drift-reproduce:<12 hex of the Dockerfile hash>`) and runs it with the flags the capsule implies:
@@ -1104,6 +1592,38 @@ drift verify --json fixtures/lab/cases/limits-nofile-1.driftcase | jq -r '.first
 none
 ```
 
+`--junit FILE` writes the same checks as a JUnit XML report. The report has one `testsuite` named `drift verify` and one `testcase` per check, named by the check id. A failed check gets a `failure` element whose message is the check line, and a skipped check gets a `skipped` element. The file is written before the command exits, so a failing archive still produces a report. The text or JSON output and the exit code do not change. CI systems that read JUnit XML, such as the GitHub, GitLab and Codecov test result views, can list each check as a test.
+
+```sh
+drift verify fixtures/lab/cases/locale-tz-date-2.driftcase --junit verify.xml
+```
+
+The text report still goes to standard output. `verify.xml` holds:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="drift verify" tests="14" failures="0" errors="0" skipped="0">
+    <testcase name="tar" classname="drift verify"/>
+    <testcase name="manifest" classname="drift verify"/>
+    <testcase name="observation-chain" classname="drift verify"/>
+    <testcase name="results-chain" classname="drift verify"/>
+    <testcase name="capsules" classname="drift verify"/>
+    <testcase name="counts" classname="drift verify"/>
+    <testcase name="fisher" classname="drift verify"/>
+    <testcase name="rules" classname="drift verify"/>
+    <testcase name="decision" classname="drift verify"/>
+    <testcase name="posteriors" classname="drift verify"/>
+    <testcase name="ranking" classname="drift verify"/>
+    <testcase name="plan" classname="drift verify"/>
+    <testcase name="verdict" classname="drift verify"/>
+    <testcase name="report" classname="drift verify"/>
+  </testsuite>
+</testsuites>
+```
+
+`drift contract verify` takes the same option. Its suite is named `drift contract verify` and each assertion is a testcase named `<kind> <id>`. A breaking assertion is a `failure`, and an unverifiable one is a `skipped` element.
+
 The four archives in `fixtures/lab/cases` cover one verdict each:
 
 | Archive | `verify` verdict line (cut) |
@@ -1382,12 +1902,12 @@ upgrade-check: drupal-10-site
   drupal   project.composer.drupal/core          10.3.6 -> 11
   symfony  project.composer.symfony/http-kernel  v6.4.12 -> 7.1
   php      tool.php.version                      8.1.34 -> 8.3
-73 of 298 rules read a target key
+83 of 426 rules read a target key
 
 Will break (0)
   none
 
-May break (7)
+May break (3)
   1. [high, inferred] Drupal 11 minimum database versions are MySQL 8.0, MariaDB 10.6, PostgreSQL 16 and SQLite 3.45 (json1); Drupal 10 minimums are no longer enough
      rule: drupal-11-database-server-minimums
      boundary: project.composer.drupal/core 10.3.6 -> 11 (rule: was any, now >=11)
@@ -1427,7 +1947,7 @@ The groups come from the three-valued verdict of the rule engine, not from a sco
 | Outside the tested range | the rule matches and every symptom of the rule has the basis `range`: a compatibility table or release note lists the supported versions and states no failure outside them (the Kotlin Multiplatform compatibility table, the AGP maximum API level and minimum Gradle version, the Gradle JVM range); the group is printed only when it has findings |
 | Unknown | the capsule has no current value for a target key, or the target is not a version the rule can compare, so the boundary cannot be judged |
 
-Only rules that read a target key on side `b` and give a different verdict for the targets than for the capsule alone are listed. The line `73 of 298 rules read a target key` counts the rules that read one before that filter. Probe results and run facts describe today's environment, so side `b` has none, and a rule that reads one is unknown.
+Only rules that read a target key on side `b` and give a different verdict for the targets than for the capsule alone are listed. The line `83 of 426 rules read a target key` counts the rules that read one before that filter. Probe results and run facts describe today's environment, so side `b` has none, and a rule that reads one is unknown.
 
 Locked packages are checked apart from the rules. When a target is `php`, `node` or `python`, `upgrade-check` reads the runtime constraint each locked package records and lists a package whose constraint allows today's runtime and excludes the target under "Will break: locked packages", with the package, its version, the lockfile and the constraint. `drift capture --project` records the constraint as `project.<ecosystem>.<package>.requires.<runtime>` for the formats that carry one, and no rule names the package:
 
@@ -1448,7 +1968,7 @@ drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=8.3,d
 ```
 
 ```
-{"rules":298,"touched":73,"willBreak":[],"versionBoundary":[{"rule":"php-8-2-dynamic-properties-deprecated","crossings":[{"key":"tool.php.version","from":"8.1.34","to":"8.3"}]},{"rule":"drupal-10-to-11-symfony-6-2-to-7-1","crossings":[{"key":"project.composer.drupal/core","from":"10.3.6","to":"11"},{"key":"project.composer.symfony/http-kernel","from":"v6.4.12","to":"7.1"}]}]}
+{"rules":426,"touched":83,"willBreak":[],"versionBoundary":[{"rule":"php-8-2-dynamic-properties-deprecated","crossings":[{"key":"tool.php.version","from":"8.1.34","to":"8.3"}]},{"rule":"drupal-10-to-11-symfony-6-2-to-7-1","crossings":[{"key":"project.composer.drupal/core","from":"10.3.6","to":"11"},{"key":"project.composer.symfony/http-kernel","from":"v6.4.12","to":"7.1"}]}]}
 ```
 
 The targets can sit in a file instead. This file gives the same result:
@@ -1476,7 +1996,7 @@ drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=7.4
 ```
 upgrade-check: drupal-10-site
   php  tool.php.version  8.1.34 -> 7.4
-46 of 298 rules read a target key
+56 of 426 rules read a target key
 
 Will break (2)
   1. [high, inferred] Drupal 10 cannot run on PHP 8.0 or earlier; PHP 8.0 sites must move to 8.1 before upgrading core
@@ -1494,8 +2014,25 @@ Will break (2)
      source: https://raw.githubusercontent.com/symfony/symfony/v6.1.0/composer.json
      source: https://raw.githubusercontent.com/symfony/symfony/v6.0.0/composer.json
 
-May break (0)
-  none
+May break (3)
+  1. [high, verified] Laravel 10 declares PHP 8.1 or higher, so a PHP below 8.1 host cannot install it
+     rule: laravel-10-php-8-1-minimum
+     boundary: tool.php.version 8.1.34 -> 7.4 (rule: was >=8.1, now <8.1)
+     needs: project.composer.laravel/framework
+     mechanism: The composer.json of Laravel 10 at tag v10.0.0 requires php ^8.1.
+     source: https://raw.githubusercontent.com/laravel/framework/v10.0.0/composer.json
+  2. [high, verified] Laravel 9 declares PHP 8.0.2 or higher, so a PHP below 8.0.2 host cannot install it
+     rule: laravel-9-php-8-0-2-minimum
+     boundary: tool.php.version 8.1.34 -> 7.4 (rule: was >=8.0.2, now <8.0.2)
+     needs: project.composer.laravel/framework
+     mechanism: The composer.json of Laravel 9 at tag v9.0.0 requires php ^8.0.2.
+     source: https://raw.githubusercontent.com/laravel/framework/v9.0.0/composer.json
+  3. [high, verified] TYPO3 12 declares PHP 8.1 or higher, so a PHP below 8.1 host cannot install it
+     rule: typo3-12-php-8-1-minimum
+     boundary: tool.php.version 8.1.34 -> 7.4 (rule: was >=8.1, now <8.1)
+     needs: project.composer.typo3/cms-core
+     mechanism: The composer.json of TYPO3 12 at tag v12.0.0 requires php ^8.1.
+     source: https://raw.githubusercontent.com/TYPO3/typo3/v12.0.0/typo3/sysext/core/composer.json
 
 Version boundary crossed (1)
   These rules apply to the versions crossed; no project fact or other environment key in the capture matched them.
@@ -1518,7 +2055,7 @@ drift upgrade-check bench/data/capsules/migration-php-json-validate-1.red.json -
 ```
 upgrade-check: red
   drupal  project.composer.drupal/core  unknown -> 11
-21 of 298 rules read a target key
+21 of 426 rules read a target key
 
 Will break (0)
   none
@@ -1529,11 +2066,13 @@ May break (0)
 Version boundary crossed (0)
   none
 
-Unknown (15)
-  1. [high, verified] Drupal 10 removes the Aggregator, Color, HAL, Quick Edit and RDF modules and the Bartik, Seven, Classy and Stable themes from core
-     rule: drupal-10-removed-core-modules-and-themes
-     boundary: project.composer.drupal/core unknown -> 11 (rule: was <10, now >=10)
-     needs: project.composer.drupal/core, project.drupal.modules.aggregator, project.drupal.modules.color, project.drupal.modules.hal, project.drupal.modules.quickedit, project.drupal.modules.rdf, project.drupal.themes.bartik, project.drupal.themes.classy, project.drupal.themes.seven, project.drupal.themes.stable; the rule is pending-scanner
+Unknown (10)
+  1. [high, inferred] Drupal 10 minimum database versions are MySQL 5.7.8, MariaDB 10.3.7, PostgreSQL 12 (pg_trgm) and SQLite 3.26 (JSON1)
+     rule: drupal-10-database-server-minimums
+     boundary: project.composer.drupal/core unknown -> 11 (rule: was any, now >=10)
+     needs: project.composer.drupal/core, runtime.database.server.kind, runtime.database.server.version; the rule is pending-scanner
+     mechanism: The Drupal 10.0.0 release notes list the minimum supported database versions as MySQL or Percona 5.7.8, MariaDB 10.3.7, PostgreSQL 12 with the pg_trgm extension, and SQLite 3.26 with the JSON1 extension.
+     source: https://www.drupal.org/project/drupal/releases/10.0.0
 ...
 ```
 
@@ -1550,7 +2089,7 @@ A bad target stops the command with exit code 1 and no output on standard output
 
 ## Atlas
 
-The Atlas asks, per probe, whether a Kotlin program prints the same thing on every target. It holds 38 probes. `atlas record` runs them on this target, `atlas build` aggregates transcripts into a dataset, `atlas compare` places this device against it, `atlas show` prints the matrix or a draft for one probe and `atlas diff` lists what changed between two Kotlin versions.
+The Atlas asks, per probe, whether a Kotlin program prints the same thing on every target. It holds 38 probes. `atlas record` runs them on this target, `atlas build` aggregates transcripts into a dataset, `atlas compare` places this device against it, `atlas show` prints the matrix, the oracle or a draft for one probe and `atlas diff` lists what changed between two Kotlin versions.
 
 **Columns.** `fixtures/atlas/` holds 15 recorded columns on Kotlin 2.4.20, and `fixtures/atlas/2.5.0-beta1/` holds 5 on 2.5.0-Beta1 (`jvm`, `macos`, `wasm`, `android`, `ios`). [`atlas/columns.yml`](./atlas/columns.yml) says how each was measured.
 
@@ -1596,8 +2135,8 @@ drift atlas build fixtures/atlas/*.txt fixtures/atlas/2.5.0-beta1/*.txt --out at
 ```
 
 ```
-dataset: 38 probes, 3 columns, 23 divergent, sha256 52cdbb80cf4e6b84ca62191a33efb5f214ae7b1dd38316226777d0e1b4f16f1e
-dataset: 38 probes, 21 columns, 32 divergent, sha256 a8dac9357ee8f42ed67eb6b0e605f8e705da3fdc0272f83b9c05aab6c78c1c29
+dataset: 38 probes, 3 columns, 23 divergent, sha256 30fad6394bf85d3f8687b7932531cc6a544afebad6af469fe551ffe41a382c93
+dataset: 38 probes, 21 columns, 32 divergent, sha256 17f82fefbd865c8521439dbc320bb817780254806b134505711fefd3cca268c1
 ```
 
 The summary goes to standard error. The sha256 is the hash of the dataset body; the file on disk has one more trailing newline. Building twice gives identical files, and the order of the arguments does not change the bytes. `--out` is required. `build` refuses a transcript that lacks a probe of the catalog, names an unknown probe, lacks a header (`bad transcript header in badt.txt: missing kotlin.target`) or duplicates a column (`fixtures/atlas/jvm.txt and fixtures/atlas/jvm.txt both record jvm@2.4.20`).
@@ -1645,6 +2184,51 @@ divergent probes per kotlin version:
 
 Each entry also has a `basis` (`verified` when the cited page states the contract, `inferred` when the page implies it), the references with a short quote, and the linked issue ids with the state read on the research date. `unclassified` is not a finding. The 24 divergent unclassified probes each have a repro draft under [`atlas/repros/`](./atlas/repros/).
 
+**Oracle.** `atlas show DATASET --oracle` gives every divergent line one kind. A divergent line is a line of one probe whose transcript differs between targets on one Kotlin version.
+
+| Kind | Meaning | Reportable |
+| --- | --- | --- |
+| `documented-contract` | a reference quote that names the line states the expected value | yes |
+| `cross-version-change` | a target prints another value on another Kotlin version, and no quote decides which is right | no |
+| `crash` | a column failed instead of printing values | yes |
+| `no-correctness-claim` | none of the above | no |
+
+A value that changed between versions is a cross-version change and is never called a regression. A regression needs a documented contract that says which value is right, and the oracle holds the quote before it uses that kind. Each reference in `atlas/classification.yml` can list the transcript lines its quote decides under `decides`; a quote that only allows the difference leaves the list empty. A failed column makes one `crash` entry for the probe, except when the research notes the whole probe as a documented or platform-defined limit. The Kotlin/JS reflection page says `KClass` is limited there, so the js-ir failure on `kotlin.collections.tostring-forms` is a `no-correctness-claim`.
+
+```sh
+drift atlas show atlas-all.json --oracle | sed -n 7,17p
+drift atlas show atlas-all.json --oracle | sed -n '/^reportable at kotlin 2.5.0-Beta1/,/^  0.49999999999999994/p'
+```
+
+```
+kotlin 2.4.20: 258 divergent lines
+  documented-contract: 15
+  cross-version-change: 31
+  crash: 4
+  no-correctness-claim: 208
+
+kotlin 2.5.0-Beta1: 94 divergent lines
+  documented-contract: 4
+  cross-version-change: 4
+  crash: 0
+  no-correctness-claim: 86
+reportable at kotlin 2.5.0-Beta1:
+kotlin.math.pow-special-cases
+  documented-contract (reportable): 1^nan
+    expected: "b.pow(NaN) is NaN"
+    source: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.math/pow.html
+  1^nan:
+    android, ios, macos: 1^nan = 1.0
+    jvm, wasm: 1^nan = NaN
+kotlin.math.rounding
+  documented-contract (reportable): 0.49999999999999994, 4503599627370497, float-8388609
+    expected: "Rounds this Double value to the nearest integer and converts the result to Int"
+    source: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.math/round-to-int.html
+  0.49999999999999994:
+```
+
+The listing then prints every other divergent line grouped by probe and kind under `no report offered`. The negated NaN line of `kotlin.double.nan-bits` (`neg-nan-raw`) is one of them: Native 2.4.20 and 2.5.0-Beta1 print the same value, no quote names the line, so it carries no claim. In Studio, the probe detail lists the same kinds under `oracle on kotlin VERSION`. `--oracle` cannot be combined with `--probe`.
+
 **Compare.** `atlas compare DATASET TRANSCRIPT` places this device against each recorded column. `--detail summary` prints counts; `detail` adds the probes that differ.
 
 ```sh
@@ -1688,6 +2272,44 @@ per column:
 ```
 
 The Mac that recorded the transcript matches its own column on 38 of 38 probes, which makes a useful check that a fresh recording is unchanged. A column from another machine can differ for hardware reasons (for example the sign bit of a NaN), and a Linux executable linked on Ubuntu instead of macOS prints different last digits for three lines of `kotlin.math.transcendental-bits`. A mismatch against a column recorded elsewhere is not a Kotlin finding by itself.
+
+**Here.** `atlas here` runs the 38 probes on this machine and compares the result with the recorded columns for this build's Kotlin version. `--version V` compares with another version in the dataset. The command makes no network call, and the device label holds the platform and the OS family only.
+
+```sh
+drift atlas here
+drift atlas here --out device.txt
+drift atlas here --exit-status
+```
+
+The output starts with the summary that `atlas compare` prints. Each probe that does not match every column follows, with the columns it matches, the columns it differs from and each differing line. A line gets one oracle kind: `documented-contract` when a quoted reference names the line, the dataset's own kind for the line when the recorded columns disagree on it, and `no-correctness-claim` otherwise. A probe that did not run on the device is reported as `no-correctness-claim (the probe did not run here)`.
+
+`--out FILE` writes this device as a transcript in the format `atlas build` reads, so it can be attached to an issue. `--exit-status` exits with 10 when a probe that ran matches no recorded column. A probe that did not run does not count.
+
+The JVM build of the CLI labels this device `jvm-linux`. Studio adds the Java feature version on the JVM (`jvm-21-linux`), and the CLI does not yet, so the label can differ from Studio's on the same machine. Output below is from the Linux x64 lane, the JVM build on kotlin 2.4.20, trimmed to the summary and one probe block (the full run prints 1,884 lines):
+
+```
+this device: jvm-linux, kotlin 2.4.20, 38 probes measured
+dataset: 38 probes, 16 columns: android@2.4.20, cloudflare-jvm@2.4.20, ..., wasm-webkit@2.4.20
+matches every column: 6
+matches some columns: 31
+matches no column: 1
+not measured here: 0
+per column:
+  android@2.4.20: 28 of 38 probes match
+  ...
+  jvm-21@2.4.20: 37 of 38 probes match
+  ...
+
+kotlin.double.nan-bits [unclassified] matches no column
+  matches: none
+  differs: android@2.4.20, cloudflare-jvm@2.4.20, cloudflare-wasm@2.4.20, ios@2.4.20, js-ir@2.4.20, jvm@2.4.20, jvm-17@2.4.20, jvm-21@2.4.20, jvm-25@2.4.20, linux@2.4.20, linux-arm64@2.4.20, macos@2.4.20, wasm@2.4.20, wasm-chromium@2.4.20, wasm-firefox@2.4.20, wasm-webkit@2.4.20
+  line 2 (this device): 0/0-raw = fff8000000000000
+  line 2 (android@2.4.20, cloudflare-jvm@2.4.20, cloudflare-wasm@2.4.20, jvm@2.4.20, wasm@2.4.20): 0/0-raw = 7ff8000000000000
+  kind: no-correctness-claim
+  ...
+```
+
+The `kotlin.double.nan-bits` block is the sign-bit difference that the compare example above describes. The probe has no classification, so no oracle claim applies.
 
 **Version changes.** `atlas diff DATASET --from X --to Y [--target T]` lists the probes whose transcript differs between two Kotlin versions on the targets recorded for both. A target recorded for only one of the two versions is named and left out. `--detail summary` prints counts, `detail` (the default) adds each changed probe with the differing lines, and `full` adds the probes that did not change. Versions match ignoring case. The ladder dataset is `fixtures/atlas` plus `fixtures/atlas-ladder` without its duplicate `2.4.20/linux.txt`: `./gradlew atlasLadderDataset` writes it to `build/atlas-work/ladder.json`, and `atlasSite` publishes it as `data/ladder.json` and as the `versions.html` page, which lists the change between each pair of consecutive versions per target.
 
@@ -2494,6 +3116,92 @@ Exit status is 0 after a normal stop. It is 1 when no build is found, a file can
 
 The server reads each file whole into memory for each request, so a few large concurrent downloads of the 8.6 MB WebAssembly file cost that much memory each. It does not support range requests or compression. The Windows executable has run under Wine and serves HTTP there; it has not been run on Windows. Safari was not tested; Chromium, Firefox and WebKit ran Studio through Playwright in a Linux container.
 
+## Doctor
+
+`drift doctor` checks the host that runs Drift and says what to fix. It makes no network calls, reads no secrets and prints no user name, home path or host name. Each probe that starts a process waits at most two seconds.
+
+```sh
+drift doctor [--json]
+```
+
+| Check | ok | warn | fail |
+| --- | --- | --- | --- |
+| `platform` | the OS and architecture are a release target: macOS arm64, Windows x64, Linux x64 or arm64 | any other OS or architecture, such as an Intel Mac | the OS is not recognised |
+| `process` | a child process starts and exits with 0 | the probe timed out | the host cannot start a process, or the probe exits non-zero |
+| `working directory` | `sh -c 'test -w .'` succeeds | not writable, or no `sh` to run the test | no fail state |
+| `docker` | `docker version` gets an answer from the daemon | not on PATH, no answer in time, or the daemon is unreachable | no fail state |
+| `git` | `git --version` exits 0 | not on PATH, no answer in time, or a non-zero exit | no fail state |
+
+Text output prints each check as a status line, a cause and a fix. This run was on the lane container, which has no Docker:
+
+```text
+ok    platform
+      cause: linux amd64 is a release target
+      fix: none
+ok    process
+      cause: a child process starts and exits
+      fix: none
+ok    working directory
+      cause: the working directory is writable
+      fix: none
+warn  docker
+      cause: docker is not on PATH
+      fix: install Docker; reproduce and solve need it
+ok    git
+      cause: git answers
+      fix: none
+```
+
+`--json` prints the same checks as canonical JSON, with `failed` and `warned` counts:
+
+```json
+{"checks":[{"cause":"linux amd64 is a release target","fix":"none","name":"platform","status":"ok"},{"cause":"a child process starts and exits","fix":"none","name":"process","status":"ok"},{"cause":"the working directory is writable","fix":"none","name":"working directory","status":"ok"},{"cause":"docker is not on PATH","fix":"install Docker; reproduce and solve need it","name":"docker","status":"warn"},{"cause":"git answers","fix":"none","name":"git","status":"ok"}],"failed":0,"warned":1}
+```
+
+The command exits 0 when no check fails, and 1 when one does. Warnings do not change the exit code. The report prints in both cases.
+
+Docker is a warning because only `reproduce` and `solve` need a reachable daemon. Git is a warning because it only supplies a version field to `triage` and `upgrade-check`. The working directory check runs `sh`, so on Windows it warns unless a POSIX shell is on `PATH`.
+
+## Help and Completion
+
+`drift --help` opens with one sentence on what Drift does, the three commands to start with (`ci`, `doctor`, `diagnose`) and the commands grouped by task, then lists every command. `drift COMMAND --help` ends with an `Examples:` block of one or two runnable lines that use files from `fixtures/`.
+
+```sh
+drift ci --help | tail -4
+```
+
+```text
+Examples:
+drift ci
+drift ci --commit c775d8f --detail summary
+```
+
+`drift help TERM` prints the plain definition of capsule, diagnose, solve, certificate, verify, Atlas or probe, in any letter case. `drift help` with no term prints all seven. The definitions are the README Terms table, held in `core` as `Glossary`.
+
+```sh
+drift help capsule
+```
+
+```text
+Capsule: A file that records one environment: the operating system, tool versions, environment variables (secret values hidden) and the results of small checks.
+```
+
+An unknown term lists the known ones on standard error and exits 1:
+
+```text
+unknown term "flux"; the terms are capsule, diagnose, solve, certificate, verify, atlas, probe
+```
+
+`drift completion bash|zsh|fish` prints a completion script on standard output. It comes from Clikt and covers commands, subcommands and options. Load it for the current shell, or save it where your shell reads completions:
+
+```sh
+source <(drift completion bash)
+drift completion zsh > "${fpath[1]}/_drift"
+drift completion fish > ~/.config/fish/completions/drift.fish
+```
+
+A usage error, such as a missing option, still exits 1, the same code as a failed command.
+
 ## Install Scripts
 
 `install.sh` (POSIX `sh`) and `install.ps1` (PowerShell 5.1 and 7) download a release archive, verify its checksum, check that the executable runs and hand over to `drift install`. They live in the repository root. Both fail with `cannot download` until a release exists.
@@ -2799,10 +3507,13 @@ Set `DRIFT_RUNNER_LABEL` in the job to record the runner. Do not use `--keep-ide
 | 1 | `case show` or `next` on a case that fails its integrity check |
 | 1 | `contract verify` when any assertion breaks (the report is still printed on standard output) |
 | 1 | `verify` when any check fails (the report is still printed on standard output) |
+| 1 | `doctor` when any check fails (the report is still printed on standard output) |
 | 1 | `run` with `--tail-lines` below 1, an existing capsule directory without `--force` or a directory it cannot write; `import` with a log that holds no runner environment, an unreadable file or an invalid summary; `bisect plan` over capsules with no static difference; `bisect apply` for a step that is not pending, with neither or both of `--green` and `--red`, or on a finished plan |
 | 1 | a refusal: `ingest` with any bad result, `pack` on an unsolved case, `diagnose --case` or `solve --case` into an existing case, a bad `--budget` or `--fail-when`, `install` into a directory that is not writable or while another install exists |
 | 1 | `upgrade-check` with no target, a target that is not `name=version`, an unknown name, a value that is not a version for an alias, two names for one attribute with different values, or an unreadable capsule or `--to-file` |
 | 1 | `triage` with an unreadable file, a `--publish-threshold` outside 0 to 1, a `--date` that is not `yyyy-mm-dd`, an unreadable or invalid `--confidence` table or `--learned` store, `--corpus` or `--out` without `calibrate`, or `calibrate` without both or with an unreadable corpus |
+| 1 | `ci` outside a git checkout, on a host that is neither GitHub nor GitLab, without `gh` or `glab` on the path or a login, with no failed run, no passing run to compare with or no such job, when a log cannot be read, and for a bad flag value; it prints one sentence with the next step |
+| 1 | `handsoff plan` with any stop (`two-lockfiles`, `no-lockfile`, `package-manager`, `runtime-version`, `monorepo`, `no-test-command`, `several-test-commands`, `matrix-cell`, `ci-config`, `nothing-found`) or a bad `--cell` or `--runtime` value; the report is still printed on standard output |
 | 1 | `serve` with no build to serve, an unreadable file, a busy port or a build without TLS; `install.sh` for any failed step |
 | 2 | `install` with `--user` and `--global`, a relative `--dir`, or from the JVM build; `serve` with a bad combination of options (`--tls` without a certificate, `--cert` without `--key`, `--mdns` without a `.local` name); `install.sh` for an unknown option, `--user` with `--global`, or `--dir` without a value |
 | 130 | `serve` on the JVM build after Ctrl+C (the JVM's status for SIGINT) |

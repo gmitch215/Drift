@@ -19,15 +19,15 @@ This document is the engineering reference for what the working tree does today,
 | macOS arm64 CLI, release executable | 9,866,776 bytes; 21 subcommands | `ls -l`, `drift --help` |
 | Probes in the catalog | 71: 33 general, 38 Kotlin | `drift capture --probes` |
 | Scanners | 23 | `Scanners.all` |
-| Rules | 298 in 27 folders: 207 active and 91 `pending-scanner`; 913 fixtures (303 positive, 610 negative); 338 cited sources (210 distinct) | `rules/**/*.yml` |
+| Rules | 426 in 51 folders: 375 active and 51 `pending-scanner`; 1481 fixtures (465 positive, 1016 negative); 494 cited sources (313 distinct) | `rules/**/*.yml` |
 | Atlas, Kotlin 2.4.20, 16 columns | 32 of 38 probes differ on at least one column; 6 are identical on all 16 | `drift atlas build fixtures/atlas/*.txt` |
 | Atlas, Kotlin 2.5.0-Beta1, 5 columns | 18 of 38 differ | `drift atlas build` over the Beta fixtures |
 | Atlas version ladder | 14 compiler versions, 1.3.72 to 2.4.21, plus 2.5.0-Beta1; 74 columns, 2,812 cells, 34 divergent probes | `drift atlas build` |
 | Atlas probe classification | 10 documented, 4 platform-defined, 24 unclassified; among the 32 divergent probes on 2.4.20, 4, 4 and 24 | `drift atlas show` |
 | Atlas site | 79 files, 18,548 KiB, 39 probe pages and `versions.html` | `./gradlew atlasSite` |
 | DriftBench | 80 scenarios from 43 templates; 49 dev scenarios validated in containers, 31 sealed | `bench/data` |
-| Ranker on the 45 dev scenarios that have a cause, with probes | top-1 21 of 45 (Wilson 95% interval 0.33 to 0.61); random order expects 16.3; exact P = 0.018. Top-3 29 of 45 against 25.9 expected, P = 0.009 | `evaluation.json` |
-| `plausible` or `known` top candidate wrong | 10 of 49 dev scenarios (0.11 to 0.34); 14 of 25 `plausible` candidates | same |
+| Ranker on the 105 dev scenarios that have a cause and probed captures, with probes | top-1 46 of 105 (Wilson 95% interval 0.35 to 0.53); random order expects 36.2; exact P = 0.0012. Top-3 67 of 105 against 57.0 expected, P = 0.00002 | `evaluation.json` |
+| `plausible` or `known` top candidate wrong | 25 of 115 dev scenarios (0.15 to 0.30); 40 of 62 `plausible` candidates | same |
 | Lab, 45 dev scenarios, first run | 14 CONFIRMED (all correct), 9 CONFIRMED EFFECT (bundle), 1 NARROWED, 21 STUCK; 0 false CONFIRMED (the four migration scenarios added later: 2 CONFIRMED EFFECT (bundle), 1 NARROWED, 1 STUCK) | 45 case directories, `drift verify` |
 | Lab, three more runs of the same 45 | 180 runs in all: 0 false CONFIRMED, exact one-sided 95% upper bound 1.65%; 2 of 45 scenarios changed verdict class, both intermittent | 135 more `certificate.json` files |
 | `.driftcase` archives, JVM and macOS native | byte-identical; `verify` output identical; 4 archives in `fixtures/lab/cases` | `cmp` |
@@ -107,7 +107,7 @@ What Drift does not do here: `diagnose` runs no experiment, `reproduce` never ru
 | `bench` | DriftBench: scenario DSL, seeded generator, container runner, ingest, calibration. |
 | `build-core` | Included build with the `drift.kmp`, `drift.layout`, `drift.coverage`, `drift.quality`, `drift.mobile`, `drift.docs`, `drift.docs-root`, `drift.atlas` and `drift.packaging` plugins and the tasks they register: `embedFixtures`, `embedRules`, `embedClassification`, `embedDriftVersion`, `embedKotlinVersion`, `sharedRatio`, `checkLineLength`, the coverage tasks, `atlasSite`, `docsSite`, `checkSiteLinks` and `renderPackaging`. |
 
-The remaining directories are data and delivery, not modules: `rules` (298 YAML rule files in 27 folders), `triage` (the corpus manifest and the claim-check labels), `notices` (third-party notices that ship in every artifact), `atlas` (the hand-maintained classification of every Atlas probe), `fixtures` (recorded capsules, Atlas transcripts, solved cases, project trees, issue bodies and upgrade-check captures), `packaging` (templates for the Homebrew and Chocolatey packages), `assets` (the icon), and `install.sh` and `install.ps1` at the root. `.github/release` holds the scripts the release workflow runs. The version is `version=1.0.0` in `gradle.properties`; `core` embeds it for `--version`, the Studio and Android packages read it, and the Xcode project carries its own copy of the marketing version.
+The remaining directories are data and delivery, not modules: `rules` (426 YAML rule files in 51 folders), `triage` (the corpus manifest and the claim-check labels), `notices` (third-party notices that ship in every artifact), `atlas` (the hand-maintained classification of every Atlas probe), `fixtures` (recorded capsules, Atlas transcripts, solved cases, project trees, issue bodies and upgrade-check captures), `packaging` (templates for the Homebrew and Chocolatey packages), `assets` (the icon), and `install.sh` and `install.ps1` at the root. `.github/release` holds the scripts the release workflow runs. The version is `version=1.0.0` in `gradle.properties`; `core` embeds it for `--version`, the Studio and Android packages read it, and the Xcode project carries its own copy of the marketing version.
 
 **Toolchain.** Drift builds with Kotlin 2.4.20, Gradle 9.8.0 and, for `androidApp`, AGP 9.4.1, on JDK 21 in every workflow. The [Kotlin Multiplatform compatibility guide](https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html) lists Kotlin 2.4.20 and 2.4.21 with Gradle 7.6.3 to 9.7.0 and AGP 8.5.2 to 9.3.1 (read 2026-10-13). Drift's Gradle and AGP are newer than that range, so the combination is outside what the guide lists; `build.yml`, `atlas.yml` and `docs.yml` build and test on it without a failure, on Linux, macOS and Windows runners. Nothing more than that is claimed for it.
 
@@ -123,7 +123,7 @@ Sources sit at `src/<set>/main` and `src/<set>/test`. The shared-code ratio coun
 | `bench` | 2,079 | 562 | 78.7% |
 | total | 27,626 | 2,697 | 91.1% |
 
-`host` is where the platform code lives, at 545 of its 545-line budget, and its own shared share is 43.7%. The budget was 400 until the process runners were rewritten and 630 after: the POSIX runner (`fork` and `execvp` with a drained pipe, shared by Linux and macOS in one intermediate source set), the Windows `CreateProcessW` runner with batch-file escaping, and the JVM child wrapper account for the 230 added lines, which fixed a hang in which a grandchild holding the output pipe blocked the run forever. It dropped to 545 when the host class that wraps the native runners, the environment parsing, the wait-status decoding, the `PATH` search and the chunked file read moved into common code. `cli` holds the per-target file, binary file and stdout writers and the installer and server actuals: the registry and process code for Windows, the profile edits on Unix, the sockets of `serve` for POSIX and Winsock, and the OpenSSL loader; its share is 72.1%. The listener setup, the send loop, PEM decoding, address text and the cleanup command line are common. The total is 91.1% and the floor is 80%. `bench` keeps its platform lines in JVM-only code: YAML reading, scenario preparation, result ingest and an exact binomial test with `BigInteger`.
+`host` is where the platform code lives, at 545 of its 545-line budget, and its own shared share is 43.7%. The budget was 400 until the process runners were rewritten and 630 after: the POSIX runner (`posix_spawn` through a small cinterop definition, with a drained pipe, shared by Linux and macOS in one intermediate source set; it replaced a `fork` whose child could stop before `execvp` while another thread was collecting garbage), the Windows `CreateProcessW` runner with batch-file escaping, and the JVM child wrapper account for the 230 added lines, which fixed a hang in which a grandchild holding the output pipe blocked the run forever. It dropped to 545 when the host class that wraps the native runners, the environment parsing, the wait-status decoding, the `PATH` search and the chunked file read moved into common code. `cli` holds the per-target file, binary file and stdout writers and the installer and server actuals: the registry and process code for Windows, the profile edits on Unix, the sockets of `serve` for POSIX and Winsock, and the OpenSSL loader; its share is 72.1%. The listener setup, the send loop, PEM decoding, address text and the cleanup command line are common. The total is 91.1% and the floor is 80%. `bench` keeps its platform lines in JVM-only code: YAML reading, scenario preparation, result ingest and an exact binomial test with `BigInteger`.
 
 JVM line coverage comes from JaCoCo. No coverage tool exists for Kotlin/Native or Wasm in Kotlin 2.4.20, so no coverage figure exists for those targets. The same common tests run on them.
 
@@ -262,7 +262,7 @@ Each changed path maps to one of 14 dimensions by longest matching prefix: `os`,
 
 ## Rules and Provenance
 
-A rule records a documented difference between two environments that can break software. The catalog has 298 rules in `rules/**/*.yml`, one folder per subject (27 folders), each with a mechanism, one or more symptoms, a matcher, fixtures and cited sources. 207 are `active`. The other 91 are `pending-scanner`: they read an attribute that no scanner emits yet (a database server version, the TLS versions a peer offers, a browser name, a source-level key), they are compiled and checked like the rest, and they never match a capture that lacks the attribute. `RuleCatalogTest` prints the keys they are waiting for.
+A rule records a documented difference between two environments that can break software. The catalog has 426 rules in `rules/**/*.yml`, one folder per subject (51 folders), each with a mechanism, one or more symptoms, a matcher, fixtures and cited sources. 375 are `active`. The other 51 are `pending-scanner`: they read an attribute that no scanner emits yet (a database server version, the TLS versions a peer offers, a browser name, a source-level key), they are compiled and checked like the rest, and they never match a capture that lacks the attribute. `RuleCatalogTest` prints the keys they are waiting for.
 
 A rule file has `schema: 1`, an `id` equal to the file name, a `title`, `applies` (dimension ids), `difference`, `symptoms`, `mechanism` (one sentence), `detect`, `severity` (`low`, `medium`, `high`), `provenance`, `fixtures` and `status` (`active` or `pending-scanner`). A symptom has a `basis`: `verified` when the cited source states the symptom, `inferred` when it only states the mechanism, `range` when it lists a compatible or tested range and states no failure. The matcher is a small language over a passing side `a` and a failing side `b`: `eq`, `ne`, `in`, `has`, `starts`, `ver` (version ranges), `present`, `changed` (with a trailing `*`), and `all`, `any`, `not`, to a depth of 8. This is a rule from the catalog:
 
@@ -284,41 +284,53 @@ severity: medium
 
 Rule files are YAML because people maintain them by hand. snakeyaml-engine 3.2 parses them at build time under the failsafe schema, so every scalar is a string (`1.20`, `no`, `0o17` and `~` stay strings), and `embedRules` writes the JSON that `core` reads. Common code never parses YAML. A stray `rules/**/*.json` fails the build, and the embedded JSON was byte-identical to what the earlier JSON catalog produced when the format changed (32 of 32 rules at that time).
 
-The checker, `Constraints.check`, runs in the `core` test suite, so on every build. It validates each rule (id shape, non-empty fields, one-sentence mechanism, dimension ids, provenance, fixtures), requires unique ids, requires every positive fixture to match and every negative fixture not to match, and lists every `pending-scanner` rule (91 today). A scan-side test (`RuleCatalogTest`) checks that every attribute path an active rule reads is one that capture or a scanner emits, and that a pending rule reads at least one that none emits.
+The checker, `Constraints.check`, runs in the `core` test suite, so on every build. It validates each rule (id shape, non-empty fields, one-sentence mechanism, dimension ids, provenance, fixtures), requires unique ids, requires every positive fixture to match and every negative fixture not to match, and lists every `pending-scanner` rule (51 today). A scan-side test (`RuleCatalogTest`) checks that every attribute path an active rule reads is one that capture or a scanner emits, and that a pending rule reads at least one that none emits.
 
 | property | count |
 | --- | --- |
-| rules, active / pending-scanner | 298: 207 / 91 |
-| severity high / medium / low | 85 / 166 / 47 |
-| fixtures, positive / negative | 303 / 610 |
-| cited sources | 338 entries, 210 distinct locations |
-| source kinds: measurement / vendor-doc / release-note / spec | 14 / 138 / 145 / 41 |
-| symptoms, `verified` / `inferred` | 86 / 233 |
-| rules with at least one `inferred` symptom | 230 |
+| rules, active / pending-scanner | 426: 375 / 51 |
+| severity high / medium / low | 132 / 239 / 55 |
+| fixtures, positive / negative | 465 / 1016 |
+| cited sources | 494 entries, 313 distinct locations |
+| source kinds: measurement / vendor-doc / release-note / spec / report | 19 / 205 / 197 / 72 / 1 |
+| symptoms, `verified` / `inferred` / `range` | 133 / 265 / 52 |
+| rules with at least one `inferred` symptom | 262 |
 
 A matched rule gives a candidate the `known` tier and a weight by severity, with its mechanism text attached. A rule whose matcher touches no changed attribute is listed as unattached and never dropped.
 
-The rule sources are cited and not reproduced. The fixtures are synthetic pairs written to exercise the matcher. They show that the rule fires on the stated versions and stays quiet on others; they do not show that the failure occurs. The 335 provenance entries name 208 distinct locations: 207 web URLs and 1 `fixture:` reference, which the verifier skips. `tools` includes a verifier that fetches each distinct web URL and records the HTTP status. Its unit tests use a fake fetcher. A run against the network covered 3 URLs when it was written (all 3 returned HTTP 200). A run over all 207 web URLs is not recorded. An HTTP 200 shows the page exists, not that the quoted section still does. Most symptoms are `inferred` (232 of 316): the cited page states the mechanism, and the symptom is what that mechanism implies.
+The rule sources are cited and not reproduced. The fixtures are synthetic pairs written to exercise the matcher. They show that the rule fires on the stated versions and stays quiet on others; they do not show that the failure occurs. The 494 provenance entries name 313 distinct locations: 309 web URLs and 4 `fixture:` references, which the verifier skips. `tools` includes a verifier that fetches each distinct web URL and records the HTTP status. Its unit tests use a fake fetcher. A run against the network covered 3 URLs when it was written (all 3 returned HTTP 200). A run over all 309 web URLs is not recorded. An HTTP 200 shows the page exists, not that the quoted section still does. Most symptoms are `inferred` (265 of 450): the cited page states the mechanism, and the symptom is what that mechanism implies.
 
 **Catalog by subject.**
 
 | folder | rules | active | pending | folder | rules | active | pending |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `browser` | 2 | 1 | 1 | `libc` | 6 | 3 | 3 |
-| `clang` | 5 | 4 | 1 | `network` | 4 | 3 | 1 |
-| `composer` | 3 | 3 | 0 | `node` | 18 | 17 | 1 |
-| `database` | 13 | 0 | 13 | `os-image` | 25 | 17 | 8 |
-| `do-sqlite` | 6 | 6 | 0 | `php` | 35 | 33 | 2 |
-| `docker` | 7 | 0 | 7 | `python` | 29 | 25 | 4 |
-| `drupal` | 21 | 8 | 13 | `runner` | 7 | 4 | 3 |
-| `filesystem` | 4 | 0 | 4 | `spring` | 3 | 2 | 1 |
-| `gcc` | 8 | 7 | 1 | `symfony` | 17 | 7 | 10 |
+| `angular` | 4 | 4 | 0 | `network` | 4 | 3 | 1 |
+| `astro` | 3 | 3 | 0 | `nextjs` | 2 | 2 | 0 |
+| `browser` | 4 | 3 | 1 | `node` | 18 | 17 | 1 |
+| `clang` | 5 | 4 | 1 | `npm-native` | 3 | 3 | 0 |
+| `composer` | 3 | 3 | 0 | `numpy` | 6 | 6 | 0 |
+| `dart` | 1 | 1 | 0 | `nuxt` | 3 | 3 | 0 |
+| `database` | 13 | 0 | 13 | `os-image` | 25 | 20 | 5 |
+| `django` | 6 | 6 | 0 | `pandas` | 4 | 4 | 0 |
+| `do-sqlite` | 6 | 6 | 0 | `php` | 35 | 35 | 0 |
+| `docker` | 7 | 0 | 7 | `prisma` | 2 | 2 | 0 |
+| `drupal` | 21 | 13 | 8 | `pydantic` | 4 | 4 | 0 |
+| `elixir` | 1 | 1 | 0 | `python` | 29 | 28 | 1 |
+| `expo-react-native` | 3 | 3 | 0 | `pytorch` | 3 | 3 | 0 |
+| `fastapi` | 3 | 3 | 0 | `r` | 1 | 1 | 0 |
+| `filesystem` | 4 | 1 | 3 | `react-router` | 2 | 2 | 0 |
+| `flask` | 2 | 2 | 0 | `runner` | 11 | 11 | 0 |
+| `flutter` | 3 | 3 | 0 | `spring` | 3 | 3 | 0 |
+| `gcc` | 8 | 7 | 1 | `symfony` | 17 | 17 | 0 |
 | `git` | 1 | 1 | 0 | `teavm` | 2 | 2 | 0 |
 | `go` | 3 | 1 | 2 | `tls` | 4 | 2 | 2 |
-| `gradle` | 12 | 11 | 1 | `tz` | 5 | 0 | 5 |
-| `jdk` | 35 | 27 | 8 | `workerd` | 3 | 3 | 0 |
-| `kotlin` | 20 | 20 | 0 |  | | | |
-| total | 298 | 207 | 91 | | | | |
+| `gradle` | 13 | 13 | 0 | `typo3` | 3 | 3 | 0 |
+| `jdk` | 35 | 33 | 2 | `tz` | 5 | 5 | 0 |
+| `julia` | 1 | 1 | 0 | `vite` | 2 | 2 | 0 |
+| `kotlin` | 72 | 72 | 0 | `wordpress` | 3 | 3 | 0 |
+| `laravel` | 4 | 4 | 0 | `workerd` | 3 | 3 | 0 |
+| `libc` | 6 | 3 | 3 | | | | |
+| total | 426 | 375 | 51 | | | | |
 
 Three shapes of rule exist. Version-boundary rules read only version keys (`ver` on `tool.php.version` and the like) and say that a documented change lies between two versions. Fact rules also read a project or system fact, such as `project.composer.require.<name>`, `runtime.openssl.legacy-provider` or `tool.sudo.flavor`, and match only when the fact is present. Added-API rules (36 of them: PHP 12, Python 12, JDK 8, Node 4) read a call site or import under `project.<eco>.calls.*` on the failing side and an older runtime there; they describe code that a newer runtime accepts and an older one rejects, so they fire for a CI runner older than the developer machine and not for an upgrade (see Upgrade Check). The 15 older rules with a single negative fixture were left as written; the compiler allows one.
 
@@ -660,13 +672,13 @@ The GitHub Action (`action.yml`) and the GitLab component (`templates/drift.yml`
 
 The result has five groups (four, plus the group below that is printed only when it has findings), taken from the three-valued verdicts of the matcher and not from a new score. **Will break** is a rule that matches on a fact beyond the target version keys, such as a package in the lockfile or a call in the source; the finding prints that fact on an `evidence:` line. **Version boundary crossed** is a rule that matches on the target versions alone: a documented change lies between the two versions, and nothing in the capsule shows that the project meets it. **May break** is a rule whose verdict is unknown because another key it reads is missing from the capsule or is one no scanner emits yet, and the output names the key (and says when the rule is `pending-scanner`). **Outside the tested range** is a rule that matches and whose symptoms all have the basis `range`: a compatibility table lists the supported versions (Kotlin Multiplatform against Gradle and AGP, AGP against Gradle and the maximum API level) and says nothing about a failure outside them, so the move is untested and not known to break. **Unknown** is a target whose current value the capsule lacks. A rule is listed only when its verdict for the target differs from its verdict for the capsule alone. The order inside a group is severity, verified symptoms before inferred ones, then rule id, and the JSON form is canonical, schema 2.
 
-On the real capture `fixtures/upgrade-check/drupal-10-php-8-1.json` (the Composer fixture inside `php:8.1-cli-bookworm`: PHP 8.1.34, Drupal 10.3.6, Symfony 6.4.12), `--to php=8.3,drupal=11,symfony=7.1` gives 0 will break, 7 may break, 2 version boundary and 0 unknown, and 73 of the 298 rules read a target key. The output is byte-identical on the JVM and macOS builds, and `UpgradeCheckTest` (19 tests) and `UpgradeCheckCommandTest` (9) run on all three Gradle targets.
+On the real capture `fixtures/upgrade-check/drupal-10-php-8-1.json` (the Composer fixture inside `php:8.1-cli-bookworm`: PHP 8.1.34, Drupal 10.3.6, Symfony 6.4.12), `--to php=8.3,drupal=11,symfony=7.1` gives 0 will break, 3 may break, 2 version boundary and 0 unknown, and 83 of the 426 rules read a target key. The output is byte-identical on the JVM and macOS builds, and `UpgradeCheckTest` (19 tests) and `UpgradeCheckCommandTest` (9) run on all three Gradle targets.
 
 **What it got wrong.** The first version put every version-only match under Will break. Case D (below) ran it before a PHP 7.4 to 8.3 move: 11 will-break findings and 1 may-break, and none of them was a failure in the project's own test suite (0 true positives, 12 false positives). The suite passed on PHP 8.3. What did break the move was not predicted: a locked package with a PHP upper bound stopped the install, and a locked package that lacks a PHP 8.1 tentative return type died with a fatal error. No rule covers either. The group split and the evidence requirement are the response, and the same capture now gives 0 will break, 1 may break, 11 version boundary and 0 unknown. That is a change of wording, not a better prediction: the 11 are still not failures, and the frozen prediction in `fixtures/cases/d` is unchanged.
 
 **A second check.** On the four migration scenarios of DriftBench, moving the green arm to the red arm's version put a will-break finding on the injected version key in 3 of 4 scenarios, and in 2 of 4 in the natural direction (the red arm to the new version). Both counts are weak: any finding on the version key counts, and at that time none named the injected API (0 of 4). Added-API rules (36, one per call such as `json_validate`, `Array.fromAsync` or `List.getFirst`) then raised the API-level hits to 4 of 4, but only in the direction where side b has the older runtime, which is the CI-older-than-local shape; an upgrade runs the other way, and those rules do not fire for it.
 
-**Limits.** A quiet result does not show that a move is safe: the catalog holds documented changes, 91 of its 298 rules wait for a key no scanner emits, and a project that uses a removed API without a rule for it is invisible. The direction of a rule is the direction of its text (`a` is the passing side), and a rule written for a downgrade can match an upgrade only by accident. `--learned DIR` adds the rules published by `drift triage` (see Triage and the Corpus).
+**Limits.** A quiet result does not show that a move is safe: the catalog holds documented changes, 51 of its 426 rules wait for a key no scanner emits, and a project that uses a removed API without a rule for it is invisible. The direction of a rule is the direction of its text (`a` is the passing side), and a rule written for a downgrade can match an upgrade only by accident. `--learned DIR` adds the rules published by `drift triage` (see Triage and the Corpus).
 
 ---
 
@@ -1011,6 +1023,26 @@ Folds are the first four bytes of `sha256("fold:" + id)` mod 5. A model replaces
 
 The calibration files were regenerated on 2026-10-13 after the dev split grew from 45 to 49 scenarios (four migration scenarios, see DriftBench) and the catalog from 32 to 296 rules. The weights table did not change, and `selection.chosen` is still `hand-set+softmax-none`. `evaluation.json` is `4effe497...e374` and `fit.json` is `fbbb6f45...4a31`; `CalibrationTest` regenerates both and compares bytes.
 
+**Complete dev set.** The committed calibration files now cover 115 of the 122 dev scenarios, the ones that have probed captures; 105 of the 115 have a cause and 10 are controls. The other seven (`build-checksum-pin-1` and `-2`, `build-version-pin-1` and `-2`, `network-hosts-stale-1` and `-2`, `network-nsswitch-order-1`) read a file the harness mounts, which a container built from a capsule does not have, so `solve` cannot capture them. `Lab.UNPROBED` lists them and the probed lab leaves them out of every section, including `original`. `evaluation.json` is `030fdf04...31a5` and `fit.json` is `25eb0d75...d524`, and two regenerations gave identical bytes. The paragraphs from here to the end of this section describe the earlier run on 49 scenarios, so their figures differ from the ones below.
+
+| order, probed input, 105 scenarios with a cause | top-1 | top-3 | MRR | P, top-1 / top-3 |
+| --- | --- | --- | --- | --- |
+| random (expected) | 36.2 (0.344) | 57.0 (0.543) | 0.457 | |
+| diff order, alphabetical | 43 of 105 | 58 of 105 | 0.499 | |
+| dimension prior | 50 of 105 | 67 of 105 | 0.553 | |
+| rules only | 48 of 105 | 65 of 105 | 0.543 | |
+| hand-set (shipped) | 46 of 105 (0.35 to 0.53) | 67 of 105 (0.54 to 0.72) | 0.532 | 0.0012 / 0.00002 |
+| hand-set, probes removed | 48 of 105 | 67 of 105 | 0.543 | 0.0001 / 0.00002 |
+| hand-set, original capsules | 58 of 105 | 81 of 105 | 0.661 | 0.00015 / 0.00003 |
+
+The shipped order does not beat the dimension prior. In the template-clustered bootstrap (10,000 resamples, seed 20261006, 77 templates), shipped minus dimension prior is -0.038 at top-1 (-0.101 to 0.019), 0.000 at top-3 (-0.028 to 0.029) and -0.021 in MRR (-0.060 to 0.014). Against alphabetical order the top-1 gain is 0.029 (-0.110 to 0.165), so its interval includes zero, and the top-3 gain is 0.086 (0.000 to 0.180). Probes still help no scenario: the same two scenarios move down (`env-pool-size-decoy-2`, `migration-python-copy-1`), and top-1 is 48 without probes and 46 with them.
+
+Tiers of the shipped ranker: `difference` holds 271 candidates and 39 are the cause (0.14; 0.11 to 0.19), `plausible` 62 and 22 (0.35; 0.25 to 0.48), `known` 13 and 10 (0.77; 0.50 to 0.92). A `plausible` or `known` top candidate is wrong in 25 of 115 scenarios (0.15 to 0.30), 43 of 75 confident candidates are wrong (0.46 to 0.68), and 4 of the 10 controls get a confident candidate. Of 27 bundle scenarios with a ranked cause, 15 put it inside a bundle (0.37 to 0.72).
+
+The selection rule now picks `hand-set+softmax+isotonic`. Out of fold, on the 79 candidates of rankings that print a probability, it scores Brier 0.170 against 0.184 for the shipped `hand-set+softmax-none` readout and 0.173 for a uniform guess. The gain over the shipped readout is 7.9% with equal MRR, which passes the 2% rule. The shipped readout reads worse than a uniform guess on these rankings, where on 49 scenarios it read better (0.166 against 0.179). `core` still ships `Weights.NONE` (0.25, fit on 49 scenarios) and applies no isotonic map; the fit of the none weight on the 115 is 0.5. This regeneration changes neither.
+
+Evidence classes on the complete set (`evidence` section of `evaluation.json`, labelled `complete`, which counts the 115 scenarios with captures): the evidence ranker gets top-1 48 of 105 (0.457), top-3 67 and MRR 0.542, against 50, 67 and 0.553 for the dimension prior, so it does not beat the prior. Shipped minus evidence ranker at top-1 is -0.019 (-0.061 to 0.000). `plausible` is right for 11 of 12 candidates (0.92; 0.65 to 0.99), `known` is empty, and `correlated` holds 63 candidates of which 21 are the cause (0.33). One scenario of 115 has a confident wrong top candidate (shipped: 25), and none of the 10 controls has a confident candidate. The top-1 gains are `memory-oom-decoy-1` and `-2`, with no losses. Trials to a verdict stay pending, because the repository holds no dev solve certificates.
+
 Order of the hand-set ranker on the 45 scenarios with a cause (Wilson 95% intervals; "P" is the exact chance that a random order does at least as well, one-sided, not corrected for the three inputs):
 
 | input | order | top-1 | top-3 | MRR | P, top-1 / top-3 |
@@ -1041,7 +1073,7 @@ Probes were first linked to candidates through their dimension. They are now lin
 | confident candidates (`plausible` or `known`) that are wrong | 14 of 28 (0.33 to 0.67); 14 of 25 `plausible` candidates |
 | controls with a confident candidate | 1 of 4 (`control-locale-noise-fixed-1`, whose decoy `TZ` does differ and the timezone probe sees it) |
 
-The three `known` candidates come from a matched catalog rule, and the cause rate of 3 of 3 says only that those rules agreed with the injected cause. Their interval, 0.44 to 1.00, is wide. The intervals for `difference` and `plausible` overlap, so the data does not show that `plausible` is better evidence than `difference`. In plain terms, the `plausible` tier is not reliable on this benchmark. More than half of what it names is wrong, and a user reading "plausible" as "probably right" would be misled about as often as not. The wrong `plausible` candidates are decoys that changed, and the probe is right about them: it separates attributes that behaved differently from attributes that did not, and does not separate a cause from a bystander. Only a link through the symptom (the probe whose output relates to the failure) could, and it was not tried. The ranking still prints the tier and the mechanism that earned it, and prints no probability for it.
+The three `known` candidates come from a matched catalog rule, and the cause rate of 3 of 3 says only that those rules agreed with the injected cause. Their interval, 0.44 to 1.00, is wide. The intervals for `difference` and `plausible` overlap, so the data does not show that `plausible` is better evidence than `difference`. In plain terms, the `plausible` tier is not reliable on this benchmark. More than half of what it names is wrong, and a user reading "plausible" as "probably right" would be misled about as often as not. The wrong `plausible` candidates are decoys that changed, and the probe is right about them: it separates attributes that behaved differently from attributes that did not, and does not separate a cause from a bystander. Only a link through the symptom (the probe whose output relates to the failure) could, and the Evidence Classes paragraph below measures it. The ranking still prints the tier and the mechanism that earned it, and prints no probability for it.
 
 **Re-weighting is refuted.** The probe, rule and spectrum weights were refit out of fold and none replaced the hand-set value.
 
@@ -1050,7 +1082,9 @@ The three `known` candidates come from a matched catalog rule, and the cause rat
 - Rule weights and spectrum weights stay hand-set. Seven scenarios now carry a rule match, which is too few to fit a weight, and no dev scenario has a history.
 - Fitted per-dimension priors lose again against the hand-set priors in the out-of-fold comparison that `fit.json` records.
 
-The weights stay hand-set. This refutes one mechanism, that a fitted weight improves the order or the printed probability on this benchmark. It does not close the objective of weighing probe evidence. A probe linked through the symptom it relates to was not tried, and the data here says only that probes linked through the attribute they read carry nothing beyond the attribute change.
+The weights stay hand-set. This refutes one mechanism, that a fitted weight improves the order or the printed probability on this benchmark. It does not close the objective of weighing probe evidence. A probe linked through the symptom it relates to is measured under Evidence Classes. The data above says only that probes linked through the attribute they read carry nothing beyond the attribute change.
+
+**Evidence classes.** `Ranker.rank` takes an optional observed failure (the symptoms read from a log). With one, a probe or a rule match is mechanism-level only when its symptom matches it: a probe through the phrase table in `ProbeSymptoms`, a rule when a distinctive token of one of its symptoms appears in the failure. Anything else is observational, carries ratio 1 and lifts a candidate to `correlated` at most. Without a failure the output is unchanged, and no command passes one yet. On the 49 dev scenarios that have probed captures (`partial`: 73 of the 122 dev ids have none yet), with the red arm's last failure line as the failure, top-1 moves from 21 to 23 of 45 (paired gain 0.044, percentile interval 0 to 0.133) and top-3 stays at 29, against 23 and 28 for the dimension prior alone. That is a tie with the prior at top-1 and one scenario at top-3, so the result does not beat the prior. `plausible` is right for 9 of 10 candidates (shipped: 11 of 25) and 1 of 49 scenarios has a confident wrong top candidate (shipped: 10). The three `known` candidates fall to `correlated`: their rules describe a date-time parse failure and a loose string comparison, which are not the failures observed, so those three hits were a version crossing and not a mechanism. Both top-1 gains (`memory-oom-decoy-1` and `-2`) come from exit code 137 reading as the memory probe's symptom, and the phrase table was written after the dev signatures had been seen, so the numbers are not blind. Prose-only rule symptoms never match, and no dev scenario has a matching rule symptom, so rule matching is untested. Trials to a verdict from `solve` are pending: the repository holds no dev solve certificates, and `Solve` ranks with the unconditioned ranker.
 
 **Probability readout.** Models on the rankings that print a probability (30 candidates), Brier score out of fold unless stated:
 
@@ -1210,6 +1244,8 @@ Of 14, six were reconstructed and run: three CONFIRMED EFFECT (bundle), three ST
 
 What the flagship does not show. The verdict says an OS release change is enough, not why. The thread proposes that libssl moved from `/lib` to `/usr/lib`; no arm tests that. The arms were not captured (the Linux binary is glibc and cannot run on Alpine), so the 12 members come from the list of what the base image changes, not from a measured arm diff. Capture inside the Alpine images needed `apk add gcompat`, so the two capsules describe the images plus that package. The pin of `prisma@6.0.1` is the latest release on the issue date and the Node version is held at 22.12.0 on both sides; neither is stated in the thread.
 
+**The isolation check.** `drift verify` requires a measured diff from both arms for a bundle, as it does for a CONFIRMED verdict. INC-13 fails that check and nothing else: its arms ran on Alpine without the Linux binary, so both diffs are predicted from the base image's change list (`expected measured, recorded predicted and predicted`). The other 13 checks pass and the sealed archive is unchanged. INC-11 and INC-12 measured their diffs and pass all 14 checks, and INC-02, INC-07 and INC-14 end STUCK and pass.
+
 **The losses.** Three results are failures of reconstruction by `solve`, not of the diagnosis, and each is a defect in the engine that this protocol did not fix:
 
 - INC-07: the capsules say Debian 10 (`node:16.13.0` is a buster image), and the image table in `ImageTable.kt` maps only Debian 11 to 13, so the arm is `node:16.13.0-bookworm-slim`, which does not exist. The diagnosis ranks `tool.node.version` first of 9 candidates, but `solve` stops at the first build. A variant run after the seal, with `node:16.20.2` and `node:17.9.1` (both Debian 11), failed the same way on the treatment arm (`node:17.9.1-bookworm-slim`); it is not a row of the table.
@@ -1253,7 +1289,7 @@ The group split that followed (see Upgrade Check) rerun on the same capture give
 - Intermittency is a hash gate on the fault, so no scenario contains a real race, and five scenarios carry capsule values that were written in and not measured.
 - The 31 sealed scenarios were never run. Their validity is inferred from dev siblings.
 - Weights are hand-set. The ranking weights, the planner's cost weights, its 25% unknown prior and the trial-plan thresholds are guesses with a written reason, and none was calibrated.
-- Rule sources are cited and not reproduced. Rule fixtures are synthetic. 230 of 298 rules have a symptom that rests on the mechanism alone (233 of 319 symptoms are `inferred`), and 91 rules wait for an attribute no scanner emits.
+- Rule sources are cited and not reproduced. Rule fixtures are synthetic. 262 of 426 rules have a symptom that rests on the mechanism alone (265 of 450 symptoms are `inferred`), and 51 rules wait for an attribute no scanner emits.
 - Rule matches on real data are few. Seven dev scenarios and one real project (case D, where the 12 matched rules predicted breaks that did not happen) are the only matches, and the Drangler pair matches no rule. Real multi-rule captures were not tested.
 - A probe links to a candidate through the attribute path it reads, a table that is a reading of the probe sources and not a measurement, and the link ignores the symptom. A differing probe supports a decoy that really changed as much as the cause.
 - `correlated` needs the history to carry step data. Without the run JSON joined to the logs, every green's steps are unknown, all five are excluded as `NO_STEP_EVIDENCE`, and all eight drangler candidates drop to `difference` (`withoutStepEvidenceInTheGreensTheDranglerFallsBackToDifferences`).
@@ -1334,7 +1370,7 @@ This prints `49 31 457097f88491381de17a43a67a7f09ab3843d008c838f02db2e81b0c6d5b4
 | capture counts (90, 117, 71) | this Mac | `drift capture`, `drift capture --tools`, `drift capture --probes --tools` |
 | masked and identifier-bearing env attributes | 13 masked of 81; with `--keep-identifiers` 22 hold the account name and 20 the home path; by default 0 and 0 | `drift capture` and `drift capture --keep-identifiers`, then count `env.*` values equal to `<redacted>`, containing the account name, containing `$HOME` |
 | capture stdout bytes | strict JSON parse succeeds; 1 raw U+0085 and 1 raw U+2028 | `drift capture --probes --tools > c.json; python3 -c "import json; json.load(open('c.json'))"`; count the UTF-8 bytes of both code points in `c.json` |
-| rules, status, fixtures, sources, severities | 298; 207 active and 91 pending-scanner; 913 (303/610); 338 entries, 210 distinct; 85/166/47 | `find rules -name '*.yml' \| wc -l`; `grep -rh '^status:' rules --include='*.yml' \| sort \| uniq -c`; `grep -rh '^severity:' rules --include='*.yml' \| sort \| uniq -c`; `- name:` under `fixtures:` and `kind:` under `provenance:` per file |
+| rules, status, fixtures, sources, severities | 426; 375 active and 51 pending-scanner; 1481 (465/1016); 494 entries, 313 distinct; 132/239/55 | `find rules -name '*.yml' \| wc -l`; `grep -rh '^status:' rules --include='*.yml' \| sort \| uniq -c`; `grep -rh '^severity:' rules --include='*.yml' \| sort \| uniq -c`; `- name:` under `fixtures:` and `kind:` under `provenance:` per file |
 | rule symptom basis | 86 verified, 233 inferred; 230 rules | `grep -rh "basis:" rules --include="*.yml"` |
 | transcript fixtures | 77 files, 23 tool folders | `find fixtures/transcripts -type f`; `ls fixtures/transcripts` |
 | probes | 71 = 33 + 38 | `drift capture --probes` |
@@ -1355,15 +1391,15 @@ This prints `49 31 457097f88491381de17a43a67a7f09ab3843d008c838f02db2e81b0c6d5b4
 | Documentation site | 3,969 files, 68,944 KiB; 95,013 relative links, 0 unresolved outside `engine/`, 132 inside it | `./gradlew docsSite`; `find build/site -type f \| wc -l`; `du -sk build/site`; the `checkSiteLinks` output |
 | DriftBench | 80 scenarios, 43 templates, 49 dev, 31 sealed | `bench/data/scenarios.json`, `bench/data/split.json` |
 | dev validation | 49 of 49, 2,580 trials, 978 red failures, 0 green failures | `bench/data/results/*.json` (`valid`, `arms.*.trials`, `arms.*.failures`) |
-| order table, three inputs | 21, 23 and 26 of 45 top-1 for hand-set (probed, probes removed, original) | `bench/data/calibration/evaluation.json` (`original`, `probes_removed`, `probed`: `models[id=hand-set].in_sample`); Wilson 95% intervals computed from the counts |
-| exact tests against a random order | P = 0.018 (probed), 0.001, 0.003 at top-1; 0.009, 0.009, 0.012 at top-3 | `evaluation.json` `versus_random.top1.p_at_least_micro`, `.top3` |
+| order table, three inputs | 46, 48 and 58 of 105 top-1 for hand-set (probed, probes removed, original) | `bench/data/calibration/evaluation.json` (`original`, `probes_removed`, `probed`: `models[id=hand-set].in_sample`); Wilson 95% intervals computed from the counts |
+| exact tests against a random order | P = 0.0012 (probed), 0.0001, 0.00015 at top-1; 0.00002, 0.00002, 0.00003 at top-3 | `evaluation.json` `versus_random.top1.p_at_least_micro`, `.top3` |
 | probe effect | 2 scenarios move down (`env-pool-size-decoy-2`, `migration-python-copy-1`); none improves | compare the `ranked` order of `env-pool-size-decoy-2` and every other scenario in `probed` and `probes_removed` |
-| calibration files | `evaluation.json` sha256 `4effe497...e374`; `fit.json` `fbbb6f45...4a31`; regenerated and byte-compared by `CalibrationTest` | `shasum -a 256 bench/data/calibration/*.json`; `./gradlew :bench:jvmRun --args="calibrate --root $PWD/bench"` |
-| tiers and false confidence | 71 / 25 / 3; 10 of 49; 14 of 25 `plausible` wrong | `evaluation.json` `probed.scenarios[].ranked[].tier`, `.cause` |
-| probe ratio sweep | 0.170 at ratio 1 to 0.218 at 6; 0.187 for "one of n" | `evaluation.json` `probe_sweep` |
-| readout Brier, covered rankings | 0.166 shipped; 0.179 uniform; 0.146 against 0.160 on all rankings | `evaluation.json` `probed.models[].cross_validated.covered.brier` |
+| calibration files | `evaluation.json` sha256 `030fdf04...31a5`; `fit.json` `25eb0d75...d524`; regenerated and byte-compared by `CalibrationTest` | `shasum -a 256 bench/data/calibration/*.json`; `./gradlew :bench:jvmRun --args="calibrate --root $PWD/bench"` |
+| tiers and false confidence | 271 / 62 / 13; 25 of 115; 40 of 62 `plausible` wrong | `evaluation.json` `probed.scenarios[].ranked[].tier`, `.cause` |
+| probe ratio sweep | 0.106 at ratio 1 to 0.118 at 6; 0.108 for "one of n" | `evaluation.json` `probe_sweep` |
+| readout Brier, covered rankings | 0.184 shipped; 0.173 uniform; 0.123 against 0.124 on all rankings | `evaluation.json` `probed.models[].cross_validated.covered.brier` |
 | none weight, fit provenance | 0.25; seed 20261006 | `fit.json` `probability.none`, `provenance`; `Weights.NONE`, `Weights.FIT` |
-| dev inputs | 99 candidates, 29 causes, 14 scenarios with a differing probe, 7 scenarios with a rule match | `fit.json` `provenance.inputs.probed` |
+| dev inputs | 346 candidates, 71 causes, 41 scenarios with a differing probe, 25 scenarios with a rule match | `fit.json` `provenance.inputs.probed` |
 | drangler pair ranking | 9 candidates, bundle-1, probabilities 0.129032 and 0.107527 | `drift diagnose ... --detail full` |
 | drangler history ranking | 9 candidates, `ef 3, nf 0, ep 0`, coverage 862,068 | `RankHistoryTest.theDranglerTransitionIsOneBundleNoCandidateIsTheCause` |
 | failing test files in the logs | `to-worker` 8 tests (greens) and 8 with 2 failed (reds); `modify` 3 and 8; `preview` 3 skipped in reds | `HistoryFixtureTest.theStepRanInEveryGreenButTheFailingTestsAreNotAllInThem`; `fixtures/drangler/logs/*.log` |
@@ -1389,7 +1425,7 @@ This prints `49 31 457097f88491381de17a43a67a7f09ab3843d008c838f02db2e81b0c6d5b4
 | `serve` embedding sizes | 493,368 / 12,588,056 / 33,913,192 bytes | executables of a trivial program that embeds the 12.4 MB build as a gzip base64 string and as a raw base64 string; not in the repository |
 | triage, held-out | 1,376 facts, precision 0.783, Brier 0.1486; 1 claim hit in 222,707 bodies | `./gradlew :tools:evalTriage -Pdrift.corpus=<corpus.json.zst>` (needs the corpus file) |
 | triage fixtures | 70 bodies, 189 facts, precision 0.989, recall 0.979, Brier 0.0851 | `TriageTest` |
-| upgrade-check | 0 / 7 / 2 / 0 on the Drupal capture, 73 of 298 rules; case D 1 / 2 / 11 / 0, 46 of 298 | `drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=8.3,drupal=11,symfony=7.1`; `drift upgrade-check fixtures/cases/d/capture-php-7-4.json --to php=8.3` |
+| upgrade-check | 0 / 3 / 2 / 0 on the Drupal capture, 83 of 426 rules; case D 1 / 1 / 11 / 0, 56 of 426 | `drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=8.3,drupal=11,symfony=7.1`; `drift upgrade-check fixtures/cases/d/capture-php-7-4.json --to php=8.3` |
 | performance | the table in Performance | `tools/perf/results/SUMMARY.md`; `python3 tools/perf/summarize.py` |
 | Linux and mingw test runs | 730 tests each on Linux x64 and arm64; Wine counts as listed | `./gradlew :core:linkDebugTestLinuxX64` (and the other modules), then run `<module>/build/bin/linuxX64/debugTest/test.kexe` in a Debian container; `linkDebugTestMingwX64` and `wine64 test.exe` |
 | browser transcripts | byte-identical over 4 runs per engine | `node tools/browsers/run.mjs --engine chromium --headed --dist studio/build/dist/wasmJs/productionExecutable --out out` (under `xvfb-run` in the Playwright image); `cmp` between runs |
