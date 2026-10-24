@@ -185,7 +185,7 @@ float-nan-raw = 7fc00000
 float-payload-raw = 7f800001
 neg-zero-raw = 8000000000000000</pre>
 <h2>Classification</h2>
-<p>unclassified, basis verified; causes: platform-defined, hardware, unexplained.</p>
+<p>unclassified, basis verified; causes: platform-defined, Kotlin issue, hardware.</p>
 <p>No explanation was found in the sources searched.</p>
 <blockquote><p>IEEE 754 allows multiple distinct NaN values for each of its binary32 and binary64 floating-point formats.</p>
 <footer><a href="https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.2.3">https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.2.3</a></footer></blockquote>
@@ -196,7 +196,7 @@ neg-zero-raw = 8000000000000000</pre>
 <blockquote><p>are represented in ECMAScript as a single special NaN value</p>
 <footer><a href="https://tc39.es/ecma262/#sec-ecmascript-language-types-number-type">https://tc39.es/ecma262/#sec-ecmascript-language-types-number-type</a></footer></blockquote>
 <h3>Notes</h3>
-<p>Four lines differ at 2.4.20. 0/0-raw follows the CPU in every column (x86 fff8..., arm64 7ff8...; the browsers on x86 print fff8 like x86 JVM and Linux, Node on arm64 prints 7ff8; checked for Wasm with a hand-assembled f64.div module on Node arm64 and Node x64). sqrt-neg-raw follows the CPU on JVM and Native but not in the three x86 browsers (7ff8), which the Wasm NaN rule allows. neg-nan-raw follows the Kotlin target: Native 7ff8 on every host, JVM, Android and Wasm fff8 on every host; no page explains it, and the Wasm fneg rule (a deterministic sign flip) gives fff8 as the JVM does. The source is the constant expression -Double.NaN; whether the compiler folds it was not checked. float-payload-raw differs only on js-ir (7fc00001), which ECMAScript's single NaN value allows. The ladder fixtures show Native neg-nan-raw fff8 on 1.6.21 and 7ff8 from 1.9.25 on macos and linux. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, jvm, wasm print.</p>
+<p>Four lines differ at 2.4.20. 0/0-raw follows the CPU in every column (x86 fff8..., arm64 7ff8...; the browsers on x86 print fff8 like x86 JVM and Linux, Node on arm64 prints 7ff8; checked for Wasm with a hand-assembled f64.div module on Node arm64 and Node x64). sqrt-neg-raw follows the CPU on JVM and Native but not in the three x86 browsers (7ff8), which the Wasm NaN rule allows. neg-nan-raw follows the Kotlin target: Native 7ff8 on every host, JVM, Android and Wasm fff8 on every host; KT-88082 explains the Native value, and the Wasm fneg rule (a deterministic sign flip) gives fff8 as the JVM does. The source is the constant expression -Double.NaN; KT-88082 shows the compiler folded it before code generation, and 2.5.0-Beta2 stopped that folding. float-payload-raw differs only on js-ir (7fc00001), which ECMAScript's single NaN value allows. The ladder fixtures show Native neg-nan-raw fff8 on 1.6.21 and 7ff8 from 1.9.25 on macos and linux. cloudflare-wasm prints what wasm prints; cloudflare-jvm prints what android, jvm, wasm print.</p>
 <p class="muted">Read on 2026-10-15.</p>
 <h2>Issues</h2>
 <table>

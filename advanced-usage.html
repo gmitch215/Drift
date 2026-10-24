@@ -1657,6 +1657,10 @@ CONFIRMED: this dimension causes the failure: env.TZ. Setting it to the failing 
 <td>the same, but the arms also differ in attributes nobody set; each member is named</td>
 </tr>
 <tr>
+<td><code>CONFIRMED EFFECT (isolation not measured)</code></td>
+<td>the effect and its reverse or replicate agree, but an arm was not captured inside its container, so what differed between the arms is predicted and not measured</td>
+</tr>
+<tr>
 <td><code>NARROWED</code></td>
 <td>an experiment was supported or stayed inconclusive, but the conditions above are not met</td>
 </tr>
@@ -2456,8 +2460,8 @@ identical-to-fixture
 <pre><code class="language-sh">drift atlas build fixtures/atlas/jvm.txt fixtures/atlas/macos.txt fixtures/atlas/wasm.txt --out atlas.json
 drift atlas build fixtures/atlas/*.txt fixtures/atlas/2.5.0-beta1/*.txt --out atlas-all.json
 </code></pre>
-<pre><code>dataset: 38 probes, 3 columns, 23 divergent, sha256 c69fd560a487f6084b1e1296ed478aac18b58265c47e96e6a10fa3e1503e5ea4
-dataset: 38 probes, 21 columns, 32 divergent, sha256 8364183f0ffda6face1da93bd71142ac66761d85cc145818533eebffa574aae5
+<pre><code>dataset: 38 probes, 3 columns, 23 divergent, sha256 52cdbb80cf4e6b84ca62191a33efb5f214ae7b1dd38316226777d0e1b4f16f1e
+dataset: 38 probes, 21 columns, 32 divergent, sha256 a8dac9357ee8f42ed67eb6b0e605f8e705da3fdc0272f83b9c05aab6c78c1c29
 </code></pre>
 <p>The summary goes to standard error. The sha256 is the hash of the dataset body; the file on disk has one more trailing newline. Building twice gives identical files, and the order of the arguments does not change the bytes. <code>--out</code> is required. <code>build</code> refuses a transcript that lacks a probe of the catalog, names an unknown probe, lacks a header (<code>bad transcript header in badt.txt: missing kotlin.target</code>) or duplicates a column (<code>fixtures/atlas/jvm.txt and fixtures/atlas/jvm.txt both record jvm@2.4.20</code>).</p>
 <p><strong>Show.</strong> Without <code>--probe</code>, <code>atlas show</code> prints the matrix: one row per probe, one letter per distinct output, and a repeated letter on a row marks a byte-identical transcript.</p>
@@ -3835,7 +3839,7 @@ e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08  -
 </tr>
 <tr>
 <td>10</td>
-<td><code>solve --exit-status</code> or <code>ingest --exit-status</code> ended <code>CONFIRMED EFFECT (bundle)</code></td>
+<td><code>solve --exit-status</code> or <code>ingest --exit-status</code> ended <code>CONFIRMED EFFECT (bundle)</code> or <code>CONFIRMED EFFECT (isolation not measured)</code></td>
 </tr>
 <tr>
 <td>11</td>
