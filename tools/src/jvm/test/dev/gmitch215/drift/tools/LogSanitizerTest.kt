@@ -226,7 +226,7 @@ class LogSanitizerTest {
             " {\n" +
             "-\t\"version\": \"0.2.0\",\n" +
             "+\t\"version\": \"0.3.0\",\n" +
-            " \t\"author\": \"Gregory Mitchell <me@gmitch215.xyz>\",\n"
+            " \t\"author\": \"Gregory Mitchell <author@example.com>\",\n"
         val result = LogSanitizer.sanitizeDiff(raw)
         assertEquals(
             "diff --git a/package.json b/package.json\n" +

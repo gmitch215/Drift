@@ -1,0 +1,221 @@
+- path: .github/workflows/docs.yml
+  value: action@github.com
+  category: email
+  reason: public identity of the GitHub Actions bot
+- path: TECHNICAL_REPORT.md
+  value: 10.0.0.5
+  category: network
+  reason: example host in the serve host check description
+- path: bench/data/results/build-make-feature-1.json
+  value: bug-make@gnu.org
+  category: email
+  reason: public GNU make bug list address in recorded tool output
+- path: bench/triage/triage.json
+  value: 192.168.0.12
+  category: network
+  reason: synthetic address in a fixture issue body
+- path: bench/triage/triage.json
+  value: ghp_abcdefghijklmnopqrstuvwxyz0123456789
+  category: token
+  reason: fake alphabet token in a fixture issue body
+- path: fixtures/lab/*.json
+  value: /home/node
+  category: home-path
+  reason: account of the official node image, recorded in a lab capsule
+- path: fixtures/transcripts/sudo/*.txt
+  value: 172.17.0.2
+  category: network
+  reason: default Docker bridge address in a recorded transcript
+- path: fixtures/triage/w07-env-dump.md
+  value: ghp_abcdefghijklmnopqrstuvwxyz0123456789
+  category: token
+  reason: fake alphabet token in a synthetic issue
+- path: fixtures/triage/w10-dates-and-ids.md
+  value: 192.168.0.12
+  category: network
+  reason: synthetic address in a synthetic issue
+- path: 'build-core/src/test/kotlin/dev/gmitch215/drift/build/PrivacyTest.kt'
+  category: capture-attribute
+  reason: 'synthetic capture attribute in a test input'
+- path: 'build-core/src/test/kotlin/dev/gmitch215/drift/build/PrivacyTest.kt'
+  category: email
+  reason: 'synthetic address in a test input'
+- path: 'build-core/src/test/kotlin/dev/gmitch215/drift/build/PrivacyTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'build-core/src/test/kotlin/dev/gmitch215/drift/build/PrivacyTest.kt'
+  category: network
+  reason: 'synthetic private address in a test input'
+- path: 'build-core/src/test/kotlin/dev/gmitch215/drift/build/PrivacyTest.kt'
+  category: token
+  reason: 'fake token of a known shape fed to a redaction test'
+- path: 'cli/src/common/test/dev/gmitch215/drift/cli/DoctorCommandTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'cli/src/common/test/dev/gmitch215/drift/cli/DriftCommandTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'cli/src/common/test/dev/gmitch215/drift/cli/TriageCommandTest.kt'
+  category: token
+  reason: 'fake token of a known shape fed to a redaction test'
+- path: 'cli/src/common/test/dev/gmitch215/drift/cli/install/FakeInstallSystem.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'cli/src/common/test/dev/gmitch215/drift/cli/install/InstallerTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'cli/src/common/test/dev/gmitch215/drift/cli/install/LayoutTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'cli/src/common/test/dev/gmitch215/drift/cli/install/ProfileBlockTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'cli/src/common/test/dev/gmitch215/drift/cli/install/ReceiptTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'cli/src/common/test/dev/gmitch215/drift/cli/install/WindowsInstallTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'cli/src/common/test/dev/gmitch215/drift/cli/install/WindowsPathTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'cli/src/common/test/dev/gmitch215/drift/cli/serve/ListenersTest.kt'
+  category: network
+  reason: 'synthetic private address in a test input'
+- path: 'cli/src/common/test/dev/gmitch215/drift/cli/serve/ListenersTest.kt'
+  category: token
+  reason: 'fake token of a known shape fed to a redaction test'
+- path: 'cli/src/common/test/dev/gmitch215/drift/cli/serve/ServeCommandTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'cli/src/common/test/dev/gmitch215/drift/cli/serve/ServeCommandTest.kt'
+  category: network
+  reason: 'synthetic private address in a test input'
+- path: 'cli/src/common/test/dev/gmitch215/drift/cli/serve/StaticSiteTest.kt'
+  category: network
+  reason: 'synthetic private address in a test input'
+- path: 'cli/src/jvm/test/dev/gmitch215/drift/cli/install/UnsupportedInstallTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'cli/src/jvm/test/dev/gmitch215/drift/cli/serve/JvmServeTest.kt'
+  category: network
+  reason: 'synthetic private address in a test input'
+- path: 'cli/src/jvm/test/dev/gmitch215/drift/cli/serve/JvmServeTest.kt'
+  category: token
+  reason: 'fake token of a known shape fed to a redaction test'
+- path: 'core/src/common/test/dev/gmitch215/drift/AnonymizerTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'core/src/common/test/dev/gmitch215/drift/CapsuleTest.kt'
+  category: network
+  reason: 'synthetic private address in a test input'
+- path: 'core/src/common/test/dev/gmitch215/drift/CapsuleTest.kt'
+  category: token
+  reason: 'fake token of a known shape fed to a redaction test'
+- path: 'core/src/common/test/dev/gmitch215/drift/RankTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'core/src/common/test/dev/gmitch215/drift/ReproduceTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'core/src/common/test/dev/gmitch215/drift/SignatureTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'core/src/common/test/dev/gmitch215/drift/SignatureTest.kt'
+  category: network
+  reason: 'synthetic private address in a test input'
+- path: 'core/src/common/test/dev/gmitch215/drift/SignatureTest.kt'
+  category: token
+  reason: 'fake token of a known shape fed to a redaction test'
+- path: 'core/src/common/test/dev/gmitch215/drift/SymptomTest.kt'
+  category: token
+  reason: 'fake token of a known shape fed to a redaction test'
+- path: 'core/src/common/test/dev/gmitch215/drift/TriageTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'core/src/common/test/dev/gmitch215/drift/TriageTest.kt'
+  category: token
+  reason: 'fake token of a known shape fed to a redaction test'
+- path: 'host/src/common/test/dev/gmitch215/drift/host/SshHostTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'host/src/common/test/dev/gmitch215/drift/host/SshHostTest.kt'
+  category: network
+  reason: 'synthetic private address in a test input'
+- path: 'scan/src/common/test/dev/gmitch215/drift/scan/CaptureTest.kt'
+  category: email
+  reason: 'synthetic address in a test input'
+- path: 'scan/src/common/test/dev/gmitch215/drift/scan/CaptureTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'scan/src/common/test/dev/gmitch215/drift/scan/CaptureTest.kt'
+  category: token
+  reason: 'fake token of a known shape fed to a redaction test'
+- path: 'scan/src/common/test/dev/gmitch215/drift/scan/CiTest.kt'
+  category: email
+  reason: 'synthetic address in a test input'
+- path: 'scan/src/common/test/dev/gmitch215/drift/scan/CiTest.kt'
+  category: token
+  reason: 'fake token of a known shape fed to a redaction test'
+- path: 'scan/src/common/test/dev/gmitch215/drift/scan/ProjectScannerTest.kt'
+  category: email
+  reason: 'synthetic address in a test input'
+- path: 'scan/src/common/test/dev/gmitch215/drift/scan/SshCaptureTest.kt'
+  category: home-path
+  reason: 'placeholder account name in a synthetic test input'
+- path: 'studio/src/common/test/dev/gmitch215/drift/studio/ui/CiDiagnosisTest.kt'
+  category: token
+  reason: 'fake token of a known shape fed to a redaction test'
+- path: 'studio/src/jvm/test/dev/gmitch215/drift/studio/ui/CiScreenTest.kt'
+  category: token
+  reason: 'fake token of a known shape fed to a redaction test'
+- path: 'tools/src/jvm/test/dev/gmitch215/drift/tools/LogSanitizerTest.kt'
+  value: 'alice.smith@corp-internal.io'
+  category: email
+  reason: 'synthetic address in a test input'
+- path: 'tools/src/jvm/test/dev/gmitch215/drift/tools/LogSanitizerTest.kt'
+  value: 'bob@corp-internal.io'
+  category: email
+  reason: 'synthetic address in a test input'
+- path: 'tools/src/jvm/test/dev/gmitch215/drift/tools/LogSanitizerTest.kt'
+  value: 'pass@code.corp-internal.io'
+  category: email
+  reason: 'synthetic address in a test input'
+- path: 'tools/src/jvm/test/dev/gmitch215/drift/tools/LogSanitizerTest.kt'
+  value: 'dev@corp-internal.io'
+  category: email
+  reason: 'synthetic address in a test input'
+- path: 'tools/src/jvm/test/dev/gmitch215/drift/tools/LogSanitizerTest.kt'
+  category: network
+  reason: 'synthetic private address in a test input'
+- path: 'tools/src/jvm/test/dev/gmitch215/drift/tools/corpus/CorpusTest.kt'
+  category: network
+  reason: 'synthetic private address in a test input'
+- path: 'fixtures/projects/composer-real/composer.lock'
+  value: 'daniel@dantleech.com'
+  category: email
+  reason: 'public Packagist author metadata, copied verbatim from a real lockfile fixture read by the composer scanner tests'
+- path: 'fixtures/projects/composer-real/composer.lock'
+  value: 'ever.zet@gmail.com'
+  category: email
+  reason: 'public Packagist author metadata, copied verbatim from a real lockfile fixture read by the composer scanner tests'
+- path: 'fixtures/projects/composer-real/composer.lock'
+  value: 'fabien@symfony.com'
+  category: email
+  reason: 'public Packagist author metadata, copied verbatim from a real lockfile fixture read by the composer scanner tests'
+- path: 'fixtures/projects/composer-real/composer.lock'
+  value: 'lcobucci@gmail.com'
+  category: email
+  reason: 'public Packagist author metadata, copied verbatim from a real lockfile fixture read by the composer scanner tests'
+- path: 'fixtures/projects/composer-real/composer.lock'
+  value: 'maks.rafalko@gmail.com'
+  category: email
+  reason: 'public Packagist author metadata, copied verbatim from a real lockfile fixture read by the composer scanner tests'
+- path: 'fixtures/projects/composer-real/composer.lock'
+  value: 'marcello.duarte@gmail.com'
+  category: email
+  reason: 'public Packagist author metadata, copied verbatim from a real lockfile fixture read by the composer scanner tests'
+- path: 'fixtures/projects/composer-real/composer.lock'
+  value: 'sebastian@phpunit.de'
+  category: email
+  reason: 'public Packagist author metadata, copied verbatim from a real lockfile fixture read by the composer scanner tests'

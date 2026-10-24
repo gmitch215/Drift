@@ -7,6 +7,7 @@ Drift is a Kotlin Multiplatform application, version 1.0.0: the `drift` command 
 - `./gradlew build` runs tests for the targets the host can execute, spotless, the line-length check, the shared-ratio check, the coverage check and `:build-core:check`
 - `./gradlew spotlessApply` formats; `./format.sh` and `./check-format.sh` wrap spotless
 - `./gradlew checkLineLength` fails on any Kotlin line over the `.editorconfig` limit, with a tab counted to the next 4-column stop
+- `./gradlew checkPrivacy` scans the files git tracks for named home paths, e-mail addresses, token shapes, private network addresses and capture attributes that carry a user or host name, and fails on any hit not listed in `build-core/privacy-allow.yml` (each entry needs a reason, and an entry that matches nothing fails); it writes a masked report to `build/reports/privacy.txt` and never edits files
 - `./gradlew sharedRatio` prints common versus platform lines per module and enforces the floor, the `host` budget and a common-only `core`, and fails when the `data-shared-ratio` line in the README header is stale; `./gradlew sharedRatioReadme` rewrites that line
 - `./gradlew jvmJacocoAggregateReport verifyCoverage coverageSummary` writes `build/jacoco.xml`, `build/jacocoHtml` and `build/coverage/summary.txt`
 - `./gradlew :tools:buildCorpus`, `:tools:downloadCorpus` and `:tools:evalTriage` build, fetch by pinned SHA-256 and score the triage corpus (`-Pdrift.corpus=<file>` skips the download); none is part of `build`

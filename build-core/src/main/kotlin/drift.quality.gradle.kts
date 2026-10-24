@@ -1,6 +1,7 @@
 import dev.gmitch215.drift.build.CoverageModules
 import dev.gmitch215.drift.build.CoverageSummary
 import dev.gmitch215.drift.build.LineLengthTask
+import dev.gmitch215.drift.build.PrivacyTask
 import dev.gmitch215.drift.build.SharedRatioTask
 import dev.gmitch215.drift.build.VerifyCoverage
 import org.gradle.testing.jacoco.tasks.JacocoReport
@@ -43,6 +44,12 @@ val checkLineLength = tasks.register<LineLengthTask>("checkLineLength") {
     )
 }
 
+val checkPrivacy = tasks.register<PrivacyTask>("checkPrivacy") {
+    root = layout.projectDirectory
+    allowFile = layout.projectDirectory.file("build-core/privacy-allow.yml")
+    report = layout.buildDirectory.file("reports/privacy.txt")
+}
+
 val jvmModules = coverageModules.filter { file(it).isDirectory }
 
 val jvmJacocoAggregateReport = tasks.register<JacocoReport>("jvmJacocoAggregateReport") {
@@ -81,6 +88,7 @@ tasks.named("check") {
     dependsOn(
         sharedRatio,
         checkLineLength,
+        checkPrivacy,
         verifyCoverage,
         gradle.includedBuild("build-core").task(":check"),
     )
