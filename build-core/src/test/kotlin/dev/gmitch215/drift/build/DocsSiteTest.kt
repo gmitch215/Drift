@@ -41,6 +41,11 @@ class DocsSiteTest {
                     "and [more](#start-here).\n\n## What It Does\n\n## Install and Run\n\n" +
                     "## Try It\n",
             )
+            root.resolve("docs/manual").mkdirs()
+            root.resolve("docs/manual/home.png").writeBytes(byteArrayOf(7, 7))
+            root.resolve("MANUAL.md").writeText(
+                "# Studio Manual\n\n## Home\n\n![Home](docs/manual/home.png)\n",
+            )
             root.resolve("ADVANCED_USAGE.md").writeText(
                 "# Advanced Usage\n\n## Run It\n\nBack to [the report](TECHNICAL_REPORT.md).\n",
             )
@@ -81,9 +86,9 @@ class DocsSiteTest {
         r.assemble()
         assertEquals(
             setOf(
-                "index.html", "advanced-usage.html", "technical-report.html", "drift.png",
-                "drift_128.png", "drift.ico", "atlas/index.html", "engine/index.html", ".nojekyll",
-                "CNAME",
+                "index.html", "manual.html", "advanced-usage.html", "technical-report.html",
+                "docs/manual/home.png", "drift.png", "drift_128.png", "drift.ico",
+                "atlas/index.html", "engine/index.html", ".nojekyll", "CNAME",
             ),
             tree(r.out).keys,
         )
@@ -186,9 +191,12 @@ class DocsSiteTest {
         r.assemble()
         val front = r.html("index.html")
         assertFalse("rel=\"prev\"" in front)
-        assertTrue("href=\"advanced-usage.html\" rel=\"next\"" in front)
+        assertTrue("href=\"manual.html\" rel=\"next\"" in front)
+        val manual = r.html("manual.html")
+        assertTrue("href=\"index.html\" rel=\"prev\"" in manual)
+        assertTrue("href=\"advanced-usage.html\" rel=\"next\"" in manual)
         val usage = r.html("advanced-usage.html")
-        assertTrue("href=\"index.html\" rel=\"prev\"" in usage)
+        assertTrue("href=\"manual.html\" rel=\"prev\"" in usage)
         assertTrue("href=\"technical-report.html\" rel=\"next\"" in usage)
         val report = r.html("technical-report.html")
         assertTrue("href=\"advanced-usage.html\" rel=\"prev\"" in report)
@@ -227,7 +235,7 @@ class DocsSiteTest {
         assertTrue("<a href=\"advanced-usage.html\" aria-current=\"page\">Usage</a>" in usage)
         assertFalse("<a class=\"brand\" href=\"index.html\" aria-current" in usage)
         assertEquals(1, Regex("aria-current").findAll(usage.substringBefore("</nav>")).count())
-        for (label in listOf("Usage", "Report", "Atlas", "Engine", "GitHub")) {
+        for (label in listOf("Manual", "Usage", "Report", "Atlas", "Engine", "GitHub")) {
             assertTrue(">$label</a>" in usage, label)
         }
         assertTrue("<a href=\"atlas/#atlas\">Atlas</a>" in usage)
@@ -266,6 +274,24 @@ class DocsSiteTest {
         assertEquals(listOf<Byte>(9, 8), r.out.resolve("assets/shot.png").readBytes().toList())
         r.root.resolve("assets/shot.png").delete()
         failure(r, "assets/shot.png", "not a repository file")
+    }
+
+    @Test
+    fun theManualRendersAsItsOwnPageWithItsImagesAndANavEntry() {
+        val r = repo()
+        r.assemble()
+        val manual = r.html("manual.html")
+        assertTrue("<title>Studio Manual - Drift</title>" in manual, manual)
+        assertTrue("<img src=\"docs/manual/home.png\" alt=\"Home\" />" in manual)
+        assertEquals(
+            listOf<Byte>(7, 7),
+            r.out.resolve("docs/manual/home.png").readBytes().toList(),
+        )
+        assertTrue("<a href=\"manual.html\" aria-current=\"page\">Manual</a>" in manual)
+        assertTrue("<a href=\"manual.html\">Manual</a>" in r.html("index.html"))
+        assertEquals(0, SiteLinks.scan(r.out).broken.size)
+        r.root.resolve("docs/manual/home.png").delete()
+        failure(r, "MANUAL.md", "docs/manual/home.png", "not a repository file")
     }
 
     @Test
@@ -383,6 +409,14 @@ class DocsSiteTest {
         val hrefs = Regex("href=\"[^\"]*\"").findAll(front).joinToString { it.value }
         assertFalse("ADVANCED_USAGE.md" in hrefs)
         assertTrue("<h2 id=\"command-index\">" in out.resolve("advanced-usage.html").readText())
+        val manual = out.resolve("manual.html").readText()
+        assertTrue("<h2 id=\"retaking-screenshots\">" in manual)
+        val shots = repo.resolve("docs/manual").listFiles { f -> f.extension == "png" }!!
+        assertTrue(shots.size >= 12, shots.size.toString())
+        for (shot in shots) {
+            assertTrue("docs/manual/${shot.name}" in manual, shot.name)
+            assertTrue(out.resolve("docs/manual/${shot.name}").isFile, shot.name)
+        }
         for (page in DocsSiteBuilder.PAGES) {
             val html = out.resolve(page.file).readText()
             assertFalse("<!--" in html, page.file)

@@ -107,6 +107,12 @@ object DocsSiteBuilder {
             front = true,
         ),
         DocsPage(
+            "MANUAL.md",
+            "manual.html",
+            "Studio Manual",
+            "What each Studio screen shows and how to use it, with screenshots.",
+        ),
+        DocsPage(
             "ADVANCED_USAGE.md",
             "advanced-usage.html",
             "Advanced Usage",
@@ -121,6 +127,7 @@ object DocsSiteBuilder {
     )
 
     private val NAV = listOf(
+        Triple("Manual", "manual.html", "What each Studio screen shows, with pictures."),
         Triple("Usage", "advanced-usage.html", "Every command and flag, with real output."),
         Triple("Report", "technical-report.html", "The design, the evidence and the numbers."),
         Triple("Atlas", "atlas/#atlas", "Kotlin behavior recorded per target, with Studio."),
@@ -334,7 +341,7 @@ object DocsSiteBuilder {
         val steps = STEPS.joinToString("\n") { (label, href, text) ->
             "<li>${card(label, href, text)}</li>"
         }
-        val more = NAV.drop(2).joinToString("\n") { (label, href, text) -> card(label, href, text) }
+        val more = NAV.drop(3).joinToString("\n") { (label, href, text) -> card(label, href, text) }
         val logo = "<img src=\"drift.png\" alt=\"\" width=\"96\" height=\"96\">"
         return "<div class=\"hero\">\n$logo\n" +
             "<h1>Drift</h1>\n<p class=\"lead\">${SiteRender.escape(tagline)}</p>\n</div>\n" +
