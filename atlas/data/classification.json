@@ -214,7 +214,15 @@
 			"references": [
 				{
 					"url": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/uppercase.html",
-					"quote": "This function supports one-to-many and many-to-one character mapping, thus the length of the returned string can be different from the length of the original string."
+					"quote": "This function supports one-to-many and many-to-one character mapping, thus the length of the returned string can be different from the length of the original string.",
+					"decides": [
+						"upper-sharp-s",
+						"upper-n-apostrophe",
+						"upper-j-caron",
+						"upper-iota-tonos",
+						"upper-ligature-fi",
+						"upper-greek-iota-sub"
+					]
 				}
 			],
 			"searched": "No tracker was searched. Pages read in full: Kotlin String.uppercase (one-to-many mapping allowed) and Char.uppercaseChar (one-to-one only). Source read: TeaVM 0.15.0 (the version bytebox 1.0.3 pins) TString.toUpperCase and toLowerCase (lines 741 to 860) map each UTF-16 unit with TCharacter.toUpperCase and toLowerCase.",
@@ -1612,7 +1620,10 @@
 			"references": [
 				{
 					"url": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.math/pow.html",
-					"quote": "b.pow(NaN) is NaN"
+					"quote": "b.pow(NaN) is NaN",
+					"decides": [
+						"1^nan"
+					]
 				},
 				{
 					"url": "https://developer.android.com/reference/java/lang/Math",
@@ -1734,7 +1745,12 @@
 			"references": [
 				{
 					"url": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.math/round-to-int.html",
-					"quote": "Rounds this Double value to the nearest integer and converts the result to Int"
+					"quote": "Rounds this Double value to the nearest integer and converts the result to Int",
+					"decides": [
+						"0.49999999999999994",
+						"4503599627370497",
+						"float-8388609"
+					]
 				}
 			],
 			"issues": [
@@ -1941,7 +1957,10 @@
 			"references": [
 				{
 					"url": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-u-long/to-double.html",
-					"quote": "The resulting value is the closest Double to this ULong value."
+					"quote": "The resulting value is the closest Double to this ULong value.",
+					"decides": [
+						"ulong-max-double"
+					]
 				},
 				{
 					"url": "https://www.oracle.com/java/technologies/javase/19-relnote-issues.html",
@@ -2481,11 +2500,18 @@
 				},
 				{
 					"url": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/compare-to.html",
-					"quote": "If ignoreCase is true, the result of Char.uppercaseChar().lowercaseChar() on each character is compared."
+					"quote": "If ignoreCase is true, the result of Char.uppercaseChar().lowercaseChar() on each character is compared.",
+					"decides": [
+						"compare-ignore-case-sigma"
+					]
 				},
 				{
 					"url": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/equals.html",
-					"quote": "If ignoreCase is true, the result of Char.uppercaseChar().lowercaseChar() on each character is compared."
+					"quote": "If ignoreCase is true, the result of Char.uppercaseChar().lowercaseChar() on each character is compared.",
+					"decides": [
+						"dotless-i-vs-I",
+						"final-sigma"
+					]
 				}
 			],
 			"searched": "No tracker was searched. Pages read in full: Kotlin Comparable.compareTo, String.compareTo and String.equals (ignoreCase). Source read: TeaVM 0.15.0 (the version bytebox 1.0.3 pins) TString.equalsIgnoreCase (line 687) and compareToIgnoreCase (line 260), which lower-case each UTF-16 unit and never upper-case first.",
@@ -2681,7 +2707,10 @@
 				},
 				{
 					"url": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/lowercase.html",
-					"quote": "Returns a copy of this string converted to lower case using Unicode mapping rules of the invariant locale."
+					"quote": "Returns a copy of this string converted to lower case using Unicode mapping rules of the invariant locale.",
+					"decides": [
+						"deseret-lower"
+					]
 				}
 			],
 			"searched": "No tracker was searched. Pages read in full: Kotlin Comparable.compareTo, String.reversed (\"characters\", no statement on surrogate pairs) and String.lowercase. Source read: TeaVM 0.15.0 (the version bytebox 1.0.3 pins) TAbstractStringBuilder.reverse (line 746; swaps char units), TString.toLowerCase (line 741) and toUpperCase (line 808); both scan UTF-16 units and return the string unchanged when no unit changes.",

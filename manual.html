@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Studio Manual - Drift</title>
+        <meta name="description" content="What each Studio screen shows and how to use it, with screenshots." />
+        <link rel="icon" href="drift.ico" sizes="any" />
+        <link rel="icon" href="drift_128.png" type="image/png" sizes="128x128" />
+        <link rel="apple-touch-icon" href="drift.png" />
+        <meta property="og:title" content="Studio Manual - Drift" />
+        <meta property="og:description" content="What each Studio screen shows and how to use it, with screenshots." />
+        <meta property="og:image" content="https://drift.gmitch215.dev/drift.png" />
+        <style>
+            :root {
+                color-scheme: light dark;
+                --canvas: #fcfbfe;
+                --surface: #ffffff;
+                --line: #e4def0;
+                                --fg: #1d1a26;
+                --muted: #5b556b;
+                --accent: #8a63f0;
+                --accent-text: #6b3fd4;
+                --tint: #efe8fb;
+                --radius: 6px;
+                --u: 4px;
+            }
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --canvas: #110e17;
+                    --surface: #191521;
+                    --line: #2b2438;
+                    --fg: #ece9f3;
+                    --muted: #a69fb8;
+                    --accent: #9d7bf5;
+                    --accent-text: #b99cff;
+                    --tint: #2a2140;
+                }
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                padding: 0 calc(var(--u) * 4) calc(var(--u) * 20);
+                background: var(--canvas);
+                color: var(--fg);
+                font:
+                    16px/1.65 ui-sans-serif,
+                    system-ui,
+                    -apple-system,
+                    'Segoe UI',
+                    Roboto,
+                    sans-serif;
+                overflow-wrap: break-word;
+            }
+            main,
+            nav .bar,
+            footer {
+                max-width: 52rem;
+                margin: 0 auto;
+            }
+            a:focus-visible {
+                outline: 2px solid var(--accent-text);
+                outline-offset: 2px;
+                border-radius: var(--radius);
+            }
+            nav {
+                margin: 0 calc(var(--u) * -4) calc(var(--u) * 8);
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border-bottom: 1px solid var(--line);
+                background: var(--surface);
+            }
+            nav .bar {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: var(--u) calc(var(--u) * 4);
+            }
+            nav a {
+                color: var(--muted);
+                font-size: 14px;
+                text-decoration: none;
+            }
+            nav a:hover,
+            nav a[aria-current] {
+                color: var(--accent-text);
+            }
+            nav a[aria-current] {
+                text-decoration: underline;
+                text-decoration-color: var(--accent);
+                text-decoration-thickness: 2px;
+                text-underline-offset: 0.5em;
+            }
+            nav a.brand {
+                display: flex;
+                align-items: center;
+                gap: calc(var(--u) * 2);
+                margin-right: auto;
+                color: var(--fg);
+                font-size: 16px;
+                font-weight: 600;
+            }
+            nav a.brand[aria-current] {
+                color: var(--fg);
+                text-decoration: none;
+            }
+            nav a.brand img {
+                width: 28px;
+                height: 28px;
+            }
+            h1 {
+                margin: 0 0 calc(var(--u) * 4);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .hero {
+                margin: 0 0 calc(var(--u) * 8);
+            }
+            .hero img {
+                display: block;
+                margin: 0 0 calc(var(--u) * 4);
+            }
+            .hero h1 {
+                margin: 0 0 var(--u);
+                font-size: 32px;
+                line-height: 40px;
+            }
+            .hero .lead {
+                margin: 0;
+                color: var(--muted);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .steps,
+            .links {
+                display: grid;
+                gap: calc(var(--u) * 3);
+                grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+                margin: 0 0 calc(var(--u) * 4);
+                padding: 0;
+                list-style: none;
+            }
+            .steps {
+                counter-reset: step;
+            }
+            .links {
+                margin-bottom: calc(var(--u) * 12);
+            }
+            .steps li {
+                display: flex;
+                counter-increment: step;
+            }
+            a.card {
+                display: block;
+                flex: 1;
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: var(--surface);
+                color: inherit;
+                text-decoration: none;
+            }
+            a.card:hover {
+                border-color: var(--accent);
+            }
+            a.card strong {
+                display: block;
+                color: var(--accent-text);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .steps a.card strong::before {
+                content: counter(step) '. ';
+            }
+            a.card span {
+                color: var(--muted);
+                font-size: 14px;
+                line-height: 22px;
+            }
+
+            .readme h2 {
+                margin: calc(var(--u) * 12) 0 calc(var(--u) * 3);
+                padding-bottom: calc(var(--u) * 2);
+                border-bottom: 1px solid var(--line);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .readme h3 {
+                margin: calc(var(--u) * 8) 0 calc(var(--u) * 2);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .readme h4 {
+                margin: calc(var(--u) * 6) 0 calc(var(--u) * 2);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .readme a {
+                color: var(--accent-text);
+                text-underline-offset: 0.2em;
+            }
+            .readme hr {
+                margin: calc(var(--u) * 12) 0;
+                border: 0;
+                border-top: 1px solid var(--line);
+            }
+            .readme blockquote {
+                margin: calc(var(--u) * 6) 0;
+                padding: var(--u) 0 var(--u) calc(var(--u) * 4);
+                border-left: 3px solid var(--accent);
+                color: var(--muted);
+            }
+            .readme ul,
+            .readme ol {
+                padding-left: calc(var(--u) * 6);
+            }
+            .readme li {
+                margin: calc(var(--u) * 1.5) 0;
+            }
+            .readme code {
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            }
+            .readme :not(pre) > code {
+                padding: 0.15em 0.4em;
+                border-radius: var(--radius);
+                background: var(--tint);
+                color: var(--accent-text);
+                font-size: 13px;
+                overflow-wrap: anywhere;
+            }
+            .readme pre {
+                margin: calc(var(--u) * 5) 0;
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                overflow-x: auto;
+                background: var(--surface);
+                font-size: 13px;
+                line-height: 20px;
+            }
+            .readme pre code {
+                display: block;
+            }
+            .readme .table {
+                overflow-x: auto;
+                margin: calc(var(--u) * 5) 0;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+            }
+            .readme table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 14px;
+                line-height: 22px;
+            }
+            .readme th,
+            .readme td {
+                padding: calc(var(--u) * 2) calc(var(--u) * 3);
+                border-bottom: 1px solid var(--line);
+                text-align: left;
+                vertical-align: top;
+            }
+            .readme th {
+                background: var(--tint);
+                font-weight: 600;
+            }
+            .readme tbody tr:last-child td {
+                border-bottom: 0;
+            }
+            .readme img {
+                max-width: 100%;
+            }
+
+            .pager {
+                display: flex;
+                flex-wrap: wrap;
+                gap: calc(var(--u) * 3);
+                margin: calc(var(--u) * 12) 0 0;
+            }
+            .pager a.card {
+                min-width: 13rem;
+            }
+            .pager a.next {
+                margin-left: auto;
+                text-align: right;
+            }
+            .pager a.card span {
+                display: block;
+                font-size: 12px;
+                line-height: 18px;
+            }
+            .pager a.card strong {
+                font-size: 16px;
+            }
+
+            footer {
+                margin-top: calc(var(--u) * 16);
+                padding-top: calc(var(--u) * 6);
+                border-top: 1px solid var(--line);
+                color: var(--muted);
+                font-size: 14px;
+            }
+            footer a {
+                color: inherit;
+            }
+        </style>
+    </head>
+    <body>
+        <nav>
+            <div class="bar"><a class="brand" href="index.html"><img src="drift_128.png" alt="" width="28" height="28">Drift</a>
+<a href="manual.html" aria-current="page">Manual</a>
+<a href="advanced-usage.html">Usage</a>
+<a href="technical-report.html">Report</a>
+<a href="atlas/#atlas">Atlas</a>
+<a href="engine/">Engine</a>
+<a href="https://github.com/gmitch215/Drift">GitHub</a></div>
+        </nav>
+        <main>
+            
+            <div class="readme"><h1 id="studio-manual">Studio Manual</h1>
+<p>Studio is the Drift app. It shows what the <code>drift</code> command shows, with buttons instead of flags. This
+manual walks through each screen in the order you meet it, with a picture of each. The pictures are
+of the web build, taken in a desktop-sized window (1280 by 800 pixels) and, for the first two
+screens, in a phone-sized one (390 by 844).</p>
+<p>Studio only reads. It never changes your files and never sends anything anywhere. Every screen has a
+one-paragraph explanation at the top, and a line that starts with &quot;What to do next&quot;.</p>
+<h2 id="opening-studio">Opening Studio</h2>
+<p>There are three ways in. They show the same screens.</p>
+<ul>
+<li>
+<p><strong>In a browser.</strong> Go to <a href="https://drift.gmitch215.dev/atlas/">https://drift.gmitch215.dev/atlas/</a>. Nothing to install. Add <code>#atlas</code> to
+the address to start on the Atlas tab.</p>
+</li>
+<li>
+<p><strong>From your machine, with <code>drift serve</code>.</strong> <code>drift serve</code> is a small web server that is built into
+the <code>drift</code> command. It serves a Studio web build from a directory, on your own computer only. Build
+the directory once, then serve it:</p>
+<pre><code class="language-sh">./gradlew :cli:stageStudio
+drift serve --dir cli/build/serve/studio
+</code></pre>
+<p>Open the address it prints, for example <code>http://localhost:8080/</code>. The <a href="index.html#studio-on-the-web">README</a>
+and the <a href="advanced-usage.html#serve">usage guide</a> list the flags.</p>
+</li>
+<li>
+<p><strong>As a desktop app.</strong> From a clone of the repository, <code>./gradlew :studio:run</code> starts Studio in a
+window. <code>drift open FILE.driftcase</code> opens a saved case in it.</p>
+</li>
+</ul>
+<p>The screenshots here are the web build. The desktop app was not photographed; its file choosers
+are the operating system's own.</p>
+<h2 id="home">Home</h2>
+<p><img src="docs/manual/home.png" alt="The Home screen" /></p>
+<p>Home is the first screen. Each box is a way in, with one line on what it does and one button.
+<strong>Open a Case</strong> reads a saved investigation from a file. <strong>Try a Sample</strong> uses recorded runs that
+come with Studio. The next four boxes open Upgrade, Contract, Bisect and Set. <strong>Browse the Atlas</strong>
+opens the Atlas.</p>
+<p>If you have nothing to open yet, choose <strong>Show a Sample</strong>. It needs no file.</p>
+<p>The row of buttons at the top (Home, Atlas, Investigation, Upgrade, Contract, Bisect, Set) stays on
+every screen. A Case button joins the row once you open a case. On a phone the row wraps onto
+several lines and the boxes stack in one column.</p>
+<p><img src="docs/manual/home-phone.png" alt="Home on a phone" /></p>
+<h2 id="investigation">Investigation</h2>
+<p><img src="docs/manual/investigation.png" alt="The Investigation screen with one difference selected" /></p>
+<p>Choose <strong>Show a Sample</strong> on Home to open this screen. It is titled &quot;What Changed Between Two Runs&quot;.
+A capsule is a file that records one environment: the operating system, tool versions, environment
+variables (secret values hidden) and the results of small checks. The sample holds capsules from
+four real CI runs, which are automated test runs on a server. One run passed. The other three
+failed, and each is compared with the passing one.</p>
+<p>What to do:</p>
+<ol>
+<li>Read the Result box. It states in one sentence what Drift found.</li>
+<li>Pick another failing run with the <strong>Failing Run</strong> buttons if you want to compare a different one.</li>
+<li>Select a difference in the list. Its box opens to show the setting's name and the evidence.</li>
+<li>Choose <strong>Show 6 More Differences</strong> to see the rest, and <strong>Show Technical Details</strong> to see how
+Drift narrowed the list down.</li>
+</ol>
+<p>The sample result reads &quot;Drift cannot name one cause: 9 differences tie for the top place&quot;. That
+means nine settings changed between the two runs, the data cannot tell them apart, and Drift
+declines to pick one. The list is ordered by evidence level, from level 1 (Difference: it differs, and
+no rule or check points at it) up to level 4 (Known). The screen says &quot;This is a ranking, not a
+confirmed cause.&quot;</p>
+<h2 id="atlas">Atlas</h2>
+<p>The Atlas is a table of what small Kotlin programs print on each target. A target is a platform
+that Kotlin builds for, such as the JVM, native code or WebAssembly. A probe is one of those small
+programs. Each row is a probe, and each column is a target. The Atlas screen is titled &quot;Kotlin
+Across Targets&quot;.</p>
+<h3 id="device-column">Device Column</h3>
+<p><img src="docs/manual/atlas-device.png" alt="The Atlas with the This Device panel" /></p>
+<p>Studio runs every probe on your own device when it opens, and adds the result as the first
+column, <strong>Device</strong>. The <strong>This Device</strong> panel above the table summarizes it. In the picture, 6
+probes match every column, 32 match some columns and 0 match no column. Under that, a line
+per target counts how many of the 38 probes behave like it, for example &quot;wasm-chromium: 37 of 38
+probes match&quot;.</p>
+<p>The Device vs column in the table lists which targets print the same text as your device for that
+probe. A <code>=</code> in a target cell means the same as this device, and <code>!=</code> means different.</p>
+<p>What to do:</p>
+<ol>
+<li>Pick a Kotlin version with the <strong>Kotlin Version</strong> buttons.</li>
+<li>Choose <strong>Run on This Device</strong> to measure again. The panel shows how long the run took.</li>
+<li>Choose <strong>Only Differences</strong> to hide the probes that print the same on every target.</li>
+<li>Select a probe name to see its source and the values on each target.</li>
+<li>Choose <strong>Save Device Transcript</strong> or <strong>Show Device Transcript</strong> to get the raw measurement.</li>
+</ol>
+<p><img src="docs/manual/atlas-device-phone.png" alt="The Atlas on a phone" /></p>
+<p>A difference between targets says nothing yet about a cause. Each probe row also carries a label
+such as &quot;documented&quot; (the Kotlin documentation explains the difference), &quot;platform-defined&quot; or
+&quot;unclassified: no explanation found&quot;.</p>
+<h3 id="guess-the-result">Guess the Result</h3>
+<p><img src="docs/manual/atlas-guess.png" alt="A Guess the Result question after an answer" /></p>
+<p>Choose <strong>Guess the Result</strong> next to <strong>Compare Targets</strong> to switch the screen to a quiz. Each question
+shows a probe's source code and asks what it prints on one target, for example &quot;What does android
+print?&quot; Pick one of the printed outputs, A to D, or <strong>I Don't Know</strong>. Studio then shows which
+targets print each answer, whether you were right, and the reference behind the classification. The
+score line at the top counts correct, wrong and skipped answers. <strong>Next Probe</strong> moves on.</p>
+<h2 id="case">Case</h2>
+<p><img src="docs/manual/case-summary.png" alt="The Case screen with a solved case" /></p>
+<p>A case is a saved investigation: a <code>.driftcase</code> file written by <code>drift solve</code>. Drift compared a
+passing and a failing environment, then re-ran the failing command with differences changed one at a
+time. Studio reads that record and re-runs nothing.</p>
+<p>To open one, choose <strong>Choose a Case File</strong> on Home and pick a file. The repository holds some in
+<a href="https://github.com/gmitch215/Drift/tree/master/fixtures/lab/cases">fixtures/lab/cases</a>; the picture shows <code>runtime-node-api-1.driftcase</code>.</p>
+<p>The Case Summary has these parts:</p>
+<ul>
+<li><strong>What Drift Found</strong> is the verdict in one sentence. Here the node version and the environment
+variable <code>NODE_VERSION</code> together cause the failure, and Drift cannot say which of the two matters
+because they changed together.</li>
+<li><strong>How Sure Drift Is</strong> gives the counts behind the verdict: with the failing values put in, 5 of 5
+runs failed, and with the passing values put back, 0 of 5 did.</li>
+<li><strong>What to Try</strong> is the next step to take.</li>
+<li><strong>What Differed</strong> lists the settings that changed, with the cause first.</li>
+</ul>
+<h3 id="file-check">File Check</h3>
+<p><img src="docs/manual/case-certificate.png" alt="The File Check on a case" /></p>
+<p>A certificate is the record of every run in a solve and its verdict, kept inside the <code>.driftcase</code>
+file. Studio's name for the check of that record is <strong>File Check</strong>. It recomputes every count and
+verdict from the file itself and does not run anything again. &quot;This file is intact: every check
+passed&quot; means the numbers in the file agree with each other. A changed or cut-off file shows the check
+that failed instead. <strong>Show Technical Details</strong> lists every check.</p>
+<h2 id="set">Set</h2>
+<p><img src="docs/manual/set.png" alt="The Set screen with a sample set" /></p>
+<p>Choose <strong>Set</strong> at the top. The screen is titled &quot;Find What Separates Passing from Failing&quot;. Given
+capsules from several passing runs and several failing ones, it lists the setting values that the
+failing capsules hold and the passing ones do not.</p>
+<p>What to do:</p>
+<ol>
+<li>Build the set. <strong>Add a Passing Capsule</strong> and <strong>Add a Failing Capsule</strong> open a file chooser. To
+try it without files, choose <strong>Use the Sample Set for Node.js and npm versions</strong>.</li>
+<li>Read the Result box. In the picture, one setting separates the groups: the node version 22.4.0,
+held by both failing capsules and neither passing one.</li>
+<li>Read the ranked list below it. Each entry says how many failing and passing capsules hold that
+value.</li>
+<li>Choose <strong>Clear the Set</strong> to start again.</li>
+</ol>
+<p>A setting that separates the set is a suspect, not a confirmed cause, because with few capsules several
+settings can change together.</p>
+<h2 id="upgrade">Upgrade</h2>
+<p><img src="docs/manual/upgrade.png" alt="The Upgrade screen with a result" /></p>
+<p>The Upgrade screen is titled &quot;Check an Upgrade&quot;. It reads a capsule and lists documented changes that
+would break that environment if you moved to the versions you type, such as a removed feature.</p>
+<p>What to do:</p>
+<ol>
+<li>Under <strong>1. Choose a Capsule</strong>, choose a file, or choose <strong>Use the Sample drupal-10-site</strong>.</li>
+<li>Under <strong>2. Choose Versions to Move To</strong>, type <code>name=version</code> pairs separated by commas, such as
+<code>php=8.3,drupal=11</code>, or choose one of the <strong>Common moves</strong> buttons.</li>
+<li>Choose <strong>Check the Upgrade</strong>.</li>
+</ol>
+<p>The result says how many documented changes may break the environment and how many apply to the
+versions you chose. The screen warns that a quiet result does not show a move is safe: many rules
+describe a move in one direction only, and Drift has no rule for features that a newer version only
+adds. A line such as &quot;73 of 426 rules read a setting you moved&quot; tells you how much of the rule set
+looked at your change.</p>
+<h2 id="contract">Contract</h2>
+<p><img src="docs/manual/contract.png" alt="The Contract screen with a failing result" /></p>
+<p>The Contract screen is titled &quot;Check a Contract&quot;. A contract lists what a program needs from its
+environment, as requirements that every known passing run meets. Drift checks a capsule against each
+requirement.</p>
+<p>What to do:</p>
+<ol>
+<li>Under <strong>1. Choose a Contract</strong>, choose a file, or choose <strong>Use a Sample Contract</strong>.</li>
+<li>Under <strong>2. Choose a Capsule to Check</strong>, choose a file, or choose one of the sample runs.</li>
+<li>The result appears as soon as both are chosen.</li>
+</ol>
+<p>The result counts requirements that hold, break, or could not be checked. In the picture the sample
+contract has one requirement, the CI setting <code>provisioner.build-date</code>, and the failing run breaks
+it. Each broken requirement shows what the contract requires and what the capsule has.</p>
+<h2 id="bisect">Bisect</h2>
+<p><img src="docs/manual/bisect.png" alt="The Bisect screen with a plan" /></p>
+<p>The Bisect screen is titled &quot;Plan a Bisect&quot;. A passing and a failing environment can differ in many
+settings. A bisection finds the smallest group of them that still makes the job fail, by testing
+the passing environment with some settings changed to their failing values. Studio shows the plan and
+runs nothing.</p>
+<p>What to do:</p>
+<ol>
+<li>Under <strong>1. Choose the Passing Capsule</strong>, choose a file or the sample passing run.</li>
+<li>Under <strong>2. Choose the Failing Capsule</strong>, choose a file or one of the sample failing runs.</li>
+<li>Read the plan. In the picture, 9 settings differ and the first test changes 4 of them.</li>
+</ol>
+<p>Settings Drift thinks likelier to matter are listed first. To carry the plan out, use <code>drift bisect</code>
+(see <a href="advanced-usage.html#bisect">Bisect</a> in the usage guide).</p>
+<h2 id="retaking-screenshots">Retaking Screenshots</h2>
+<p>Every image comes from one Studio web build. After a Studio change, rebuild and retake the pictures
+with these steps.</p>
+<p>Build the bundle with <code>./gradlew :studio:wasmJsBrowserDistribution</code>. Serve
+<code>studio/build/dist/wasmJs/productionExecutable</code> on loopback, for example with
+<code>python3 -m http.server 8765 --bind 127.0.0.1</code> run in that directory, and open
+<code>http://127.0.0.1:8765/</code>. Set the window to the viewport in the table with the device pixel ratio at 1,
+so a 1280 by 800 window gives a 1280 by 800 file. Take viewport screenshots only. Use only the
+sample data and the repository fixture below.</p>
+<p>Studio draws on a canvas, so the page does not scroll with the normal wheel in some automation tools. The
+rows marked &quot;scrolled&quot; need the page moved down by the stated number of wheel steps of 150 pixels.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>File</th>
+<th>Viewport</th>
+<th>Start</th>
+<th>State and clicks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>home.png</code></td>
+<td>1280 x 800</td>
+<td><code>/</code></td>
+<td>Home, nothing clicked.</td>
+</tr>
+<tr>
+<td><code>home-phone.png</code></td>
+<td>390 x 844</td>
+<td><code>/</code></td>
+<td>Home on a mobile viewport, after a reload.</td>
+</tr>
+<tr>
+<td><code>investigation.png</code></td>
+<td>1280 x 800</td>
+<td><code>/</code></td>
+<td><strong>Show a Sample</strong>, then select the first difference (&quot;Node version&quot;).</td>
+</tr>
+<tr>
+<td><code>atlas-device.png</code></td>
+<td>1280 x 800</td>
+<td><code>/</code></td>
+<td><strong>Atlas</strong> tab. Wait for &quot;measured in&quot; to appear in the This Device panel.</td>
+</tr>
+<tr>
+<td><code>atlas-device-phone.png</code></td>
+<td>390 x 844</td>
+<td><code>/</code></td>
+<td><strong>Atlas</strong> tab on a mobile viewport, then scrolled 4 steps so the This Device panel shows.</td>
+</tr>
+<tr>
+<td><code>atlas-guess.png</code></td>
+<td>1280 x 800</td>
+<td><code>/</code></td>
+<td><strong>Atlas</strong> tab, <strong>Guess the Result</strong>, scrolled 8 steps, choose answer B, then scrolled up 30 and down 4 steps.</td>
+</tr>
+<tr>
+<td><code>case-summary.png</code></td>
+<td>1280 x 800</td>
+<td><code>/</code></td>
+<td><strong>Choose a Case File</strong> with <code>fixtures/lab/cases/runtime-node-api-1.driftcase</code>.</td>
+</tr>
+<tr>
+<td><code>case-certificate.png</code></td>
+<td>1280 x 800</td>
+<td><code>/</code></td>
+<td>The same case, scrolled 5 steps so File Check shows.</td>
+</tr>
+<tr>
+<td><code>set.png</code></td>
+<td>1280 x 800</td>
+<td><code>/</code></td>
+<td><strong>Set</strong> tab, <strong>Use the Sample Set for Node.js and npm versions</strong>.</td>
+</tr>
+<tr>
+<td><code>upgrade.png</code></td>
+<td>1280 x 800</td>
+<td><code>/</code></td>
+<td><strong>Upgrade</strong> tab, <strong>Use the Sample drupal-10-site</strong>, <strong>PHP 8.3 and Drupal 11</strong>, <strong>Check the Upgrade</strong>.</td>
+</tr>
+<tr>
+<td><code>contract.png</code></td>
+<td>1280 x 800</td>
+<td><code>/</code></td>
+<td><strong>Contract</strong> tab, <strong>Use a Sample Contract</strong>, <strong>Use Failing Run 36995781138</strong>.</td>
+</tr>
+<tr>
+<td><code>bisect.png</code></td>
+<td>1280 x 800</td>
+<td><code>/</code></td>
+<td><strong>Bisect</strong> tab, <strong>Use Passing Run 36702683742</strong>, <strong>Use Failing Run 36995781138</strong>.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Check each new image by eye for a user name, host name, absolute path or bookmark bar before keeping it.
+Keep each file under about 400 KB.</p>
+<h2 id="claims-to-check">Claims to Check</h2>
+<p>Each sentence below states something this manual says that a later change to Studio could make false.</p>
+<ul>
+<li>Studio reads files and sends nothing anywhere (the Atlas footer says so on screen).</li>
+<li>The Home screen has boxes titled Open a Case, Try a Sample, Check an Upgrade, Check a Contract, Plan a Bisect, Compare a Set and Browse the Atlas.</li>
+<li>The top row has the buttons Home, Atlas, Investigation, Upgrade, Contract, Bisect and Set, and a Case button once a case is open.</li>
+<li><strong>Show a Sample</strong> opens the Investigation screen with three failing runs compared with passing run 36702683742.</li>
+<li>The sample investigation says that 9 differences tie for the top place and that the first is the node version.</li>
+<li>The Atlas measures the device when Studio opens, and <strong>Run on This Device</strong> measures again.</li>
+<li>On Kotlin 2.4.20 the Atlas reports 32 of 38 probes differing between targets.</li>
+<li><strong>Guess the Result</strong> shows a probe's source, four lettered answers and <strong>I Don't Know</strong>, and a score line.</li>
+<li><code>fixtures/lab/cases/runtime-node-api-1.driftcase</code> opens as a case that names the node version and <code>NODE_VERSION</code> together as the cause, with 5 of 5 failing runs and 0 of 5 after the fix.</li>
+<li>File Check on that case reads &quot;This file is intact: every check passed&quot;.</li>
+<li>The sample set for Node.js and npm versions has 4 capsules and one separating setting, the node version 22.4.0.</li>
+<li>Upgrade accepts <code>name=version</code> pairs and has a Common moves row with PHP 8.3 and PHP 8.3 and Drupal 11.</li>
+<li>With the sample drupal-10-site and <code>php=8.3,drupal=11</code>, the upgrade result reads &quot;73 of 426 rules read a setting you moved&quot;.</li>
+<li>With the sample contract and Failing Run 36995781138, Contract reports 1 requirement and 1 break.</li>
+<li>With the two sample runs named above, Bisect reports 9 settings that differ and a first test that changes 4.</li>
+<li>The web build is served at <a href="https://drift.gmitch215.dev/atlas/">https://drift.gmitch215.dev/atlas/</a> and by <code>drift serve --dir cli/build/serve/studio</code> after <code>./gradlew :cli:stageStudio</code>.</li>
+</ul></div>
+            <div class="pager">
+<a class="card" href="index.html" rel="prev"><span>Prev</span><strong>Drift</strong></a>
+<a class="card next" href="advanced-usage.html" rel="next"><span>Next</span><strong>Advanced Usage</strong></a>
+</div>
+        </main>
+        <footer>
+            <a href="https://github.com/gmitch215/Drift">github.com/gmitch215/Drift</a> &middot;
+            <a href="https://github.com/gmitch215/Drift/blob/master/LICENSE">MIT License</a>
+        </footer>
+    </body>
+</html>

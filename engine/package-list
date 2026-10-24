@@ -16,6 +16,7 @@ dev.gmitch215.drift.contract
 dev.gmitch215.drift.delta
 dev.gmitch215.drift.diff
 dev.gmitch215.drift.hash
+dev.gmitch215.drift.help
 dev.gmitch215.drift.history
 dev.gmitch215.drift.json
 dev.gmitch215.drift.know
@@ -27,6 +28,7 @@ dev.gmitch215.drift.rank
 dev.gmitch215.drift.redact
 dev.gmitch215.drift.set
 dev.gmitch215.drift.spectrum
+dev.gmitch215.drift.stats
 dev.gmitch215.drift.studio
 dev.gmitch215.drift.symptom
 dev.gmitch215.drift.triage
@@ -36,6 +38,8 @@ dev.gmitch215.drift.host
 module:scan
 dev.gmitch215.drift.scan
 dev.gmitch215.drift.scan.atlas
+dev.gmitch215.drift.scan.ci
+dev.gmitch215.drift.scan.handsoff
 dev.gmitch215.drift.scan.probe
 dev.gmitch215.drift.scan.probe.kotlin
 dev.gmitch215.drift.scan.project

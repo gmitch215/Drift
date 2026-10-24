@@ -309,6 +309,7 @@
     <body>
         <nav>
             <div class="bar"><a class="brand" href="index.html"><img src="drift_128.png" alt="" width="28" height="28">Drift</a>
+<a href="manual.html">Manual</a>
 <a href="advanced-usage.html">Usage</a>
 <a href="technical-report.html" aria-current="page">Report</a>
 <a href="atlas/#atlas">Atlas</a>
@@ -378,7 +379,7 @@
 </tr>
 <tr>
 <td>Rules</td>
-<td>298 in 27 folders: 207 active and 91 <code>pending-scanner</code>; 913 fixtures (303 positive, 610 negative); 338 cited sources (210 distinct)</td>
+<td>426 in 51 folders: 375 active and 51 <code>pending-scanner</code>; 1481 fixtures (465 positive, 1016 negative); 494 cited sources (313 distinct)</td>
 <td><code>rules/**/*.yml</code></td>
 </tr>
 <tr>
@@ -412,13 +413,13 @@
 <td><code>bench/data</code></td>
 </tr>
 <tr>
-<td>Ranker on the 45 dev scenarios that have a cause, with probes</td>
-<td>top-1 21 of 45 (Wilson 95% interval 0.33 to 0.61); random order expects 16.3; exact P = 0.018. Top-3 29 of 45 against 25.9 expected, P = 0.009</td>
+<td>Ranker on the 105 dev scenarios that have a cause and probed captures, with probes</td>
+<td>top-1 46 of 105 (Wilson 95% interval 0.35 to 0.53); random order expects 36.2; exact P = 0.0012. Top-3 67 of 105 against 57.0 expected, P = 0.00002</td>
 <td><code>evaluation.json</code></td>
 </tr>
 <tr>
 <td><code>plausible</code> or <code>known</code> top candidate wrong</td>
-<td>10 of 49 dev scenarios (0.11 to 0.34); 14 of 25 <code>plausible</code> candidates</td>
+<td>25 of 115 dev scenarios (0.15 to 0.30); 40 of 62 <code>plausible</code> candidates</td>
 <td>same</td>
 </tr>
 <tr>
@@ -578,7 +579,7 @@
 </tr>
 </tbody>
 </table></div>
-<p>The remaining directories are data and delivery, not modules: <code>rules</code> (298 YAML rule files in 27 folders), <code>triage</code> (the corpus manifest and the claim-check labels), <code>notices</code> (third-party notices that ship in every artifact), <code>atlas</code> (the hand-maintained classification of every Atlas probe), <code>fixtures</code> (recorded capsules, Atlas transcripts, solved cases, project trees, issue bodies and upgrade-check captures), <code>packaging</code> (templates for the Homebrew and Chocolatey packages), <code>assets</code> (the icon), and <code>install.sh</code> and <code>install.ps1</code> at the root. <code>.github/release</code> holds the scripts the release workflow runs. The version is <code>version=1.0.0</code> in <code>gradle.properties</code>; <code>core</code> embeds it for <code>--version</code>, the Studio and Android packages read it, and the Xcode project carries its own copy of the marketing version.</p>
+<p>The remaining directories are data and delivery, not modules: <code>rules</code> (426 YAML rule files in 51 folders), <code>triage</code> (the corpus manifest and the claim-check labels), <code>notices</code> (third-party notices that ship in every artifact), <code>atlas</code> (the hand-maintained classification of every Atlas probe), <code>fixtures</code> (recorded capsules, Atlas transcripts, solved cases, project trees, issue bodies and upgrade-check captures), <code>packaging</code> (templates for the Homebrew and Chocolatey packages), <code>assets</code> (the icon), and <code>install.sh</code> and <code>install.ps1</code> at the root. <code>.github/release</code> holds the scripts the release workflow runs. The version is <code>version=1.0.0</code> in <code>gradle.properties</code>; <code>core</code> embeds it for <code>--version</code>, the Studio and Android packages read it, and the Xcode project carries its own copy of the marketing version.</p>
 <p><strong>Toolchain.</strong> Drift builds with Kotlin 2.4.20, Gradle 9.8.0 and, for <code>androidApp</code>, AGP 9.4.1, on JDK 21 in every workflow. The <a href="https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html">Kotlin Multiplatform compatibility guide</a> lists Kotlin 2.4.20 and 2.4.21 with Gradle 7.6.3 to 9.7.0 and AGP 8.5.2 to 9.3.1 (read 2026-10-13). Drift's Gradle and AGP are newer than that range, so the combination is outside what the guide lists; <code>build.yml</code>, <code>atlas.yml</code> and <code>docs.yml</code> build and test on it without a failure, on Linux, macOS and Windows runners. Nothing more than that is claimed for it.</p>
 <p>Sources sit at <code>src/&lt;set&gt;/main</code> and <code>src/&lt;set&gt;/test</code>. The shared-code ratio counts non-comment lines under <code>src/common/main</code> against every other source set's <code>main</code>.</p>
 <div class="table"><table>
@@ -635,7 +636,7 @@
 </tr>
 </tbody>
 </table></div>
-<p><code>host</code> is where the platform code lives, at 545 of its 545-line budget, and its own shared share is 43.7%. The budget was 400 until the process runners were rewritten and 630 after: the POSIX runner (<code>fork</code> and <code>execvp</code> with a drained pipe, shared by Linux and macOS in one intermediate source set), the Windows <code>CreateProcessW</code> runner with batch-file escaping, and the JVM child wrapper account for the 230 added lines, which fixed a hang in which a grandchild holding the output pipe blocked the run forever. It dropped to 545 when the host class that wraps the native runners, the environment parsing, the wait-status decoding, the <code>PATH</code> search and the chunked file read moved into common code. <code>cli</code> holds the per-target file, binary file and stdout writers and the installer and server actuals: the registry and process code for Windows, the profile edits on Unix, the sockets of <code>serve</code> for POSIX and Winsock, and the OpenSSL loader; its share is 72.1%. The listener setup, the send loop, PEM decoding, address text and the cleanup command line are common. The total is 91.1% and the floor is 80%. <code>bench</code> keeps its platform lines in JVM-only code: YAML reading, scenario preparation, result ingest and an exact binomial test with <code>BigInteger</code>.</p>
+<p><code>host</code> is where the platform code lives, at 545 of its 545-line budget, and its own shared share is 43.7%. The budget was 400 until the process runners were rewritten and 630 after: the POSIX runner (<code>posix_spawn</code> through a small cinterop definition, with a drained pipe, shared by Linux and macOS in one intermediate source set; it replaced a <code>fork</code> whose child could stop before <code>execvp</code> while another thread was collecting garbage), the Windows <code>CreateProcessW</code> runner with batch-file escaping, and the JVM child wrapper account for the 230 added lines, which fixed a hang in which a grandchild holding the output pipe blocked the run forever. It dropped to 545 when the host class that wraps the native runners, the environment parsing, the wait-status decoding, the <code>PATH</code> search and the chunked file read moved into common code. <code>cli</code> holds the per-target file, binary file and stdout writers and the installer and server actuals: the registry and process code for Windows, the profile edits on Unix, the sockets of <code>serve</code> for POSIX and Winsock, and the OpenSSL loader; its share is 72.1%. The listener setup, the send loop, PEM decoding, address text and the cleanup command line are common. The total is 91.1% and the floor is 80%. <code>bench</code> keeps its platform lines in JVM-only code: YAML reading, scenario preparation, result ingest and an exact binomial test with <code>BigInteger</code>.</p>
 <p>JVM line coverage comes from JaCoCo. No coverage tool exists for Kotlin/Native or Wasm in Kotlin 2.4.20, so no coverage figure exists for those targets. The same common tests run on them.</p>
 <div class="table"><table>
 <thead>
@@ -946,7 +947,7 @@
 <p>Each changed path maps to one of 14 dimensions by longest matching prefix: <code>os</code>, <code>kernel</code>, <code>cpu</code>, <code>cpu-limit</code>, <code>memory</code>, <code>runtime</code>, <code>compiler</code>, <code>build</code>, <code>userland</code>, <code>env</code>, <code>locale</code>, <code>limits</code>, <code>network</code> and <code>browser</code>. For example <code>tool.node.</code> is <code>runtime</code>, <code>tool.npm.</code> and <code>deps.</code> and <code>ci.</code> are <code>build</code>, <code>env.TZ</code> is <code>locale</code>, and <code>env.HTTPS_PROXY</code> is <code>network</code>. A path no prefix claims has no dimension; it is listed under <code>changes</code> and never ranked. <a href="advanced-usage.html#attribute-prefixes">ADVANCED_USAGE.md</a> holds the full prefix table. Probe ids map the same way, so a probe that differs in a dimension can support a candidate in that dimension.</p>
 <hr />
 <h2 id="rules-and-provenance">Rules and Provenance</h2>
-<p>A rule records a documented difference between two environments that can break software. The catalog has 298 rules in <code>rules/**/*.yml</code>, one folder per subject (27 folders), each with a mechanism, one or more symptoms, a matcher, fixtures and cited sources. 207 are <code>active</code>. The other 91 are <code>pending-scanner</code>: they read an attribute that no scanner emits yet (a database server version, the TLS versions a peer offers, a browser name, a source-level key), they are compiled and checked like the rest, and they never match a capture that lacks the attribute. <code>RuleCatalogTest</code> prints the keys they are waiting for.</p>
+<p>A rule records a documented difference between two environments that can break software. The catalog has 426 rules in <code>rules/**/*.yml</code>, one folder per subject (51 folders), each with a mechanism, one or more symptoms, a matcher, fixtures and cited sources. 375 are <code>active</code>. The other 51 are <code>pending-scanner</code>: they read an attribute that no scanner emits yet (a database server version, the TLS versions a peer offers, a browser name, a source-level key), they are compiled and checked like the rest, and they never match a capture that lacks the attribute. <code>RuleCatalogTest</code> prints the keys they are waiting for.</p>
 <p>A rule file has <code>schema: 1</code>, an <code>id</code> equal to the file name, a <code>title</code>, <code>applies</code> (dimension ids), <code>difference</code>, <code>symptoms</code>, <code>mechanism</code> (one sentence), <code>detect</code>, <code>severity</code> (<code>low</code>, <code>medium</code>, <code>high</code>), <code>provenance</code>, <code>fixtures</code> and <code>status</code> (<code>active</code> or <code>pending-scanner</code>). A symptom has a <code>basis</code>: <code>verified</code> when the cited source states the symptom, <code>inferred</code> when it only states the mechanism, <code>range</code> when it lists a compatible or tested range and states no failure. The matcher is a small language over a passing side <code>a</code> and a failing side <code>b</code>: <code>eq</code>, <code>ne</code>, <code>in</code>, <code>has</code>, <code>starts</code>, <code>ver</code> (version ranges), <code>present</code>, <code>changed</code> (with a trailing <code>*</code>), and <code>all</code>, <code>any</code>, <code>not</code>, to a depth of 8. This is a rule from the catalog:</p>
 <pre><code class="language-yaml">id: node-localhost-ipv6-first
 applies:
@@ -963,7 +964,7 @@ detect:
 severity: medium
 </code></pre>
 <p>Rule files are YAML because people maintain them by hand. snakeyaml-engine 3.2 parses them at build time under the failsafe schema, so every scalar is a string (<code>1.20</code>, <code>no</code>, <code>0o17</code> and <code>~</code> stay strings), and <code>embedRules</code> writes the JSON that <code>core</code> reads. Common code never parses YAML. A stray <code>rules/**/*.json</code> fails the build, and the embedded JSON was byte-identical to what the earlier JSON catalog produced when the format changed (32 of 32 rules at that time).</p>
-<p>The checker, <code>Constraints.check</code>, runs in the <code>core</code> test suite, so on every build. It validates each rule (id shape, non-empty fields, one-sentence mechanism, dimension ids, provenance, fixtures), requires unique ids, requires every positive fixture to match and every negative fixture not to match, and lists every <code>pending-scanner</code> rule (91 today). A scan-side test (<code>RuleCatalogTest</code>) checks that every attribute path an active rule reads is one that capture or a scanner emits, and that a pending rule reads at least one that none emits.</p>
+<p>The checker, <code>Constraints.check</code>, runs in the <code>core</code> test suite, so on every build. It validates each rule (id shape, non-empty fields, one-sentence mechanism, dimension ids, provenance, fixtures), requires unique ids, requires every positive fixture to match and every negative fixture not to match, and lists every <code>pending-scanner</code> rule (51 today). A scan-side test (<code>RuleCatalogTest</code>) checks that every attribute path an active rule reads is one that capture or a scanner emits, and that a pending rule reads at least one that none emits.</p>
 <div class="table"><table>
 <thead>
 <tr>
@@ -974,36 +975,36 @@ severity: medium
 <tbody>
 <tr>
 <td>rules, active / pending-scanner</td>
-<td>298: 207 / 91</td>
+<td>426: 375 / 51</td>
 </tr>
 <tr>
 <td>severity high / medium / low</td>
-<td>85 / 166 / 47</td>
+<td>132 / 239 / 55</td>
 </tr>
 <tr>
 <td>fixtures, positive / negative</td>
-<td>303 / 610</td>
+<td>465 / 1016</td>
 </tr>
 <tr>
 <td>cited sources</td>
-<td>338 entries, 210 distinct locations</td>
+<td>494 entries, 313 distinct locations</td>
 </tr>
 <tr>
-<td>source kinds: measurement / vendor-doc / release-note / spec</td>
-<td>14 / 138 / 145 / 41</td>
+<td>source kinds: measurement / vendor-doc / release-note / spec / report</td>
+<td>19 / 205 / 197 / 72 / 1</td>
 </tr>
 <tr>
-<td>symptoms, <code>verified</code> / <code>inferred</code></td>
-<td>86 / 233</td>
+<td>symptoms, <code>verified</code> / <code>inferred</code> / <code>range</code></td>
+<td>133 / 265 / 52</td>
 </tr>
 <tr>
 <td>rules with at least one <code>inferred</code> symptom</td>
-<td>230</td>
+<td>262</td>
 </tr>
 </tbody>
 </table></div>
 <p>A matched rule gives a candidate the <code>known</code> tier and a weight by severity, with its mechanism text attached. A rule whose matcher touches no changed attribute is listed as unattached and never dropped.</p>
-<p>The rule sources are cited and not reproduced. The fixtures are synthetic pairs written to exercise the matcher. They show that the rule fires on the stated versions and stays quiet on others; they do not show that the failure occurs. The 335 provenance entries name 208 distinct locations: 207 web URLs and 1 <code>fixture:</code> reference, which the verifier skips. <code>tools</code> includes a verifier that fetches each distinct web URL and records the HTTP status. Its unit tests use a fake fetcher. A run against the network covered 3 URLs when it was written (all 3 returned HTTP 200). A run over all 207 web URLs is not recorded. An HTTP 200 shows the page exists, not that the quoted section still does. Most symptoms are <code>inferred</code> (232 of 316): the cited page states the mechanism, and the symptom is what that mechanism implies.</p>
+<p>The rule sources are cited and not reproduced. The fixtures are synthetic pairs written to exercise the matcher. They show that the rule fires on the stated versions and stays quiet on others; they do not show that the failure occurs. The 494 provenance entries name 313 distinct locations: 309 web URLs and 4 <code>fixture:</code> references, which the verifier skips. <code>tools</code> includes a verifier that fetches each distinct web URL and records the HTTP status. Its unit tests use a fake fetcher. A run against the network covered 3 URLs when it was written (all 3 returned HTTP 200). A run over all 309 web URLs is not recorded. An HTTP 200 shows the page exists, not that the quoted section still does. Most symptoms are <code>inferred</code> (265 of 450): the cited page states the mechanism, and the symptom is what that mechanism implies.</p>
 <p><strong>Catalog by subject.</strong></p>
 <div class="table"><table>
 <thead>
@@ -1020,34 +1021,64 @@ severity: medium
 </thead>
 <tbody>
 <tr>
-<td><code>browser</code></td>
-<td>2</td>
-<td>1</td>
-<td>1</td>
-<td><code>libc</code></td>
-<td>6</td>
-<td>3</td>
-<td>3</td>
-</tr>
-<tr>
-<td><code>clang</code></td>
-<td>5</td>
+<td><code>angular</code></td>
 <td>4</td>
-<td>1</td>
+<td>4</td>
+<td>0</td>
 <td><code>network</code></td>
 <td>4</td>
 <td>3</td>
 <td>1</td>
 </tr>
 <tr>
-<td><code>composer</code></td>
+<td><code>astro</code></td>
 <td>3</td>
 <td>3</td>
 <td>0</td>
+<td><code>nextjs</code></td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>browser</code></td>
+<td>4</td>
+<td>3</td>
+<td>1</td>
 <td><code>node</code></td>
 <td>18</td>
 <td>17</td>
 <td>1</td>
+</tr>
+<tr>
+<td><code>clang</code></td>
+<td>5</td>
+<td>4</td>
+<td>1</td>
+<td><code>npm-native</code></td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>composer</code></td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
+<td><code>numpy</code></td>
+<td>6</td>
+<td>6</td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>dart</code></td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td><code>nuxt</code></td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
 </tr>
 <tr>
 <td><code>database</code></td>
@@ -1056,8 +1087,18 @@ severity: medium
 <td>13</td>
 <td><code>os-image</code></td>
 <td>25</td>
-<td>17</td>
-<td>8</td>
+<td>20</td>
+<td>5</td>
+</tr>
+<tr>
+<td><code>django</code></td>
+<td>6</td>
+<td>6</td>
+<td>0</td>
+<td><code>pandas</code></td>
+<td>4</td>
+<td>4</td>
+<td>0</td>
 </tr>
 <tr>
 <td><code>do-sqlite</code></td>
@@ -1066,38 +1107,88 @@ severity: medium
 <td>0</td>
 <td><code>php</code></td>
 <td>35</td>
-<td>33</td>
-<td>2</td>
+<td>35</td>
+<td>0</td>
 </tr>
 <tr>
 <td><code>docker</code></td>
 <td>7</td>
 <td>0</td>
 <td>7</td>
-<td><code>python</code></td>
-<td>29</td>
-<td>25</td>
-<td>4</td>
+<td><code>prisma</code></td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
 </tr>
 <tr>
 <td><code>drupal</code></td>
 <td>21</td>
-<td>8</td>
 <td>13</td>
-<td><code>runner</code></td>
-<td>7</td>
+<td>8</td>
+<td><code>pydantic</code></td>
 <td>4</td>
+<td>4</td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>elixir</code></td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td><code>python</code></td>
+<td>29</td>
+<td>28</td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>expo-react-native</code></td>
 <td>3</td>
+<td>3</td>
+<td>0</td>
+<td><code>pytorch</code></td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>fastapi</code></td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
+<td><code>r</code></td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
 </tr>
 <tr>
 <td><code>filesystem</code></td>
 <td>4</td>
+<td>1</td>
+<td>3</td>
+<td><code>react-router</code></td>
+<td>2</td>
+<td>2</td>
 <td>0</td>
-<td>4</td>
+</tr>
+<tr>
+<td><code>flask</code></td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+<td><code>runner</code></td>
+<td>11</td>
+<td>11</td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>flutter</code></td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
 <td><code>spring</code></td>
 <td>3</td>
-<td>2</td>
-<td>1</td>
+<td>3</td>
+<td>0</td>
 </tr>
 <tr>
 <td><code>gcc</code></td>
@@ -1106,8 +1197,8 @@ severity: medium
 <td>1</td>
 <td><code>symfony</code></td>
 <td>17</td>
-<td>7</td>
-<td>10</td>
+<td>17</td>
+<td>0</td>
 </tr>
 <tr>
 <td><code>git</code></td>
@@ -1131,29 +1222,59 @@ severity: medium
 </tr>
 <tr>
 <td><code>gradle</code></td>
-<td>12</td>
-<td>11</td>
-<td>1</td>
-<td><code>tz</code></td>
-<td>5</td>
+<td>13</td>
+<td>13</td>
 <td>0</td>
-<td>5</td>
+<td><code>typo3</code></td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
 </tr>
 <tr>
 <td><code>jdk</code></td>
 <td>35</td>
-<td>27</td>
-<td>8</td>
+<td>33</td>
+<td>2</td>
+<td><code>tz</code></td>
+<td>5</td>
+<td>5</td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>julia</code></td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td><code>vite</code></td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>kotlin</code></td>
+<td>72</td>
+<td>72</td>
+<td>0</td>
+<td><code>wordpress</code></td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>laravel</code></td>
+<td>4</td>
+<td>4</td>
+<td>0</td>
 <td><code>workerd</code></td>
 <td>3</td>
 <td>3</td>
 <td>0</td>
 </tr>
 <tr>
-<td><code>kotlin</code></td>
-<td>20</td>
-<td>20</td>
-<td>0</td>
+<td><code>libc</code></td>
+<td>6</td>
+<td>3</td>
+<td>3</td>
 <td></td>
 <td></td>
 <td></td>
@@ -1161,9 +1282,9 @@ severity: medium
 </tr>
 <tr>
 <td>total</td>
-<td>298</td>
-<td>207</td>
-<td>91</td>
+<td>426</td>
+<td>375</td>
+<td>51</td>
 <td></td>
 <td></td>
 <td></td>
@@ -1562,10 +1683,10 @@ verify: failed at manifest: results/0001.json was changed; expected 5f6997c647d8
 <h2 id="upgrade-check">Upgrade Check</h2>
 <p><code>drift upgrade-check [CAPSULE] --to php=8.3,drupal=11</code> asks what a move to other versions breaks, from one capsule and no second environment. It copies the capsule, sets the target keys on the copy, and evaluates every rule against that synthetic pair with the same engine that <code>diagnose</code> uses. A target name is one of 19 aliases for an attribute path (<code>agp</code>, <code>composer</code>, <code>docker</code>, <code>drupal</code>, <code>git</code>, <code>go</code>, <code>gradle</code>, <code>java</code>, <code>jdk</code>, <code>kotlin</code>, <code>node</code>, <code>npm</code>, <code>openssl</code>, <code>php</code>, <code>python</code>, <code>ruby</code>, <code>symfony</code>, <code>twig</code>, <code>tzdata</code>), or a dotted path. Without a capsule the command captures this machine with <code>--tools --project</code>.</p>
 <p>The result has five groups (four, plus the group below that is printed only when it has findings), taken from the three-valued verdicts of the matcher and not from a new score. <strong>Will break</strong> is a rule that matches on a fact beyond the target version keys, such as a package in the lockfile or a call in the source; the finding prints that fact on an <code>evidence:</code> line. <strong>Version boundary crossed</strong> is a rule that matches on the target versions alone: a documented change lies between the two versions, and nothing in the capsule shows that the project meets it. <strong>May break</strong> is a rule whose verdict is unknown because another key it reads is missing from the capsule or is one no scanner emits yet, and the output names the key (and says when the rule is <code>pending-scanner</code>). <strong>Outside the tested range</strong> is a rule that matches and whose symptoms all have the basis <code>range</code>: a compatibility table lists the supported versions (Kotlin Multiplatform against Gradle and AGP, AGP against Gradle and the maximum API level) and says nothing about a failure outside them, so the move is untested and not known to break. <strong>Unknown</strong> is a target whose current value the capsule lacks. A rule is listed only when its verdict for the target differs from its verdict for the capsule alone. The order inside a group is severity, verified symptoms before inferred ones, then rule id, and the JSON form is canonical, schema 2.</p>
-<p>On the real capture <code>fixtures/upgrade-check/drupal-10-php-8-1.json</code> (the Composer fixture inside <code>php:8.1-cli-bookworm</code>: PHP 8.1.34, Drupal 10.3.6, Symfony 6.4.12), <code>--to php=8.3,drupal=11,symfony=7.1</code> gives 0 will break, 7 may break, 2 version boundary and 0 unknown, and 73 of the 298 rules read a target key. The output is byte-identical on the JVM and macOS builds, and <code>UpgradeCheckTest</code> (19 tests) and <code>UpgradeCheckCommandTest</code> (9) run on all three Gradle targets.</p>
+<p>On the real capture <code>fixtures/upgrade-check/drupal-10-php-8-1.json</code> (the Composer fixture inside <code>php:8.1-cli-bookworm</code>: PHP 8.1.34, Drupal 10.3.6, Symfony 6.4.12), <code>--to php=8.3,drupal=11,symfony=7.1</code> gives 0 will break, 3 may break, 2 version boundary and 0 unknown, and 83 of the 426 rules read a target key. The output is byte-identical on the JVM and macOS builds, and <code>UpgradeCheckTest</code> (19 tests) and <code>UpgradeCheckCommandTest</code> (9) run on all three Gradle targets.</p>
 <p><strong>What it got wrong.</strong> The first version put every version-only match under Will break. Case D (below) ran it before a PHP 7.4 to 8.3 move: 11 will-break findings and 1 may-break, and none of them was a failure in the project's own test suite (0 true positives, 12 false positives). The suite passed on PHP 8.3. What did break the move was not predicted: a locked package with a PHP upper bound stopped the install, and a locked package that lacks a PHP 8.1 tentative return type died with a fatal error. No rule covers either. The group split and the evidence requirement are the response, and the same capture now gives 0 will break, 1 may break, 11 version boundary and 0 unknown. That is a change of wording, not a better prediction: the 11 are still not failures, and the frozen prediction in <code>fixtures/cases/d</code> is unchanged.</p>
 <p><strong>A second check.</strong> On the four migration scenarios of DriftBench, moving the green arm to the red arm's version put a will-break finding on the injected version key in 3 of 4 scenarios, and in 2 of 4 in the natural direction (the red arm to the new version). Both counts are weak: any finding on the version key counts, and at that time none named the injected API (0 of 4). Added-API rules (36, one per call such as <code>json_validate</code>, <code>Array.fromAsync</code> or <code>List.getFirst</code>) then raised the API-level hits to 4 of 4, but only in the direction where side b has the older runtime, which is the CI-older-than-local shape; an upgrade runs the other way, and those rules do not fire for it.</p>
-<p><strong>Limits.</strong> A quiet result does not show that a move is safe: the catalog holds documented changes, 91 of its 298 rules wait for a key no scanner emits, and a project that uses a removed API without a rule for it is invisible. The direction of a rule is the direction of its text (<code>a</code> is the passing side), and a rule written for a downgrade can match an upgrade only by accident. <code>--learned DIR</code> adds the rules published by <code>drift triage</code> (see Triage and the Corpus).</p>
+<p><strong>Limits.</strong> A quiet result does not show that a move is safe: the catalog holds documented changes, 51 of its 426 rules wait for a key no scanner emits, and a project that uses a removed API without a rule for it is invisible. The direction of a rule is the direction of its text (<code>a</code> is the passing side), and a rule written for a downgrade can match an upgrade only by accident. <code>--learned DIR</code> adds the rules published by <code>drift triage</code> (see Triage and the Corpus).</p>
 <hr />
 <h2 id="triage-and-the-corpus">Triage and the Corpus</h2>
 <p><code>drift triage ISSUE_FILE</code> reads the text of an issue offline, with no model, and says what it can about the reporter's environment: facts as Drift attribute keys, each with a confidence, the rules that apply, statements that contradict what Drift knows, and a draft rule when the report suggests one. The same text gives the same bytes on the JVM, Native and Wasm builds, since the arithmetic is integer and the scanning has no regular expressions. A fact has a side (<code>passing</code> or <code>failing</code>) taken from the verdict word nearest the value, a path that says how it was found, and a confidence. The paths start at <code>section</code> 0.950 (the first line under an issue-form heading), <code>tool-output</code> 0.900, <code>pattern</code> 0.700 (0.800 under an environment heading) and <code>key-value</code> 0.490, and the agreement of two spans raises a value while a conflict or a hedge lowers it. Rules that match are listed with the facts they read. A draft rule needs a symptom signature, one version key stated on both sides with the passing version below the failing one, and no rule that already holds on that key. It is published, not only drafted, when <code>--publish-threshold</code> is set, its confidence reaches it, <code>--date</code> names the day the report was read, and the rule passes the rule compiler and its own fixtures. Published drafts go into a learned-rule store (<code>--learned DIR</code>, validated by the rule compiler on every read, never a shipped id) that <code>diagnose</code>, <code>upgrade-check</code> and <code>triage</code> read. Secrets are masked first with the capture redactor, and an <code>@login</code> mention becomes a hash.</p>
@@ -2270,6 +2391,73 @@ controls: 8 lines are the same on every target
 <p>The <code>bench</code> harness (<code>Observe.kt</code>, <code>Evaluate.kt</code>) runs the real <code>Ranker</code> on the capsule pair of each of the 49 dev scenarios and compares the result with the injected cause. The input that matters is the probed pair: the passing and the failing baseline that <code>solve</code> captured inside its containers with <code>capture --probes</code> (71 probes each, stored in <code>bench/data/probed/</code>). 45 scenarios have a cause (4 are controls). On the probed pairs the ranker produced 99 candidates, 29 of them the cause. In 14 of the 49 scenarios a probe differs between the two sides, which links 20 candidates to a probe that reads their attribute. Only four probes ever differ in these pairs (<code>resources.locale-env</code> in 7 scenarios, <code>resources.cgroup-memory</code> in 6, <code>process.timezone</code> in 5, <code>resources.cgroup-cpu</code> in 4), and each reads exactly the attribute that changed (<code>env.LANG</code>, <code>cgroup.memory.max</code>, <code>env.TZ</code>, <code>cgroup.cpu.max</code>). Seven scenarios now match a catalog rule (<code>runtime-java-virtual-basic-1</code>, <code>compiler-c2x-plain-2</code>, <code>os-distro-family-basic-1</code>, <code>os-glibc-floor-1</code> and three of the four migration scenarios). None matched one when the catalog held 32 rules, so an earlier version of this report said that no dev scenario matches a rule; that sentence is false for the current catalog of 296. Two comparison inputs share the harness: the same pairs with the probes removed, which gives a paired measurement of what probes do, and the original capsules the scenarios were validated with (no probes, 106 candidates, 33 of them the cause). The probed pairs come from the <code>reproduce</code> containers, so the five scenarios whose cause a container cannot set (kernel, CPU model, browser engine) have no candidates in them; the original capsules keep those.</p>
 <p>Folds are the first four bytes of <code>sha256(&quot;fold:&quot; + id)</code> mod 5. A model replaces the shipped one only if its out-of-fold Brier score is at least 2% lower and its out-of-fold MRR is not lower, and the Brier score is taken over the rankings that print a probability (those whose candidates all rest on attribute changes, 30 candidates).</p>
 <p>The calibration files were regenerated on 2026-10-13 after the dev split grew from 45 to 49 scenarios (four migration scenarios, see DriftBench) and the catalog from 32 to 296 rules. The weights table did not change, and <code>selection.chosen</code> is still <code>hand-set+softmax-none</code>. <code>evaluation.json</code> is <code>4effe497...e374</code> and <code>fit.json</code> is <code>fbbb6f45...4a31</code>; <code>CalibrationTest</code> regenerates both and compares bytes.</p>
+<p><strong>Complete dev set.</strong> The committed calibration files now cover 115 of the 122 dev scenarios, the ones that have probed captures; 105 of the 115 have a cause and 10 are controls. The other seven (<code>build-checksum-pin-1</code> and <code>-2</code>, <code>build-version-pin-1</code> and <code>-2</code>, <code>network-hosts-stale-1</code> and <code>-2</code>, <code>network-nsswitch-order-1</code>) read a file the harness mounts, which a container built from a capsule does not have, so <code>solve</code> cannot capture them. <code>Lab.UNPROBED</code> lists them and the probed lab leaves them out of every section, including <code>original</code>. <code>evaluation.json</code> is <code>030fdf04...31a5</code> and <code>fit.json</code> is <code>25eb0d75...d524</code>, and two regenerations gave identical bytes. The paragraphs from here to the end of this section describe the earlier run on 49 scenarios, so their figures differ from the ones below.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>order, probed input, 105 scenarios with a cause</th>
+<th>top-1</th>
+<th>top-3</th>
+<th>MRR</th>
+<th>P, top-1 / top-3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>random (expected)</td>
+<td>36.2 (0.344)</td>
+<td>57.0 (0.543)</td>
+<td>0.457</td>
+<td></td>
+</tr>
+<tr>
+<td>diff order, alphabetical</td>
+<td>43 of 105</td>
+<td>58 of 105</td>
+<td>0.499</td>
+<td></td>
+</tr>
+<tr>
+<td>dimension prior</td>
+<td>50 of 105</td>
+<td>67 of 105</td>
+<td>0.553</td>
+<td></td>
+</tr>
+<tr>
+<td>rules only</td>
+<td>48 of 105</td>
+<td>65 of 105</td>
+<td>0.543</td>
+<td></td>
+</tr>
+<tr>
+<td>hand-set (shipped)</td>
+<td>46 of 105 (0.35 to 0.53)</td>
+<td>67 of 105 (0.54 to 0.72)</td>
+<td>0.532</td>
+<td>0.0012 / 0.00002</td>
+</tr>
+<tr>
+<td>hand-set, probes removed</td>
+<td>48 of 105</td>
+<td>67 of 105</td>
+<td>0.543</td>
+<td>0.0001 / 0.00002</td>
+</tr>
+<tr>
+<td>hand-set, original capsules</td>
+<td>58 of 105</td>
+<td>81 of 105</td>
+<td>0.661</td>
+<td>0.00015 / 0.00003</td>
+</tr>
+</tbody>
+</table></div>
+<p>The shipped order does not beat the dimension prior. In the template-clustered bootstrap (10,000 resamples, seed 20261006, 77 templates), shipped minus dimension prior is -0.038 at top-1 (-0.101 to 0.019), 0.000 at top-3 (-0.028 to 0.029) and -0.021 in MRR (-0.060 to 0.014). Against alphabetical order the top-1 gain is 0.029 (-0.110 to 0.165), so its interval includes zero, and the top-3 gain is 0.086 (0.000 to 0.180). Probes still help no scenario: the same two scenarios move down (<code>env-pool-size-decoy-2</code>, <code>migration-python-copy-1</code>), and top-1 is 48 without probes and 46 with them.</p>
+<p>Tiers of the shipped ranker: <code>difference</code> holds 271 candidates and 39 are the cause (0.14; 0.11 to 0.19), <code>plausible</code> 62 and 22 (0.35; 0.25 to 0.48), <code>known</code> 13 and 10 (0.77; 0.50 to 0.92). A <code>plausible</code> or <code>known</code> top candidate is wrong in 25 of 115 scenarios (0.15 to 0.30), 43 of 75 confident candidates are wrong (0.46 to 0.68), and 4 of the 10 controls get a confident candidate. Of 27 bundle scenarios with a ranked cause, 15 put it inside a bundle (0.37 to 0.72).</p>
+<p>The selection rule now picks <code>hand-set+softmax+isotonic</code>. Out of fold, on the 79 candidates of rankings that print a probability, it scores Brier 0.170 against 0.184 for the shipped <code>hand-set+softmax-none</code> readout and 0.173 for a uniform guess. The gain over the shipped readout is 7.9% with equal MRR, which passes the 2% rule. The shipped readout reads worse than a uniform guess on these rankings, where on 49 scenarios it read better (0.166 against 0.179). <code>core</code> still ships <code>Weights.NONE</code> (0.25, fit on 49 scenarios) and applies no isotonic map; the fit of the none weight on the 115 is 0.5. This regeneration changes neither.</p>
+<p>Evidence classes on the complete set (<code>evidence</code> section of <code>evaluation.json</code>, labelled <code>complete</code>, which counts the 115 scenarios with captures): the evidence ranker gets top-1 48 of 105 (0.457), top-3 67 and MRR 0.542, against 50, 67 and 0.553 for the dimension prior, so it does not beat the prior. Shipped minus evidence ranker at top-1 is -0.019 (-0.061 to 0.000). <code>plausible</code> is right for 11 of 12 candidates (0.92; 0.65 to 0.99), <code>known</code> is empty, and <code>correlated</code> holds 63 candidates of which 21 are the cause (0.33). One scenario of 115 has a confident wrong top candidate (shipped: 25), and none of the 10 controls has a confident candidate. The top-1 gains are <code>memory-oom-decoy-1</code> and <code>-2</code>, with no losses. Trials to a verdict stay pending, because the repository holds no dev solve certificates.</p>
 <p>Order of the hand-set ranker on the 45 scenarios with a cause (Wilson 95% intervals; &quot;P&quot; is the exact chance that a random order does at least as well, one-sided, not corrected for the three inputs):</p>
 <div class="table"><table>
 <thead>
@@ -2391,7 +2579,7 @@ controls: 8 lines are the same on every target
 </tr>
 </tbody>
 </table></div>
-<p>The three <code>known</code> candidates come from a matched catalog rule, and the cause rate of 3 of 3 says only that those rules agreed with the injected cause. Their interval, 0.44 to 1.00, is wide. The intervals for <code>difference</code> and <code>plausible</code> overlap, so the data does not show that <code>plausible</code> is better evidence than <code>difference</code>. In plain terms, the <code>plausible</code> tier is not reliable on this benchmark. More than half of what it names is wrong, and a user reading &quot;plausible&quot; as &quot;probably right&quot; would be misled about as often as not. The wrong <code>plausible</code> candidates are decoys that changed, and the probe is right about them: it separates attributes that behaved differently from attributes that did not, and does not separate a cause from a bystander. Only a link through the symptom (the probe whose output relates to the failure) could, and it was not tried. The ranking still prints the tier and the mechanism that earned it, and prints no probability for it.</p>
+<p>The three <code>known</code> candidates come from a matched catalog rule, and the cause rate of 3 of 3 says only that those rules agreed with the injected cause. Their interval, 0.44 to 1.00, is wide. The intervals for <code>difference</code> and <code>plausible</code> overlap, so the data does not show that <code>plausible</code> is better evidence than <code>difference</code>. In plain terms, the <code>plausible</code> tier is not reliable on this benchmark. More than half of what it names is wrong, and a user reading &quot;plausible&quot; as &quot;probably right&quot; would be misled about as often as not. The wrong <code>plausible</code> candidates are decoys that changed, and the probe is right about them: it separates attributes that behaved differently from attributes that did not, and does not separate a cause from a bystander. Only a link through the symptom (the probe whose output relates to the failure) could, and the Evidence Classes paragraph below measures it. The ranking still prints the tier and the mechanism that earned it, and prints no probability for it.</p>
 <p><strong>Re-weighting is refuted.</strong> The probe, rule and spectrum weights were refit out of fold and none replaced the hand-set value.</p>
 <ul>
 <li>A fitted probe ratio, smoothed from the odds of a probe candidate being the cause, is 1.29 to 4.67 across the five folds (2.26, 4.67, 1.89, 1.67, 1.29), and the fit is not applied (<code>evidence_fit.applied</code> is <code>false</code>).</li>
@@ -2399,7 +2587,8 @@ controls: 8 lines are the same on every target
 <li>Rule weights and spectrum weights stay hand-set. Seven scenarios now carry a rule match, which is too few to fit a weight, and no dev scenario has a history.</li>
 <li>Fitted per-dimension priors lose again against the hand-set priors in the out-of-fold comparison that <code>fit.json</code> records.</li>
 </ul>
-<p>The weights stay hand-set. This refutes one mechanism, that a fitted weight improves the order or the printed probability on this benchmark. It does not close the objective of weighing probe evidence. A probe linked through the symptom it relates to was not tried, and the data here says only that probes linked through the attribute they read carry nothing beyond the attribute change.</p>
+<p>The weights stay hand-set. This refutes one mechanism, that a fitted weight improves the order or the printed probability on this benchmark. It does not close the objective of weighing probe evidence. A probe linked through the symptom it relates to is measured under Evidence Classes. The data above says only that probes linked through the attribute they read carry nothing beyond the attribute change.</p>
+<p><strong>Evidence classes.</strong> <code>Ranker.rank</code> takes an optional observed failure (the symptoms read from a log). With one, a probe or a rule match is mechanism-level only when its symptom matches it: a probe through the phrase table in <code>ProbeSymptoms</code>, a rule when a distinctive token of one of its symptoms appears in the failure. Anything else is observational, carries ratio 1 and lifts a candidate to <code>correlated</code> at most. Without a failure the output is unchanged, and no command passes one yet. On the 49 dev scenarios that have probed captures (<code>partial</code>: 73 of the 122 dev ids have none yet), with the red arm's last failure line as the failure, top-1 moves from 21 to 23 of 45 (paired gain 0.044, percentile interval 0 to 0.133) and top-3 stays at 29, against 23 and 28 for the dimension prior alone. That is a tie with the prior at top-1 and one scenario at top-3, so the result does not beat the prior. <code>plausible</code> is right for 9 of 10 candidates (shipped: 11 of 25) and 1 of 49 scenarios has a confident wrong top candidate (shipped: 10). The three <code>known</code> candidates fall to <code>correlated</code>: their rules describe a date-time parse failure and a loose string comparison, which are not the failures observed, so those three hits were a version crossing and not a mechanism. Both top-1 gains (<code>memory-oom-decoy-1</code> and <code>-2</code>) come from exit code 137 reading as the memory probe's symptom, and the phrase table was written after the dev signatures had been seen, so the numbers are not blind. Prose-only rule symptoms never match, and no dev scenario has a matching rule symptom, so rule matching is untested. Trials to a verdict from <code>solve</code> are pending: the repository holds no dev solve certificates, and <code>Solve</code> ranks with the unconditioned ranker.</p>
 <p><strong>Probability readout.</strong> Models on the rankings that print a probability (30 candidates), Brier score out of fold unless stated:</p>
 <div class="table"><table>
 <thead>
@@ -2713,6 +2902,7 @@ Mechanism: unexplained (no rule or probe agreed)
 <p>Of 14, six were reconstructed and run: three CONFIRMED EFFECT (bundle), three STUCK. Eight were not reconstructible. In all three bundle results the sealed cause key is among the members (ranked 2 of 2, 1 of 2 and 3 of 4 by the diagnosis), and none was CONFIRMED on one attribute. The reasons for the eight, from <code>outcomes.json</code>: two Windows machines (INC-03, INC-09); a thread that announces an image move and names no single failing command (INC-05); a registry push through buildx that a container pair cannot repeat (INC-04); a macOS Android Studio runtime and the Android SDK (INC-06); a Minecraft server that needs the EULA accepted (INC-08); two cases where the hand check found no failing side (INC-10: both pinned AdoptOpenJDK tags throw the same NullPointerException; INC-01: JerryScript built from the parent commit passes all 306 scripts in four zones, and the <code>run-tests.py</code> option sets and test262 were not run).</p>
 <p><strong>The flagship</strong> is INC-13, the first entry in the order: <code>prisma@6.0.1</code> on <code>node:22.12.0-alpine3.20</code> against <code>node:22.12.0-alpine3.21</code>, from <a href="https://github.com/prisma/orm/issues/25817">prisma/orm#25817</a>. The command is <code>node node_modules/prisma/build/index.js -v</code> and the failure is a nonzero exit. By hand, the 3.20 side prints <code>linux-musl-arm64-openssl-3.0.x</code> and exits 0, and the 3.21 side prints the libssl detection warning and cannot load the query engine. <code>solve</code> finished in 73 seconds with <code>CONFIRMED EFFECT (bundle)</code>: the arms differ in 12 attributes (<code>os.release.PRETTY_NAME</code>, <code>os.release.VERSION_ID</code>, <code>tool.libc.version</code> and nine component rows for musl, OpenSSL, BusyBox, certificates, tzdata and the bundled npm and corepack), setting the OS release moved failures from 0 of 5 to 5 of 5 (exact one-sided p 0.003968) and back in reverse, and the mechanism field reads <code>unexplained</code>. Only <code>os.release.VERSION_ID</code> can be set on its own, so no arm splits the bundle. The archive <code>INC-13.driftcase</code> (179,712 bytes, SHA-256 <code>b4b20bdcb4d3c5e44687564c570fc0be77de505e84607a936720ec18def65aeb</code>) was packed by the JVM build and by the macOS executable with identical bytes, and <code>verify</code> and <code>report</code> output is identical on both. <code>VerifyTest</code> pins the hash, verifies the archive and checks that repacking reproduces it, and pins <code>sealed.json</code> and the ordering rule.</p>
 <p>What the flagship does not show. The verdict says an OS release change is enough, not why. The thread proposes that libssl moved from <code>/lib</code> to <code>/usr/lib</code>; no arm tests that. The arms were not captured (the Linux binary is glibc and cannot run on Alpine), so the 12 members come from the list of what the base image changes, not from a measured arm diff. Capture inside the Alpine images needed <code>apk add gcompat</code>, so the two capsules describe the images plus that package. The pin of <code>prisma@6.0.1</code> is the latest release on the issue date and the Node version is held at 22.12.0 on both sides; neither is stated in the thread.</p>
+<p><strong>The isolation check.</strong> <code>drift verify</code> requires a measured diff from both arms for a bundle, as it does for a CONFIRMED verdict. INC-13 fails that check and nothing else: its arms ran on Alpine without the Linux binary, so both diffs are predicted from the base image's change list (<code>expected measured, recorded predicted and predicted</code>). The other 13 checks pass and the sealed archive is unchanged. INC-11 and INC-12 measured their diffs and pass all 14 checks, and INC-02, INC-07 and INC-14 end STUCK and pass.</p>
 <p><strong>The losses.</strong> Three results are failures of reconstruction by <code>solve</code>, not of the diagnosis, and each is a defect in the engine that this protocol did not fix:</p>
 <ul>
 <li>INC-07: the capsules say Debian 10 (<code>node:16.13.0</code> is a buster image), and the image table in <code>ImageTable.kt</code> maps only Debian 11 to 13, so the arm is <code>node:16.13.0-bookworm-slim</code>, which does not exist. The diagnosis ranks <code>tool.node.version</code> first of 9 candidates, but <code>solve</code> stops at the first build. A variant run after the seal, with <code>node:16.20.2</code> and <code>node:17.9.1</code> (both Debian 11), failed the same way on the treatment arm (<code>node:17.9.1-bookworm-slim</code>); it is not a row of the table.</li>
@@ -2777,7 +2967,7 @@ Mechanism: unexplained (no rule or probe agreed)
 <li>Intermittency is a hash gate on the fault, so no scenario contains a real race, and five scenarios carry capsule values that were written in and not measured.</li>
 <li>The 31 sealed scenarios were never run. Their validity is inferred from dev siblings.</li>
 <li>Weights are hand-set. The ranking weights, the planner's cost weights, its 25% unknown prior and the trial-plan thresholds are guesses with a written reason, and none was calibrated.</li>
-<li>Rule sources are cited and not reproduced. Rule fixtures are synthetic. 230 of 298 rules have a symptom that rests on the mechanism alone (233 of 319 symptoms are <code>inferred</code>), and 91 rules wait for an attribute no scanner emits.</li>
+<li>Rule sources are cited and not reproduced. Rule fixtures are synthetic. 262 of 426 rules have a symptom that rests on the mechanism alone (265 of 450 symptoms are <code>inferred</code>), and 51 rules wait for an attribute no scanner emits.</li>
 <li>Rule matches on real data are few. Seven dev scenarios and one real project (case D, where the 12 matched rules predicted breaks that did not happen) are the only matches, and the Drangler pair matches no rule. Real multi-rule captures were not tested.</li>
 <li>A probe links to a candidate through the attribute path it reads, a table that is a reading of the probe sources and not a measurement, and the link ignores the symptom. A differing probe supports a decoy that really changed as much as the cause.</li>
 <li><code>correlated</code> needs the history to carry step data. Without the run JSON joined to the logs, every green's steps are unknown, all five are excluded as <code>NO_STEP_EVIDENCE</code>, and all eight drangler candidates drop to <code>difference</code> (<code>withoutStepEvidenceInTheGreensTheDranglerFallsBackToDifferences</code>).</li>
@@ -2959,7 +3149,7 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
 </tr>
 <tr>
 <td>rules, status, fixtures, sources, severities</td>
-<td>298; 207 active and 91 pending-scanner; 913 (303/610); 338 entries, 210 distinct; 85/166/47</td>
+<td>426; 375 active and 51 pending-scanner; 1481 (465/1016); 494 entries, 313 distinct; 132/239/55</td>
 <td><code>find rules -name '*.yml' | wc -l</code>; <code>grep -rh '^status:' rules --include='*.yml' | sort | uniq -c</code>; <code>grep -rh '^severity:' rules --include='*.yml' | sort | uniq -c</code>; <code>- name:</code> under <code>fixtures:</code> and <code>kind:</code> under <code>provenance:</code> per file</td>
 </tr>
 <tr>
@@ -3064,12 +3254,12 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
 </tr>
 <tr>
 <td>order table, three inputs</td>
-<td>21, 23 and 26 of 45 top-1 for hand-set (probed, probes removed, original)</td>
+<td>46, 48 and 58 of 105 top-1 for hand-set (probed, probes removed, original)</td>
 <td><code>bench/data/calibration/evaluation.json</code> (<code>original</code>, <code>probes_removed</code>, <code>probed</code>: <code>models[id=hand-set].in_sample</code>); Wilson 95% intervals computed from the counts</td>
 </tr>
 <tr>
 <td>exact tests against a random order</td>
-<td>P = 0.018 (probed), 0.001, 0.003 at top-1; 0.009, 0.009, 0.012 at top-3</td>
+<td>P = 0.0012 (probed), 0.0001, 0.00015 at top-1; 0.00002, 0.00002, 0.00003 at top-3</td>
 <td><code>evaluation.json</code> <code>versus_random.top1.p_at_least_micro</code>, <code>.top3</code></td>
 </tr>
 <tr>
@@ -3079,22 +3269,22 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
 </tr>
 <tr>
 <td>calibration files</td>
-<td><code>evaluation.json</code> sha256 <code>4effe497...e374</code>; <code>fit.json</code> <code>fbbb6f45...4a31</code>; regenerated and byte-compared by <code>CalibrationTest</code></td>
+<td><code>evaluation.json</code> sha256 <code>030fdf04...31a5</code>; <code>fit.json</code> <code>25eb0d75...d524</code>; regenerated and byte-compared by <code>CalibrationTest</code></td>
 <td><code>shasum -a 256 bench/data/calibration/*.json</code>; <code>./gradlew :bench:jvmRun --args=&quot;calibrate --root $PWD/bench&quot;</code></td>
 </tr>
 <tr>
 <td>tiers and false confidence</td>
-<td>71 / 25 / 3; 10 of 49; 14 of 25 <code>plausible</code> wrong</td>
+<td>271 / 62 / 13; 25 of 115; 40 of 62 <code>plausible</code> wrong</td>
 <td><code>evaluation.json</code> <code>probed.scenarios[].ranked[].tier</code>, <code>.cause</code></td>
 </tr>
 <tr>
 <td>probe ratio sweep</td>
-<td>0.170 at ratio 1 to 0.218 at 6; 0.187 for &quot;one of n&quot;</td>
+<td>0.106 at ratio 1 to 0.118 at 6; 0.108 for &quot;one of n&quot;</td>
 <td><code>evaluation.json</code> <code>probe_sweep</code></td>
 </tr>
 <tr>
 <td>readout Brier, covered rankings</td>
-<td>0.166 shipped; 0.179 uniform; 0.146 against 0.160 on all rankings</td>
+<td>0.184 shipped; 0.173 uniform; 0.123 against 0.124 on all rankings</td>
 <td><code>evaluation.json</code> <code>probed.models[].cross_validated.covered.brier</code></td>
 </tr>
 <tr>
@@ -3104,7 +3294,7 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
 </tr>
 <tr>
 <td>dev inputs</td>
-<td>99 candidates, 29 causes, 14 scenarios with a differing probe, 7 scenarios with a rule match</td>
+<td>346 candidates, 71 causes, 41 scenarios with a differing probe, 25 scenarios with a rule match</td>
 <td><code>fit.json</code> <code>provenance.inputs.probed</code></td>
 </tr>
 <tr>
@@ -3234,7 +3424,7 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
 </tr>
 <tr>
 <td>upgrade-check</td>
-<td>0 / 7 / 2 / 0 on the Drupal capture, 73 of 298 rules; case D 1 / 2 / 11 / 0, 46 of 298</td>
+<td>0 / 3 / 2 / 0 on the Drupal capture, 83 of 426 rules; case D 1 / 1 / 11 / 0, 56 of 426</td>
 <td><code>drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=8.3,drupal=11,symfony=7.1</code>; <code>drift upgrade-check fixtures/cases/d/capture-php-7-4.json --to php=8.3</code></td>
 </tr>
 <tr>

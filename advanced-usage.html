@@ -309,6 +309,7 @@
     <body>
         <nav>
             <div class="bar"><a class="brand" href="index.html"><img src="drift_128.png" alt="" width="28" height="28">Drift</a>
+<a href="manual.html">Manual</a>
 <a href="advanced-usage.html" aria-current="page">Usage</a>
 <a href="technical-report.html">Report</a>
 <a href="atlas/#atlas">Atlas</a>
@@ -318,7 +319,7 @@
         <main>
             
             <div class="readme"><h1 id="advanced-usage-the-full-cli">Advanced Usage: The Full CLI</h1>
-<p>This guide covers every <code>drift</code> command and flag for people who have already run <code>drift capture</code>. It shows scripting patterns, the JSON and text output levels, cases, reproduction, the Lab (<code>solve</code>, <code>ingest</code>, <code>pack</code>, <code>report</code>, <code>verify</code>), CI commands (<code>run</code>, <code>import</code>, <code>diagnose --against</code>, <code>bisect plan</code>, <code>bisect apply</code>), portability contracts (<code>contract create</code>, <code>contract verify</code>), issue triage (<code>triage</code>), upgrade preflight (<code>upgrade-check</code>), the Atlas, and the commands that install and serve Drift (<code>install</code>, <code>uninstall</code>, <code>serve</code>, <code>install.sh</code>, <code>install.ps1</code>). For the design and the measurements behind the commands, see <a href="technical-report.html">TECHNICAL_REPORT.md</a>.</p>
+<p>This guide covers every <code>drift</code> command and flag for people who have already run <code>drift capture</code>. It shows scripting patterns, the JSON and text output levels, cases, reproduction, the Lab (<code>solve</code>, <code>ingest</code>, <code>pack</code>, <code>report</code>, <code>verify</code>), hands-off planning (<code>handsoff plan</code>), CI commands (<code>run</code>, <code>import</code>, <code>diagnose --against</code>, <code>bisect plan</code>, <code>bisect apply</code>), portability contracts (<code>contract create</code>, <code>contract verify</code>), issue triage (<code>triage</code>), upgrade preflight (<code>upgrade-check</code>), the Atlas, and the commands that install and serve Drift (<code>install</code>, <code>uninstall</code>, <code>serve</code>, <code>install.sh</code>, <code>install.ps1</code>). For the design and the measurements behind the commands, see <a href="technical-report.html">TECHNICAL_REPORT.md</a>.</p>
 <p>Every example below was run with the macOS release executable (<code>drift version 1.0.0 (macos)</code>) from a directory that holds <code>fixtures/</code> and <code>bench/</code>, against the files in <a href="https://github.com/gmitch215/Drift/tree/master/fixtures"><code>fixtures/</code></a> and <a href="https://github.com/gmitch215/Drift/tree/master/bench/data"><code>bench/data/</code></a>. Output is copied from those runs; a line that holds only <code>...</code> marks output cut for length. Where a command prints to standard error, the example says so. The offline run in <a href="#offline">Offline</a> used the Linux arm64 executable inside a Docker container. The <code>install</code>, <code>uninstall</code> and <code>serve</code> examples ran with a scratch home directory and a scratch prefix, never the real profile, registry or trust store. Their output shows the scratch home as <code>/home/you</code>, the scratch work directory as <code>/work</code> and the scratch release directory as <code>/release</code>. The Windows and Linux builds and the <code>.ps1</code> script were not run for this guide, and the sections say where a statement comes from a recorded run of someone else's.</p>
 <p>The executable is <code>cli/build/bin/macosArm64/releaseExecutable/drift.kexe</code>; the README explains how to build it and how to download one. The examples call it <code>drift</code>; put it on <code>PATH</code> (see <a href="#install-and-uninstall">Install and Uninstall</a>) or alias it.</p>
 <h2 id="command-index">Command Index</h2>
@@ -357,6 +358,12 @@
 <td>no</td>
 </tr>
 <tr>
+<td><a href="#compare-two-sets-of-runs"><code>compare</code></a></td>
+<td>two capsule directories written by <code>run --repeat</code></td>
+<td>text or JSON</td>
+<td>no</td>
+</tr>
+<tr>
 <td><a href="#run"><code>run</code></a></td>
 <td>this machine, a command</td>
 <td>a capsule directory</td>
@@ -366,6 +373,18 @@
 <td><a href="#import"><code>import</code></a></td>
 <td>a saved GitHub Actions or GitLab CI log</td>
 <td>a capsule directory</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#ci"><code>ci</code></a></td>
+<td>the git checkout, <code>gh</code> or <code>glab</code></td>
+<td>a case directory and two capsule directories under <code>.drift/ci</code></td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#handsoff"><code>handsoff plan</code></a></td>
+<td>a checkout, optionally a case from <code>ci</code></td>
+<td>text or JSON, optionally <code>--out FILE</code></td>
 <td>no</td>
 </tr>
 <tr>
@@ -459,6 +478,12 @@
 <td>no</td>
 </tr>
 <tr>
+<td><a href="#atlas"><code>atlas here</code></a></td>
+<td>this machine, the recorded columns</td>
+<td>text, optionally a transcript</td>
+<td>no</td>
+</tr>
+<tr>
 <td><a href="#probe"><code>probe cloudflare</code></a></td>
 <td>a built Worker directory</td>
 <td>a transcript</td>
@@ -510,6 +535,24 @@
 <td><a href="#serve"><code>serve</code></a></td>
 <td>a Studio web build directory</td>
 <td>nothing (a local web server)</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#doctor"><code>doctor</code></a></td>
+<td>this machine</td>
+<td>text or JSON</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#help-and-completion"><code>help</code></a></td>
+<td>nothing</td>
+<td>text</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="#help-and-completion"><code>completion</code></a></td>
+<td>nothing</td>
+<td>a shell script on standard output</td>
 <td>no</td>
 </tr>
 </tbody>
@@ -1246,9 +1289,163 @@ signature Error: unexpected timezone Asia/Tokyo
 <td><code>--force</code></td>
 <td>replace the files of an earlier run in <code>--out</code></td>
 </tr>
+<tr>
+<td><code>--repeat N</code></td>
+<td>run the command N times and record every run (default 1, see Repeated Runs)</td>
+</tr>
+<tr>
+<td><code>--warmup W</code></td>
+<td>run the command W times first without recording them (default 0)</td>
+</tr>
 </tbody>
 </table></div>
 <p>Put <code>--</code> before the command so that its own flags are not read as <code>drift</code> flags; arguments after the first word of the command are passed through either way. A program that does not exist makes the shell report exit code 127, which <code>drift run</code> passes through. The command is started directly when the host can (the JVM build) and through <code>sh</code> on the native builds. The Windows build was not run for this guide.</p>
+<h3 id="repeated-runs">Repeated Runs</h3>
+<p><code>--repeat N</code> runs the command N times after <code>--warmup W</code> unrecorded runs and stores one sample per recorded run in <code>run.json</code>: the exit code and the wall time in milliseconds, plus user CPU time, system CPU time and peak memory where the host measures them. A measurement the host cannot make is left out of the sample, never written as zero. Without <code>--repeat</code> (or with <code>--repeat 1</code>) nothing changes: no samples are stored and the output is the single line shown above.</p>
+<pre><code class="language-sh">drift run --out fast --label fast --repeat 10 --warmup 1 -- sh -c 'sleep 0.1'
+GOMAXPROCS=1 drift run --out slow --label slow --repeat 10 --warmup 1 -- sh -c 'sleep 0.3'
+drift diagnose fast slow --detail summary
+</code></pre>
+<pre><code>drift: 10 runs, 10 passed (100%)
+drift: wall time median 110 ms, min 100 ms, max 111 ms
+drift: cpu time median 0 ms user, 0 ms system
+drift: exit 0; capsule in fast
+drift: 10 runs, 10 passed (100%)
+drift: wall time median 302 ms, min 302 ms, max 302 ms
+drift: cpu time median 0 ms user, 0 ms system
+drift: exit 0; capsule in slow
+env.GOMAXPROCS differs most (tier difference); this ranks differences and does not confirm a cause.
+
+Wall time: the second run is 2.7 times slower than the first (median 302 ms over 10 samples against median 110 ms over 10 samples; the smallest second sample, 302 ms, is above the largest first sample, 111 ms).
+</code></pre>
+<p>That run is a demonstration of the output format. The two commands cost a known, different time, and the one environment difference between the two captures is a variable set for the demonstration, so the ranking says nothing about why a real program is slow. The numbers came from the Linux x64 build in a container; the 10 ms steps in the wall times are the host's polling interval.</p>
+<p>With several runs the command's output is printed once, from the first failing run or else the last run, and the exit code is that of the first failing run. <code>tail.log</code> and the symptoms come from the same run, the step duration and <code>durationMs</code> in <code>result.json</code> are the median wall time, and the run's outcome is <code>fail</code> when any run failed.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Host</th>
+<th>Measured per run</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linux and macOS native builds</td>
+<td>wall time, user and system CPU time, peak memory</td>
+</tr>
+<tr>
+<td>JVM build, Wasm build</td>
+<td>wall time only</td>
+</tr>
+</tbody>
+</table></div>
+<p>Peak memory comes from <code>wait4</code>, and a child that starts through <code>posix_spawn</code> begins with its parent's high-water mark. Drift therefore records a peak only when it is above its own peak resident size at the moment it started the command, and leaves it out otherwise. A small command that uses less memory than Drift itself has no peak sample. The macOS build applies the same rule, and it was not run for this guide.</p>
+<h4 id="flaky-commands">Flaky Commands</h4>
+<p>When the recorded runs mix passes and failures, the summary names what <code>History</code> makes of them. <code>History</code> calls two or more changes of outcome <code>FLAKY</code>; one change (passes, then failures that never recover) is <code>REGRESSION</code> or <code>RECOVERED</code>, and the summary says it is not flaky by that rule.</p>
+<pre><code class="language-sh">drift run --out flaky --label flaky --repeat 20 -- sh -c 'n=$(cat count 2&gt;/dev/null || echo 0); n=$((n+1)); echo $n &gt; count; [ $((n % 3)) -ne 0 ]'
+</code></pre>
+<pre><code>drift: 20 runs, 14 passed (70%), 6 failed; history state FLAKY
+drift: wall time median 10 ms, min 10 ms, max 10 ms
+drift: cpu time median 0 ms user, 0 ms system
+drift: exit 1; capsule in flaky
+</code></pre>
+<p><code>drift diagnose</code> over a directory with mixed samples says so, and without <code>--runs</code> and <code>--failures</code> it takes the sample count and the failed samples as the runs seen on the failing side:</p>
+<pre><code>The second run is intermittent: 6 of 20 samples failed (history state FLAKY). A difference between two captures can explain a failure rate, and it does not say which runs fail.
+</code></pre>
+<h4 id="slower-and-more-memory">Slower and More Memory</h4>
+<p><code>drift diagnose FIRST SECOND</code> reads the samples of both <code>run.json</code> files when both have them. Wall times differ only when the ranges do not overlap: the smallest sample of the larger side is above the largest sample of the smaller side. Then the second run gets a <code>slower</code> symptom whose value is the ratio of the two medians in tenths (<code>2.7 times slower</code>), and peak memory gets a <code>memory</code> symptom (<code>2.0 times more peak memory</code>) by the same rule when both sides measured it. The symptoms condition the ranking as the failure: the probe of the CPU limit counts as mechanistic evidence for <code>slower</code>, the probe of the memory limit for <code>memory</code>, and the attribute weights stay as they are. When the ranges overlap, the output says <code>no difference larger than the run to run spread</code> with both ranges and adds no symptom. A first run that is the slower one gets a line and no symptom. A side with fewer than two samples has no spread and is not compared. The JSON output carries a <code>performance</code> object, and only when a run has samples; its <code>ranges</code> list holds the minimum, median and maximum of each side. The Studio Investigation result draws them as range bars when a diagnosis carries them; the built-in sample investigations carry none.</p>
+<p>Each limit below is printed only when it applies:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Line</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>different hardware</td>
+<td>the captures differ in <code>hw.cpu.model</code>, <code>cpu.count</code> or <code>os.arch</code></td>
+</tr>
+<tr>
+<td>fewer than 5 samples</td>
+<td>either side has fewer than 5 samples</td>
+</tr>
+<tr>
+<td>the command starts a JVM</td>
+<td>the command starts with <code>java</code>, <code>javac</code>, <code>kotlin</code>, <code>kotlinc</code>, <code>gradle</code>, <code>gradlew</code>, <code>mvn</code>, <code>mvnw</code> or <code>sbt</code> and the shorter median is under 5000 ms</td>
+</tr>
+<tr>
+<td>Wasm in Node or a browser</td>
+<td>a capture is Wasm and the two captures differ in <code>runtime.platform</code> or in having <code>browser.</code> facts</td>
+</tr>
+</tbody>
+</table></div>
+<p>None of these lines names a cause. Drift does not count allocations, compare times across different hardware or model JIT behaviour; for a benchmark use <code>kotlinx-benchmark</code> or <code>hyperfine</code>.</p>
+<h3 id="compare-two-sets-of-runs">Compare Two Sets of Runs</h3>
+<p><code>drift compare RUNA RUNB [--json]</code> reads the <code>run.json</code> of two capsule directories written by <code>drift run --repeat</code> and compares their stored samples. It runs offline and keeps nothing: the same two directories give the same bytes on every target. Each side needs at least two samples. For wall time, and for CPU time and peak memory where both sides measured them, it prints the sample count, the minimum, median and maximum of each side, the ratio of the medians (B over A), a Mann-Whitney U test, Cliff's delta, a bootstrap interval of the ratio and one verdict sentence. CPU time is left out when both medians are 0 ms.</p>
+<pre><code class="language-sh">drift run --out fast --label fast --repeat 10 --warmup 1 -- sh -c 'sleep 0.1'
+drift run --out slow --label slow --repeat 10 --warmup 1 -- sh -c 'sleep 0.3'
+drift compare fast slow
+</code></pre>
+<pre><code>A: fast (fast)
+B: slow (slow)
+Wall time (ms): A 10 samples, B 10 samples
+  A: min 100, median 110, max 110
+  B: min 301, median 302, max 302
+  ratio of medians, B over A: 2.7
+  Mann-Whitney U 0; exact p below 0.0001
+  Cliff's delta +1000 permille (large; positive means B is larger)
+  bootstrap interval of the ratio, 2000 resamples, 95 percent: 2.7 to 2.7
+  B is 2.7 times slower than A; exact p below 0.0001; the interval of the ratio of B to A is 2.7 to 2.7.
+</code></pre>
+<p>With the arguments swapped, the verdict reads <code>A is 2.7 times slower than B</code> and Cliff's delta is <code>-1000</code>. The numbers came from the Linux x64 build in a container. The 10 ms steps in the wall times are the polling interval of the native host.</p>
+<p>The same command recorded twice gives the control:</p>
+<pre><code>A: fast (fast)
+B: again (again)
+Wall time (ms): A 10 samples, B 10 samples
+  A: min 100, median 110, max 110
+  B: min 110, median 110, max 111
+  ratio of medians, B over A: 1.0
+  Mann-Whitney U 22.5; exact p 0.0217
+  Cliff's delta +550 permille (large; positive means B is larger)
+  bootstrap interval of the ratio, 2000 resamples, 95 percent: 1.0 to 1.0
+  No difference larger than the run to run spread (exact p 0.0217; the interval of the ratio of B to A is 1.0 to 1.0).
+</code></pre>
+<p>Here the rank test alone would have called a difference: one side has a few samples at 100 ms where the other has 110 ms, a single polling step. A verdict names a direction only when both the exact p-value is at most 0.05 and the interval of the ratio lies on one side of 1, so this pair has no verdict. Three repetitions of this control gave exact p-values of 0.25, 0.09 and 0.0217.</p>
+<p><strong>The statistics.</strong> All of them use whole numbers, so every target prints the same digits, and none reads a clock or a random source.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Statistic</th>
+<th>How it is computed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mann-Whitney U</td>
+<td>counted from pairs; a tie counts half; the line shows the smaller of the two U values</td>
+</tr>
+<tr>
+<td>Exact two-sided p</td>
+<td>every split of the pooled values into groups of the two sizes is counted in <code>Long</code> arithmetic, with ties taking the midrank of their group; a split counts when its rank sum is at least as far from the mean as the observed one</td>
+</tr>
+<tr>
+<td>Cliff's delta</td>
+<td>pairs where B is larger minus pairs where B is smaller, over all pairs, in permille; the labels are negligible below 147, small below 330, medium below 474 and large above, the thresholds published by Romano and others (2006) for the absolute value</td>
+</tr>
+<tr>
+<td>Bootstrap interval</td>
+<td>2000 resamples of each side with replacement, the ratio of the resampled medians in permille, and the 51st and 1950th ratios in sorted order as a 95 percent interval</td>
+</tr>
+</tbody>
+</table></div>
+<p>The count of splits is <code>C(n+m, n)</code>, which fits in a <code>Long</code> only up to 30 samples per side. Above that the line says <code>exact test not computed above 30 samples per side</code>, and the verdict rests on the interval alone; there is no normal approximation. The bootstrap uses xorshift64 (shifts 13, 7 and 17) seeded from the first 16 hex digits of the SHA-256 of the sorted samples of both sides, so shuffling the samples within a side changes nothing. A ratio of 1.1 or more is written in times (<code>2.7 times slower</code>); a smaller one is written as the excess in percent (<code>0.5 percent slower</code>). When the two sides are too small for any split to reach 0.05, the verdict says what the lowest possible p-value is: with 3 samples on each side it is 0.1000.</p>
+<p>The verdict is a statement about samples from one host. <code>drift diagnose</code> keeps its own rule, which names a <code>slower</code> symptom only when the ranges do not overlap, and <code>compare</code> does not change it. The two agree when the sides are clearly apart or clearly the same. They disagree with 3 samples a side that are completely separated (the range rule fires, and the exact test cannot go below 0.1) and with 10 samples a side that overlap but shift consistently, as in a synthetic shift of 5 percent (the exact test and the interval fire, the range rule does not). The same limits as in <code>diagnose</code> are printed under the metrics: different hardware, fewer than 5 samples, a short JVM run and Wasm in Node against a browser.</p>
+<p><strong>Cgroup counters.</strong> On Linux, <code>drift run --repeat</code> reads the counters of its own cgroup v2 before and after each recorded run: <code>nr_throttled</code> from <code>cpu.stat</code>, and <code>max</code>, <code>oom</code> and <code>oom_kill</code> from <code>memory.events</code>. The growth of each counter is stored in the sample as <code>cgroup</code> (<code>throttled</code>, <code>memoryMax</code>, <code>oom</code>, <code>oomKill</code>). A counter that cannot be read is left out, never written as zero. <code>compare</code> then says which side was throttled or short of memory:</p>
+<pre><code>CPU throttled 102 times in B, none in A.
+Throttling by the container is a cause to check before blaming the code.
+</code></pre>
+<p>That pair came from a command that runs 4 busy loops against one that runs 24, in a container limited to 8 CPUs (<code>cpu.max</code> of <code>800000 100000</code>). The wall times differ by 0.5 percent because both commands stop after one second, the CPU time doubles and the second command was throttled in every run. The counters belong to the whole cgroup, so another process in the same container adds to them, and they say nothing outside a cgroup v2 host. With <code>--json</code>, the output carries <code>exactExtreme</code> and <code>exactTotal</code> for the p-value, <code>deltaPermille</code>, <code>intervalLowPermille</code> and <code>intervalHighPermille</code>, and <code>direction</code> as <code>second larger</code>, <code>first larger</code> or <code>none</code>.</p>
 <h2 id="import">Import</h2>
 <p><code>drift import LOG --format github|gitlab --out DIR [--summary FILE] [--job NAME] [--label TEXT] [--force]</code> turns a saved CI log into a capsule directory. It reads files only and never contacts GitHub or GitLab. The directory holds <code>capsule.json</code> and <code>run.json</code>, so it works as a baseline or as the current run for <code>diagnose --against</code>.</p>
 <pre><code class="language-sh">drift import fixtures/drangler/logs/36702683742.log --format github --job &quot;Docker E2E&quot; \
@@ -1321,6 +1518,449 @@ test/rspec failure 192
 deploy/deploy skipped null
 </code></pre>
 <p>The GitLab fixtures are written by hand in the shape of the real format; the field names of the pipeline and job JSON were checked against the GitLab REST documentation, not against a real pipeline.</p>
+<h2 id="ci">CI</h2>
+<p><code>drift ci [--commit SHA | --run ID] [--good SHA|ID] [--job NAME] [--remote NAME] [--provider github|gitlab] [--out DIR] [--detail summary|detail|full] [--json]</code> answers &quot;what is wrong with my CI&quot; from inside a git checkout. With no flag it does what the <a href="#import">Import</a> and <a href="#diagnose">diagnose</a> steps do by hand:</p>
+<ol>
+<li>Reads the checkout root, the <code>origin</code> remote (parsed to a host and an <code>owner/name</code> path, with any credentials in the URL dropped), the branch and <code>HEAD</code>. <code>github.com</code> and the host in <code>GH_HOST</code> are GitHub; <code>gitlab.com</code> and the host in <code>GITLAB_HOST</code> are GitLab. Any other host stops with a message that lists the two providers and the <code>drift import</code> route.</li>
+<li>Takes the latest failed run on the current branch. <code>--commit</code> takes the failed run of that commit, <code>--run</code> names one. The passing run is the latest successful run of the same workflow that started before the failing one, on the same branch first and on any branch if there is none; <code>--good</code> takes a commit or a run id instead (nine or more digits is a run id).</li>
+<li>Asks <code>gh</code> (<code>gh run list</code>, <code>gh run view --json</code>, <code>gh run view --log --job</code>) or <code>glab</code> (<code>glab api</code> on the pipelines, jobs and trace endpoints) for the two runs, so your own login does the authentication and Drift holds no token. It compares one job: the first failed job of the failing run and the job of the same name in the passing run. <code>--job</code> picks another.</li>
+<li>Imports both logs with the code behind <code>drift import</code>, ranks the pair as <code>diagnose</code> does, and writes the case to <code>.drift/ci/&lt;short-sha&gt;</code> in the checkout root, with the two capsule directories in <code>capsules/passing</code> and <code>capsules/failing</code> below it. <code>--out</code> changes the directory. It never edits a tracked file or <code>.gitignore</code>; when git does not ignore the directory it prints the line to add.</li>
+</ol>
+<p>Everything it does is available as the existing commands: <code>drift diagnose .drift/ci/&lt;sha&gt;/capsules/passing .drift/ci/&lt;sha&gt;/capsules/failing</code>, <code>drift case show .drift/ci/&lt;sha&gt;</code> and <code>drift next .drift/ci/&lt;sha&gt;</code> read what it wrote.</p>
+<p>The output below replays recorded <code>git</code> and <code>gh</code> answers from public runs of this repository (<a href="https://github.com/gmitch215/Drift/tree/master/fixtures/ci/live"><code>fixtures/ci/live</code></a>); a live run prints the same layout for your own runs.</p>
+<pre><code class="language-sh">drift ci
+</code></pre>
+<pre><code>drift ci: gmitch215/Drift, branch master, HEAD c775d8f
+
+Failing  Build Project, run 40042665061 (c775d8f, 2026-10-23, branch master)
+         https://github.com/gmitch215/Drift/actions/runs/40042665061
+Passing  Build Project, run 38452229524 (da0505e, 2026-10-13, branch master)
+         https://github.com/gmitch215/Drift/actions/runs/38452229524
+Job      Test Project (linux-x64), failed in step Run Tests
+         Other failed jobs: Test Project (macos-arm64), Test Project (windows-x64), Test Project
+         (linux-arm64). Pass --job NAME to compare one of them.
+
+Environment differences, best first (3 of 4):
+  1. ci.provisioner.build-date: 2026-10-02T22:28:27Z -&gt; 2026-10-12T17:48:21Z (tier difference)
+  2. ci.provisioner.version: 20261002.596 -&gt; 20261012.601 (tier difference)
+  3. ci.runner.image.version: 20261004.327.1 -&gt; 20261012.334.1 (tier difference)
+
+Result: 4 changes differ with the same support, and ci.provisioner.build-date ranks first only by
+hand-set weights, so the data does not name one cause.
+Confidence: low, 4 changes tie and the data cannot separate them.
+
+This compares the runner environment of the two jobs, not your code. It cannot find an ordinary code
+regression, so a failure that comes from a code change shows up as no cause or a weak difference.
+Read the code change next: git diff --stat da0505e c775d8f
+
+Saved to .drift/ci/c775d8f
+Next: drift case show .drift/ci/c775d8f
+Then: drift next .drift/ci/c775d8f
+...
+</code></pre>
+<p>In that run the log shows the <code>bench</code> tests failing, which is a code problem. The runner image did change between the two runs, and four environment attributes moved together, so nothing in the data ties one of them to the failure; the report says only that. The limits paragraph appears whenever the best candidate is tied, has no rule or probe behind it, or there is no difference at all. After it, <code>drift ci</code> prints the instrumented-rerun route (<code>drift run --tools --project</code> on both commits, with <code>TEST_COMMAND</code> where your test command goes, which Drift does not guess) and the line for <code>.gitignore</code>.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--commit SHA</code></td>
+<td>take the failed run of this commit (4 to 40 hex digits)</td>
+</tr>
+<tr>
+<td><code>--run ID</code></td>
+<td>take this run as the failing run; it must have failed</td>
+</tr>
+<tr>
+<td><code>--good SHA|ID</code></td>
+<td>take the passing run of this commit, or this run id</td>
+</tr>
+<tr>
+<td><code>--job NAME</code></td>
+<td>compare this job in both runs (default: the first failed job)</td>
+</tr>
+<tr>
+<td><code>--remote NAME</code></td>
+<td>the git remote that names the repository (default <code>origin</code>)</td>
+</tr>
+<tr>
+<td><code>--provider github|gitlab</code></td>
+<td>override the provider chosen from the host</td>
+</tr>
+<tr>
+<td><code>--out DIR</code></td>
+<td>write the case here (default <code>.drift/ci/&lt;short-sha&gt;</code> in the checkout root)</td>
+</tr>
+<tr>
+<td><code>--detail LEVEL</code></td>
+<td>also print the full ranking and plan, as <code>diagnose --detail</code> does</td>
+</tr>
+<tr>
+<td><code>--json</code></td>
+<td>print canonical JSON (the comparison and the ranking) instead of text</td>
+</tr>
+</tbody>
+</table></div>
+<p>When the failing and passing runs are for the same commit (a rerun that passed), the two capsule labels read <code>&lt;sha&gt;@&lt;run id&gt;</code> so they differ. GitLab jobs have no steps, so the Job line shows no step name.</p>
+<p>Each failure ends in one sentence and exit code 1, and never prints a response from the service:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Cause</th>
+<th>Message says</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gh</code> or <code>glab</code> missing</td>
+<td>where to install it, then to log in</td>
+</tr>
+<tr>
+<td>not logged in</td>
+<td>the login command for that host</td>
+</tr>
+<tr>
+<td>no network, a timeout, rate limiting</td>
+<td>check the connection, or wait and run again</td>
+</tr>
+<tr>
+<td>no failed run, or HEAD detached</td>
+<td>pass <code>--commit</code> or <code>--run</code></td>
+</tr>
+<tr>
+<td>no passing run</td>
+<td>pass <code>--good</code>, or compare two <code>drift run --tools --project</code> captures by hand</td>
+</tr>
+<tr>
+<td>log expired or deleted</td>
+<td>choose a newer run</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>import</code> masks attribute values and symptom text with the same redaction <code>capture</code> uses before anything is written, and <code>drift ci</code> stores only the capsule and run files, never the log. Limits: the provider tools list at most 20 failed runs, 50 GitHub passing runs, 100 GitLab pipelines and 100 GitLab jobs per request; an <code>env:</code> block is read only from the first step of a GitHub log; and the GitLab pair in <a href="https://github.com/gmitch215/Drift/tree/master/fixtures/ci/live/gitlab"><code>fixtures/ci/live/gitlab</code></a> comes from the public <code>gitlab-org/cli</code> project because this repository has no GitLab pipelines.</p>
+<h2 id="handsoff">Handsoff</h2>
+<p><code>drift handsoff plan [CHECKOUT]</code> reads a local checkout and prints what a hands-off run of it would do: which tools it uses, which commands CI ran, where they would run, and what the run would leave out. It is step one of a longer path and runs nothing. It reads files, starts no program from the repository and makes no network call. The one process it starts is <code>ls -1</code> on <code>.github/workflows</code> (a <code>Host</code> has no directory listing); <code>--workflow FILE</code> skips even that. The only file it writes is the one <code>--out</code> names.</p>
+<p><code>CHECKOUT</code> defaults to the current directory. The plan below is for this repository, with the job <code>lint</code> of <code>build.yml</code>. It ran on the Linux JVM build in a copy of the tree, with the checkout path shown as <code>.</code>.</p>
+<pre><code class="language-sh">drift handsoff plan . --workflow .github/workflows/build.yml --job lint
+</code></pre>
+<pre><code>handsoff plan: .
+files read: 5; nothing was run and no network call was made
+
+result: ready
+
+ecosystems
+  jdk
+    files        build.gradle.kts, settings.gradle.kts
+    manager      gradle wrapper
+    lockfiles    none
+    pin          gradle 9.8.0 (gradle wrapper, gradle/wrapper/gradle-wrapper.properties:3)
+    note         Gradle tasks and Maven goals are not read
+not read: any ecosystem not listed above (for example Cargo, Gemfile, .NET project files)
+
+ci
+  files        .github/workflows/build.yml
+  job          lint (.github/workflows/build.yml:15)
+  runs on      ubuntu-24.04
+  image        not set
+  services     none
+  actions, not run
+    .github/workflows/build.yml:24  actions/checkout@v6
+    .github/workflows/build.yml:25  actions/setup-java@v5  (distribution: temurin, java-version: 21, cache: gradle)
+    .github/workflows/build.yml:31  actions/cache@v5  (path: ~/.konan/caches ~/.konan/dependencies ~/.konan/kotlin-native-prebuilt-*, key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}, restore-keys: ${{ runner.os }}-${{ runner.arch }}-konan- ${{ runner.os }}-konan-)
+    .github/workflows/build.yml:42  gradle/actions/wrapper-validation@v5
+  steps, in order
+    step 5 [Check Style and Coverage Rules]  ./gradlew spotlessCheck checkLineLength sharedRatio :build-core:check  (.github/workflows/build.yml:44)
+    step 6 [Compile Every Target]  ./gradlew compileKotlinJvm compileKotlinLinuxX64 compileKotlinLinuxArm64 compileKotlinMingwX64 compileKotlinWasmJs  (.github/workflows/build.yml:46)
+    step 7 [Stop Gradle]  ./gradlew --stop  (.github/workflows/build.yml:48)
+  note         expressions other than matrix.* are shown as written and are not evaluated
+
+plan
+  would run, in order
+    1. ./gradlew spotlessCheck checkLineLength sharedRatio :build-core:check  (.github/workflows/build.yml:44)
+    2. ./gradlew compileKotlinJvm compileKotlinLinuxX64 compileKotlinLinuxArm64 compileKotlinMingwX64 compileKotlinWasmJs  (.github/workflows/build.yml:46)
+    3. ./gradlew --stop  (.github/workflows/build.yml:48)
+  where        a rootless container, never the host
+  image        not chosen (--from-ci CASE builds one from the failing capsule)
+  network      install step only; this plan makes no call and starts nothing
+  will not
+    pass secrets or the environment of this machine
+    mount the home directory
+    start the services the job names
+    run anything on the host
+  by hand
+    ./gradlew spotlessCheck checkLineLength sharedRatio :build-core:check
+    ./gradlew compileKotlinJvm compileKotlinLinuxX64 compileKotlinLinuxArm64 compileKotlinMingwX64 compileKotlinWasmJs
+    ./gradlew --stop
+</code></pre>
+<p>The plan states what is known and prints <code>not set</code> or <code>not chosen</code> for the rest. The root build files of this repository pin no JDK (the workflow does), so without <code>--job</code> the same command stops on the runtime version. With a job chosen, its <code>setup-java</code> input counts as the pin. <code>--from-ci DIR</code> takes a case that <a href="#ci"><code>drift ci</code></a> wrote and uses the job that failed there; when that case holds a capsule, the image comes from the same code as <a href="#reproduce"><code>drift reproduce</code></a> and the plan says which attributes picked it.</p>
+<h3 id="stops">Stops</h3>
+<p>A stop is a place where the checkout is ambiguous. Each one prints what is ambiguous, the one question to answer and the flag that answers it, the plan section is left out, and the exit code is 1. The command never guesses past a stop. The test command rules run only when no other stop is left, because most of them depend on the answers to the others.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Stop</th>
+<th>Fires when</th>
+<th>Answer with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>two-lockfiles</code></td>
+<td>an ecosystem has more than one lockfile (<code>package-lock.json</code> with <code>yarn.lock</code>, <code>poetry.lock</code> with <code>uv.lock</code>)</td>
+<td><code>--lockfile FILE</code></td>
+</tr>
+<tr>
+<td><code>no-lockfile</code></td>
+<td><code>package.json</code> with dependencies, <code>composer.json</code> with packages, a <code>go.mod</code> with requirements, a Python manifest with dependencies, and no lockfile</td>
+<td><code>--accept-no-lockfile</code></td>
+</tr>
+<tr>
+<td><code>package-manager</code></td>
+<td><code>packageManager</code> names one tool and the lockfile belongs to another</td>
+<td><code>--lockfile FILE</code></td>
+</tr>
+<tr>
+<td><code>runtime-version</code></td>
+<td>no version of the runtime is pinned, a pin is a name that moves (<code>lts/*</code>, <code>latest</code>, <code>stable</code>, <code>node</code>), or two pins disagree</td>
+<td><code>--runtime NAME=VERSION</code></td>
+</tr>
+<tr>
+<td><code>monorepo</code></td>
+<td><code>package.json</code> <code>workspaces</code>, <code>pnpm-workspace.yaml</code> or <code>go.work</code> declares several roots</td>
+<td><code>--root DIR</code></td>
+</tr>
+<tr>
+<td><code>no-test-command</code></td>
+<td>the repository names no test command Drift can run, or the chosen job has no <code>run:</code> step</td>
+<td><code>--test-command COMMAND</code></td>
+</tr>
+<tr>
+<td><code>several-test-commands</code></td>
+<td>the repository names more than one</td>
+<td><code>--test-command COMMAND</code></td>
+</tr>
+<tr>
+<td><code>matrix-cell</code></td>
+<td>the chosen job has a matrix and <code>--cell</code> does not select exactly one cell, or the matrix is computed</td>
+<td><code>--cell KEY=VALUE</code></td>
+</tr>
+<tr>
+<td><code>ci-config</code></td>
+<td>the job is not found, matches several jobs, the CI file uses YAML this reader does not follow, or <code>--from-ci</code> does not name a case</td>
+<td><code>--job NAME</code>, <code>--workflow FILE</code></td>
+</tr>
+<tr>
+<td><code>nothing-found</code></td>
+<td>no manifest of a supported ecosystem is in the directory</td>
+<td>the <code>CHECKOUT</code> argument or <code>--root DIR</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Two pins disagree when both are exact versions that differ on the components both state (<code>18</code> and <code>20.11.0</code>), or when an exact version fails a constraint (<code>18</code> against <code>&gt;=20</code>). Two constraints are not compared, and a form the comparer does not read (a caret on <code>0.x</code>, a name) is reported and not compared. <code>lts/*</code>, <code>latest</code>, <code>stable</code>, <code>node</code> and <code>system</code> move with the day or the machine, so they stop.</p>
+<pre><code>stop 1 of 1: two-lockfiles
+  what: node has 2 lockfiles: package-lock.json, yarn.lock
+  question: Which lockfile do installs follow? Pass --lockfile with one of them.
+  answer with: --lockfile FILE
+</code></pre>
+<p>That excerpt comes from <a href="https://github.com/gmitch215/Drift/tree/master/fixtures/handsoff/stop-two-lockfiles"><code>fixtures/handsoff/stop-two-lockfiles</code></a>. Each fixture directory holds a small <code>repo/</code> and, under <code>golden/</code>, the plan printed for it; the stop fixtures also hold the plan with the stop answered.</p>
+<h3 id="reading-the-ci-file">Reading the CI file</h3>
+<p>Drift reads <code>.github/workflows/*.yml</code> and <code>.gitlab-ci.yml</code>. Without <code>--job</code> it lists the jobs it found and reads none. With <code>--job</code> (an id or a name) it prints the job's <code>run:</code> steps in order with the line of each, its <code>setup-*</code> actions and their <code>with:</code> values, the runner label or image, the <code>container:</code> image and the <code>services</code>. A GitLab job also gets its <code>before_script</code>, <code>script</code> and <code>after_script</code> as steps, <code>extends</code> resolved inside the file, <code>default:</code> values, and the <code>image</code>, <code>services</code> and <code>tags</code> it inherits.</p>
+<p>A matrix is never expanded. The plan reads one cell: the one <code>--cell</code> selects, or the one whose job name matches the failing job of a <code>--from-ci</code> case. <code>include</code> and <code>exclude</code> follow the GitHub rules for the chosen cell, and GitLab <code>parallel: matrix</code> cells are read the same way. Only <code>matrix.*</code> expressions are replaced; any other <code>${{ }}</code> text stays as written, and the plan says so. Steps with an <code>if:</code> condition are listed with the condition, and the plan does not decide whether they run.</p>
+<p>Drift ships no YAML library in common code, so a small reader handles block mappings and sequences, plain and quoted scalars, block scalars and one-line flow collections. Anchors, aliases, merge keys, tags, tab indentation, multi-line flow collections and a second document in one file are not read. A file that uses one is named in a note with the line, and a job that lives in it stops as <code>ci-config</code>. GitLab <code>include:</code> is not followed, and the plan says so.</p>
+<h3 id="ecosystems">Ecosystems</h3>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Ecosystem</th>
+<th>Files read</th>
+<th>Pins read</th>
+<th>Lockfiles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>node</td>
+<td><code>package.json</code>, <code>pnpm-workspace.yaml</code></td>
+<td><code>.nvmrc</code>, <code>.node-version</code>, <code>.tool-versions</code>, <code>engines.node</code>, <code>devEngines.runtime</code>, <code>volta.node</code>, <code>packageManager</code> (names the manager)</td>
+<td><code>package-lock.json</code>, <code>npm-shrinkwrap.json</code>, <code>yarn.lock</code>, <code>pnpm-lock.yaml</code>, <code>bun.lock</code>, <code>bun.lockb</code></td>
+</tr>
+<tr>
+<td>python</td>
+<td><code>pyproject.toml</code>, <code>requirements.txt</code>, <code>Pipfile</code>, <code>setup.py</code>, <code>setup.cfg</code>, <code>tox.ini</code>, <code>noxfile.py</code></td>
+<td><code>.python-version</code>, <code>.tool-versions</code>, <code>requires-python</code>, <code>python</code> under <code>[tool.poetry.dependencies]</code></td>
+<td><code>poetry.lock</code>, <code>uv.lock</code>, <code>Pipfile.lock</code>, and <code>requirements.txt</code> when every line is pinned with <code>==</code></td>
+</tr>
+<tr>
+<td>jdk</td>
+<td><code>build.gradle.kts</code>, <code>build.gradle</code>, <code>settings.gradle.kts</code>, <code>settings.gradle</code>, <code>pom.xml</code></td>
+<td><code>.java-version</code>, <code>.sdkmanrc</code>, <code>.tool-versions</code>, a Gradle toolchain (<code>jvmToolchain</code>, <code>JavaLanguageVersion.of</code>), a Maven compiler level (read as <code>&gt;=N</code>), the Gradle and Maven wrapper versions</td>
+<td><code>gradle.lockfile</code> (no lockfile rule: Gradle and Maven lock only by opt-in)</td>
+</tr>
+<tr>
+<td>php</td>
+<td><code>composer.json</code></td>
+<td><code>require.php</code>, <code>config.platform.php</code>, <code>.tool-versions</code></td>
+<td><code>composer.lock</code></td>
+</tr>
+<tr>
+<td>go</td>
+<td><code>go.mod</code>, <code>go.work</code></td>
+<td>the <code>go</code> line (read as <code>&gt;=N</code>), <code>toolchain</code>, <code>.tool-versions</code></td>
+<td><code>go.sum</code></td>
+</tr>
+<tr>
+<td>make, just</td>
+<td><code>Makefile</code>, <code>GNUmakefile</code>, <code>makefile</code>; <code>justfile</code>, <code>Justfile</code>, <code>.justfile</code></td>
+<td>none</td>
+<td>none</td>
+</tr>
+</tbody>
+</table></div>
+<p>Not read: Cargo, Gemfile, .NET project files and solutions, Elixir, Dart, Deno, Swift, Scala, Julia and R. A root file that marks one of them is named in the output as found and not read. Subdirectories are not searched except for workspaces that a manifest declares, and <code>--root DIR</code> plans one directory at a time (its lockfile has to be in that directory too). Gradle tasks, Maven goals and Composer scripts are not read.</p>
+<h3 id="commands-from-the-repository">Commands from the repository</h3>
+<p>The plan prefers a command the repository names: a CI <code>run:</code> step, a <code>package.json</code> script, a Makefile target, a justfile recipe, a nox session. For the rest it uses one default per lockfile, and only where an official page that was fetched documents the command. The pages were read through a summarizing fetch tool, not as full text.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Command</th>
+<th>Page</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>package-lock.json</code>, <code>npm-shrinkwrap.json</code></td>
+<td><code>npm ci</code></td>
+<td><a href="https://docs.npmjs.com/cli/v10/commands/npm-ci">https://docs.npmjs.com/cli/v10/commands/npm-ci</a></td>
+</tr>
+<tr>
+<td><code>pnpm-lock.yaml</code></td>
+<td><code>pnpm install --frozen-lockfile</code></td>
+<td><a href="https://pnpm.io/cli/install">https://pnpm.io/cli/install</a></td>
+</tr>
+<tr>
+<td><code>yarn.lock</code> with <code>__metadata:</code></td>
+<td><code>yarn install --immutable</code></td>
+<td><a href="https://yarnpkg.com/cli/install">https://yarnpkg.com/cli/install</a></td>
+</tr>
+<tr>
+<td><code>yarn.lock</code> with <code># yarn lockfile v1</code></td>
+<td><code>yarn install --frozen-lockfile</code></td>
+<td><a href="https://classic.yarnpkg.com/en/docs/cli/install">https://classic.yarnpkg.com/en/docs/cli/install</a></td>
+</tr>
+<tr>
+<td><code>composer.lock</code></td>
+<td><code>composer install</code></td>
+<td><a href="https://getcomposer.org/doc/03-cli.md">https://getcomposer.org/doc/03-cli.md</a></td>
+</tr>
+<tr>
+<td><code>go.mod</code></td>
+<td><code>go mod download</code></td>
+<td><a href="https://go.dev/ref/mod">https://go.dev/ref/mod</a></td>
+</tr>
+<tr>
+<td><code>requirements.txt</code></td>
+<td><code>python -m pip install -r requirements.txt</code></td>
+<td><a href="https://pip.pypa.io/en/stable/user_guide/">https://pip.pypa.io/en/stable/user_guide/</a></td>
+</tr>
+<tr>
+<td><code>poetry.lock</code></td>
+<td><code>poetry install</code></td>
+<td><a href="https://python-poetry.org/docs/cli/">https://python-poetry.org/docs/cli/</a></td>
+</tr>
+<tr>
+<td><code>uv.lock</code></td>
+<td><code>uv sync</code></td>
+<td><a href="https://docs.astral.sh/uv/concepts/projects/sync/">https://docs.astral.sh/uv/concepts/projects/sync/</a></td>
+</tr>
+<tr>
+<td>script <code>NAME</code> in <code>package.json</code></td>
+<td><code>npm run NAME</code>, <code>pnpm run NAME</code> or <code>yarn run NAME</code>, by the manager</td>
+<td><a href="https://docs.npmjs.com/cli/v10/commands/npm-run-script">https://docs.npmjs.com/cli/v10/commands/npm-run-script</a>, <a href="https://pnpm.io/cli/run">https://pnpm.io/cli/run</a>, <a href="https://yarnpkg.com/cli/run">https://yarnpkg.com/cli/run</a></td>
+</tr>
+<tr>
+<td>nox session</td>
+<td><code>nox -s SESSION</code></td>
+<td><a href="https://nox.thea.codes/en/stable/usage.html">https://nox.thea.codes/en/stable/usage.html</a></td>
+</tr>
+<tr>
+<td>justfile recipe</td>
+<td><code>just RECIPE</code></td>
+<td><a href="https://just.systems/man/en/">https://just.systems/man/en/</a></td>
+</tr>
+<tr>
+<td>Makefile target</td>
+<td><code>make TARGET</code></td>
+<td><a href="https://www.gnu.org/software/make/manual/html_node/Goals.html">https://www.gnu.org/software/make/manual/html_node/Goals.html</a></td>
+</tr>
+</tbody>
+</table></div>
+<p>Everything else prints as not detected. A tox environment is listed with the line it came from and no command, because the tox pages returned no text when fetched. <code>bun.lock</code> and <code>bun.lockb</code> count as lockfiles and have no install command, and Composer scripts and Go tests have no run command. A script, target or recipe named <code>test</code> is the test command (a nox session named <code>test</code> or <code>tests</code> also counts); any other name is listed and not planned.</p>
+<h3 id="handsoff-flags">Handsoff Flags</h3>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CHECKOUT</code></td>
+<td>the directory to read (default <code>.</code>)</td>
+</tr>
+<tr>
+<td><code>--root DIR</code></td>
+<td>plan this directory of the checkout; the CI files are still read from the checkout root</td>
+</tr>
+<tr>
+<td><code>--job NAME</code></td>
+<td>the CI job, by id or name</td>
+</tr>
+<tr>
+<td><code>--workflow FILE</code></td>
+<td>the CI file, from the checkout root; starts no process</td>
+</tr>
+<tr>
+<td><code>--from-ci DIR</code></td>
+<td>a case written by <code>drift ci</code>; its failing job is the job (path relative to the working directory)</td>
+</tr>
+<tr>
+<td><code>--cell KEY=VALUE</code></td>
+<td>choose a matrix cell; repeat for each key</td>
+</tr>
+<tr>
+<td><code>--lockfile FILE</code></td>
+<td>the lockfile an install follows</td>
+</tr>
+<tr>
+<td><code>--accept-no-lockfile</code></td>
+<td>go ahead although a manifest has no lockfile</td>
+</tr>
+<tr>
+<td><code>--test-command COMMAND</code></td>
+<td>the test command, used as written; with a job chosen it is used only when the job has no <code>run:</code> step</td>
+</tr>
+<tr>
+<td><code>--runtime NAME=VERSION</code></td>
+<td>a version of <code>node</code>, <code>python</code>, <code>java</code>, <code>php</code> or <code>go</code>; it ends the version stop for that tool</td>
+</tr>
+<tr>
+<td><code>--json</code></td>
+<td>print canonical JSON instead of text</td>
+</tr>
+<tr>
+<td><code>--out FILE</code></td>
+<td>also write the report to this file</td>
+</tr>
+</tbody>
+</table></div>
+<p>The text and the JSON hold the same facts in the same order for the same checkout. Exit code 0 means a plan was printed; exit code 1 means a stop or a bad flag value.</p>
+<p>Limits: this step plans and never runs, so it cannot say whether a command works. It does not expand a matrix, evaluate expressions other than <code>matrix.*</code>, follow GitLab <code>include:</code>, search subdirectories, read Rust, Ruby or .NET projects, or emulate services. Containers are the default place in the plan; running in one is a later step.</p>
 <h2 id="bisect">Bisect</h2>
 <p><code>drift bisect plan GREEN RED --out PLAN</code> lists the static attributes that differ between two capsules (files or directories) and writes a plan. <code>drift bisect apply PLAN --step N --green|--red</code> records what happened when you ran your test on step N, and prints the next step or the minimal set. Drift never runs the test: a step names attributes to set to their red values in the green environment, and you run whatever applies them (a container flag, a version pin, an environment variable).</p>
 <pre><code class="language-sh">drift bisect plan green-import red-import --out plan.json
@@ -1346,7 +1986,7 @@ minimal set: 1 of 3 attributes after 3 tests; the test fails with all of them an
 <p>The plan file is canonical JSON and holds the whole state: the flips, the recorded trials, and the derived <code>status</code>, <code>next</code> and <code>minimal</code> fields. The same two capsules always give the same bytes (the plan above hashes to <code>c788ced1...e1c3</code> on every run). <code>apply</code> accepts only the pending step; repeating the last recorded outcome changes nothing, and a different outcome for a recorded step fails with <code>step 2 already holds red</code>. A test that cannot be judged has no third outcome: stop and rerun it rather than guessing.</p>
 <p>Only static attributes are flipped. Volatile attributes and probe differences are left out, and a plan over capsules with no static difference fails with <code>the capsules have no static attribute differences to bisect</code>.</p>
 <h2 id="offline">Offline</h2>
-<p>Nothing in <code>run</code>, <code>import</code>, <code>diagnose --against</code> or <code>bisect</code> opens a network connection. This run used the Linux arm64 executable in a container with <code>--network none</code>, whose network namespace holds the loopback device and the kernel's default tunnel devices, all <code>down</code> or <code>unknown</code> in <code>/sys/class/net/*/operstate</code>:</p>
+<p>Nothing in <code>run</code>, <code>import</code>, <code>diagnose --against</code> or <code>bisect</code> opens a network connection, and the default path of every command stays offline: <code>--ssh</code> on <code>capture</code> and <code>diagnose</code> is the one explicit opt-in that connects to another machine (see <a href="#remote-capture-over-ssh">Remote Capture over SSH</a>). This run used the Linux arm64 executable in a container with <code>--network none</code>, whose network namespace holds the loopback device and the kernel's default tunnel devices, all <code>down</code> or <code>unknown</code> in <code>/sys/class/net/*/operstate</code>:</p>
 <pre><code class="language-sh">docker run --rm --network none -v &quot;$PWD/n:/n&quot; -w /n debian:bookworm-slim sh /n.sh
 </code></pre>
 <pre><code>wrote 11 attributes and 0 symptoms to green
@@ -1370,6 +2010,188 @@ drift diagnose --against baseline current --detail summary
 exit &quot;${status:-0}&quot;
 </code></pre>
 <p>This shape was not run in a CI service for this guide.</p>
+<h2 id="remote-capture-over-ssh">Remote Capture over SSH</h2>
+<p><code>drift capture --ssh HOST</code> captures another machine, and <code>drift diagnose --ssh A --ssh B</code> captures two and diagnoses them. Both are opt-in: every other command, and both of these without <code>--ssh</code>, stay offline (see <a href="#offline">Offline</a>). The remote machine needs an SSH server, a POSIX shell and your key in its <code>authorized_keys</code>. Drift installs nothing there and writes nothing there.</p>
+<pre><code class="language-sh">drift capture --ssh build-02 --label build-02 &gt; build-02.json
+drift capture --ssh build-02 --out caps/build-02
+drift diagnose --ssh ci-green --ssh ci-red --detail summary
+</code></pre>
+<p>None of the three was run for this guide, because no ssh connection was made; <a href="#checks-for-this-section">Checks for This Section</a> says what was. HOST is a name from your own <code>~/.ssh/config</code>, or <code>[user@]name</code> with letters, digits, <code>.</code>, <code>_</code> and <code>-</code>. The first <code>--ssh</code> of <code>diagnose</code> is the passing machine and the second is the failing one, as with <code>drift diagnose A B</code>.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>capture --ssh HOST</code></td>
+<td>capture HOST over ssh with read-only commands</td>
+</tr>
+<tr>
+<td><code>capture --out DIR</code></td>
+<td>write <code>capsule.json</code> into <code>DIR</code> instead of printing the capsule; works with or without <code>--ssh</code></td>
+</tr>
+<tr>
+<td><code>diagnose --ssh HOST</code></td>
+<td>give it twice; capture both machines, write the two capsules and the case to <code>.drift/ssh/A-B/</code> in the working directory, and diagnose them with the same code as <code>drift diagnose A B</code></td>
+</tr>
+<tr>
+<td><code>diagnose --case DIR</code></td>
+<td>with <code>--ssh</code>, write the capsules and the case to <code>DIR</code> instead (and refuse a <code>DIR</code> that already holds a case)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The case frame is always <code>environment</code>, because two machines have no commits. <code>.drift/ssh/A-B/</code> takes each host text with every character outside letters, digits, <code>.</code>, <code>_</code> and <code>-</code> turned into <code>_</code>, and a second run over the same pair overwrites it. Drift prints the path on standard error, edits no tracked file, and prints a note after the result that says what a read-only capture cannot show:</p>
+<pre><code>note: this compares what a read-only capture shows on each machine: system files and the environment of a non-login ssh session. No repository code ran, so the ranking names differences and cannot confirm which one causes a failure.
+</code></pre>
+<h3 id="what-drift-runs">What Drift Runs</h3>
+<p>Drift starts the system <code>ssh</code> through the same process interface that <code>drift ci</code> uses for <code>gh</code>. It has no SSH library and no new dependency. The first command of a capture, as the tests record it, is this one (the last argument is one word that holds the quoted remote command; <code>mktemp -d /tmp/drift-ssh.XXXXXX</code> picks the control directory, and the test's stand-in answered <code>/tmp/drift-ssh.AbC123</code>):</p>
+<pre><code>ssh -T -n -o BatchMode=yes -o StrictHostKeyChecking=yes -o ForwardAgent=no -o ForwardX11=no -o ClearAllForwardings=yes -o ConnectTimeout=10 -o LogLevel=ERROR -o ControlMaster=auto -o ControlPersist=30 -o ControlPath=/tmp/drift-ssh.AbC123/m -- me@build-02 &quot;'uname' '-sm'&quot;
+</code></pre>
+<p>The remote side runs only the commands below, each with every argument in single quotes. Any other command is refused inside Drift with an error, and there is no flag to widen the list in this version.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Remote command</th>
+<th>Used for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>uname -sm</code></td>
+<td>the remote <code>os.name</code> and <code>os.arch</code>; also the first check that the connection works</td>
+</tr>
+<tr>
+<td><code>uname -r</code>, <code>getconf _NPROCESSORS_ONLN</code>, <code>sw_vers -productVersion</code></td>
+<td><code>kernel.release</code>, <code>cpu.count</code>, and <code>os.version</code> on macOS</td>
+</tr>
+<tr>
+<td><code>readlink /etc/localtime</code></td>
+<td><code>tz.system-zone</code></td>
+</tr>
+<tr>
+<td><code>env</code></td>
+<td>the <code>env.*</code> attributes</td>
+</tr>
+<tr>
+<td><code>cat</code> of one of: <code>/etc/os-release</code>, <code>/etc/timezone</code>, <code>/etc/crypto-policies/config</code>, <code>/proc/self/cgroup</code>, <code>/proc/cmdline</code>, <code>/proc/sys/kernel/apparmor_restrict_unprivileged_userns</code>, <code>/sys/fs/cgroup/cpu.max</code>, <code>/sys/fs/cgroup/memory.max</code>, <code>/sys/fs/cgroup/memory/memory.limit_in_bytes</code>, <code>/usr/share/zoneinfo/tzdata.zi</code>, <code>/usr/share/zoneinfo/+VERSION</code></td>
+<td>the OS release, cgroup, kernel command line, crypto policy and time zone database facts</td>
+</tr>
+</tbody>
+</table></div>
+<p>A Linux capture makes 17 ssh calls that run 15 distinct commands (<code>env</code> runs twice and <code>cat /sys/fs/cgroup/memory.max</code> twice); a 16th command, <code>cat /etc/timezone</code>, runs only when <code>/etc/localtime</code> is not a link. The facts never run <code>df</code>, <code>mount</code>, <code>find</code> or <code>ls</code>, and never read a path outside the list.</p>
+<h3 id="safety-rules">Safety Rules</h3>
+<p>Drift passes <code>-o BatchMode=yes</code>, so ssh never asks for a password, and it never calls <code>sshpass</code> or <code>sudo</code>. It passes <code>-o StrictHostKeyChecking=yes</code>, so a host key that is not already in your <code>known_hosts</code> fails the connection. Drift never runs <code>ssh-keyscan</code>, never edits <code>known_hosts</code>, and never uses <code>accept-new</code>, <code>StrictHostKeyChecking=no</code> or <code>UserKnownHostsFile=/dev/null</code>. Your own <code>~/.ssh/config</code>, agent and keys do the authentication, and Drift stores no credential and no host key. It passes <code>ForwardAgent=no</code>, <code>ForwardX11=no</code> and <code>ClearAllForwardings=yes</code> so your config cannot turn forwarding on.</p>
+<p>The host text must match <code>[user@]name</code>, with letters, digits, <code>.</code>, <code>_</code> and <code>-</code> (or a bracketed IPv6 address after the <code>@</code>), no part may start with <code>-</code>, and Drift passes it after <code>--</code>. Anything else is refused before ssh runs, so a host argument cannot become an ssh option. A host argument in brackets reaches ssh without them.</p>
+<p>Each remote command has a 30 second limit, ssh itself has <code>ConnectTimeout=10</code>, and Drift keeps at most 1 MiB of output from one command. A command that sends more stops the capture with an error. After any ssh failure, Drift runs no further remote command.</p>
+<p>Before the first remote command Drift prints one line on standard error:</p>
+<pre><code>drift: running read-only fact commands on me@build-02 over ssh; it reads system files and the environment, runs no repository code, uses no sudo and stores no credentials
+</code></pre>
+<p>Drift reuses one connection for the whole capture. It makes a private directory with <code>mktemp -d</code> (mode 0700), puts the control socket in it, closes the connection with <code>ssh -O exit</code> at the end and removes the directory. If it cannot make the directory, or the local machine is Windows, it runs without connection reuse.</p>
+<p><code>--tools</code>, <code>--probes</code> and <code>--project</code> run many more commands, so <code>capture --ssh</code> refuses them. Both refusals below are real output from the JVM build in a Linux container (<code>drift capture --ssh build-02 --tools</code>, then <code>drift capture --ssh=-oProxyCommand=id</code>), and each exits 1 before any <code>ssh</code> starts:</p>
+<pre><code>Usage: drift [&lt;options&gt;] &lt;command&gt; [&lt;args&gt;]...
+
+Error: --tools, --probes and --project run many more commands and are not available with --ssh in this version
+</code></pre>
+<pre><code>Usage: drift [&lt;options&gt;] &lt;command&gt; [&lt;args&gt;]...
+
+Error: -oProxyCommand=id is not a host name: use [user@]name with letters, digits, '.', '_' and '-', and no leading '-'
+</code></pre>
+<h3 id="what-the-capsule-holds">What the Capsule Holds</h3>
+<p>The remote capsule comes from the same <code>Capture</code> code as a local one, reading the remote machine through the commands above, so it diffs the same way. Three things differ. It has no <code>kotlin.version</code>, <code>kotlin.target</code> or <code>drift.platform</code>, because those describe the Drift build on your machine. It has no <code>runtime.platform</code> unless the remote environment sets <code>DRIFT_RUNTIME_PLATFORM</code>. It has <code>capture.transport</code> with the value <code>ssh</code>, so a remote and a local capsule never look the same by accident. The <code>env.*</code> attributes come from a non-login ssh session, which loads less of the remote shell profile than a terminal does, and that can differ from what a test sees when you log in. The account name, host name and home path are anonymized as in a local capture; <code>--keep-identifiers</code> keeps them.</p>
+<p><code>os.name</code> comes from <code>uname -s</code> in the same vocabulary as a local capture (<code>linux</code>, <code>macos</code>, <code>freebsd</code>, and <code>unknown</code> for other names). A Windows remote, or a host that does not answer <code>uname</code>, is refused with a message. No hardware facts are read over ssh.</p>
+<h3 id="when-ssh-fails">When ssh Fails</h3>
+<p>Every failure exits 1, prints nothing on standard output, and prints a plain message. The left column is what OpenSSH prints, written from memory of its messages and not captured from a run for this guide.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>ssh says</th>
+<th>Drift prints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>No ED25519 host key is known for HOST and you have requested strict checking.</code></td>
+<td><code>HOST is not in your known_hosts, so Drift will not connect. Check its fingerprint with its owner and add the key yourself, for example by connecting once with ssh. Drift never adds host keys</code></td>
+</tr>
+<tr>
+<td><code>WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!</code></td>
+<td><code>the host key of HOST does not match your known_hosts, so Drift refuses to connect: the host may have been replaced or intercepted. Ask its owner before you change known_hosts</code></td>
+</tr>
+<tr>
+<td><code>Permission denied (publickey).</code></td>
+<td><code>ssh could not log in to HOST without a prompt. Drift never asks for a password; use a key or agent that your own ssh config selects for this host</code></td>
+</tr>
+<tr>
+<td><code>Connection refused</code></td>
+<td><code>HOST refused the connection; check the name, the port in your ssh config and that sshd is running</code></td>
+</tr>
+<tr>
+<td><code>Could not resolve hostname</code></td>
+<td><code>cannot resolve the name HOST; check it and your ssh config</code></td>
+</tr>
+<tr>
+<td><code>Connection timed out</code>, or no answer in 30 seconds</td>
+<td><code>ssh to HOST timed out</code></td>
+</tr>
+<tr>
+<td>any other text</td>
+<td><code>ssh to HOST failed: </code> and the first line, cut to 200 characters</td>
+</tr>
+</tbody>
+</table></div>
+<p>Two more stops have their own messages: <code>cannot start ssh; install an OpenSSH client and make sure it is on the path</code>, and, on a build that cannot start programs (the web and iOS builds), <code>this build cannot start other programs, so it cannot run ssh; use the desktop command line</code>. The Studio app does not call ssh.</p>
+<h3 id="risks">Risks</h3>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Control</th>
+<th>What is left</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>First contact with an unknown host</td>
+<td><code>StrictHostKeyChecking=yes</code> against your <code>known_hosts</code>; Drift never adds a key</td>
+<td>a key you add without checking its fingerprint</td>
+</tr>
+<tr>
+<td>A changed host key</td>
+<td>ssh refuses and Drift reports it without retrying</td>
+<td>none beyond the line above</td>
+</tr>
+<tr>
+<td>A secret in the capsule</td>
+<td><code>env</code> values are masked by name and by token shape, as in a local capture</td>
+<td>a secret under a variable name that the masks do not match</td>
+</tr>
+<tr>
+<td>Remote code runs</td>
+<td>only the fixed commands above, no repository code, no <code>sudo</code></td>
+<td>each new flag that adds commands needs its own review</td>
+</tr>
+<tr>
+<td>Option injection through the host text</td>
+<td>strict pattern, <code>--</code>, every remote argument quoted</td>
+<td>none known</td>
+</tr>
+<tr>
+<td>Output flood from the remote</td>
+<td>1 MiB per command and a 30 second limit</td>
+<td>a slow link can still take a while</td>
+</tr>
+<tr>
+<td>Remote profile prints text on login</td>
+<td><code>uname -sm</code> uses its last line and <code>env</code> keeps only <code>NAME=value</code> lines</td>
+<td>a banner in the middle of a file read can add a stray line to that file's text</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="checks-for-this-section">Checks for This Section</h3>
+<p>The tests run the whole capture against a stand-in for <code>ssh</code> that records each argument list, so no test opens a connection. They check the exact command line above, that hostile host text and hostile quoted arguments (<code>;</code>, <code>$()</code>, backticks, quotes, newlines, a leading <code>-</code>, a 100,000 character string) never reach a remote shell unquoted, that every command outside the list is refused before ssh runs, the output bound, the timeout, each failure in the table above, the capsule without <code>kotlin.*</code> and with <code>capture.transport</code>, and the refusal of <code>--tools</code>, <code>--probes</code> and <code>--project</code>. No ssh connection was made for this guide. The one live check is <code>drift capture --ssh paisley-park --label paisley</code>, run on the Mac against a machine whose host key is already in <code>known_hosts</code>. It is read-only and changes nothing on the remote.</p>
 <h2 id="next-and-case-show">Next and Case Show</h2>
 <p><code>drift next CASE</code> prints the proposed experiments of a case. <code>drift case show CASE</code> prints what the case holds and whether it still checks out.</p>
 <pre><code class="language-sh">drift case show case
@@ -1427,16 +2249,16 @@ This is not the original environment. Attributes that are not mirrored are liste
   at --detail detail.
 # drift reproduce: capsule 540e5c225a8ee48280f38e3c96a68e4d43ee1b2879e9d2d7d21f1c8fcb006531; manifest.json says what is not mirrored
 FROM node:22.12.0-alpine3.20
-RUN apk add --no-cache gcompat tzdata
+RUN apk add --no-cache gcompat libgcc tzdata
 RUN npm install -g npm@10.9.2
 WORKDIR /work
 </code></pre>
 <p><code>wrote 3 files</code> goes to standard error and the summary to standard output. Running the command twice produces identical files:</p>
 <pre><code class="language-sh">shasum -a 256 repro/*
 </code></pre>
-<pre><code>67b596a58c76f708d69be46e3a99d00a84e4007142697cae8cc0fb76dfbf1d9c  repro/Dockerfile
-33592f2de94cedfb387f9311810f65a72939566ee7183a8dee0da32f3cf7b878  repro/manifest.json
-14e096545016d3c998c10ff787a0ec456f1dab2fbeba38516b090f22d9abd280  repro/run.sh
+<pre><code>f47eacf4b6acd22940547256bfcf3a0d34914a52bc0fd6b8254a6192797f7305  repro/Dockerfile
+d58f19006418c668478e69e5b452646bd0491691c4a4d02721199cb50f8e3012  repro/manifest.json
+2697a96f2b1eb65ec1ad9ebcd6294570fd47d3537312e18ecbdc145333dcef56  repro/run.sh
 </code></pre>
 <p><code>run.sh</code> builds the image (tagged <code>drift-reproduce:&lt;12 hex of the Dockerfile hash&gt;</code>) and runs it with the flags the capsule implies:</p>
 <pre><code class="language-sh">sed -n 6,20p repro/run.sh
@@ -1828,6 +2650,31 @@ verify: ok
 </code></pre>
 <pre><code>none
 </code></pre>
+<p><code>--junit FILE</code> writes the same checks as a JUnit XML report. The report has one <code>testsuite</code> named <code>drift verify</code> and one <code>testcase</code> per check, named by the check id. A failed check gets a <code>failure</code> element whose message is the check line, and a skipped check gets a <code>skipped</code> element. The file is written before the command exits, so a failing archive still produces a report. The text or JSON output and the exit code do not change. CI systems that read JUnit XML, such as the GitHub, GitLab and Codecov test result views, can list each check as a test.</p>
+<pre><code class="language-sh">drift verify fixtures/lab/cases/locale-tz-date-2.driftcase --junit verify.xml
+</code></pre>
+<p>The text report still goes to standard output. <code>verify.xml</code> holds:</p>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;testsuites&gt;
+  &lt;testsuite name=&quot;drift verify&quot; tests=&quot;14&quot; failures=&quot;0&quot; errors=&quot;0&quot; skipped=&quot;0&quot;&gt;
+    &lt;testcase name=&quot;tar&quot; classname=&quot;drift verify&quot;/&gt;
+    &lt;testcase name=&quot;manifest&quot; classname=&quot;drift verify&quot;/&gt;
+    &lt;testcase name=&quot;observation-chain&quot; classname=&quot;drift verify&quot;/&gt;
+    &lt;testcase name=&quot;results-chain&quot; classname=&quot;drift verify&quot;/&gt;
+    &lt;testcase name=&quot;capsules&quot; classname=&quot;drift verify&quot;/&gt;
+    &lt;testcase name=&quot;counts&quot; classname=&quot;drift verify&quot;/&gt;
+    &lt;testcase name=&quot;fisher&quot; classname=&quot;drift verify&quot;/&gt;
+    &lt;testcase name=&quot;rules&quot; classname=&quot;drift verify&quot;/&gt;
+    &lt;testcase name=&quot;decision&quot; classname=&quot;drift verify&quot;/&gt;
+    &lt;testcase name=&quot;posteriors&quot; classname=&quot;drift verify&quot;/&gt;
+    &lt;testcase name=&quot;ranking&quot; classname=&quot;drift verify&quot;/&gt;
+    &lt;testcase name=&quot;plan&quot; classname=&quot;drift verify&quot;/&gt;
+    &lt;testcase name=&quot;verdict&quot; classname=&quot;drift verify&quot;/&gt;
+    &lt;testcase name=&quot;report&quot; classname=&quot;drift verify&quot;/&gt;
+  &lt;/testsuite&gt;
+&lt;/testsuites&gt;
+</code></pre>
+<p><code>drift contract verify</code> takes the same option. Its suite is named <code>drift contract verify</code> and each assertion is a testcase named <code>&lt;kind&gt; &lt;id&gt;</code>. A breaking assertion is a <code>failure</code>, and an unverifiable one is a <code>skipped</code> element.</p>
 <p>The four archives in <code>fixtures/lab/cases</code> cover one verdict each:</p>
 <div class="table"><table>
 <thead>
@@ -2209,12 +3056,12 @@ contract: 0 hold, 0 break, 1 unverifiable
   drupal   project.composer.drupal/core          10.3.6 -&gt; 11
   symfony  project.composer.symfony/http-kernel  v6.4.12 -&gt; 7.1
   php      tool.php.version                      8.1.34 -&gt; 8.3
-73 of 298 rules read a target key
+83 of 426 rules read a target key
 
 Will break (0)
   none
 
-May break (7)
+May break (3)
   1. [high, inferred] Drupal 11 minimum database versions are MySQL 8.0, MariaDB 10.6, PostgreSQL 16 and SQLite 3.45 (json1); Drupal 10 minimums are no longer enough
      rule: drupal-11-database-server-minimums
      boundary: project.composer.drupal/core 10.3.6 -&gt; 11 (rule: was any, now &gt;=11)
@@ -2273,7 +3120,7 @@ Unknown (0)
 </tr>
 </tbody>
 </table></div>
-<p>Only rules that read a target key on side <code>b</code> and give a different verdict for the targets than for the capsule alone are listed. The line <code>73 of 298 rules read a target key</code> counts the rules that read one before that filter. Probe results and run facts describe today's environment, so side <code>b</code> has none, and a rule that reads one is unknown.</p>
+<p>Only rules that read a target key on side <code>b</code> and give a different verdict for the targets than for the capsule alone are listed. The line <code>83 of 426 rules read a target key</code> counts the rules that read one before that filter. Probe results and run facts describe today's environment, so side <code>b</code> has none, and a rule that reads one is unknown.</p>
 <p>Locked packages are checked apart from the rules. When a target is <code>php</code>, <code>node</code> or <code>python</code>, <code>upgrade-check</code> reads the runtime constraint each locked package records and lists a package whose constraint allows today's runtime and excludes the target under &quot;Will break: locked packages&quot;, with the package, its version, the lockfile and the constraint. <code>drift capture --project</code> records the constraint as <code>project.&lt;ecosystem&gt;.&lt;package&gt;.requires.&lt;runtime&gt;</code> for the formats that carry one, and no rule names the package:</p>
 <div class="table"><table>
 <thead>
@@ -2311,7 +3158,7 @@ Unknown (0)
 <pre><code class="language-sh">drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=8.3,drupal=11,symfony=7.1 --json \
   | jq -c '{rules, touched, willBreak: [.&quot;will-break&quot;[] | {rule}], versionBoundary: [.&quot;version-boundary&quot;[] | {rule, crossings: [.crossings[] | {key, from, to}]}]}'
 </code></pre>
-<pre><code>{&quot;rules&quot;:298,&quot;touched&quot;:73,&quot;willBreak&quot;:[],&quot;versionBoundary&quot;:[{&quot;rule&quot;:&quot;php-8-2-dynamic-properties-deprecated&quot;,&quot;crossings&quot;:[{&quot;key&quot;:&quot;tool.php.version&quot;,&quot;from&quot;:&quot;8.1.34&quot;,&quot;to&quot;:&quot;8.3&quot;}]},{&quot;rule&quot;:&quot;drupal-10-to-11-symfony-6-2-to-7-1&quot;,&quot;crossings&quot;:[{&quot;key&quot;:&quot;project.composer.drupal/core&quot;,&quot;from&quot;:&quot;10.3.6&quot;,&quot;to&quot;:&quot;11&quot;},{&quot;key&quot;:&quot;project.composer.symfony/http-kernel&quot;,&quot;from&quot;:&quot;v6.4.12&quot;,&quot;to&quot;:&quot;7.1&quot;}]}]}
+<pre><code>{&quot;rules&quot;:426,&quot;touched&quot;:83,&quot;willBreak&quot;:[],&quot;versionBoundary&quot;:[{&quot;rule&quot;:&quot;php-8-2-dynamic-properties-deprecated&quot;,&quot;crossings&quot;:[{&quot;key&quot;:&quot;tool.php.version&quot;,&quot;from&quot;:&quot;8.1.34&quot;,&quot;to&quot;:&quot;8.3&quot;}]},{&quot;rule&quot;:&quot;drupal-10-to-11-symfony-6-2-to-7-1&quot;,&quot;crossings&quot;:[{&quot;key&quot;:&quot;project.composer.drupal/core&quot;,&quot;from&quot;:&quot;10.3.6&quot;,&quot;to&quot;:&quot;11&quot;},{&quot;key&quot;:&quot;project.composer.symfony/http-kernel&quot;,&quot;from&quot;:&quot;v6.4.12&quot;,&quot;to&quot;:&quot;7.1&quot;}]}]}
 </code></pre>
 <p>The targets can sit in a file instead. This file gives the same result:</p>
 <pre><code class="language-yaml">php: 8.3
@@ -2327,7 +3174,7 @@ symfony: '7.1'
 </code></pre>
 <pre><code>upgrade-check: drupal-10-site
   php  tool.php.version  8.1.34 -&gt; 7.4
-46 of 298 rules read a target key
+56 of 426 rules read a target key
 
 Will break (2)
   1. [high, inferred] Drupal 10 cannot run on PHP 8.0 or earlier; PHP 8.0 sites must move to 8.1 before upgrading core
@@ -2345,8 +3192,25 @@ Will break (2)
      source: https://raw.githubusercontent.com/symfony/symfony/v6.1.0/composer.json
      source: https://raw.githubusercontent.com/symfony/symfony/v6.0.0/composer.json
 
-May break (0)
-  none
+May break (3)
+  1. [high, verified] Laravel 10 declares PHP 8.1 or higher, so a PHP below 8.1 host cannot install it
+     rule: laravel-10-php-8-1-minimum
+     boundary: tool.php.version 8.1.34 -&gt; 7.4 (rule: was &gt;=8.1, now &lt;8.1)
+     needs: project.composer.laravel/framework
+     mechanism: The composer.json of Laravel 10 at tag v10.0.0 requires php ^8.1.
+     source: https://raw.githubusercontent.com/laravel/framework/v10.0.0/composer.json
+  2. [high, verified] Laravel 9 declares PHP 8.0.2 or higher, so a PHP below 8.0.2 host cannot install it
+     rule: laravel-9-php-8-0-2-minimum
+     boundary: tool.php.version 8.1.34 -&gt; 7.4 (rule: was &gt;=8.0.2, now &lt;8.0.2)
+     needs: project.composer.laravel/framework
+     mechanism: The composer.json of Laravel 9 at tag v9.0.0 requires php ^8.0.2.
+     source: https://raw.githubusercontent.com/laravel/framework/v9.0.0/composer.json
+  3. [high, verified] TYPO3 12 declares PHP 8.1 or higher, so a PHP below 8.1 host cannot install it
+     rule: typo3-12-php-8-1-minimum
+     boundary: tool.php.version 8.1.34 -&gt; 7.4 (rule: was &gt;=8.1, now &lt;8.1)
+     needs: project.composer.typo3/cms-core
+     mechanism: The composer.json of TYPO3 12 at tag v12.0.0 requires php ^8.1.
+     source: https://raw.githubusercontent.com/TYPO3/typo3/v12.0.0/typo3/sysext/core/composer.json
 
 Version boundary crossed (1)
   These rules apply to the versions crossed; no project fact or other environment key in the capture matched them.
@@ -2364,7 +3228,7 @@ Unknown (0)
 </code></pre>
 <pre><code>upgrade-check: red
   drupal  project.composer.drupal/core  unknown -&gt; 11
-21 of 298 rules read a target key
+21 of 426 rules read a target key
 
 Will break (0)
   none
@@ -2375,11 +3239,13 @@ May break (0)
 Version boundary crossed (0)
   none
 
-Unknown (15)
-  1. [high, verified] Drupal 10 removes the Aggregator, Color, HAL, Quick Edit and RDF modules and the Bartik, Seven, Classy and Stable themes from core
-     rule: drupal-10-removed-core-modules-and-themes
-     boundary: project.composer.drupal/core unknown -&gt; 11 (rule: was &lt;10, now &gt;=10)
-     needs: project.composer.drupal/core, project.drupal.modules.aggregator, project.drupal.modules.color, project.drupal.modules.hal, project.drupal.modules.quickedit, project.drupal.modules.rdf, project.drupal.themes.bartik, project.drupal.themes.classy, project.drupal.themes.seven, project.drupal.themes.stable; the rule is pending-scanner
+Unknown (10)
+  1. [high, inferred] Drupal 10 minimum database versions are MySQL 5.7.8, MariaDB 10.3.7, PostgreSQL 12 (pg_trgm) and SQLite 3.26 (JSON1)
+     rule: drupal-10-database-server-minimums
+     boundary: project.composer.drupal/core unknown -&gt; 11 (rule: was any, now &gt;=10)
+     needs: project.composer.drupal/core, runtime.database.server.kind, runtime.database.server.version; the rule is pending-scanner
+     mechanism: The Drupal 10.0.0 release notes list the minimum supported database versions as MySQL or Percona 5.7.8, MariaDB 10.3.7, PostgreSQL 12 with the pg_trgm extension, and SQLite 3.26 with the JSON1 extension.
+     source: https://www.drupal.org/project/drupal/releases/10.0.0
 ...
 </code></pre>
 <p>A bad target stops the command with exit code 1 and no output on standard output: <code>php=zzz is not a version</code>, <code>unknown target 'rust'</code> (the message lists the aliases), a name given twice with different values (<code>java=21,jdk=17</code>), and an unreadable <code>--to-file</code>.</p>
@@ -2393,7 +3259,7 @@ Unknown (15)
 <li>Group counts change when the rule catalog changes. The counts above are from this checkout.</li>
 </ul>
 <h2 id="atlas">Atlas</h2>
-<p>The Atlas asks, per probe, whether a Kotlin program prints the same thing on every target. It holds 38 probes. <code>atlas record</code> runs them on this target, <code>atlas build</code> aggregates transcripts into a dataset, <code>atlas compare</code> places this device against it, <code>atlas show</code> prints the matrix or a draft for one probe and <code>atlas diff</code> lists what changed between two Kotlin versions.</p>
+<p>The Atlas asks, per probe, whether a Kotlin program prints the same thing on every target. It holds 38 probes. <code>atlas record</code> runs them on this target, <code>atlas build</code> aggregates transcripts into a dataset, <code>atlas compare</code> places this device against it, <code>atlas show</code> prints the matrix, the oracle or a draft for one probe and <code>atlas diff</code> lists what changed between two Kotlin versions.</p>
 <p><strong>Columns.</strong> <code>fixtures/atlas/</code> holds 15 recorded columns on Kotlin 2.4.20, and <code>fixtures/atlas/2.5.0-beta1/</code> holds 5 on 2.5.0-Beta1 (<code>jvm</code>, <code>macos</code>, <code>wasm</code>, <code>android</code>, <code>ios</code>). <a href="https://github.com/gmitch215/Drift/blob/master/atlas/columns.yml"><code>atlas/columns.yml</code></a> says how each was measured.</p>
 <div class="table"><table>
 <thead>
@@ -2460,8 +3326,8 @@ identical-to-fixture
 <pre><code class="language-sh">drift atlas build fixtures/atlas/jvm.txt fixtures/atlas/macos.txt fixtures/atlas/wasm.txt --out atlas.json
 drift atlas build fixtures/atlas/*.txt fixtures/atlas/2.5.0-beta1/*.txt --out atlas-all.json
 </code></pre>
-<pre><code>dataset: 38 probes, 3 columns, 23 divergent, sha256 52cdbb80cf4e6b84ca62191a33efb5f214ae7b1dd38316226777d0e1b4f16f1e
-dataset: 38 probes, 21 columns, 32 divergent, sha256 a8dac9357ee8f42ed67eb6b0e605f8e705da3fdc0272f83b9c05aab6c78c1c29
+<pre><code>dataset: 38 probes, 3 columns, 23 divergent, sha256 30fad6394bf85d3f8687b7932531cc6a544afebad6af469fe551ffe41a382c93
+dataset: 38 probes, 21 columns, 32 divergent, sha256 17f82fefbd865c8521439dbc320bb817780254806b134505711fefd3cca268c1
 </code></pre>
 <p>The summary goes to standard error. The sha256 is the hash of the dataset body; the file on disk has one more trailing newline. Building twice gives identical files, and the order of the arguments does not change the bytes. <code>--out</code> is required. <code>build</code> refuses a transcript that lacks a probe of the catalog, names an unknown probe, lacks a header (<code>bad transcript header in badt.txt: missing kotlin.target</code>) or duplicates a column (<code>fixtures/atlas/jvm.txt and fixtures/atlas/jvm.txt both record jvm@2.4.20</code>).</p>
 <p><strong>Show.</strong> Without <code>--probe</code>, <code>atlas show</code> prints the matrix: one row per probe, one letter per distinct output, and a repeated letter on a row marks a byte-identical transcript.</p>
@@ -2515,6 +3381,68 @@ divergent probes: 23 of 38
 </tbody>
 </table></div>
 <p>Each entry also has a <code>basis</code> (<code>verified</code> when the cited page states the contract, <code>inferred</code> when the page implies it), the references with a short quote, and the linked issue ids with the state read on the research date. <code>unclassified</code> is not a finding. The 24 divergent unclassified probes each have a repro draft under <a href="https://github.com/gmitch215/Drift/tree/master/atlas/repros"><code>atlas/repros/</code></a>.</p>
+<p><strong>Oracle.</strong> <code>atlas show DATASET --oracle</code> gives every divergent line one kind. A divergent line is a line of one probe whose transcript differs between targets on one Kotlin version.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Meaning</th>
+<th>Reportable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>documented-contract</code></td>
+<td>a reference quote that names the line states the expected value</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>cross-version-change</code></td>
+<td>a target prints another value on another Kotlin version, and no quote decides which is right</td>
+<td>no</td>
+</tr>
+<tr>
+<td><code>crash</code></td>
+<td>a column failed instead of printing values</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>no-correctness-claim</code></td>
+<td>none of the above</td>
+<td>no</td>
+</tr>
+</tbody>
+</table></div>
+<p>A value that changed between versions is a cross-version change and is never called a regression. A regression needs a documented contract that says which value is right, and the oracle holds the quote before it uses that kind. Each reference in <code>atlas/classification.yml</code> can list the transcript lines its quote decides under <code>decides</code>; a quote that only allows the difference leaves the list empty. A failed column makes one <code>crash</code> entry for the probe, except when the research notes the whole probe as a documented or platform-defined limit. The Kotlin/JS reflection page says <code>KClass</code> is limited there, so the js-ir failure on <code>kotlin.collections.tostring-forms</code> is a <code>no-correctness-claim</code>.</p>
+<pre><code class="language-sh">drift atlas show atlas-all.json --oracle | sed -n 7,17p
+drift atlas show atlas-all.json --oracle | sed -n '/^reportable at kotlin 2.5.0-Beta1/,/^  0.49999999999999994/p'
+</code></pre>
+<pre><code>kotlin 2.4.20: 258 divergent lines
+  documented-contract: 15
+  cross-version-change: 31
+  crash: 4
+  no-correctness-claim: 208
+
+kotlin 2.5.0-Beta1: 94 divergent lines
+  documented-contract: 4
+  cross-version-change: 4
+  crash: 0
+  no-correctness-claim: 86
+reportable at kotlin 2.5.0-Beta1:
+kotlin.math.pow-special-cases
+  documented-contract (reportable): 1^nan
+    expected: &quot;b.pow(NaN) is NaN&quot;
+    source: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.math/pow.html
+  1^nan:
+    android, ios, macos: 1^nan = 1.0
+    jvm, wasm: 1^nan = NaN
+kotlin.math.rounding
+  documented-contract (reportable): 0.49999999999999994, 4503599627370497, float-8388609
+    expected: &quot;Rounds this Double value to the nearest integer and converts the result to Int&quot;
+    source: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.math/round-to-int.html
+  0.49999999999999994:
+</code></pre>
+<p>The listing then prints every other divergent line grouped by probe and kind under <code>no report offered</code>. The negated NaN line of <code>kotlin.double.nan-bits</code> (<code>neg-nan-raw</code>) is one of them: Native 2.4.20 and 2.5.0-Beta1 print the same value, no quote names the line, so it carries no claim. In Studio, the probe detail lists the same kinds under <code>oracle on kotlin VERSION</code>. <code>--oracle</code> cannot be combined with <code>--probe</code>.</p>
 <p><strong>Compare.</strong> <code>atlas compare DATASET TRANSCRIPT</code> places this device against each recorded column. <code>--detail summary</code> prints counts; <code>detail</code> adds the probes that differ.</p>
 <pre><code class="language-sh">drift atlas compare atlas.json tr/macos.txt
 drift atlas compare atlas-all.json tr/macos.txt | tail -21
@@ -2553,6 +3481,35 @@ per column:
   wasm-webkit@2.4.20: 25 of 38 probes match
 </code></pre>
 <p>The Mac that recorded the transcript matches its own column on 38 of 38 probes, which makes a useful check that a fresh recording is unchanged. A column from another machine can differ for hardware reasons (for example the sign bit of a NaN), and a Linux executable linked on Ubuntu instead of macOS prints different last digits for three lines of <code>kotlin.math.transcendental-bits</code>. A mismatch against a column recorded elsewhere is not a Kotlin finding by itself.</p>
+<p><strong>Here.</strong> <code>atlas here</code> runs the 38 probes on this machine and compares the result with the recorded columns for this build's Kotlin version. <code>--version V</code> compares with another version in the dataset. The command makes no network call, and the device label holds the platform and the OS family only.</p>
+<pre><code class="language-sh">drift atlas here
+drift atlas here --out device.txt
+drift atlas here --exit-status
+</code></pre>
+<p>The output starts with the summary that <code>atlas compare</code> prints. Each probe that does not match every column follows, with the columns it matches, the columns it differs from and each differing line. A line gets one oracle kind: <code>documented-contract</code> when a quoted reference names the line, the dataset's own kind for the line when the recorded columns disagree on it, and <code>no-correctness-claim</code> otherwise. A probe that did not run on the device is reported as <code>no-correctness-claim (the probe did not run here)</code>.</p>
+<p><code>--out FILE</code> writes this device as a transcript in the format <code>atlas build</code> reads, so it can be attached to an issue. <code>--exit-status</code> exits with 10 when a probe that ran matches no recorded column. A probe that did not run does not count.</p>
+<p>The JVM build of the CLI labels this device <code>jvm-linux</code>. Studio adds the Java feature version on the JVM (<code>jvm-21-linux</code>), and the CLI does not yet, so the label can differ from Studio's on the same machine. Output below is from the Linux x64 lane, the JVM build on kotlin 2.4.20, trimmed to the summary and one probe block (the full run prints 1,884 lines):</p>
+<pre><code>this device: jvm-linux, kotlin 2.4.20, 38 probes measured
+dataset: 38 probes, 16 columns: android@2.4.20, cloudflare-jvm@2.4.20, ..., wasm-webkit@2.4.20
+matches every column: 6
+matches some columns: 31
+matches no column: 1
+not measured here: 0
+per column:
+  android@2.4.20: 28 of 38 probes match
+  ...
+  jvm-21@2.4.20: 37 of 38 probes match
+  ...
+
+kotlin.double.nan-bits [unclassified] matches no column
+  matches: none
+  differs: android@2.4.20, cloudflare-jvm@2.4.20, cloudflare-wasm@2.4.20, ios@2.4.20, js-ir@2.4.20, jvm@2.4.20, jvm-17@2.4.20, jvm-21@2.4.20, jvm-25@2.4.20, linux@2.4.20, linux-arm64@2.4.20, macos@2.4.20, wasm@2.4.20, wasm-chromium@2.4.20, wasm-firefox@2.4.20, wasm-webkit@2.4.20
+  line 2 (this device): 0/0-raw = fff8000000000000
+  line 2 (android@2.4.20, cloudflare-jvm@2.4.20, cloudflare-wasm@2.4.20, jvm@2.4.20, wasm@2.4.20): 0/0-raw = 7ff8000000000000
+  kind: no-correctness-claim
+  ...
+</code></pre>
+<p>The <code>kotlin.double.nan-bits</code> block is the sign-bit difference that the compare example above describes. The probe has no classification, so no oracle claim applies.</p>
 <p><strong>Version changes.</strong> <code>atlas diff DATASET --from X --to Y [--target T]</code> lists the probes whose transcript differs between two Kotlin versions on the targets recorded for both. A target recorded for only one of the two versions is named and left out. <code>--detail summary</code> prints counts, <code>detail</code> (the default) adds each changed probe with the differing lines, and <code>full</code> adds the probes that did not change. Versions match ignoring case. The ladder dataset is <code>fixtures/atlas</code> plus <code>fixtures/atlas-ladder</code> without its duplicate <code>2.4.20/linux.txt</code>: <code>./gradlew atlasLadderDataset</code> writes it to <code>build/atlas-work/ladder.json</code>, and <code>atlasSite</code> publishes it as <code>data/ladder.json</code> and as the <code>versions.html</code> page, which lists the change between each pair of consecutive versions per target.</p>
 <pre><code class="language-sh">drift atlas diff ladder.json --from 2.4.21 --to 2.5.0-Beta1 --target js-ir
 </code></pre>
@@ -3472,6 +4429,96 @@ press Ctrl+C to stop
 <p>Exit status is 0 after a normal stop. It is 1 when no build is found, a file cannot be read, a port is busy (<code>error: cannot listen on port 57111: Address already in use; pass --port 0 to take a free port</code>), or the build cannot serve TLS, and 2 for a bad combination of options (<code>error: --tls needs --cert and --key, or --mkcert</code>, <code>error: --cert and --key go together</code>, <code>--mdns</code> without a <code>.local</code> name).</p>
 <h3 id="serve-limits">Serve Limits</h3>
 <p>The server reads each file whole into memory for each request, so a few large concurrent downloads of the 8.6 MB WebAssembly file cost that much memory each. It does not support range requests or compression. The Windows executable has run under Wine and serves HTTP there; it has not been run on Windows. Safari was not tested; Chromium, Firefox and WebKit ran Studio through Playwright in a Linux container.</p>
+<h2 id="doctor">Doctor</h2>
+<p><code>drift doctor</code> checks the host that runs Drift and says what to fix. It makes no network calls, reads no secrets and prints no user name, home path or host name. Each probe that starts a process waits at most two seconds.</p>
+<pre><code class="language-sh">drift doctor [--json]
+</code></pre>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Check</th>
+<th>ok</th>
+<th>warn</th>
+<th>fail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>platform</code></td>
+<td>the OS and architecture are a release target: macOS arm64, Windows x64, Linux x64 or arm64</td>
+<td>any other OS or architecture, such as an Intel Mac</td>
+<td>the OS is not recognised</td>
+</tr>
+<tr>
+<td><code>process</code></td>
+<td>a child process starts and exits with 0</td>
+<td>the probe timed out</td>
+<td>the host cannot start a process, or the probe exits non-zero</td>
+</tr>
+<tr>
+<td><code>working directory</code></td>
+<td><code>sh -c 'test -w .'</code> succeeds</td>
+<td>not writable, or no <code>sh</code> to run the test</td>
+<td>no fail state</td>
+</tr>
+<tr>
+<td><code>docker</code></td>
+<td><code>docker version</code> gets an answer from the daemon</td>
+<td>not on PATH, no answer in time, or the daemon is unreachable</td>
+<td>no fail state</td>
+</tr>
+<tr>
+<td><code>git</code></td>
+<td><code>git --version</code> exits 0</td>
+<td>not on PATH, no answer in time, or a non-zero exit</td>
+<td>no fail state</td>
+</tr>
+</tbody>
+</table></div>
+<p>Text output prints each check as a status line, a cause and a fix. This run was on the lane container, which has no Docker:</p>
+<pre><code class="language-text">ok    platform
+      cause: linux amd64 is a release target
+      fix: none
+ok    process
+      cause: a child process starts and exits
+      fix: none
+ok    working directory
+      cause: the working directory is writable
+      fix: none
+warn  docker
+      cause: docker is not on PATH
+      fix: install Docker; reproduce and solve need it
+ok    git
+      cause: git answers
+      fix: none
+</code></pre>
+<p><code>--json</code> prints the same checks as canonical JSON, with <code>failed</code> and <code>warned</code> counts:</p>
+<pre><code class="language-json">{&quot;checks&quot;:[{&quot;cause&quot;:&quot;linux amd64 is a release target&quot;,&quot;fix&quot;:&quot;none&quot;,&quot;name&quot;:&quot;platform&quot;,&quot;status&quot;:&quot;ok&quot;},{&quot;cause&quot;:&quot;a child process starts and exits&quot;,&quot;fix&quot;:&quot;none&quot;,&quot;name&quot;:&quot;process&quot;,&quot;status&quot;:&quot;ok&quot;},{&quot;cause&quot;:&quot;the working directory is writable&quot;,&quot;fix&quot;:&quot;none&quot;,&quot;name&quot;:&quot;working directory&quot;,&quot;status&quot;:&quot;ok&quot;},{&quot;cause&quot;:&quot;docker is not on PATH&quot;,&quot;fix&quot;:&quot;install Docker; reproduce and solve need it&quot;,&quot;name&quot;:&quot;docker&quot;,&quot;status&quot;:&quot;warn&quot;},{&quot;cause&quot;:&quot;git answers&quot;,&quot;fix&quot;:&quot;none&quot;,&quot;name&quot;:&quot;git&quot;,&quot;status&quot;:&quot;ok&quot;}],&quot;failed&quot;:0,&quot;warned&quot;:1}
+</code></pre>
+<p>The command exits 0 when no check fails, and 1 when one does. Warnings do not change the exit code. The report prints in both cases.</p>
+<p>Docker is a warning because only <code>reproduce</code> and <code>solve</code> need a reachable daemon. Git is a warning because it only supplies a version field to <code>triage</code> and <code>upgrade-check</code>. The working directory check runs <code>sh</code>, so on Windows it warns unless a POSIX shell is on <code>PATH</code>.</p>
+<h2 id="help-and-completion">Help and Completion</h2>
+<p><code>drift --help</code> opens with one sentence on what Drift does, the three commands to start with (<code>ci</code>, <code>doctor</code>, <code>diagnose</code>) and the commands grouped by task, then lists every command. <code>drift COMMAND --help</code> ends with an <code>Examples:</code> block of one or two runnable lines that use files from <code>fixtures/</code>.</p>
+<pre><code class="language-sh">drift ci --help | tail -4
+</code></pre>
+<pre><code class="language-text">Examples:
+drift ci
+drift ci --commit c775d8f --detail summary
+</code></pre>
+<p><code>drift help TERM</code> prints the plain definition of capsule, diagnose, solve, certificate, verify, Atlas or probe, in any letter case. <code>drift help</code> with no term prints all seven. The definitions are the README Terms table, held in <code>core</code> as <code>Glossary</code>.</p>
+<pre><code class="language-sh">drift help capsule
+</code></pre>
+<pre><code class="language-text">Capsule: A file that records one environment: the operating system, tool versions, environment variables (secret values hidden) and the results of small checks.
+</code></pre>
+<p>An unknown term lists the known ones on standard error and exits 1:</p>
+<pre><code class="language-text">unknown term &quot;flux&quot;; the terms are capsule, diagnose, solve, certificate, verify, atlas, probe
+</code></pre>
+<p><code>drift completion bash|zsh|fish</code> prints a completion script on standard output. It comes from Clikt and covers commands, subcommands and options. Load it for the current shell, or save it where your shell reads completions:</p>
+<pre><code class="language-sh">source &lt;(drift completion bash)
+drift completion zsh &gt; &quot;${fpath[1]}/_drift&quot;
+drift completion fish &gt; ~/.config/fish/completions/drift.fish
+</code></pre>
+<p>A usage error, such as a missing option, still exits 1, the same code as a failed command.</p>
 <h2 id="install-scripts">Install Scripts</h2>
 <p><code>install.sh</code> (POSIX <code>sh</code>) and <code>install.ps1</code> (PowerShell 5.1 and 7) download a release archive, verify its checksum, check that the executable runs and hand over to <code>drift install</code>. They live in the repository root. Both fail with <code>cannot download</code> until a release exists.</p>
 <pre><code class="language-sh">curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh | sh -s -- --dry-run
@@ -3871,6 +4918,10 @@ e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08  -
 </tr>
 <tr>
 <td>1</td>
+<td><code>doctor</code> when any check fails (the report is still printed on standard output)</td>
+</tr>
+<tr>
+<td>1</td>
 <td><code>run</code> with <code>--tail-lines</code> below 1, an existing capsule directory without <code>--force</code> or a directory it cannot write; <code>import</code> with a log that holds no runner environment, an unreadable file or an invalid summary; <code>bisect plan</code> over capsules with no static difference; <code>bisect apply</code> for a step that is not pending, with neither or both of <code>--green</code> and <code>--red</code>, or on a finished plan</td>
 </tr>
 <tr>
@@ -3884,6 +4935,14 @@ e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08  -
 <tr>
 <td>1</td>
 <td><code>triage</code> with an unreadable file, a <code>--publish-threshold</code> outside 0 to 1, a <code>--date</code> that is not <code>yyyy-mm-dd</code>, an unreadable or invalid <code>--confidence</code> table or <code>--learned</code> store, <code>--corpus</code> or <code>--out</code> without <code>calibrate</code>, or <code>calibrate</code> without both or with an unreadable corpus</td>
+</tr>
+<tr>
+<td>1</td>
+<td><code>ci</code> outside a git checkout, on a host that is neither GitHub nor GitLab, without <code>gh</code> or <code>glab</code> on the path or a login, with no failed run, no passing run to compare with or no such job, when a log cannot be read, and for a bad flag value; it prints one sentence with the next step</td>
+</tr>
+<tr>
+<td>1</td>
+<td><code>handsoff plan</code> with any stop (<code>two-lockfiles</code>, <code>no-lockfile</code>, <code>package-manager</code>, <code>runtime-version</code>, <code>monorepo</code>, <code>no-test-command</code>, <code>several-test-commands</code>, <code>matrix-cell</code>, <code>ci-config</code>, <code>nothing-found</code>) or a bad <code>--cell</code> or <code>--runtime</code> value; the report is still printed on standard output</td>
 </tr>
 <tr>
 <td>1</td>
@@ -4108,7 +5167,7 @@ e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08  -
 <li>No release has been published. The asset names, the <code>brew</code> and <code>choco</code> commands and the install scripts' default download URL are what the workflows and templates say, and they have not been exercised against GitHub.</li>
 </ul></div>
             <div class="pager">
-<a class="card" href="index.html" rel="prev"><span>Prev</span><strong>Drift</strong></a>
+<a class="card" href="manual.html" rel="prev"><span>Prev</span><strong>Studio Manual</strong></a>
 <a class="card next" href="technical-report.html" rel="next"><span>Next</span><strong>Technical Report</strong></a>
 </div>
         </main>
