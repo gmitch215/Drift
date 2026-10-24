@@ -30,7 +30,7 @@ jobs:
       arm64: ${{ steps.matrix.outputs.arm64 }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Select Hosts
         id: matrix
         env:
@@ -90,7 +90,7 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up JDK 21
         uses: actions/setup-java@v6
         with:
@@ -138,7 +138,7 @@ jobs:
         shell: bash
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Download Run Directories
         uses: actions/download-artifact@v8
         with:
