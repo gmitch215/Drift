@@ -13,8 +13,10 @@ import dev.gmitch215.drift.json.obj
 /**
  * The inputs of a run: the capsule pairs with probes ([Inputs.probed], the fit and the primary
  * evaluation) and the first attribute-only pairs ([Inputs.original], for the before numbers).
+ * [Inputs.results] reads `<id>.json` of `data/results`; with it the evaluation also scores the
+ * ranker conditioned on the observed failure (see [EvidenceEval]).
  */
-class Inputs(val probed: Lab, val original: Lab)
+class Inputs(val probed: Lab, val original: Lab, val results: ((String) -> String)? = null)
 
 /** The result of one calibration run: both files as canonical JSON text. */
 class Calibration(val fit: String, val evaluation: String, val chosen: Model)
@@ -66,13 +68,19 @@ object Calibrate {
         val lab = inputs.probed
         val obs = lab.observeDev()
         val stripped = lab.withoutProbes().observeDev()
-        val original = inputs.original.observeDev()
+        val originalLab = inputs.original.excluding(lab.excluded)
+        val original = originalLab.observeDev()
+        val reversed = lab.reversed().observeDev()
         val (chosen, verdicts) = select(obs)
+        val evidence = inputs.results?.let { EvidenceEval.run(lab, lab.devIds, it, seed) }
+
+        fun withEvidence(base: JsonObject) =
+            if (evidence == null) base else JsonObject(base.fields + ("evidence" to evidence))
         val provenance = obj(
             "inputs" to obj(
                 "probed" to inputJson(lab, obs),
                 "probes_removed" to inputJson(lab.withoutProbes(), stripped),
-                "original" to inputJson(inputs.original, original),
+                "original" to inputJson(originalLab, original),
             ),
             "seed" to JsonInt(seed),
             "scenario_list_sha256" to JsonString(lab.scenarioListSha256),
@@ -96,9 +104,7 @@ object Calibrate {
         )
         return Calibration(
             encode(fit(obs, chosen, verdicts, provenance)),
-            encode(
-                evaluation(obs, stripped, original, lab.reversed().observeDev(), provenance, seed),
-            ),
+            encode(withEvidence(evaluation(obs, stripped, original, reversed, provenance, seed))),
             chosen,
         )
     }

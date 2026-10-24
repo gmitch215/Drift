@@ -22,7 +22,9 @@ class UnsealTest {
             val source = Path.of(".")
             source.resolve("data").toFile().copyRecursively(root.resolve("data").toFile())
             val runner = root.resolve("runner").createDirectories()
-            for (name in listOf("harness.sh", "run-batch.sh", "native.sh")) {
+            val names =
+                listOf("harness.sh", "run-batch.sh", "native.sh", "run-solve.sh", "prepull.sh")
+            for (name in names) {
                 runner.resolve(name).writeText(source.resolve("runner/$name").readText())
             }
         }

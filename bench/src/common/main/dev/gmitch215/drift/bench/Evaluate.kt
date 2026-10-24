@@ -196,6 +196,16 @@ object Models {
         },
     )
 
+    /** The ranker's own order and tiers, whatever evidence classes produced them. */
+    val rankerOrder = Model(
+        "evidence-ranker",
+        "the ranker's order with probe and rule evidence classed by the observed failure",
+        true,
+        Learner {
+            { o -> Pred(o, o.ranked.map { entry(it, 0) }) }
+        },
+    )
+
     val scoreOrder = Model(
         "hand-set-score-order",
         "hand-set-1 scores only: the tier does not order; probability read as logistic(score)",

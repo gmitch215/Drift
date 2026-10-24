@@ -21,6 +21,9 @@ import kotlin.io.path.readLines
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
+/** The cases `probed` wrote and the ones it skipped, each with the arms it lacks. */
+data class ProbedImport(val imported: List<String>, val skipped: Map<String, List<String>>)
+
 /** File operations behind the three commands; `root` is the `bench/` directory. */
 class Work(private val root: Path) {
     private val data = root.resolve("data")
@@ -82,29 +85,56 @@ class Work(private val root: Path) {
         data.resolve("scenarios.json").readText(),
         data.resolve("split.json").readText(),
         unsealed,
+        if (dir == "probed") Lab.UNPROBED else emptySet(),
     ) { data.resolve("$dir/$it").readText() }
 
     /**
      * Copies the passing and failing baseline captures (`arms/p0-control` and `arms/p0-treatment`,
      * probes included) of each solve case directory under [solved] to `data/probed/`. A test id
-     * is refused.
+     * is refused. A case that lacks either capture is skipped, and nothing is written for it.
      */
-    fun importProbed(solved: Path): List<String> {
+    fun importProbed(solved: Path): ProbedImport {
         val dev = devIds()
         val dirs = solved.listDirectoryEntries().filter { it.isDirectory() }.sortedBy { it.name }
         dirs.firstOrNull { it.name !in dev }?.let { throw SealedException(it.name) }
         val out = data.resolve("probed").createDirectories()
+        val arms = listOf("p0-control" to "green", "p0-treatment" to "red")
+        val imported = mutableListOf<String>()
+        val skipped = mutableMapOf<String, List<String>>()
         for (dir in dirs) {
-            for ((arm, side) in listOf("p0-control" to "green", "p0-treatment" to "red")) {
+            val missing = arms.map { it.first }
+                .filter { !dir.resolve("arms/$it/capsule.json").exists() }
+            if (missing.isNotEmpty()) {
+                skipped[dir.name] = missing
+                continue
+            }
+            for ((arm, side) in arms) {
                 val text = dir.resolve("arms/$arm/capsule.json").readText().trimEnd()
                 Capsule.parse(text)
                 out.resolve("${dir.name}.$side.json").writeText(text + "\n")
             }
+            imported += dir.name
         }
-        return dirs.map { it.name }
+        return ProbedImport(imported, skipped)
     }
 
-    fun calibration(): Calibration = Calibrate.run(Inputs(lab("probed"), lab("capsules")), SEED)
+    private fun result(id: String) = data.resolve("results/$id").readText()
+
+    fun calibration(): Calibration =
+        Calibrate.run(Inputs(lab("probed"), lab("capsules"), ::result), SEED)
+
+    /**
+     * The evidence evaluation on the dev scenarios that have both probed captures, as canonical
+     * JSON; a run with fewer than every dev id says `partial`.
+     */
+    fun evidence(): String {
+        val lab = lab("probed")
+        val ids = lab.devIds.filter {
+            data.resolve("probed/$it.green.json").exists() &&
+                data.resolve("probed/$it.red.json").exists()
+        }
+        return CanonicalJson.encode(EvidenceEval.run(lab, ids, ::result, SEED)) + "\n"
+    }
 
     fun writeCalibration(): Calibration {
         val c = calibration()
@@ -135,7 +165,7 @@ class Work(private val root: Path) {
         out.createDirectories()
         val harness = root.resolve("runner/harness.sh").readText()
         out.resolve("harness.sh").writeText(harness)
-        for (name in listOf("run-batch.sh", "native.sh")) {
+        for (name in listOf("run-batch.sh", "native.sh", "run-solve.sh", "prepull.sh")) {
             out.resolve(name).writeText(root.resolve("runner/$name").readText())
         }
         for (s in chosen) {
@@ -144,6 +174,8 @@ class Work(private val root: Path) {
             dir.resolve("harness.sh").writeText(harness)
             dir.resolve(Dimensions.runtimes.getValue(s.runtime).first).writeText(s.source)
             Harness.nativeRefusal(s)?.let { dir.resolve("native.skip").writeText(it + "\n") }
+            dir.resolve("images").writeText(Harness.images(s))
+            writeSolve(s, dir)
             for ((name, arm) in listOf("green" to s.green, "red" to s.red)) {
                 dir.resolve("$name.plan").writeText(Harness.plan(s, arm))
                 dir.resolve("$name.env").writeText(Harness.env(arm))
@@ -156,6 +188,17 @@ class Work(private val root: Path) {
             }
         }
         return chosen.map { it.id }
+    }
+
+    /** The solve inputs of a scenario that has capsules; one without them is not solved. */
+    private fun writeSolve(s: Scenario, dir: Path) {
+        val capsules = listOf("green", "red")
+            .associateWith { data.resolve("capsules/${s.id}.$it.json") }
+        if (capsules.values.any { !it.exists() }) return
+        for ((arm, file) in capsules) dir.resolve("capsule.$arm.json").writeText(file.readText())
+        val workspace = dir.resolve("workspace").createDirectories()
+        workspace.resolve(Dimensions.runtimes.getValue(s.runtime).first).writeText(s.source)
+        dir.resolve("solve.sh").writeText(Harness.solveScript(s))
     }
 
     private val freezeFile = data.resolve("freeze.json")

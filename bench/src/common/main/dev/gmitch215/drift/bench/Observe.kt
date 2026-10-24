@@ -12,10 +12,12 @@ import dev.gmitch215.drift.know.Basis
 import dev.gmitch215.drift.know.Severity
 import dev.gmitch215.drift.model.Capsule
 import dev.gmitch215.drift.model.Dimension
+import dev.gmitch215.drift.rank.EvidenceClass
 import dev.gmitch215.drift.rank.EvidenceKind
 import dev.gmitch215.drift.rank.Ranker
 import dev.gmitch215.drift.rank.Tier
 import dev.gmitch215.drift.rank.Weights
+import dev.gmitch215.drift.symptom.Symptom
 
 /**
  * One ranked candidate with the facts the weights act on, and the scenario's label for it.
@@ -35,6 +37,8 @@ class Cand(
     val decoy: Boolean,
     val verifiedRule: Boolean = false,
     val dimensionProbe: Boolean = false,
+    val observationalProbe: Boolean = false,
+    val mechanisticRule: Boolean = false,
 )
 
 /**
@@ -53,7 +57,9 @@ class Observed(
      * attribute change alone. The dev pairs have no history, so no candidate has a spectrum.
      */
     val covered: Boolean
-        get() = ranked.none { it.probe || it.dimensionProbe || it.rules.isNotEmpty() }
+        get() = ranked.none {
+            it.probe || it.dimensionProbe || it.observationalProbe || it.rules.isNotEmpty()
+        }
 }
 
 /**
@@ -66,8 +72,10 @@ class Lab(
     private val capsule: (String) -> String,
     val scenarioListSha256: String,
     private val open: Set<String> = emptySet(),
+    val excluded: Set<String> = emptySet(),
 ) {
-    val devIds: List<String> = scenarios.map { it.id }.filter { it in dev }.sorted()
+    val devIds: List<String> =
+        scenarios.map { it.id }.filter { it in dev && it !in excluded }.sorted()
 
     val devIdsSha256: String = Sha256.hex(devIds.joinToString("") { it + "\n" })
 
@@ -91,6 +99,7 @@ class Lab(
         },
         scenarioListSha256,
         open,
+        excluded,
     )
 
     /** The same pairs with every probe dropped, to measure what the probes add. */
@@ -100,15 +109,21 @@ class Lab(
         { Capsule.parse(capsule(it)).copy(probes = emptyList()).canonical() },
         scenarioListSha256,
         open,
+        excluded,
     )
 
-    fun observe(ids: List<String>): List<Observed> {
+    /** The same lab without [ids] among its dev ids; they stay dev ids, never test ids. */
+    fun excluding(ids: Set<String>): Lab =
+        Lab(scenarios, dev, capsule, scenarioListSha256, open, excluded + ids)
+
+    /** [failure] gives the observed failure of an id, or null to rank without one. */
+    fun observe(ids: List<String>, failure: (String) -> List<Symptom>? = { null }): List<Observed> {
         ids.firstOrNull { it !in dev && it !in open }?.let { throw SealedException(it) }
         val byId = scenarios.associateBy { it.id }
         return ids.map { id ->
             val s = byId[id] ?: throw SealedException(id)
             val green = Capsule.parse(capsule("$id.green.json"))
-            observe(s, green, Capsule.parse(capsule("$id.red.json")))
+            observe(s, green, Capsule.parse(capsule("$id.red.json")), failure(id))
         }
     }
 
@@ -125,6 +140,7 @@ class Lab(
             scenariosText: String,
             splitText: String,
             unsealed: Unsealed? = null,
+            excluded: Set<String> = emptySet(),
             capsule: (String) -> String,
         ): Lab {
             val scenarios = (CanonicalJson.parse(scenariosText) as JsonArray).items
@@ -137,11 +153,33 @@ class Lab(
                 capsule,
                 Sha256.hex(scenariosText),
                 unsealed?.test?.toSet().orEmpty(),
+                excluded,
             )
         }
 
-        fun observe(s: Scenario, green: Capsule, red: Capsule): Observed {
-            val ranking = Ranker.rank(green, red)
+        /**
+         * Dev scenarios with no probed capture, because the Lab cannot solve them: each reads a
+         * file the bench harness mounts, which a container built from a capsule never has. The
+         * probed lab leaves them out of the fit and the evaluation; they stay in `dev` and in the
+         * capsule results.
+         */
+        val UNPROBED: Set<String> = setOf(
+            "build-checksum-pin-1",
+            "build-checksum-pin-2",
+            "build-version-pin-1",
+            "build-version-pin-2",
+            "network-hosts-stale-1",
+            "network-hosts-stale-2",
+            "network-nsswitch-order-1",
+        )
+
+        fun observe(
+            s: Scenario,
+            green: Capsule,
+            red: Capsule,
+            failure: List<Symptom>? = null,
+        ): Observed {
+            val ranking = Ranker.rank(green, red, failure = failure)
             val cause = s.cause?.path
             val decoys = s.decoys.map { it.path }.toSet()
             val inBundle = ranking.bundles.flatMap { it.members }.toSet()
@@ -160,6 +198,10 @@ class Lab(
                     c.path in decoys,
                     c.matches.any { it.basis == Basis.VERIFIED },
                     Weights.probeDimension.id in probeIds,
+                    Weights.probeObservational.id in probeIds,
+                    c.evidence.any {
+                        it.kind == EvidenceKind.RULE && it.cls == EvidenceClass.MECHANISTIC
+                    },
                 )
             }
             val diff = CapsuleDiff.diff(green, red)

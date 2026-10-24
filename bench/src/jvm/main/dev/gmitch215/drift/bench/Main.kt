@@ -10,8 +10,11 @@ private const val USAGE = """usage: bench <command> --root <bench dir> [options]
   prepare --out <dir> [--only a,b] [--template t,u] [--test]   write run directories for dev
                                 scenarios, or for the test scenarios after the unseal
   ingest --prepared <dir> [--drift <binary>]   validate outputs, write results and capsules
-  probed --solved <dir>         copy the baseline capsules of solve cases to data/probed
+  probed --solved <dir> [--strict]   copy the baseline capsules of solve cases to data/probed;
+                                skip a case that lacks one (--strict exits 1 when any is skipped)
   calibrate                     fit on the dev split, write data/calibration/*.json
+  evidence [--out <file>]       score the failure-conditioned ranker on the dev scenarios that
+                                have probed captures; print the JSON or write it to <file>
   freeze [--commit <sha>]       write data/freeze.json from the working tree
   triage                        write triage/triage.json and print the dev triage scores
   upgrade                       write upgrade/upgrade.json and print the dev upgrade-check scores
@@ -67,10 +70,21 @@ fun main(args: Array<String>) {
 
             "probed" -> {
                 val solved = Path.of(opts["--solved"] ?: error("--solved is required"))
-                println("imported ${work.importProbed(solved).size} scenarios from $solved")
+                val result = work.importProbed(solved)
+                for ((id, missing) in result.skipped) {
+                    println("skipped $id: no capsule for ${missing.joinToString(", ")}")
+                }
+                println("imported ${result.imported.size} scenarios from $solved")
+                println("skipped ${result.skipped.size}")
+                if ("--strict" in opts && result.skipped.isNotEmpty()) exitProcess(1)
             }
 
             "calibrate" -> println("chosen ${work.writeCalibration().chosen.id}")
+
+            "evidence" -> {
+                val text = work.evidence()
+                opts["--out"]?.let { Path.of(it).toFile().writeText(text) } ?: print(text)
+            }
 
             "freeze" -> {
                 work.writeFreeze(opts["--commit"] ?: headCommit(root))

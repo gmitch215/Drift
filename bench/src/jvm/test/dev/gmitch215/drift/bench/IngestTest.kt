@@ -212,7 +212,7 @@ class IngestTest {
         arm(dev, "p0-control", greenCapsule)
         arm(dev, "p0-treatment", redCapsule)
         arm(dev, "x1-treatment", "not a capsule")
-        assertEquals(listOf(dev), Work(root).importProbed(solved))
+        assertEquals(ProbedImport(listOf(dev), emptyMap()), Work(root).importProbed(solved))
         assertEquals(greenCapsule + "\n", data.resolve("probed/$dev.green.json").readText())
         assertEquals(redCapsule + "\n", data.resolve("probed/$dev.red.json").readText())
         assertEquals(setOf("$dev.green.json", "$dev.red.json"), data.resolve("probed").names())
@@ -220,6 +220,44 @@ class IngestTest {
         arm(test, "p0-treatment", redCapsule)
         assertFailsWith<SealedException> { Work(root).importProbed(solved) }
         assertEquals(setOf("$dev.green.json", "$dev.red.json"), data.resolve("probed").names())
+    }
+
+    @Test
+    fun importingProbedCapsulesSkipsACaseThatLacksACapture() {
+        val committed = Path.of(".")
+        val (first, second) = Work(committed).devIds().sorted().take(2)
+        val root = Files.createTempDirectory("bench-probed-skip")
+        val data = root.resolve("data").createDirectories()
+        data.resolve("split.json").writeText(committed.resolve("data/split.json").readText())
+        val solved = root.resolve("solved")
+        fun arm(id: String, name: String, text: String) {
+            solved.resolve("$id/arms/$name").createDirectories()
+                .resolve("capsule.json").writeText(text)
+        }
+        arm(first, "p0-control", greenCapsule)
+        arm(first, "p0-treatment", redCapsule)
+        arm(second, "p0-control", greenCapsule)
+        val one = Work(root).importProbed(solved)
+        assertEquals(listOf(first), one.imported)
+        assertEquals(mapOf(second to listOf("p0-treatment")), one.skipped)
+        assertEquals(setOf("$first.green.json", "$first.red.json"), data.resolve("probed").names())
+
+        val none = Files.createTempDirectory("bench-probed-none")
+        none.resolve("data").createDirectories()
+            .resolve("split.json").writeText(committed.resolve("data/split.json").readText())
+        val bare = none.resolve("solved")
+        bare.resolve("$first/arms").createDirectories()
+        bare.resolve("$second/arms/p0-treatment").createDirectories()
+        val all = Work(none).importProbed(bare)
+        assertEquals(emptyList(), all.imported)
+        assertEquals(
+            mapOf(
+                first to listOf("p0-control", "p0-treatment"),
+                second to listOf("p0-control", "p0-treatment"),
+            ),
+            all.skipped,
+        )
+        assertEquals(emptySet(), none.resolve("data/probed").names())
     }
 
     private fun Path.names() = listDirectoryEntries().map { it.name }.toSet()
