@@ -13,7 +13,11 @@ import dev.gmitch215.drift.json.require
 import dev.gmitch215.drift.json.string
 import dev.gmitch215.drift.scan.probe.kotlin.Classification
 
-class Reference(val url: String, val quote: String)
+/**
+ * A page and the sentence read from it. [decides] names the transcript lines whose expected value
+ * the sentence states; a sentence that only allows variation leaves it empty.
+ */
+class Reference(val url: String, val quote: String, val decides: List<String> = emptyList())
 
 /**
  * A tracker issue with the state it had when the research read it. A Kotlin issue has no [url];
@@ -75,7 +79,12 @@ object Classifications {
             "causes" to strings(e.causes),
             "references" to JsonArray(
                 e.references.map {
-                    obj("url" to JsonString(it.url), "quote" to JsonString(it.quote))
+                    val reference = linkedMapOf<String, JsonValue>(
+                        "url" to JsonString(it.url),
+                        "quote" to JsonString(it.quote),
+                    )
+                    if (it.decides.isNotEmpty()) reference["decides"] = strings(it.decides)
+                    JsonObject(reference)
                 },
             ),
             "issues" to JsonArray(
@@ -131,7 +140,11 @@ object Classifications {
             downgradedFrom = optional(o, "downgradedFrom")?.let { classification(it.string()) },
             references = list(o, "references") {
                 val r = it.obj()
-                Reference(r.require("url").string(), r.require("quote").string())
+                Reference(
+                    r.require("url").string(),
+                    r.require("quote").string(),
+                    list(r, "decides") { d -> d.string() },
+                )
             },
             issues = list(o, "issues") {
                 val i = it.obj()

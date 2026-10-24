@@ -1,13 +1,24 @@
 package dev.gmitch215.drift.scan
 
 import dev.gmitch215.drift.fixtures.AtlasFixtures
+import dev.gmitch215.drift.hash.Sha256
 import dev.gmitch215.drift.json.CanonicalJson
 import dev.gmitch215.drift.json.JsonObject
+import dev.gmitch215.drift.model.ProbeStatus
 import dev.gmitch215.drift.scan.atlas.AtlasException
 import dev.gmitch215.drift.scan.atlas.BadClassification
 import dev.gmitch215.drift.scan.atlas.ClassificationData
+import dev.gmitch215.drift.scan.atlas.ClassificationEntry
 import dev.gmitch215.drift.scan.atlas.Classifications
+import dev.gmitch215.drift.scan.atlas.ColumnKey
 import dev.gmitch215.drift.scan.atlas.Dataset
+import dev.gmitch215.drift.scan.atlas.DatasetCell
+import dev.gmitch215.drift.scan.atlas.LineNote
+import dev.gmitch215.drift.scan.atlas.Oracle
+import dev.gmitch215.drift.scan.atlas.OracleKind
+import dev.gmitch215.drift.scan.atlas.ProbeEntry
+import dev.gmitch215.drift.scan.atlas.Reference
+import dev.gmitch215.drift.scan.atlas.Show
 import dev.gmitch215.drift.scan.atlas.Transcripts
 import dev.gmitch215.drift.scan.atlas.label
 import dev.gmitch215.drift.scan.probe.kotlin.Classification
@@ -205,6 +216,7 @@ class ClassificationTest {
             val other = back.probe(p.id)!!
             assertEquals(p.classification, other.classification)
             assertEquals(p.references.map { it.quote }, other.references.map { it.quote })
+            assertEquals(p.references.map { it.decides }, other.references.map { it.decides })
             assertEquals(p.issues.map { it.id + it.state }, other.issues.map { it.id + it.state })
             assertEquals(p.info.searched, other.info.searched)
             assertEquals(p.info.repro, other.info.repro)
@@ -252,4 +264,186 @@ class ClassificationTest {
             Classifications.fromJson(JsonObject(emptyMap()))
         }
     }
+
+    @Test
+    fun decidesNamesRealLinesOfUnclassifiedProbesOnly() {
+        val named = data.entries.flatMap { e -> e.references.map { e to it } }
+            .filter { it.second.decides.isNotEmpty() }
+        assertEquals(7, named.size)
+        for ((e, reference) in named) {
+            assertEquals(Classification.UNCLASSIFIED, e.classification, e.id)
+            val keys = full.probe(e.id)!!.cells
+                .flatMap { c -> c.lines.map { it.substringBefore(" = ") } }
+            for (line in reference.decides) assertTrue(line in keys, "${e.id} has no line $line")
+        }
+    }
+
+    @Test
+    fun everyDivergentLineHasOneKindAndTheCountsAreMeasured() {
+        val counts = full.versions.associateWith { v -> Oracle.counts(Oracle.lines(full, v)) }
+        assertEquals(
+            mapOf(
+                OracleKind.DOCUMENTED_CONTRACT to 15,
+                OracleKind.CROSS_VERSION_CHANGE to 31,
+                OracleKind.CRASH to 4,
+                OracleKind.NO_CORRECTNESS_CLAIM to 208,
+            ),
+            counts.getValue("2.4.20"),
+        )
+        assertEquals(
+            mapOf(
+                OracleKind.DOCUMENTED_CONTRACT to 4,
+                OracleKind.CROSS_VERSION_CHANGE to 4,
+                OracleKind.CRASH to 0,
+                OracleKind.NO_CORRECTNESS_CLAIM to 86,
+            ),
+            counts.getValue("2.5.0-Beta1"),
+        )
+        for (v in full.versions) {
+            val lines = Oracle.lines(full, v)
+            val own = lines.filter { it.line != Oracle.WHOLE_PROBE }
+            assertEquals(own.size, own.map { it.probe.id to it.line }.toSet().size, v)
+            val divergent = full.probes.count { v in it.divergentVersions }
+            assertEquals(divergent, lines.map { it.probe }.toSet().size)
+        }
+    }
+
+    @Test
+    fun theReportableLinesAreContractsWithQuotesAndFailedColumns() {
+        val reportable = full.versions.associateWith { v ->
+            Oracle.lines(full, v).filter { it.reportable }
+        }
+        for (line in reportable.values.flatten()) {
+            val quote = line.contract
+            if (line.kind == OracleKind.DOCUMENTED_CONTRACT) {
+                assertTrue(quote!!.quote.isNotBlank() && quote.url.startsWith("https://"))
+                assertTrue(line.line in quote.decides, line.line)
+            } else {
+                assertEquals(OracleKind.CRASH, line.kind)
+                assertEquals(Oracle.WHOLE_PROBE, line.line)
+                assertEquals(listOf("cloudflare-jvm"), line.results.flatMap { it.first })
+            }
+        }
+        assertEquals(
+            listOf(
+                "kotlin.char.case-special:upper-greek-iota-sub",
+                "kotlin.char.case-special:upper-iota-tonos",
+                "kotlin.char.case-special:upper-j-caron",
+                "kotlin.char.case-special:upper-ligature-fi",
+                "kotlin.char.case-special:upper-n-apostrophe",
+                "kotlin.char.case-special:upper-sharp-s",
+                "kotlin.exceptions.messages:(whole probe)",
+                "kotlin.exceptions.tostring-cause:(whole probe)",
+                "kotlin.int.overflow:(whole probe)",
+                "kotlin.math.pow-special-cases:1^nan",
+                "kotlin.math.rounding:0.49999999999999994",
+                "kotlin.math.rounding:4503599627370497",
+                "kotlin.math.rounding:float-8388609",
+                "kotlin.numbers.float-conversions:ulong-max-double",
+                "kotlin.regex.anchors-lines:(whole probe)",
+                "kotlin.string.compare-order:compare-ignore-case-sigma",
+                "kotlin.string.compare-order:dotless-i-vs-I",
+                "kotlin.string.compare-order:final-sigma",
+                "kotlin.string.supplementary:deseret-lower",
+            ),
+            reportable.getValue("2.4.20").map { "${it.probe.id}:${it.line}" }.sorted(),
+        )
+        assertEquals(
+            listOf(
+                "kotlin.math.pow-special-cases:1^nan",
+                "kotlin.math.rounding:0.49999999999999994",
+                "kotlin.math.rounding:4503599627370497",
+                "kotlin.math.rounding:float-8388609",
+            ),
+            reportable.getValue("2.5.0-Beta1").map { "${it.probe.id}:${it.line}" }.sorted(),
+        )
+    }
+
+    @Test
+    fun theNegatedNanLineIsNeverARegression() {
+        for (v in full.versions) {
+            val line = Oracle.lines(full.probe("kotlin.double.nan-bits")!!, v)
+                .single { it.line == "neg-nan-raw" }
+            assertEquals(OracleKind.NO_CORRECTNESS_CLAIM, line.kind, v)
+            assertEquals(null, line.contract)
+            assertTrue(!line.reportable)
+            assertEquals(emptyList(), line.changed)
+        }
+    }
+
+    @Test
+    fun aDocumentedLimitThatFailsAColumnIsNotACrash() {
+        val line = Oracle.lines(full.probe("kotlin.collections.tostring-forms")!!, "2.4.20")
+            .single { it.line == Oracle.WHOLE_PROBE }
+        assertEquals(OracleKind.NO_CORRECTNESS_CLAIM, line.kind)
+        assertEquals(listOf(listOf("js-ir")), line.results.map { it.first })
+        assertTrue(!line.reportable)
+    }
+
+    @Test
+    fun noKindOrListingSaysRegression() {
+        val text = Show.oracle(full) + OracleKind.entries.joinToString { it.label + it.meaning }
+        assertTrue(!text.lowercase().contains("regress"), text)
+        assertTrue(text.all { it.code in 0x20..0x7e || it == '\n' })
+        assertEquals(ORACLE_SHA, Sha256.hex(Show.oracle(full)))
+    }
+
+    @Test
+    fun oneProbeOfEachKind() {
+        fun cell(target: String, version: String, vararg lines: String) =
+            DatasetCell(ColumnKey(target, version), ProbeStatus.OK, lines.toList())
+
+        fun probe(
+            decides: List<String>,
+            cells: List<DatasetCell>,
+            lines: List<LineNote> = emptyList(),
+        ) = ProbeEntry(
+            "kotlin.synthetic.line",
+            "question",
+            "source",
+            ClassificationEntry(
+                "kotlin.synthetic.line", Classification.UNCLASSIFIED, "verified", listOf("g"),
+                null,
+                listOf(Reference("https://example.org/page", "the value is two", decides)),
+                emptyList(), null, null, emptyMap(), lines, "note",
+            ),
+            cells,
+        )
+        val cells = listOf(
+            cell("a", "2.0.0", "decided = 1", "moved = 1", "plain = 1"),
+            cell("b", "2.0.0", "decided = 2", "moved = 1", "plain = 2"),
+            cell("c", "2.0.0", "decided = 2", "moved = 3", "plain = 2"),
+            cell("a", "2.1.0", "decided = 1", "moved = 2", "plain = 1"),
+        )
+        val kinds = Oracle.lines(probe(listOf("decided"), cells), "2.0.0")
+            .associate { it.line to it.kind }
+        assertEquals(
+            mapOf(
+                "decided" to OracleKind.DOCUMENTED_CONTRACT,
+                "moved" to OracleKind.CROSS_VERSION_CHANGE,
+                "plain" to OracleKind.NO_CORRECTNESS_CLAIM,
+            ),
+            kinds,
+        )
+        val without = Oracle.lines(probe(emptyList(), cells), "2.0.0")
+            .associate { it.line to it.kind }
+        assertEquals(OracleKind.NO_CORRECTNESS_CLAIM, without["decided"])
+        val failed = cells + DatasetCell(
+            ColumnKey("d", "2.0.0"),
+            ProbeStatus.UNAVAILABLE,
+            listOf("failed Boom: nope"),
+        )
+        val crash = Oracle.lines(probe(emptyList(), failed), "2.0.0").first()
+        assertEquals(OracleKind.CRASH, crash.kind)
+        assertEquals(Oracle.WHOLE_PROBE, crash.line)
+        assertEquals(listOf(listOf("d") to "failed Boom: nope"), crash.results)
+        val rest = Oracle.lines(probe(emptyList(), failed), "2.0.0").drop(1)
+        assertEquals(setOf("decided", "moved", "plain"), rest.map { it.line }.toSet())
+        val limit = listOf(LineNote("whole probe", "b", "d", null))
+        val limited = Oracle.lines(probe(emptyList(), failed, limit), "2.0.0").first()
+        assertEquals(OracleKind.NO_CORRECTNESS_CLAIM, limited.kind)
+        assertEquals(emptyList(), Oracle.lines(probe(emptyList(), cells), "2.1.0"))
+    }
 }
+
+private const val ORACLE_SHA = "422aa874eaf8a956196bfb95d1becbb7566e08ebc4094314be17690ca0e0f366"

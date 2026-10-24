@@ -30,3 +30,5 @@ Each entry lists cause letters:
 | `g` | unexplained |
 
 An issue in another tracker, such as a TeaVM issue, is listed under `issues` with a `url` field; an issue without one is a Kotlin issue.
+
+A reference may carry `decides`, a list of transcript line names whose expected value the quoted sentence states. `drift atlas show DATASET --oracle` reads it: a divergent line named there is a `documented-contract` line and carries the quote and page. A quote that only allows the difference leaves `decides` empty, and only `unclassified` entries use it. Every other divergent line is a `cross-version-change` when a target prints a different value on another version, and a `no-correctness-claim` otherwise. A column that failed instead of printing values makes one `crash` entry for the probe, unless the entry's `whole probe` line note has cause `a` or `b`.

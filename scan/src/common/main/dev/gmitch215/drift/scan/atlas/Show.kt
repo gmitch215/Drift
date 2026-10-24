@@ -52,6 +52,45 @@ object Show {
         }
     }
 
+    /** Every divergent line with its [OracleKind], and the evidence for the reportable ones. */
+    fun oracle(dataset: Dataset): String = buildString {
+        appendLine("atlas oracle: one kind for every divergent line")
+        for (kind in OracleKind.entries) {
+            val reportable = if (kind.reportable) " (reportable)" else ""
+            appendLine("  ${kind.label}$reportable: ${kind.meaning}")
+        }
+        val all = dataset.versions.associateWith { Oracle.lines(dataset, it) }
+        for ((version, lines) in all) {
+            appendLine()
+            appendLine("kotlin $version: ${lines.size} divergent lines")
+            for ((kind, n) in Oracle.counts(lines)) appendLine("  ${kind.label}: $n")
+        }
+        for ((version, lines) in all) {
+            appendLine()
+            val none = if (lines.none { it.reportable }) " none" else ""
+            appendLine("reportable at kotlin $version:$none")
+            for ((p, own) in lines.filter { it.reportable }.groupBy { it.probe }) {
+                appendLine(p.id)
+                Oracle.describe(own, "  ").forEach { appendLine(it) }
+                for (line in own.filter { it.line != Oracle.WHOLE_PROBE }) {
+                    appendLine("  ${line.line}:")
+                    for ((targets, text) in line.results) {
+                        wrap("${targets.joinToString(", ")}: ${ascii(text)}", indent = "    ")
+                            .forEach { appendLine(it) }
+                    }
+                }
+            }
+        }
+        for ((version, lines) in all) {
+            appendLine()
+            appendLine("no report offered at kotlin $version:")
+            for ((p, own) in lines.filter { !it.reportable }.groupBy { it.probe }) {
+                appendLine("  ${p.id}")
+                Oracle.describe(own, "    ").forEach { appendLine(it) }
+            }
+        }
+    }
+
     /** A draft a person can review; it states what was measured and nothing more. */
     fun repro(dataset: Dataset, id: String): String {
         val p = dataset.probe(id) ?: throw AtlasException(NoSuchProbe(id))

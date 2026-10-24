@@ -16,15 +16,19 @@ import dev.gmitch215.drift.scan.atlas.Comparison
 import dev.gmitch215.drift.scan.atlas.Dataset
 import dev.gmitch215.drift.scan.atlas.DuplicateColumn
 import dev.gmitch215.drift.scan.atlas.DuplicateProbe
+import dev.gmitch215.drift.scan.atlas.Here
 import dev.gmitch215.drift.scan.atlas.MissingProbes
 import dev.gmitch215.drift.scan.atlas.NoSuchProbe
 import dev.gmitch215.drift.scan.atlas.NoTranscripts
+import dev.gmitch215.drift.scan.atlas.Oracle
+import dev.gmitch215.drift.scan.atlas.OracleKind
 import dev.gmitch215.drift.scan.atlas.Show
 import dev.gmitch215.drift.scan.atlas.Transcripts
 import dev.gmitch215.drift.scan.atlas.TruncatedTranscript
 import dev.gmitch215.drift.scan.atlas.UnknownProbe
 import dev.gmitch215.drift.scan.atlas.Verdict
 import dev.gmitch215.drift.scan.atlas.VersionDiff
+import dev.gmitch215.drift.scan.atlas.label
 import dev.gmitch215.drift.scan.probe.kotlin.AtlasTranscript
 import dev.gmitch215.drift.scan.probe.kotlin.Classification
 import kotlin.test.Test
@@ -50,6 +54,37 @@ class AtlasTest {
     }
 
     private fun sha(text: String) = Sha256.hex(text)
+
+    @Test
+    fun hereIsSilentWhenTheDeviceMatchesItsColumn() {
+        val own = Dataset.build(listOf(Transcripts.read("jvm.txt", jvmText)))
+        val here = Here(Comparison(own, Transcripts.read("jvm.txt", jvmText)), "2.4.20")
+        assertFalse(here.differsEverywhere)
+        val out = here.render()
+        assertTrue("matches every column: ${own.probes.size}\n" in out, out)
+        assertTrue("matches no column: 0\n" in out, out)
+        assertFalse("] matches" in out, out)
+    }
+
+    @Test
+    fun hereNamesTheProbeThatDiffers() {
+        val lines = jvmText.lines().toMutableList()
+        val i = lines.indexOfFirst { " = " in it && !it.startsWith("#") && !it.startsWith("@@") }
+        lines[i] = lines[i] + "!"
+        val comparison = Comparison(
+            Dataset.build(listOf(Transcripts.read("jvm.txt", jvmText))),
+            Transcripts.read("jvm.txt", lines.joinToString("\n")),
+        )
+        val here = Here(comparison, "2.4.20")
+        val changed = comparison.rows.single { it.verdict != Verdict.SAME }
+        val out = here.render()
+        assertTrue(here.differsEverywhere)
+        val heading = "${changed.probe.id} [${changed.probe.classification.label}]"
+        assertTrue("$heading matches no column\n" in out, out)
+        assertTrue("  matches: none\n  differs: jvm@2.4.20\n" in out, out)
+        assertTrue("  line " in out && "(this device): " in out, out)
+        assertTrue("  kind: " in out, out)
+    }
 
     @Test
     fun datasetMatchesTheMeasuredFindings() {
@@ -427,6 +462,21 @@ class AtlasTest {
     }
 
     @Test
+    fun oracleListsEveryDivergentLineOnce() {
+        val text = Show.oracle(dataset)
+        assertEquals(ORACLE_THREE_SHA, sha(text))
+        val lines = Oracle.lines(dataset, "2.4.20")
+        val counts = Oracle.counts(lines)
+        assertEquals(0, counts.getValue(OracleKind.CROSS_VERSION_CHANGE))
+        val divergent = dataset.probes.filter { "2.4.20" in it.divergentVersions }.map { it.id }
+        assertEquals(divergent.toSet(), lines.map { it.probe.id }.toSet())
+        assertTrue(text.contains("kotlin 2.4.20: ${lines.size} divergent lines\n"), text)
+        assertTrue(text.contains("reportable at kotlin 2.4.20:\n"), text)
+        assertTrue(text.contains("no report offered at kotlin 2.4.20:\n"), text)
+        assertFalse(text.lowercase().contains("regress"), text)
+    }
+
+    @Test
     fun reproDraftsAreGolden() {
         val wasm = Show.repro(dataset, "kotlin.double.tostring-boundaries")
         val iterator = Show.repro(dataset, "kotlin.collections.iterator-modification")
@@ -459,7 +509,7 @@ class AtlasTest {
 }
 
 private const val BOTH_SHA =
-    "82a3ce21b3842ca75f2ae93cf1ec8281375cf4f6a840576b1cdaf1e406b8c615"
+    "3bfd00d0111a598a3e4dd0702bdc89f268ce241926dc9011e62dd107e9a64bce"
 
 private const val HEAD_TARGET = "# kotlin.target = x\n"
 
@@ -477,7 +527,7 @@ private const val VERSION_DIFF_FULL_SHA =
     "f4686e67cfa432962ee7623e446c06d37ab8ecdfb7008540a0796c571c7f93ad"
 
 private const val DATASET_SHA =
-    "52cdbb80cf4e6b84ca62191a33efb5f214ae7b1dd38316226777d0e1b4f16f1e"
+    "30fad6394bf85d3f8687b7932531cc6a544afebad6af469fe551ffe41a382c93"
 
 private const val COMPARE_DETAIL_SHA =
     "566dc95c2feaef903c7d1bcc06dfd3f0279879db0465b2eb0248a26d4aedfc75"
@@ -493,3 +543,6 @@ private const val REPRO_FLOAT_SHA =
 
 private const val REPRO_ITERATOR_SHA =
     "1c072f50cb7f4fc70ef51e08591987d4d89565d8d2c69714a1597330806d0e7a"
+
+private const val ORACLE_THREE_SHA =
+    "897ac37b3e616e2d4763ca3d4dea79f33f7cc5d7cf9e6990c992400c31e313a9"
