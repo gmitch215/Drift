@@ -172,6 +172,127 @@ class HarnessTest {
         assertEquals("files/green/3", Harness.filePath("green", 3))
     }
 
+    private fun solveScenario(runtime: String, extra: String, arms: String): Scenario {
+        val text = """{"id":"h","dimension":"network","runtime":"$runtime","program":"x",
+            |$extra,$arms,
+            |"cause":{"dimension":"network","path":"network.hosts","direction":"changed"}}
+        """.trimMargin()
+        return Template.fromJson(CanonicalJson.parse(text)).build(1, emptyMap(), 99)
+    }
+
+    private fun solveGolden(run: String, failWhen: String, gate: String?): String {
+        val head = """
+            #!/bin/sh
+            dir=@(cd "@(dirname "@0")" && pwd)
+            [ -n "@DRIFT" ] || { echo 'set DRIFT to the drift binary' >&2; exit 2; }
+            solved=@{SOLVED:-@dir/../solved}
+            limit=@{SOLVE_TIMEOUT:-2700}
+            DOCKER_CONFIG=@{TMPDIR:-/tmp}/drift-solve-docker-config
+            mkdir -p "@DOCKER_CONFIG"
+            export DOCKER_CONFIG
+            : > "@dir/solve.verdict"
+            if grep -q aarch64 "@dir/capsule.red.json"; then
+            ~arms=@{DRIFT_ARMS_AARCH64:-@{DRIFT_ARMS:-@DRIFT}}
+            else
+            ~arms=@{DRIFT_ARMS_X86_64:-@{DRIFT_ARMS:-@DRIFT}}
+            fi
+            set -m
+            "@DRIFT" solve "@dir/capsule.green.json" "@dir/capsule.red.json" \
+            ~--run $run \
+            ~--fail-when $failWhen \
+            ~--workspace "@dir/workspace" \
+            ~--case "@solved/h-1" \
+
+        """.trimIndent()
+        val gateLine = gate?.let { "~--gate $it \\\n" } ?: ""
+        val watchdog = "( sleep \"@limit\"; echo timeout > \"@dir/solve.verdict\"; " +
+            "kill -s TERM -- \"-@pid\"; sleep 10; kill -s KILL -- \"-@pid\" ) > /dev/null 2>&1 &\n"
+        val tail = """
+            ~--drift-binary "@arms" \
+            ~> "@dir/solve.out" 2> "@dir/solve.err" &
+            pid=@!
+            WATCHDOG
+            watch=@!
+            wait "@pid"
+            kill -s KILL "@watch" 2> /dev/null
+            if [ ! -s "@dir/solve.verdict" ]; then
+            ~case @(head -n 1 "@dir/solve.out") in
+            ~~'CONFIRMED EFFECT (bundle)'*) v=confirmed-bundle ;;
+            ~~'CONFIRMED EFFECT'*) v=confirmed-effect ;;
+            ~~CONFIRMED*) v=confirmed ;;
+            ~~NARROWED*) v=narrowed ;;
+            ~~STUCK*) v=stuck ;;
+            ~~*) v=error ;;
+            ~esac
+            ~echo "@v" > "@dir/solve.verdict"
+            fi
+            cat "@dir/solve.verdict"
+            case @(cat "@dir/solve.verdict") in timeout | error) exit 1 ;; esac
+
+        """.trimIndent().replace("WATCHDOG\n", watchdog)
+        return (head + gateLine + tail).replace('@', '$').replace('~', '\t')
+    }
+
+    @Test
+    fun anIntermittentPythonSolveArmsTheGateAndLeavesFlakeOutOfTheRun() {
+        val t = solveScenario(
+            "python3",
+            "\"signature\":\"it's\",\"gate\":\"500\"",
+            "\"green\":{\"image\":\"python:3.12-slim\"}," +
+                "\"red\":{\"image\":\"python:3.12-slim\",\"files\":{\"/etc/hosts\":\"x\"}}",
+        )
+        assertEquals("intermittent", t.klass)
+        assertEquals(
+            solveGolden(
+                "'python3 prog.py'",
+                "'it'\\''s'",
+                "'permille=500,salt=99,env=BENCH_FLAKE'",
+            ),
+            Harness.solveScript(t),
+        )
+    }
+
+    @Test
+    fun aSignatureWithRegexCharactersIsPassedAsALiteral() {
+        assertEquals("\\[\\[: not found", Harness.regexLiteral("[[: not found"))
+        assertEquals("a\\.b\\(c\\)\\$", Harness.regexLiteral("a.b(c)$"))
+        assertEquals("plain text", Harness.regexLiteral("plain text"))
+        val t = solveScenario(
+            "sh",
+            "\"signature\":\"[[: not found\"",
+            "\"green\":{\"image\":\"debian:12-slim\"}," +
+                "\"red\":{\"image\":\"debian:12-slim\",\"files\":{\"/etc/hosts\":\"x\"}}",
+        )
+        assertTrue("--fail-when '\\[\\[: not found'" in Harness.solveScript(t))
+    }
+
+    @Test
+    fun aDeterministicNodeSolveSetsFlakeInTheRun() {
+        val t = solveScenario(
+            "node",
+            "\"signature\":\"boom\"",
+            "\"green\":{\"image\":\"node:22\"},\"red\":{\"image\":\"node:20\",\"args\":[\"a b\"]}",
+        )
+        assertEquals(
+            solveGolden("'BENCH_FLAKE=1 node prog.js '\\''a b'\\'''", "'boom'", null),
+            Harness.solveScript(t),
+        )
+    }
+
+    @Test
+    fun anAlpineShellSolveWithAnExitCodeFailsOnAnyNonzeroExit() {
+        val t = solveScenario(
+            "sh",
+            "\"exit\":\"137\"",
+            "\"green\":{\"image\":\"alpine:3.20\"},\"red\":{\"image\":\"alpine:3.19\"}",
+        )
+        assertEquals(
+            solveGolden("'BENCH_FLAKE=1 sh prog.sh'", "'exit'", null),
+            Harness.solveScript(t),
+        )
+        assertEquals("alpine:3.19\nalpine:3.20\n", Harness.images(t))
+    }
+
     private companion object {
         const val GREEN_X = "\"green\":{\"image\":\"x\"}"
         const val RED_Y = "\"red\":{\"image\":\"y\"}"
