@@ -26,6 +26,8 @@ class ProbeCommand(host: Host, files: CaseFiles) : CliktCommand(name = "probe") 
 
     override fun help(context: Context) = "Record Kotlin probe transcripts on remote runtimes"
 
+    override fun helpEpilog(context: Context) = examples("probe")
+
     override fun run() = Unit
 }
 
@@ -59,6 +61,8 @@ private class ProbeCloudflareCommand(private val host: Host, private val files: 
     override fun help(context: Context) =
         "Run the Kotlin probes in a Worker on workerd and write the transcript; the default run " +
             "is local through wrangler dev and needs no network"
+
+    override fun helpEpilog(context: Context) = examples("probe cloudflare")
 
     override fun run() {
         if (!targetLabel.matches(target)) {

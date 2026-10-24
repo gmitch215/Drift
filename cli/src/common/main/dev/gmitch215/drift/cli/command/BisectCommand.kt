@@ -26,6 +26,8 @@ class BisectCommand(host: Host, files: CaseFiles) : CliktCommand(name = "bisect"
     override fun help(context: Context) =
         "Narrow a green and red pair to the attributes that matter, one test at a time"
 
+    override fun helpEpilog(context: Context) = examples("bisect")
+
     override fun run() = Unit
 }
 
@@ -38,6 +40,8 @@ private class BisectPlanCommand(private val host: Host, private val files: CaseF
 
     override fun help(context: Context) =
         "Write a bisection plan over the static attributes that differ, and print the first step"
+
+    override fun helpEpilog(context: Context) = examples("bisect plan")
 
     override fun run() {
         if (!force && files.read(out) != null) {
@@ -59,6 +63,8 @@ private class BisectApplyCommand(private val files: CaseFiles) : CliktCommand(na
 
     override fun help(context: Context) =
         "Record the outcome of a step, then print the next step or the minimal set"
+
+    override fun helpEpilog(context: Context) = examples("bisect apply")
 
     override fun run() {
         if (green == red) throw UsageError("pass exactly one of --green and --red")

@@ -64,6 +64,8 @@ class IngestCommand(private val host: Host, private val files: CaseFiles) :
         echo(skeleton.keys.joinToString("\n"))
     }
 
+    override fun helpEpilog(context: Context) = examples("ingest")
+
     override fun run() {
         val dir = case.trimEnd('/')
         val loaded = loadCase(files, dir)

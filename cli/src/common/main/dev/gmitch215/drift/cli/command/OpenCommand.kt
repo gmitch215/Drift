@@ -18,6 +18,8 @@ class OpenCommand(
     override fun help(context: Context) =
         "Open a .driftcase in Drift Studio, or write its report next to it without Studio"
 
+    override fun helpEpilog(context: Context) = examples("open")
+
     override fun run() {
         files.refuseCaseDirectory(file)
         val bytes = archives.read(file) ?: throw CliktError("cannot read archive: $file")

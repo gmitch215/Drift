@@ -44,6 +44,8 @@ class InstallCommand(private val host: Host, private val system: InstallSystem) 
     override fun help(context: Context) =
         "Copy this executable to a directory on the user's PATH and record what changed"
 
+    override fun helpEpilog(context: Context) = examples("install")
+
     override fun run() {
         if (user && global) {
             echo("error: --user and --global cannot be combined", err = true)
@@ -65,6 +67,8 @@ class UninstallCommand(private val host: Host, private val system: InstallSystem
 
     override fun help(context: Context) =
         "Remove what drift install recorded in its receipt, and nothing else"
+
+    override fun helpEpilog(context: Context) = examples("uninstall")
 
     override fun run() = runInstaller(host, system) { it.uninstall(dryRun) }
 }

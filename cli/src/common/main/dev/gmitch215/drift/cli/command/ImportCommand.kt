@@ -36,6 +36,8 @@ class ImportCommand(private val host: Host, private val files: CaseFiles) :
     override fun help(context: Context) =
         "Turn a saved GitHub Actions or GitLab CI log into a capsule directory, offline"
 
+    override fun helpEpilog(context: Context) = examples("import")
+
     override fun run() {
         if (job != null && format != "github") throw UsageError("--job applies to --format github")
         val dir = out.trimEnd('/')

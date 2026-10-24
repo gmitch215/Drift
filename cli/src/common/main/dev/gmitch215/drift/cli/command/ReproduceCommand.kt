@@ -46,6 +46,8 @@ class ReproduceCommand(private val host: Host, private val files: CaseFiles) :
     override fun help(context: Context) =
         "Write a Dockerfile, run.sh and manifest.json that mirror a capsule, and say what does not"
 
+    override fun helpEpilog(context: Context) = examples("reproduce")
+
     override fun run() {
         val dir = out.trimEnd('/')
         val names = listOf("Dockerfile", "run.sh", "manifest.json")

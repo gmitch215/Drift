@@ -22,6 +22,8 @@ class ReportCommand(private val files: CaseFiles, private val archives: ArchiveF
     override fun help(context: Context) =
         "Write the static report.html generated from the certificate of a .driftcase"
 
+    override fun helpEpilog(context: Context) = examples("report")
+
     override fun run() {
         files.refuseCaseDirectory(file)
         val bytes = archives.read(file) ?: throw CliktError("cannot read archive: $file")

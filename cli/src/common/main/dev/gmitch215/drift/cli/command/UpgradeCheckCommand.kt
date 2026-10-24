@@ -43,6 +43,8 @@ class UpgradeCheckCommand(private val host: Host, private val files: CaseFiles) 
     override fun help(context: Context) =
         "List what a move to other tool and dependency versions breaks, from one capsule"
 
+    override fun helpEpilog(context: Context) = examples("upgrade-check")
+
     override fun run() {
         val targets = try {
             val file = toFile?.let { path ->

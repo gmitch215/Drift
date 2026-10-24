@@ -20,6 +20,8 @@ class PackCommand(private val files: CaseFiles, private val archives: ArchiveFil
     override fun help(context: Context) =
         "Pack a solved case directory into a deterministic .driftcase archive"
 
+    override fun helpEpilog(context: Context) = examples("pack")
+
     override fun run() {
         val loaded = loadCase(files, case.trimEnd('/'))
         when (val packed = Archive.pack(loaded)) {

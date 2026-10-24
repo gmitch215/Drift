@@ -25,6 +25,8 @@ class CaseCommand(files: CaseFiles) : CliktCommand(name = "case") {
 
     override fun help(context: Context) = "Work with case directories"
 
+    override fun helpEpilog(context: Context) = examples("case")
+
     override fun run() = Unit
 }
 
@@ -34,6 +36,8 @@ private class ShowCommand(private val files: CaseFiles) : CliktCommand(name = "s
         .choice("summary", "detail", "full").default("summary")
 
     override fun help(context: Context) = "Show what a case holds and whether it still checks out"
+
+    override fun helpEpilog(context: Context) = examples("case show")
 
     override fun run() {
         val case = loadCase(files, dir)

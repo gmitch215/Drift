@@ -67,6 +67,8 @@ class TriageCommand(private val host: Host, private val files: CaseFiles) :
             "contradicted claims and a draft rule. `triage calibrate --corpus FILE --out FILE` " +
             "recalibrates the confidence of each path on your own issues"
 
+    override fun helpEpilog(context: Context) = examples("triage")
+
     override fun run() {
         if (issue == CALIBRATE) return calibrate()
         if (corpus != null || out != null) {

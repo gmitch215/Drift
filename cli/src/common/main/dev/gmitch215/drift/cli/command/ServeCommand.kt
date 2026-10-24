@@ -55,6 +55,8 @@ class ServeCommand(
     override fun help(context: Context) =
         "Serve the Studio web build on localhost, read only, bound to the loopback interface"
 
+    override fun helpEpilog(context: Context) = examples("serve")
+
     override fun run() {
         val options = ServeOptions(
             dir, port, tls, cert, key, mkcert, domain, mdns, open, unsafeBindAll, quiet,

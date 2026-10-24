@@ -77,6 +77,8 @@ class SolveCommand(
     override fun help(context: Context) =
         "Find the cause of a failure by running counterfactual arms in containers"
 
+    override fun helpEpilog(context: Context) = examples("solve")
+
     override fun run() {
         val dir = case.trimEnd('/')
         if (files.read("$dir/case.json") != null) {

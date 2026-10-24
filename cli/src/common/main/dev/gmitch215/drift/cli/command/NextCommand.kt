@@ -17,6 +17,8 @@ class NextCommand(private val files: CaseFiles) : CliktCommand(name = "next") {
     override fun help(context: Context) =
         "Print the next proposed experiment of a case, and the manual ones with instructions"
 
+    override fun helpEpilog(context: Context) = examples("next")
+
     override fun run() {
         val case = loadCase(files, dir)
         case.requireIntact(dir)
