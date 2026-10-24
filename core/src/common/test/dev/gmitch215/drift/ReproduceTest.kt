@@ -10,6 +10,7 @@ import dev.gmitch215.drift.json.array
 import dev.gmitch215.drift.json.obj
 import dev.gmitch215.drift.json.require
 import dev.gmitch215.drift.json.string
+import dev.gmitch215.drift.lab.Distro
 import dev.gmitch215.drift.lab.ImageDistro
 import dev.gmitch215.drift.lab.ImageTable
 import dev.gmitch215.drift.lab.ImageTags
@@ -71,9 +72,9 @@ class ReproduceTest {
             "9a3ab7e6f560ed2bab27906ae58647786ab225f0b4d30b7f059444196cac4641",
         ),
         "node-alpine" to listOf(
-            "957953b3e6c02c05ee6f821d6ff087a636e127266d70a02c61ad65a5bdfefac7",
-            "652e6fe23295db6a7e3d68e137d0426ddb3722208e911b98418d696e97cc2274",
-            "b92bdfa45699ad496bc2cf5e7538947b864f36e63a51163a009b5d533f8be09f",
+            "f47eacf4b6acd22940547256bfcf3a0d34914a52bc0fd6b8254a6192797f7305",
+            "2697a96f2b1eb65ec1ad9ebcd6294570fd47d3537312e18ecbdc145333dcef56",
+            "d58f19006418c668478e69e5b452646bd0491691c4a4d02721199cb50f8e3012",
         ),
         "drangler-red" to listOf(
             "31046eebbeec44898217b9f3db0492b6a8d68356eb37d489c9c743914b26b932",
@@ -295,6 +296,79 @@ class ReproduceTest {
             "gcc:13.2",
             "the command names a cc tool",
         ),
+        Base(
+            "r from the base version the r-base image records",
+            listOf("env.R_BASE_VERSION" to "4.6.1", "tool.cc.family" to "gcc") +
+                ("tool.cc.version" to "16.2.0"),
+            "Rscript prog.R",
+            "r-base:4.6.1",
+            "env.R_BASE_VERSION 4.6.1; the command names a r tool",
+        ),
+        Base(
+            "r from the version the scanner records",
+            listOf("tool.r.version" to "4.3.3"),
+            "BENCH_FLAKE=1 Rscript prog.R",
+            "r-base:4.3.3",
+            "tool.r.version 4.3.3; the command names a r tool",
+        ),
+        Base(
+            "elixir from the versions the scanner records",
+            listOf(
+                "tool.elixir.version" to "1.16.3",
+                "tool.erlang.otp" to "26",
+                "tool.elixir.compiled-otp" to "26",
+            ),
+            "elixir prog.exs",
+            "elixir:1.16.3-otp-26",
+            "tool.elixir.version 1.16.3; the command names a elixir tool",
+        ),
+        Base(
+            "an old r version with an exact tag",
+            listOf("env.R_BASE_VERSION" to "4.0.5"),
+            "R --version",
+            "r-base:4.0.5",
+            "the command names a r tool",
+        ),
+        Base(
+            "elixir pins the erlang major",
+            debian12 + listOf(
+                "env.ELIXIR_VERSION" to "v1.16.3",
+                "env.OTP_VERSION" to "26.2.5.21",
+                "tool.python.version" to "3.11.2",
+            ),
+            "elixir prog.exs",
+            "elixir:1.16.3-otp-26",
+            "env.ELIXIR_VERSION v1.16.3; the command names a elixir tool",
+        ),
+        Base(
+            "elixir through mix without an otp version",
+            listOf("env.ELIXIR_VERSION" to "1.20.4"),
+            "mix test",
+            "elixir:1.20.4",
+            "the command names a elixir tool",
+        ),
+        Base(
+            "elixir with no tag for its version takes the nearest",
+            listOf("env.ELIXIR_VERSION" to "1.16.9", "env.OTP_VERSION" to "26.2.5.21"),
+            "elixir prog.exs",
+            "elixir:1.16.3-otp-26",
+            "the command names a elixir tool",
+        ),
+        Base(
+            "ruby on debian 13",
+            listOf("os.release.ID" to "debian", "os.release.VERSION_ID" to "13") +
+                ("tool.ruby.version" to "3.4.11"),
+            "bundle lock",
+            "ruby:3.4.11-slim-trixie",
+            "the command names a ruby tool",
+        ),
+        Base(
+            "a toolchain in a script is not named by sh and the first usable row wins",
+            debian12 + listOf("tool.python.version" to "3.12.4", "env.R_BASE_VERSION" to "4.6.1"),
+            "sh prog.sh",
+            "python:3.12.4-slim-bookworm",
+            "the first of 2 toolchains in table order",
+        ),
         Base("only a distribution: ubuntu", ubuntu2204, "make", "ubuntu:22.04", "distribution"),
         Base("only a distribution: debian", debian12, "make", "debian:12-slim", "distribution"),
         Base("only a distribution: alpine", alpine320, "make", "alpine:3.20", "distribution"),
@@ -309,6 +383,52 @@ class ReproduceTest {
             assertTrue(b.basis in r.basis, "${b.name}: ${r.basis}")
             assertTrue(r.dockerfile.contains("FROM ${b.image}\n"), b.name)
         }
+    }
+
+    @Test
+    fun theRAndElixirRowsReadTheEnvironmentTheImagesRecordAndSayWhatTheTagLeavesOpen() {
+        val r = build(
+            capsule("env.R_BASE_VERSION" to "4.0.5", "os.arch" to "aarch64"),
+            "Rscript a.R",
+        )
+        assertEquals(Status.PARTIAL, r.status("env.R_BASE_VERSION"))
+        assertTrue("FROM r-base:4.0.5; " in r.entry("env.R_BASE_VERSION").detail)
+        assertTrue("Debian testing" in r.entry("env.R_BASE_VERSION").detail)
+        assertTrue("--platform linux/arm64" in r.runScript)
+        assertEquals("debian", r.distro)
+        val generated = build(
+            capsule("env.R_BASE_VERSION" to "4.0.5", "env.LC_ALL" to "en_US.UTF-8"),
+            "Rscript a.R",
+        )
+        assertFalse("apt-get" in generated.dockerfile)
+        assertTrue(generated.packages.isEmpty())
+        assertEquals(Status.MIRRORED, generated.status("env.LC_ALL"))
+        assertTrue("the image generates the locale" in generated.entry("env.LC_ALL").detail)
+        val other = build(
+            capsule("env.R_BASE_VERSION" to "4.0.5", "env.LC_ALL" to "de_DE.UTF-8"),
+            "Rscript a.R",
+        )
+        assertTrue("apt-get install" in other.dockerfile)
+        assertTrue("de_DE.UTF-8 UTF-8" in other.dockerfile)
+        val odd = build(capsule("env.R_BASE_VERSION" to "4.0"), "Rscript a.R")
+        assertEquals("debian:12-slim", odd.imageTag)
+        assertEquals(Status.NOT_MIRRORED, odd.status("env.R_BASE_VERSION"))
+        val elixir = build(
+            capsule("env.ELIXIR_VERSION" to "v1.16.3", "env.OTP_VERSION" to "26.2.5.21"),
+            "elixir a.exs",
+        )
+        assertEquals("elixir:1.16.3-otp-26", elixir.imageTag)
+        assertTrue("major version only" in elixir.entry("env.ELIXIR_VERSION").detail)
+        val bare = build(capsule("env.ELIXIR_VERSION" to "1.16.3"), "elixir a.exs")
+        assertEquals("elixir:1.16.3", bare.imageTag)
+        assertTrue("or the Erlang/OTP version" in bare.entry("env.ELIXIR_VERSION").detail)
+        val unknown = build(capsule("env.ELIXIR_VERSION" to "latest"), "elixir a.exs")
+        assertEquals("debian:12-slim", unknown.imageTag)
+        val attrs = mapOf("env.ELIXIR_VERSION" to "1.16.9", "env.OTP_VERSION" to "26.1")
+        val nearest = ImageTable.rows.single { it.tool == "elixir" }
+            .pick(attrs, Distro.of(emptyMap()))
+        assertEquals("elixir:1.16.3-otp-26", nearest?.tag)
+        assertTrue("the nearest published version is 1.16.3" in nearest?.note.orEmpty())
     }
 
     @Test
@@ -471,8 +591,10 @@ class ReproduceTest {
         assertEquals("python:3.12.4-slimline", unknownShape.tag)
         assertTrue("no tag of this form" in unknownShape.note.orEmpty())
 
-        assertEquals("ruby:3.3.6", pick("ruby:3.3.6").tag)
-        assertNull(pick("ruby:3.3.6").note)
+        assertEquals("swift:5.10", pick("swift:5.10").tag)
+        assertNull(pick("swift:5.10").note)
+        assertEquals("r-base:4.6.1", pick("r-base:4.6.1").tag)
+        assertEquals("r-base:4.6.1", pick("r-base:4.6.9").tag)
     }
 
     @Test
@@ -869,7 +991,7 @@ class ReproduceTest {
             ),
             "node a.js",
         )
-        assertTrue("RUN apk add --no-cache gcompat tzdata\n" in alpine.dockerfile)
+        assertTrue("RUN apk add --no-cache gcompat libgcc tzdata\n" in alpine.dockerfile)
         assertFalse("locale" in alpine.dockerfile)
         assertEquals(Status.PARTIAL, alpine.status("env.LANG"))
         assertTrue("musl" in alpine.entry("env.LANG").detail)
@@ -879,7 +1001,7 @@ class ReproduceTest {
     fun anAlpineArmGetsGcompatForTheGlibcDriftBinaryAndADebianArmDoesNot() {
         val node = "tool.node.version" to "22.12.0"
         val alpine = build(capsule(*(alpine320 + node).toTypedArray()), "node a.js")
-        assertTrue("RUN apk add --no-cache gcompat\n" in alpine.dockerfile)
+        assertTrue("RUN apk add --no-cache gcompat libgcc\n" in alpine.dockerfile)
         val debian = build(capsule(*(debian12 + node).toTypedArray()), "node a.js")
         assertFalse("apk" in debian.dockerfile)
     }
@@ -896,9 +1018,9 @@ class ReproduceTest {
             "node a.js",
         )
         val alpinePackages = manifestPackages(alpine)
-        assertEquals(listOf("gcompat", "tzdata"), alpinePackages.map { it.first })
+        assertEquals(listOf("gcompat", "libgcc", "tzdata"), alpinePackages.map { it.first })
         assertTrue(alpinePackages.all { it.second == "apk" })
-        assertTrue("RUN apk add --no-cache gcompat tzdata\n" in alpine.dockerfile)
+        assertTrue("RUN apk add --no-cache gcompat libgcc tzdata\n" in alpine.dockerfile)
         val debian = build(
             capsule(
                 "tool.node.version" to "22.12.0",
@@ -910,6 +1032,48 @@ class ReproduceTest {
         assertEquals(listOf("locales" to "apt"), manifestPackages(debian))
         val bare = build(capsule("tool.node.version" to "22.12.0"), "node a.js")
         assertEquals(emptyList(), manifestPackages(bare))
+    }
+
+    @Test
+    fun anArchivedOrUnknownDebianReleaseIsPointedAtArchiveDebianOrgAtBuildTime() {
+        val locale = "env.LANG" to "en_US.UTF-8"
+        val gcc = listOf("tool.cc.family" to "gcc", "tool.cc.version" to "10.2.1")
+        val buster = build(capsule(*(debian10 + gcc + locale).toTypedArray()), "make")
+        assertTrue("FROM gcc:10.2\nRUN . /etc/os-release \\\n" in buster.dockerfile)
+        assertTrue("case \"\$VERSION_ID\" in 9|10) sed -i" in buster.dockerfile)
+        assertTrue("archive.debian.org/debian-security|' \\\n" in buster.dockerfile)
+        assertTrue("-e 's|deb.debian.org|archive.debian.org|' \\\n" in buster.dockerfile)
+        assertTrue("/etc/apt/sources.list ;; esac\nRUN apt-get update" in buster.dockerfile)
+        assertEquals(
+            listOf("archive.debian.org" to "apt-sources", "locales" to "apt"),
+            manifestPackages(buster),
+        )
+        val unknown = build(capsule(*(gcc + locale).toTypedArray()), "make")
+        assertEquals(
+            buster.dockerfile.substringAfter("\n"),
+            unknown.dockerfile.substringAfter("\n"),
+        )
+        val nodeAttrs = debian10 + locale + ("tool.node.version" to "16.13.0")
+        val node = build(capsule(*nodeAttrs.toTypedArray()), "node a.js")
+        assertTrue("case \"\$VERSION_ID\"" in node.dockerfile)
+        val served = listOf(
+            build(capsule(*(debian12 + gcc + locale).toTypedArray()), "make"),
+            build(
+                capsule(
+                    "os.release.ID" to "debian",
+                    "os.release.VERSION_ID" to "11",
+                    "tool.node.version" to "18.0.0",
+                    locale,
+                ),
+                "node a.js",
+            ),
+            build(capsule(*(debian10 + gcc).toTypedArray()), "make"),
+        )
+        for (r in served) {
+            assertFalse("archive.debian.org" in r.dockerfile, r.dockerfile)
+        }
+        assertEquals(listOf("locales" to "apt"), manifestPackages(served[0]))
+        assertEquals(listOf("locales" to "apt"), manifestPackages(served[1]))
     }
 
     private fun manifestPackages(r: Reproduction): List<Pair<String, String>> {

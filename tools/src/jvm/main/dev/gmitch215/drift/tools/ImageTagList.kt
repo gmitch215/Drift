@@ -29,6 +29,9 @@ object ImageTagList {
         "node" to listOf(Regex("^$VERSION-(?:$CODENAMES-slim|$ALPINE)$")),
         "php" to listOf(Regex("^$VERSION-(?:cli|zts)-(?:$CODENAMES|$ALPINE)$")),
         "python" to listOf(Regex("^$VERSION-(?:slim-$CODENAMES|$ALPINE)$")),
+        "r-base" to listOf(Regex("^$VERSION$")),
+        "ruby" to listOf(Regex("^$VERSION-(?:slim-$CODENAMES|$ALPINE)$")),
+        "elixir" to listOf(Regex("^$VERSION(?:-otp-\\d+)?$")),
         "rust" to listOf(Regex("^$VERSION-(?:slim-$CODENAMES|$ALPINE)$")),
     )
 

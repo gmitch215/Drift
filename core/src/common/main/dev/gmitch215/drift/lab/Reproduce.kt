@@ -301,7 +301,8 @@ object Reproduce {
                     usable.size == 1 -> "the only toolchain with a version an image tag can pin"
                     else -> "the first of ${usable.size} toolchains in table order"
                 }
-                val basis = "${row.versionPath} ${attrs.getValue(row.versionPath)}; $why"
+                val path = row.versionPath(attrs)
+                val basis = "$path ${attrs.getValue(path)}; $why"
                 return Base(pick.tag, digests[pick.tag], row, pick, pick.image, basis)
             }
             val id = distro.id
@@ -337,7 +338,9 @@ object Reproduce {
 
         fun classify(a: Attribute): Entry {
             val p = a.path
+            val pinned = base.row?.takeIf { p.startsWith("env.") && p in it.versionPaths }
             val (status, detail) = when {
+                pinned != null -> selected(pinned, "version", a.value)
                 p.startsWith("env.") -> env(a)
                 p == "cgroup.memory.max" -> memory(a.value.trim())
                 p == "cgroup.cpu.max" -> cpu(a.value.trim())
@@ -447,6 +450,10 @@ object Reproduce {
             val m = UTF8_LOCALE.matchEntire(value)
                 ?: return Status.PARTIAL to "run.sh: --env $name=$value; only xx_YY.UTF-8 " +
                     "locales are generated, so this one is set but not installed"
+            if ("${m.groupValues[1]}.UTF-8" in base.row?.locales.orEmpty()) {
+                return Status.MIRRORED to "run.sh: --env $name=$value; the image generates the " +
+                    "locale"
+            }
             locales += "${m.groupValues[1]}.UTF-8 UTF-8"
             return Status.MIRRORED to "run.sh: --env $name=$value; the locale is generated in " +
                 "the image"
@@ -711,6 +718,12 @@ object Reproduce {
         val header = "# drift reproduce: capsule ${capsule.hash()}; " +
             "manifest.json says what is not mirrored\n"
 
+        fun archiveMaybe(): Boolean {
+            if (base.image.id != "debian") return false
+            val release = base.image.release ?: distro.release.takeIf { distro.id == "debian" }
+            return release == null || release in ARCHIVED_DEBIAN
+        }
+
         fun packages(): List<AddedPackage> {
             val manager = if (base.image.alpine) "apk" else "apt"
             val list = mutableListOf<AddedPackage>()
@@ -721,8 +734,24 @@ object Reproduce {
                     manager,
                     "glibc for the Drift executable on musl; the capsule does not record it",
                 )
+                list += AddedPackage(
+                    "libgcc",
+                    manager,
+                    "the unwinder library that the Drift executable loads; the capsule does not " +
+                        "record it",
+                )
             }
             if (locales.isNotEmpty() && !base.image.alpine) {
+                if (archiveMaybe()) {
+                    list += AddedPackage(
+                        ARCHIVE_STEP,
+                        ARCHIVE_MANAGER,
+                        "on a Debian release whose repositories moved to archive.debian.org " +
+                            "(${ARCHIVED_DEBIAN.joinToString(", ")}), apt is pointed there; the " +
+                            "image's release is read at build time; the capsule does not " +
+                            "record it",
+                    )
+                }
                 list += AddedPackage(
                     "locales",
                     manager,
@@ -739,15 +768,33 @@ object Reproduce {
             return list
         }
 
+        fun archiveStep(): String {
+            val sec = "archive.debian.org/debian-security"
+            val rules = listOf(
+                "s|deb.debian.org/debian-security|$sec|",
+                "s|security.debian.org/debian-security|$sec|",
+                "s|security.debian.org|$sec|",
+                "s|deb.debian.org|archive.debian.org|",
+                "/stretch-updates/d",
+            )
+            val out = StringBuilder("RUN . /etc/os-release \\\n")
+            out.append("\t&& case \"\$VERSION_ID\" in ${ARCHIVED_DEBIAN.joinToString("|")}) sed -i")
+            for (rule in rules) out.append(" \\\n\t\t-e '$rule'")
+            return out.append(" \\\n\t\t/etc/apt/sources.list ;; esac\n").toString()
+        }
+
         fun dockerfile(packages: List<AddedPackage>): String {
             val out = StringBuilder()
             out.append(header)
             out.append("FROM ${base.ref}\n")
-            val names = packages.map { it.name }
+            val names = packages.filter { it.manager != ARCHIVE_MANAGER }.map { it.name }
             if (names.isNotEmpty()) {
                 if (base.image.alpine) {
                     out.append("RUN apk add --no-cache ${names.joinToString(" ")}\n")
                 } else {
+                    if (packages.any { it.manager == ARCHIVE_MANAGER }) {
+                        out.append(archiveStep())
+                    }
                     out.append("RUN apt-get update \\\n")
                     out.append("\t&& apt-get install -y --no-install-recommends ")
                     out.append(names.joinToString(" ")).append(" \\\n")
@@ -785,6 +832,9 @@ object Reproduce {
         // #endregion
     }
 
+    private const val ARCHIVE_STEP = "archive.debian.org"
+    private const val ARCHIVE_MANAGER = "apt-sources"
+    private val ARCHIVED_DEBIAN = setOf("9", "10")
     private val ENV_NAME = Regex("^[A-Za-z_][A-Za-z0-9_]*$")
     private val HOST_PATH = Regex("^(/|~|\\\\\\\\|[A-Za-z]:[\\\\/])|/Users/|/home/")
     private val UTF8_LOCALE = Regex("^([a-z]{2,3}_[A-Z]{2})\\.(?:UTF-8|utf8|UTF8|utf-8)$")

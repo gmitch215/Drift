@@ -33,6 +33,39 @@ class ImageTagListTest {
     }
 
     @Test
+    fun theRAndElixirAndRubyTagsAreGroupedByTheirSuffix() {
+        assertEquals(
+            mapOf("" to listOf("4.0.5", "4.6.1")),
+            ImageTagList.group("r-base", listOf("4.6.1", "4.0.5", "latest", "4.6.1-bookworm")),
+        )
+        assertEquals(
+            mapOf(
+                "" to listOf("1.16.3"),
+                "-otp-26" to listOf("1.16.3"),
+                "-otp-29" to listOf("1.20.4"),
+            ),
+            ImageTagList.group(
+                "elixir",
+                listOf(
+                    "1.16.3",
+                    "1.16.3-otp-26",
+                    "1.16.3-otp-26-slim",
+                    "1.16.3-alpine",
+                    "1.16",
+                    "1.20.4-otp-29",
+                ),
+            ),
+        )
+        assertEquals(
+            mapOf("-slim-trixie" to listOf("3.4.11"), "-alpine3.22" to listOf("3.4.11")),
+            ImageTagList.group(
+                "ruby",
+                listOf("3.4.11-slim-trixie", "3.4.11-alpine3.22", "3.4.11", "3.4-slim-trixie"),
+            ),
+        )
+    }
+
+    @Test
     fun versionsSortNumericallyAndAShortOneComesFirst() {
         assertTrue(ImageTagList.compareVersions("9.0.0", "10.0.0") < 0)
         assertTrue(ImageTagList.compareVersions("13.2", "13.2.0") < 0)

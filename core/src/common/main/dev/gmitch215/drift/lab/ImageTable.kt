@@ -34,16 +34,21 @@ internal data class Pick(val tag: String, val note: String?, val image: ImageDis
 /**
  * One row of the mapping from a scanned toolchain to an official image. [commands] are the words
  * in a test command that name the toolchain; [prefixes] and [others] are what else changes when
- * the image does, on top of the distribution members every image has.
+ * the image does, on top of the distribution members every image has. [versionPaths] are the
+ * attributes that can carry the version, the first one the capsule has first; [locales] are the
+ * glibc locales the image already generates.
  */
 internal class Row(
     val tool: String,
     val commands: Set<String>,
     val prefixes: List<String>,
     val others: List<String>,
+    val versionPaths: List<String> = listOf("tool.$tool.version"),
+    val locales: Set<String> = emptySet(),
     private val formula: (Map<String, String>, Distro) -> Pick?,
 ) {
-    val versionPath: String get() = "tool.$tool.version"
+    fun versionPath(attrs: Map<String, String>): String =
+        versionPaths.firstOrNull { it in attrs } ?: versionPaths.first()
 
     /** The formula's tag, or the nearest published one when the formula's tag does not exist. */
     fun pick(attrs: Map<String, String>, distro: Distro): Pick? =
@@ -58,6 +63,7 @@ internal object ImageTable {
     private val ubuntu = mapOf("20.04" to "focal", "22.04" to "jammy", "24.04" to "noble")
     private val exact = Regex("^\\d+\\.\\d+\\.\\d+$")
     private val minor = Regex("^\\d+\\.\\d+(\\.\\d+)?$")
+    private val otpMajor = Regex("^(\\d+)(?:\\.\\d+)*$")
 
     const val DEFAULT_DEBIAN = "bookworm"
 
@@ -106,6 +112,9 @@ internal object ImageTable {
 
     private fun versioned(attrs: Map<String, String>, path: String, pattern: Regex): String? =
         attrs[path]?.takeIf { pattern.matches(it) }
+
+    private fun firstVersion(attrs: Map<String, String>, paths: List<String>): String? =
+        paths.firstNotNullOfOrNull { attrs[it]?.removePrefix("v")?.takeIf(exact::matches) }
 
     private fun slimFirst(version: String, f: Flavor, repository: String): Pick {
         val tag = if (f.image.alpine) "$version-${f.suffix}" else "$version-slim-${f.suffix}"
@@ -277,6 +286,47 @@ internal object ImageTable {
                 "the tag pins $line only; the patch level is whatever the tag points to"
             }
             Pick("gcc:$line", note, ImageDistro("debian", null))
+        },
+        Row(
+            "ruby",
+            setOf("ruby", "irb", "gem", "bundle", "bundler", "rake"),
+            emptyList(),
+            listOf("bundled gems", "bundler"),
+        ) { attrs, d ->
+            val v = versioned(attrs, "tool.ruby.version", exact) ?: return@Row null
+            slimFirst(v, flavor(d), "ruby")
+        },
+        Row(
+            "r",
+            setOf("R", "Rscript"),
+            emptyList(),
+            listOf("base and recommended packages"),
+            listOf("tool.r.version", "env.R_BASE_VERSION"),
+            setOf("en_US.UTF-8"),
+        ) { attrs, _ ->
+            val v = firstVersion(attrs, listOf("tool.r.version", "env.R_BASE_VERSION"))
+                ?: return@Row null
+            val note = "the tag does not pin the Debian release; r-base follows Debian testing"
+            Pick("r-base:$v", note, ImageDistro("debian", null))
+        },
+        Row(
+            "elixir",
+            setOf("elixir", "elixirc", "iex", "mix"),
+            emptyList(),
+            listOf("Erlang/OTP", "rebar3", "hex"),
+            listOf("tool.elixir.version", "env.ELIXIR_VERSION"),
+        ) { attrs, _ ->
+            val v = firstVersion(attrs, listOf("tool.elixir.version", "env.ELIXIR_VERSION"))
+                ?: return@Row null
+            val otp = listOf("env.OTP_VERSION", "tool.erlang.otp")
+                .firstNotNullOfOrNull { attrs[it]?.let(otpMajor::find)?.groupValues?.get(1) }
+            val note = "the tag does not pin the Debian release" + if (otp == null) {
+                " or the Erlang/OTP version"
+            } else {
+                "; Erlang/OTP $otp is pinned to its major version only"
+            }
+            val tag = if (otp == null) "elixir:$v" else "elixir:$v-otp-$otp"
+            Pick(tag, note, ImageDistro("debian", null))
         },
     )
 }
