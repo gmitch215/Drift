@@ -8,6 +8,7 @@ import dev.gmitch215.drift.json.long
 import dev.gmitch215.drift.json.obj
 import dev.gmitch215.drift.json.require
 import dev.gmitch215.drift.model.Capsule
+import dev.gmitch215.drift.model.Run
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -30,5 +31,19 @@ class RunProcessTest {
         val result = CanonicalJson.parse(disk.files.getValue("bad/result.json")).obj()
         assertEquals(1L, result.require("exitCode").long())
         assertTrue(disk.files.getValue("bad/tail.log").contains("NoSuchClassForDrift"))
+    }
+
+    @Test
+    fun repeatedRealRunsRecordWallTimeAndNoCpuOrMemoryOnTheJvm() {
+        val disk = MemoryCaseFiles()
+        val result = DriftCommand(systemHost(), disk)
+            .test("run --out rep --repeat 2 -- \"$java\" -version")
+        assertEquals(0, result.statusCode, result.stderr)
+        val run = Run.parse(disk.files.getValue("rep/run.json"))
+        assertEquals(2, run.samples.size)
+        assertTrue(run.samples.all { it.exitCode == 0 && it.wallMs > 0 })
+        assertTrue(run.samples.all { it.userMs == null && it.peakKb == null })
+        assertTrue(run.samples.all { it.systemMs == null })
+        assertTrue("2 runs, 2 passed (100%)" in result.stderr, result.stderr)
     }
 }
