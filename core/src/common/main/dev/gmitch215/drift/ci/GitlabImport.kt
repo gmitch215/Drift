@@ -25,7 +25,8 @@ object GitlabImport {
     private val runner = Regex("Running with gitlab-runner (\\S+)")
     private val executor = Regex("Preparing the \"([^\"]+)\" executor")
     private val image = Regex("executor with image (\\S+)")
-    private val digest = Regex("with digest (\\S+)")
+    private val digest = Regex("for (\\S+) with digest (\\S+)")
+    private val stamp = Regex("^\\d{4}-\\d\\d-\\d\\dT[0-9:.]+Z \\d\\d[OE][+ ]")
 
     /** The outcome comes from the final `Job succeeded` or `ERROR: Job failed` line, if any. */
     fun trace(text: String, id: String): Import {
@@ -42,7 +43,14 @@ object GitlabImport {
         add("ci.runner.version", runner)
         add("ci.runner.executor", executor)
         add("ci.runner.image", image)
-        add("ci.runner.image.digest", digest)
+        val jobImage = found["ci.runner.image"]?.value
+        val jobDigest = lines.firstNotNullOfOrNull {
+            digest.find(it)?.groupValues?.takeIf { g -> g[1] == jobImage }?.get(2)
+        }
+        if (!jobDigest.isNullOrEmpty()) {
+            found["ci.runner.image.digest"] =
+                Redactor.redact(Attribute("ci.runner.image.digest", jobDigest, SOURCE))
+        }
         if (found.isEmpty()) {
             return Import.Refused(
                 "no runner environment found (expected a gitlab-runner header and executor lines)",
@@ -129,7 +137,7 @@ object GitlabImport {
 
     private fun lines(text: String): List<String> = text.replace("\r\n", "\n").replace('\r', '\n')
         .lineSequence()
+        .map { SymptomExtractor.stripAnsi(it.take(LINE_LIMIT).replace(stamp, "")).trim() }
         .filterNot { it.startsWith("section_start:") || it.startsWith("section_end:") }
-        .map { SymptomExtractor.stripAnsi(it.take(LINE_LIMIT)).trim() }
         .toList()
 }

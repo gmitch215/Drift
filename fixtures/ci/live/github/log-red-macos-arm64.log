@@ -1,0 +1,88 @@
+Test Project (macos-arm64)	Set up job	﻿2026-10-24T00:05:02.3018190Z Current runner version: '2.338.0'
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3031890Z ##[group]Runner Image Provisioner
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3032370Z Hosted Compute Agent
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3032720Z Version: 20260828.587
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3033090Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3033540Z Build Date: 2026-08-28T16:44:25Z
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3034030Z Worker ID: {0abe0517-0f09-4d1f-8056-e929d1a6d800}
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3034450Z Azure Region: westus
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3034790Z ##[endgroup]
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3035570Z ##[group]Operating System
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3035930Z macOS
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3036320Z 15.7.9
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3036630Z 24G830
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3036960Z ##[endgroup]
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3037290Z ##[group]Runner Image
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3037660Z Image: macos-15-arm64
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3038020Z Version: 20260907.0337.1
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3038720Z Included Software: https://github.com/actions/runner-images/blob/macos-15-arm64/20260907.0337/images/macos/macos-15-arm64-Readme.md
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3039750Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-15-arm64%2F20260907.0337
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3040360Z ##[endgroup]
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3041020Z ##[group]GITHUB_TOKEN Permissions
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3041890Z Contents: read
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3042230Z Metadata: read
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3042550Z ##[endgroup]
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3043690Z Secret source: Actions
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3044200Z Cache mode: write
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3044610Z Prepare workflow directory
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3288230Z Prepare all required actions
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.3319180Z Getting action download info
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.6662200Z Download action repository 'actions/checkout@v6' (SHA:d23441a48e516b6c34aea4fa41551a30e30af803)
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:02.9664360Z Download action repository 'actions/setup-java@v5' (SHA:b6effb05e454b25005698d916606bdc6ffcbf961)
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:03.4616860Z Download action repository 'actions/cache@v5' (SHA:caa296126883cff596d87d8935842f9db880ef25)
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:03.5309350Z Download action repository 'codecov/codecov-action@v7' (SHA:303a32d7a59b442fa8d48b6a1cc6825c09c847a5)
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:03.7925360Z Download action repository 'actions/upload-artifact@v7' (SHA:cf430e030ddbb5b0abf93d22962f4752f3646cd9)
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:04.3215250Z Getting action download info
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:04.4348670Z Download action repository 'actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd' (SHA:ed597411d8f924073f98dfc5c65a23a2325f34cd)
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:04.9025750Z Getting action download info
+Test Project (macos-arm64)	Set up job	2026-10-24T00:05:05.0789380Z Complete job name: Test Project (macos-arm64)
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:10:45.7483270Z > Task :cli:linkDebugTestMacosArm64
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:10:47.8550260Z w: The number of threads 4 is more than the number of processors 3
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:10:47.8552690Z 
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:10:47.8662790Z > Task :scan:linkDebugTestMacosArm64
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:10:54.0964150Z 
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:10:54.1107530Z > Task :core:linkDebugTestMacosArm64
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:11:00.6587350Z w: The number of threads 4 is more than the number of processors 3
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:11:07.3364500Z 
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:11:07.3465810Z w: The number of threads 4 is more than the number of processors 3
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:11:07.3466440Z > Task :cli:linkDebugTestMacosArm64
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:11:17.8129680Z 
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:11:17.8231140Z > Task :scan:macosArm64Test
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:11:31.5941140Z > Task :cli:macosArm64Test
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:11:31.8285160Z > Task :core:macosArm64Test
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:11:53.0431440Z > Task :cli:linkReleaseExecutableMacosArm64
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7436120Z 
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7436710Z 
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7536040Z FAILURE: Build completed with 2 failures.
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7537360Z [Incubating] Problems report is available at: file:///Users/runner/work/Drift/Drift/build/reports/problems/problems-report.html
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7706930Z 
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7707210Z 1: Task failed with an exception.
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7708000Z -----------
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7708250Z * What went wrong:
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7708770Z Execution failed for task ':bench:jvmTest'.
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7709610Z > There were failing tests. See the report at: file:///Users/runner/work/Drift/Drift/bench/build/reports/tests/jvmTest/index.html
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7710160Z 
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7710210Z * Try:
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7710710Z > Run with --scan to get full insights from a Build Scan (powered by Develocity).
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7711540Z ==============================================================================
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7711850Z 
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7711940Z 2: Task failed with an exception.
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7712350Z -----------
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7712740Z * What went wrong:
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7713020Z Execution failed for task ':bench:macosArm64Test'.
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7713690Z > There were failing tests. See the report at: file:///Users/runner/work/Drift/Drift/bench/build/reports/tests/macosArm64Test/index.html
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7714250Z 
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7714390Z * Try:
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7714810Z > Run with --scan to get full insights from a Build Scan (powered by Develocity).
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7715340Z ==============================================================================
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7715650Z 
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7715740Z BUILD FAILED in 7m 10s
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7715960Z 
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7716290Z Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7716670Z 
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7717070Z You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7717640Z 
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7718370Z For more on this, please refer to https://docs.gradle.org/9.8.0/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.7719290Z 156 actionable tasks: 156 executed
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:44.8543950Z Configuration cache entry stored.
+Test Project (macos-arm64)	Run Tests	2026-10-24T00:12:46.8626020Z ##[error]Process completed with exit code 1.

@@ -1,0 +1,79 @@
+Test Project (macos-arm64)	UNKNOWN STEP	﻿2026-10-13T19:10:25.4168880Z Current runner version: '2.337.0'
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4212540Z ##[group]Runner Image Provisioner
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4241100Z Hosted Compute Agent
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4241610Z Version: 20260828.587
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4242060Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4242540Z Build Date: 2026-08-28T16:44:25Z
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4242990Z Worker ID: {cfdfa2ca-84be-4a37-afcd-e05c8da44bbe}
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4243520Z Azure Region: westus
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4243890Z ##[endgroup]
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4245460Z ##[group]Operating System
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4245900Z macOS
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4246290Z 15.7.9
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4246640Z 24G830
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4246970Z ##[endgroup]
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4247330Z ##[group]Runner Image
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4247730Z Image: macos-15-arm64
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4248200Z Version: 20260907.0337.1
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4249260Z Included Software: https://github.com/actions/runner-images/blob/macos-15-arm64/20260907.0337/images/macos/macos-15-arm64-Readme.md
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4250410Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-15-arm64%2F20260907.0337
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4251110Z ##[endgroup]
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4251930Z ##[group]GITHUB_TOKEN Permissions
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4254020Z Contents: read
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4254400Z Metadata: read
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4254850Z ##[endgroup]
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4256710Z Secret source: Actions
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4257310Z Cache mode: write
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4257790Z Prepare workflow directory
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4846480Z Prepare all required actions
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.4895200Z Getting action download info
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:25.8507960Z Download action repository 'actions/checkout@v6' (SHA:d23441a48e516b6c34aea4fa41551a30e30af803)
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:26.1091180Z Download action repository 'actions/setup-java@v5' (SHA:b6effb05e454b25005698d916606bdc6ffcbf961)
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:26.9601220Z Download action repository 'actions/cache@v5' (SHA:caa296126883cff596d87d8935842f9db880ef25)
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:27.0520430Z Download action repository 'codecov/codecov-action@v7' (SHA:303a32d7a59b442fa8d48b6a1cc6825c09c847a5)
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:27.4694670Z Download action repository 'actions/upload-artifact@v7' (SHA:cf430e030ddbb5b0abf93d22962f4752f3646cd9)
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:28.3830110Z Getting action download info
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:28.5153840Z Download action repository 'actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd' (SHA:ed597411d8f924073f98dfc5c65a23a2325f34cd)
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:29.2870830Z Getting action download info
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:10:29.4485090Z Complete job name: Test Project (macos-arm64)
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:15:44.2080890Z > Task :core:macosArm64MainKlibrary
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:15:44.4415360Z > Task :cli:compileTestKotlinMacosArm64
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:15:50.7897710Z > Task :studio:jvmTest
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:15:51.4620090Z > Task :studio:jvmJacocoTestReport
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:15:51.4724980Z > Task :host:macosArm64MainKlibrary
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:15:52.2567510Z > Task :host:compileTestKotlinMacosArm64
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:15:58.2719150Z w: The number of threads 4 is more than the number of processors 3
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:15:58.2721060Z 
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:15:58.2810880Z > Task :host:linkDebugTestMacosArm64
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:15:59.3593710Z 
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:15:59.3695380Z > Task :host:macosArm64Test
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:15:59.3849650Z > Task :scan:macosArm64MainKlibrary
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:16:00.7659670Z > Task :core:compileTestKotlinMacosArm64
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:16:04.0735920Z > Task :scan:compileTestKotlinMacosArm64
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:16:14.2995610Z > Task :cli:linkDebugTestMacosArm64
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:16:27.4829530Z w: The number of threads 4 is more than the number of processors 3
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:16:27.4831610Z 
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:16:27.4921270Z > Task :scan:linkDebugTestMacosArm64
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:16:30.6386750Z 
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:16:30.6491350Z > Task :core:linkDebugTestMacosArm64
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:16:36.1501160Z w: The number of threads 4 is more than the number of processors 3
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:16:36.1501930Z 
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:16:36.1602820Z > Task :cli:linkDebugTestMacosArm64
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:16:36.9822250Z w: The number of threads 4 is more than the number of processors 3
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:16:36.9822730Z 
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:16:36.9921740Z > Task :core:linkDebugTestMacosArm64
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:16:57.3794940Z 
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:16:57.3895670Z > Task :scan:macosArm64Test
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:17:05.9874760Z > Task :cli:macosArm64Test
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:17:08.1901340Z > Task :core:macosArm64Test
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:17:31.7561290Z > Task :cli:linkReleaseExecutableMacosArm64
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:18:57.5024330Z 
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:18:57.5129090Z [Incubating] Problems report is available at: file:///Users/runner/work/Drift/Drift/build/reports/problems/problems-report.html
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:18:57.5233190Z 
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:18:57.5335750Z Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:18:57.5438310Z 
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:18:57.5523470Z You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:18:57.5524900Z 
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:18:57.5525560Z For more on this, please refer to https://docs.gradle.org/9.8.0/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:18:57.5526360Z 
+Test Project (macos-arm64)	UNKNOWN STEP	2026-10-13T19:18:57.7306830Z BUILD SUCCESSFUL in 7m 27s

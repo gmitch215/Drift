@@ -146,6 +146,32 @@ class CiImportTest {
     }
 
     @Test
+    fun githubLogFromGhKeepsTheRunnerVersionBehindItsByteOrderMark() {
+        val text = CiFixtures.text("live/github/log-red-linux-x64.log")
+        assertTrue(text.startsWith("Test Project (linux-x64)\tSet up job\t\uFEFF"))
+        val values = attrs(done(GithubImport.log(text, "red", "Test Project (linux-x64)")))
+        assertEquals("2.338.0", values["ci.runner.version"])
+        assertEquals("20261012.334.1", values["ci.runner.image.version"])
+        assertEquals("Ubuntu", values["os.release.name"])
+    }
+
+    @Test
+    fun gitlabTraceFromTheApiReadsPastItsTimestampPrefix() {
+        val red = done(GitlabImport.trace(CiFixtures.text("live/gitlab/trace-red.txt"), "red"))
+        assertEquals(RunOutcome.FAIL, red.outcome)
+        val pass = done(GitlabImport.trace(CiFixtures.text("live/gitlab/trace-green.txt"), "green"))
+        assertEquals(RunOutcome.PASS, pass.outcome)
+        val values = attrs(red)
+        assertEquals("19.6.0~pre.2348.g4d083417", values["ci.runner.version"])
+        assertEquals("docker+machine", values["ci.runner.executor"])
+        assertEquals(
+            "gitlab.com:443/gitlab-org/dependency_proxy/containers/golang@sha256:" +
+                "820153096fda4de6ac1b7194d12e416b7dd8f4e9a33d17e0345b111b945162d8",
+            values["ci.runner.image.digest"],
+        )
+    }
+
+    @Test
     fun gitlabPipelineAndJobs() {
         val pipeline = done(GitlabImport.summary(CiFixtures.text("gitlab-pipeline.json")))
         assertEquals("4242", pipeline.id)

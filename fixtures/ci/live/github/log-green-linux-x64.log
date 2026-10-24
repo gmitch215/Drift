@@ -1,0 +1,80 @@
+Test Project (linux-x64)	UNKNOWN STEP	﻿2026-10-13T19:10:21.1085030Z Current runner version: '2.337.0'
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1105052Z ##[group]Runner Image Provisioner
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1105618Z Hosted Compute Agent
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1106047Z Version: 20261002.596
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1106478Z Commit: c3d12f3313a95f25162a1503be624f3b0617f8c0
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1106914Z Build Date: 2026-10-02T22:28:27Z
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1107406Z Worker ID: {0154865e-3c0a-4331-ab65-f8372cb1fd1c}
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1107824Z Region: westus3
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1108186Z Cloud: Azure
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1108557Z ##[endgroup]
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1109429Z ##[group]Operating System
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1109837Z Ubuntu
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1110151Z 24.04.5
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1110455Z LTS
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1110845Z ##[endgroup]
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1111177Z ##[group]Runner Image
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1111597Z Image: ubuntu-24.04
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1111942Z Version: 20261004.327.1
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1112773Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261004.327/images/ubuntu/Ubuntu2404-Readme.md
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1113661Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261004.327
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1114258Z ##[endgroup]
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1115090Z ##[group]GITHUB_TOKEN Permissions
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1116439Z Contents: read
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1116788Z Metadata: read
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1117117Z ##[endgroup]
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1118569Z Secret source: Actions
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1119158Z Cache mode: write
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1119656Z Prepare workflow directory
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1380630Z Prepare all required actions
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.1412401Z Getting action download info
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.5013112Z Download action repository 'actions/checkout@v6' (SHA:d23441a48e516b6c34aea4fa41551a30e30af803)
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:21.5775937Z Download action repository 'actions/setup-java@v5' (SHA:b6effb05e454b25005698d916606bdc6ffcbf961)
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:22.5336024Z Download action repository 'actions/cache@v5' (SHA:caa296126883cff596d87d8935842f9db880ef25)
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:22.6824966Z Download action repository 'codecov/codecov-action@v7' (SHA:303a32d7a59b442fa8d48b6a1cc6825c09c847a5)
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:22.9621982Z Download action repository 'actions/upload-artifact@v7' (SHA:cf430e030ddbb5b0abf93d22962f4752f3646cd9)
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:23.8089928Z Getting action download info
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:23.9400449Z Download action repository 'actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd' (SHA:ed597411d8f924073f98dfc5c65a23a2325f34cd)
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:24.5452826Z Getting action download info
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:10:24.7029734Z Complete job name: Test Project (linux-x64)
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:18.1012797Z > Task :core:linuxX64Test
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:20.1012231Z > Task :cli:linuxX64Test
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:20.7013152Z > Task :core:compileTestKotlinWasmJs
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:20.7035951Z > Task :core:wasmJsTestProcessResources NO-SOURCE
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:20.7055900Z > Task :core:wasmJsTestClasses
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:21.1025697Z > Task :core:kotlinWasmNodeJsSetup
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:21.1085985Z > Task :host:wasmJsProcessResources NO-SOURCE
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:21.1145945Z > Task :host:wasmJsMainClasses
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:21.7066108Z > Task :host:compileTestKotlinWasmJs
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:21.7105666Z > Task :host:wasmJsTestProcessResources NO-SOURCE
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:21.7115308Z > Task :host:wasmJsTestClasses
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:24.7015117Z > Task :cli:compileTestDevelopmentExecutableKotlinWasmJs
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:24.8025764Z > Task :cli:wasmJsTestTestDevelopmentExecutableCompileSync
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:27.2015845Z > Task :host:compileTestDevelopmentExecutableKotlinWasmJs
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:27.5025512Z > Task :host:kotlinWasmNodeJsSetup
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:27.6030273Z > Task :host:wasmJsTestTestDevelopmentExecutableCompileSync
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:27.9020229Z > Task :host:wasmJsNodeTest
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:27.9073380Z > Task :scan:wasmJsProcessResources NO-SOURCE
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:27.9105571Z > Task :scan:wasmJsMainClasses
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:30.3015827Z > Task :scan:compileTestKotlinWasmJs
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:30.3035576Z > Task :scan:wasmJsTestProcessResources NO-SOURCE
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:30.3091980Z > Task :scan:wasmJsTestClasses
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:33.8037090Z > Task :core:compileTestDevelopmentExecutableKotlinWasmJs
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:33.9048141Z > Task :core:wasmJsTestTestDevelopmentExecutableCompileSync
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:35.4035768Z > Task :cli:wasmJsNodeTest
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:35.5055803Z > Task :scan:kotlinWasmNodeJsSetup
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:36.8021979Z > Task :scan:compileTestDevelopmentExecutableKotlinWasmJs
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:36.9038103Z > Task :scan:wasmJsTestTestDevelopmentExecutableCompileSync
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:15:46.1012141Z > Task :scan:wasmJsNodeTest
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:16:03.9025830Z > Task :core:wasmJsNodeTest
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:16:05.5012338Z > Task :cli:linkReleaseExecutableLinuxX64
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:16:59.4012693Z 
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:16:59.4014163Z [Incubating] Problems report is available at: file:///home/runner/work/Drift/Drift/build/reports/problems/problems-report.html
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:16:59.4014842Z 
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:16:59.4015141Z Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:16:59.4015465Z 
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:16:59.4015813Z You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:16:59.4016241Z 
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:16:59.4016644Z For more on this, please refer to https://docs.gradle.org/9.8.0/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:16:59.4017126Z 
+Test Project (linux-x64)	UNKNOWN STEP	2026-10-13T19:16:59.4017310Z BUILD SUCCESSFUL in 6m 2s

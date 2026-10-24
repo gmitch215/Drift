@@ -1,0 +1,39 @@
+drift ci: gmitch215/Drift, branch master, HEAD c775d8f
+
+Failing  Build Project, run 40042665061 (c775d8f, 2026-10-23, branch master)
+         https://github.com/gmitch215/Drift/actions/runs/40042665061
+Passing  Build Project, run 38452229524 (da0505e, 2026-10-13, branch master)
+         https://github.com/gmitch215/Drift/actions/runs/38452229524
+Job      Test Project (linux-x64), failed in step Run Tests
+         Other failed jobs: Test Project (macos-arm64), Test Project (windows-x64), Test Project
+         (linux-arm64). Pass --job NAME to compare one of them.
+
+Environment differences, best first (3 of 4):
+  1. ci.provisioner.build-date: 2026-10-02T22:28:27Z -> 2026-10-12T17:48:21Z (tier difference)
+  2. ci.provisioner.version: 20261002.596 -> 20261012.601 (tier difference)
+  3. ci.runner.image.version: 20261004.327.1 -> 20261012.334.1 (tier difference)
+
+Result: 4 changes differ with the same support, and ci.provisioner.build-date ranks first only by
+hand-set weights, so the data does not name one cause.
+Confidence: low, 4 changes tie and the data cannot separate them.
+
+This compares the runner environment of the two jobs, not your code. It cannot find an ordinary code
+regression, so a failure that comes from a code change shows up as no cause or a weak difference.
+Read the code change next: git diff --stat da0505e c775d8f
+
+Saved to .drift/ci/c775d8f
+Next: drift case show .drift/ci/c775d8f
+Then: drift next .drift/ci/c775d8f
+
+To compare instrumented captures of both commits, run your test command on each
+(commit or stash local changes first):
+  git switch --detach da0505e
+  drift run --tools --project --label da0505e --out .drift/ci/c775d8f/passing-local -- TEST_COMMAND
+  git switch --detach c775d8f
+  drift run --tools --project --label c775d8f --out .drift/ci/c775d8f/failing-local -- TEST_COMMAND
+  git switch master
+  drift diagnose .drift/ci/c775d8f/passing-local .drift/ci/c775d8f/failing-local --detail summary
+TEST_COMMAND is what the failing step ran (step Run Tests); drift does not guess it.
+
+git does not ignore this directory; add this line to .gitignore:
+  .drift/

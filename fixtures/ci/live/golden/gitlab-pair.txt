@@ -1,0 +1,35 @@
+drift ci: gitlab-org/cli, branch main, HEAD 288e506
+
+Failing  pipeline 2970143654 from push (288e506, 2026-10-21, branch main)
+         https://gitlab.com/gitlab-org/cli/-/pipelines/2970143654
+Passing  pipeline 2969877432 from push (fbfefcb, 2026-10-21, branch main)
+         https://gitlab.com/gitlab-org/cli/-/pipelines/2969877432
+Job      govulncheck
+First errors in the log: ERROR: Job failed: exit code 3
+
+The two jobs show the same environment (4 attributes read from each log).
+
+Result: The two captures show no difference that could explain the failure, so the data names no
+cause.
+Confidence: none, the logs show no environment difference.
+
+This compares the runner environment of the two jobs, not your code. It cannot find an ordinary code
+regression, so a failure that comes from a code change shows up as no cause or a weak difference.
+Read the code change next: git diff --stat fbfefcb 288e506
+
+Saved to .drift/ci/288e506
+Next: drift case show .drift/ci/288e506
+Then: drift next .drift/ci/288e506
+
+To compare instrumented captures of both commits, run your test command on each
+(commit or stash local changes first):
+  git switch --detach fbfefcb
+  drift run --tools --project --label fbfefcb --out .drift/ci/288e506/passing-local -- TEST_COMMAND
+  git switch --detach 288e506
+  drift run --tools --project --label 288e506 --out .drift/ci/288e506/failing-local -- TEST_COMMAND
+  git switch main
+  drift diagnose .drift/ci/288e506/passing-local .drift/ci/288e506/failing-local --detail summary
+TEST_COMMAND is what the failing step ran; drift does not guess it.
+
+git does not ignore this directory; add this line to .gitignore:
+  .drift/

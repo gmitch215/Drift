@@ -1,0 +1,59 @@
+2026-10-21T02:34:20.320397Z 00O [0KRunning with gitlab-runner 19.6.0~pre.2348.g4d083417 (4d083417)[0;m
+2026-10-21T02:34:20.320420Z 00O [0K  on k8s.saas-linux-medium-amd64.runners-manager.gitlab.com/default j8vTLRhES, system ID: r_b3adpzCg8icC[0;m
+2026-10-21T02:34:20.320423Z 00O [0K  UUID: 01a01aa6-2f91-7d2c-b24d-7e2d2752ac58[0;m
+2026-10-21T02:34:20.320434Z 00O [0K  feature flags: FF_USE_GIT_PROACTIVE_AUTH:true, FF_HASH_CACHE_KEYS:true, FF_USE_JOB_ROUTER:true, FF_MACHINE_OPTIONS_EXPAND_ENV:true, FF_DOCKER_MACHINE_JSON_OUTPUT:true[0;m
+2026-10-21T02:34:20.320470Z 00O [0K[36;1mResolving secrets[0;m[0;m
+2026-10-21T02:34:20.320684Z 00O section_start:1792550060:prepare_executor[0K
+2026-10-21T02:34:20.320689Z 00O+[0K[36;1mPreparing the "docker+machine" executor[0;m[0;m
+2026-10-21T02:34:20.405059Z 00O [0KUsing Docker executor with image gitlab.com:443/gitlab-org/dependency_proxy/containers/golang:1.27.2 ...[0;m
+2026-10-21T02:34:20.405111Z 00O [0KUsing helper image:  us-east1-docker.pkg.dev/gitlab-com-artifact-registry/containers-public/gitlab-runner-helper:4d083417  (overridden, default would be  registry.gitlab.com/gitlab-org/gitlab-runner/gitlab-runner-helper:x86_64-v19.6.0 )[0;m
+2026-10-21T02:34:20.405121Z 00O [0KUsing effective pull policy of [always] for container us-east1-docker.pkg.dev/gitlab-com-artifact-registry/containers-public/gitlab-runner-helper:4d083417[0;m
+2026-10-21T02:34:20.405736Z 00O [0KPulling docker image us-east1-docker.pkg.dev/gitlab-com-artifact-registry/containers-public/gitlab-runner-helper:4d083417 ...[0;m
+2026-10-21T02:34:21.744290Z 00O [0KUsing docker image sha256:c5ca9f1ff59b06cbc6900886b0afa93adaaf2533bbe4ebc22591aeb17f47eed2 for us-east1-docker.pkg.dev/gitlab-com-artifact-registry/containers-public/gitlab-runner-helper:4d083417 with digest us-east1-docker.pkg.dev/gitlab-com-artifact-registry/containers-public/gitlab-runner-helper@sha256:6dd0253c026df36d272574a32240d7fd854087ce1c7d626e513904ac014ae4be ...[0;m
+2026-10-21T02:34:23.377446Z 00O [0KUsing helper image:  us-east1-docker.pkg.dev/gitlab-com-artifact-registry/containers-public/gitlab-runner-helper:4d083417  (overridden, default would be  registry.gitlab.com/gitlab-org/gitlab-runner/gitlab-runner-helper:x86_64-v19.6.0 )[0;m
+2026-10-21T02:34:23.377467Z 00O [0KUsing effective pull policy of [always] for container us-east1-docker.pkg.dev/gitlab-com-artifact-registry/containers-public/gitlab-runner-helper:4d083417[0;m
+2026-10-21T02:34:23.378601Z 00O [0KUsing docker image sha256:c5ca9f1ff59b06cbc6900886b0afa93adaaf2533bbe4ebc22591aeb17f47eed2 for us-east1-docker.pkg.dev/gitlab-com-artifact-registry/containers-public/gitlab-runner-helper:4d083417 with digest us-east1-docker.pkg.dev/gitlab-com-artifact-registry/containers-public/gitlab-runner-helper@sha256:6dd0253c026df36d272574a32240d7fd854087ce1c7d626e513904ac014ae4be ...[0;m
+2026-10-21T02:34:23.378623Z 00O [0KUsing effective pull policy of [always] for container gitlab.com:443/gitlab-org/dependency_proxy/containers/golang:1.27.2[0;m
+2026-10-21T02:34:23.379281Z 00O [0KAuthenticating with credentials from job payload (GitLab Registry)[0;m
+2026-10-21T02:34:23.379291Z 00O [0KPulling docker image gitlab.com:443/gitlab-org/dependency_proxy/containers/golang:1.27.2 ...[0;m
+2026-10-21T02:34:33.502493Z 00O [0KUsing docker image sha256:99668476f0893c0b7a4f4c1b6d3913a3b966a4af7e275173e06bbf12e9bebb88 for gitlab.com:443/gitlab-org/dependency_proxy/containers/golang:1.27.2 with digest gitlab.com:443/gitlab-org/dependency_proxy/containers/golang@sha256:820153096fda4de6ac1b7194d12e416b7dd8f4e9a33d17e0345b111b945162d8 ...[0;m
+2026-10-21T02:34:33.502618Z 00O section_end:1792550073:prepare_executor[0K
+2026-10-21T02:34:33.502756Z 00O+section_start:1792550073:prepare_script[0K
+2026-10-21T02:34:33.502792Z 00O+[0K[36;1mPreparing environment[0;m[0;m
+2026-10-21T02:34:33.502840Z 00O [0KUsing helper image:  us-east1-docker.pkg.dev/gitlab-com-artifact-registry/containers-public/gitlab-runner-helper:4d083417  (overridden, default would be  registry.gitlab.com/gitlab-org/gitlab-runner/gitlab-runner-helper:x86_64-v19.6.0 )[0;m
+2026-10-21T02:34:33.502852Z 00O [0KUsing effective pull policy of [always] for container us-east1-docker.pkg.dev/gitlab-com-artifact-registry/containers-public/gitlab-runner-helper:4d083417[0;m
+2026-10-21T02:34:33.503898Z 00O [0KUsing docker image sha256:c5ca9f1ff59b06cbc6900886b0afa93adaaf2533bbe4ebc22591aeb17f47eed2 for us-east1-docker.pkg.dev/gitlab-com-artifact-registry/containers-public/gitlab-runner-helper:4d083417 with digest us-east1-docker.pkg.dev/gitlab-com-artifact-registry/containers-public/gitlab-runner-helper@sha256:6dd0253c026df36d272574a32240d7fd854087ce1c7d626e513904ac014ae4be ...[0;m
+2026-10-21T02:34:33.503922Z 00O [0KUsing effective pull policy of [always] for container sha256:c5ca9f1ff59b06cbc6900886b0afa93adaaf2533bbe4ebc22591aeb17f47eed2[0;m
+2026-10-21T02:34:40.525477Z 01O Running on runner-j8vtlrhes-project-34675721-concurrent-0 via runner-j8vtlrhes-s-l-m-amd64-1792549983-47f74caf...
+2026-10-21T02:34:40.528236Z 01O Running on CPU: INTEL(R) XEON(R) PLATINUM 8581C CPU @ 2.10GHz (avx, avx2, avx512f)
+2026-10-21T02:34:40.678429Z 00O section_end:1792550080:prepare_script[0K
+2026-10-21T02:34:40.679019Z 00O+section_start:1792550080:get_sources[0K
+2026-10-21T02:34:40.679026Z 00O+[0K[36;1mGetting source from Git repository[0;m[0;m
+2026-10-21T02:34:40.999803Z 01O [32;1mGitaly correlation ID: a59c1c2d473d46f78ee112b0dda1b5b6[0;m
+2026-10-21T02:34:41.005172Z 01O [32;1mFetching changes with git depth set to 20...[0;m
+2026-10-21T02:34:41.007984Z 01O Initialized empty Git repository in /builds/gitlab-org/cli/.git/
+2026-10-21T02:34:41.010111Z 01O [32;1mCreated fresh repository.[0;m
+2026-10-21T02:34:43.031474Z 01O [32;1mChecking out 288e5065 as detached HEAD (ref is main)...[0;m
+2026-10-21T02:34:43.238390Z 01O 
+2026-10-21T02:34:43.238398Z 01O [32;1mSkipping Git submodules setup[0;m
+2026-10-21T02:34:43.238399Z 01O [32;1m$ git remote set-url origin "${CI_REPOSITORY_URL}" || echo 'Not a git repository; skipping'[0;m
+2026-10-21T02:34:43.486127Z 00O section_end:1792550083:get_sources[0K
+2026-10-21T02:34:43.635991Z 00O+section_start:1792550083:restore_cache[0K
+2026-10-21T02:34:43.636003Z 00O+[0K[36;1mRestoring cache[0;m[0;m
+2026-10-21T02:34:43.987504Z 01O [32;1mChecking cache for go-govulncheck-1-protected...[0;m
+2026-10-21T02:34:44.034796Z 01E Using presigned URL for cache download            [0;m 
+2026-10-21T02:34:44.101371Z 01E Selecting primary cache URL                       [0;m  alternate_modified[0;m=0001-01-01 00:00:00 +0000 UTC alternate_url[0;m=https://storage.googleapis.com/gitlab-com-runners-cache/project/34675721/go-govulncheck-1-protected primary_modified[0;m=2026-10-21 00:11:39 +0000 UTC primary_url[0;m=https://storage.googleapis.com/gitlab-com-runners-cache/project/34675721/37/378a8ee126c9931798b5a1cb49d9c0f7b80af882530239b25ef17fe528a7658a
+2026-10-21T02:34:44.187033Z 01E Downloading cache from https://storage.googleapis.com/gitlab-com-runners-cache/project/34675721/37/378a8ee126c9931798b5a1cb49d9c0f7b80af882530239b25ef17fe528a7658a[0;m  etag[0;m="3aac11ea76b73acaca377a0e50d0dd55"
+2026-10-21T02:34:50.118722Z 01O [32;1mSuccessfully extracted cache[0;m
+2026-10-21T02:35:01.640307Z 00O section_end:1792550101:restore_cache[0K
+2026-10-21T02:35:01.641141Z 00O+section_start:1792550101:step_script[0K
+2026-10-21T02:35:01.641151Z 00O+[0K[36;1mExecuting "step_script" stage of the job script[0;m[0;m
+2026-10-21T02:35:01.641164Z 00O [0KUsing effective pull policy of [always] for container gitlab.com:443/gitlab-org/dependency_proxy/containers/golang:1.27.2[0;m
+2026-10-21T02:35:01.645399Z 00O [0KUsing docker image sha256:99668476f0893c0b7a4f4c1b6d3913a3b966a4af7e275173e06bbf12e9bebb88 for gitlab.com:443/gitlab-org/dependency_proxy/containers/golang:1.27.2 with digest gitlab.com:443/gitlab-org/dependency_proxy/containers/golang@sha256:820153096fda4de6ac1b7194d12e416b7dd8f4e9a33d17e0345b111b945162d8 ...[0;m
+2026-10-21T02:35:01.944072Z 01O [32;1m$ go install golang.org/x/vuln/cmd/govulncheck@${GOVULNCHECK_VERSION}[0;m
+2026-10-21T02:35:02.525707Z 01O [32;1m$ go build -o bin/govulncheck-to-gitlab ./scripts/govulncheck-to-gitlab[0;m
+2026-10-21T02:35:02.830827Z 01O [32;1m$ $GOPATH/bin/govulncheck -format json ./... > govulncheck.json[0;m
+2026-10-21T02:35:17.053536Z 01O [32;1m$ ./bin/govulncheck-to-gitlab < govulncheck.json > gl-dependency-scanning-report.json[0;m
+2026-10-21T02:35:17.060131Z 01E reachable vulnerability not on the ignore list: GO-2026-6809 (https://pkg.go.dev/vuln/GO-2026-6809)
+2026-10-21T02:35:17.251809Z 00O section_end:1792550117:step_script[0K
+2026-10-21T02:35:19.973993Z 00O [31;1mERROR: Job failed: exit code 3[0;m

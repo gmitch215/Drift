@@ -26,6 +26,7 @@ object GithubImport {
     private const val GROUP_LIMIT = 64
     private const val LINE_LIMIT = 4096
     private const val ERROR_TAG = "##[error]"
+    private const val BOM = "\uFEFF"
     private val runnerVersion = Regex("Current runner version: '([^']+)'")
 
     /** The outcome is `FAIL` when the log holds an error annotation and `UNKNOWN` otherwise. */
@@ -100,7 +101,7 @@ object GithubImport {
     private class Row(val job: String?, val text: String)
 
     private fun row(raw: String): Row {
-        val line = raw.trimEnd('\r').take(LINE_LIMIT)
+        val line = raw.trimEnd('\r').replace(BOM, "").take(LINE_LIMIT)
         val tab = line.indexOf('\t')
         val second = if (tab > 0) line.indexOf('\t', tab + 1) else -1
         var job: String? = null
