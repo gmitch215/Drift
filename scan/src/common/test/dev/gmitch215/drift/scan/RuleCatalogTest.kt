@@ -1,5 +1,8 @@
 package dev.gmitch215.drift.scan
 
+import dev.gmitch215.drift.ci.GithubImport
+import dev.gmitch215.drift.ci.GitlabImport
+import dev.gmitch215.drift.ci.Import
 import dev.gmitch215.drift.fixtures.Fixtures
 import dev.gmitch215.drift.fixtures.LayoutFixtures
 import dev.gmitch215.drift.fixtures.ProjectFixtures
@@ -83,10 +86,36 @@ class RuleCatalogTest {
         .flatMap { Capsule.parse(LayoutFixtures.text(it)).attributes.map { a -> a.path } }
         .toSet()
 
+    private val githubLog = listOf(
+        "Current runner version: '2.338.0'",
+        "##[group]Runner Image",
+        "Image: ubuntu-24.04",
+        "Version: 20261012.334.1",
+        "##[endgroup]",
+        "##[group]Runner Image Provisioner",
+        "Hosted Compute Agent",
+        "Version: 20261012.601",
+        "##[endgroup]",
+    ).joinToString("\n")
+
+    private val gitlabTrace = listOf(
+        "Running with gitlab-runner 19.6.0 (abc)",
+        "Preparing the \"docker+machine\" executor",
+        "Using Docker executor with image golang:1.27.2 ...",
+        "Pulling docker image for golang:1.27.2 with digest sha256:abc ...",
+    ).joinToString("\n")
+
+    private val imported: Set<String> = listOf(
+        GithubImport.log(githubLog, "github"),
+        GitlabImport.trace(gitlabTrace, "gitlab"),
+    ).flatMap { import ->
+        (import as Import.Done).run.capsule!!.attributes.map { it.path }
+    }.toSet()
+
     private fun emitted(path: String): Boolean {
         val base = path.removeSuffix("*")
         if (path.startsWith("env.")) return capture.any { it.startsWith("env.") }
-        return (capture + scanned + projected + laidOut).any {
+        return (capture + scanned + projected + laidOut + imported).any {
             it == path ||
                 (path.endsWith("*") && it.startsWith(base))
         }
@@ -132,6 +161,9 @@ class RuleCatalogTest {
             "tool.visualstudio.version",
             "runtime.platform",
             "ci.runner.label",
+            "ci.runner.image.version",
+            "ci.runner.image.digest",
+            "ci.runner.executor",
             "tool.npm.version",
             "tool.python.gil-disabled",
             "tool.cc.vendor",

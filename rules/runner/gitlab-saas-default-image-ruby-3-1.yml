@@ -54,4 +54,4 @@ fixtures:
         attrs:
           ci.runner.image: node:22
           ci.runner.executor: docker+machine
-status: pending-scanner
+status: active

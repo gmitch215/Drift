@@ -1,0 +1,63 @@
+schema: 1
+id: gitlab-job-image-digest-changed
+title: The GitLab job image reference is unchanged but its digest differs between the two jobs
+applies:
+  - build
+difference: >-
+  the passing job and the failing job used the same image name and tag, and the digest of the pulled image differs, so the tag points to a different image
+symptoms:
+  - text: >-
+      a job with no change in the pipeline file may fail because the tag was republished with different contents
+    basis: inferred
+mechanism: >-
+  With the default always pull policy the runner pulls the image even when a local copy exists, which keeps the image up to date, so a tag that was republished between the runs gives the job a different image under the same name.
+detect:
+  all:
+    - changed: ci.runner.image.digest
+    - not:
+        changed: ci.runner.image
+severity: medium
+provenance:
+  - url: https://docs.gitlab.com/runner/executors/docker/
+    kind: vendor-doc
+    verified: '2026-10-24'
+    section: Pull policies, the always policy
+fixtures:
+  positive:
+    - name: node:22 tag with a new digest
+      a:
+        attrs:
+          ci.runner.image: node:22
+          ci.runner.image.digest: sha256:1111111111111111111111111111111111111111111111111111111111111111
+      b:
+        attrs:
+          ci.runner.image: node:22
+          ci.runner.image.digest: sha256:2222222222222222222222222222222222222222222222222222222222222222
+  negative:
+    - name: same digest
+      a:
+        attrs:
+          ci.runner.image: node:22
+          ci.runner.image.digest: sha256:1111111111111111111111111111111111111111111111111111111111111111
+      b:
+        attrs:
+          ci.runner.image: node:22
+          ci.runner.image.digest: sha256:1111111111111111111111111111111111111111111111111111111111111111
+    - name: the image name changed with the digest
+      a:
+        attrs:
+          ci.runner.image: node:20
+          ci.runner.image.digest: sha256:1111111111111111111111111111111111111111111111111111111111111111
+      b:
+        attrs:
+          ci.runner.image: node:22
+          ci.runner.image.digest: sha256:2222222222222222222222222222222222222222222222222222222222222222
+    - name: only one job reports a digest
+      a:
+        attrs:
+          ci.runner.image: node:22
+      b:
+        attrs:
+          ci.runner.image: node:22
+          ci.runner.image.digest: sha256:2222222222222222222222222222222222222222222222222222222222222222
+status: active

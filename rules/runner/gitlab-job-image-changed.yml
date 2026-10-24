@@ -1,0 +1,56 @@
+schema: 1
+id: gitlab-job-image-changed
+title: The GitLab job image differs between the two jobs
+applies:
+  - build
+difference: >-
+  the passing job and the failing job ran in different container images, so the tools the job finds come from a different image
+symptoms:
+  - text: >-
+      commands that expect a tool or a version from the passing job's image may fail or behave differently in the failing job's image
+    basis: inferred
+mechanism: >-
+  The image keyword names the Docker image the executor uses to run a job, and the job finds only the tools that image holds beyond a shell and grep, so a changed image changes the toolset under the same commands.
+detect:
+  all:
+    - changed: ci.runner.image
+    - a: ci.runner.executor
+      present: 'true'
+    - b: ci.runner.executor
+      present: 'true'
+severity: medium
+provenance:
+  - url: https://docs.gitlab.com/ci/docker/using_docker_images/
+    kind: vendor-doc
+    verified: '2026-10-24'
+    section: The image keyword and the applications an image needs
+fixtures:
+  positive:
+    - name: golang image minor version bump
+      a:
+        attrs:
+          ci.runner.image: golang:1.27.1
+          ci.runner.executor: docker+machine
+      b:
+        attrs:
+          ci.runner.image: golang:1.27.2
+          ci.runner.executor: docker+machine
+  negative:
+    - name: same image in both jobs
+      a:
+        attrs:
+          ci.runner.image: golang:1.27.2
+          ci.runner.executor: docker+machine
+      b:
+        attrs:
+          ci.runner.image: golang:1.27.2
+          ci.runner.executor: docker+machine
+    - name: the failing job has no image line
+      a:
+        attrs:
+          ci.runner.image: golang:1.27.2
+          ci.runner.executor: shell
+      b:
+        attrs:
+          ci.runner.executor: shell
+status: active

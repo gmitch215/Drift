@@ -65,4 +65,4 @@ fixtures:
         attrs:
           ci.runner.label: windows-2022
           ci.runner.image.version: '20260610.200'
-status: pending-scanner
+status: active

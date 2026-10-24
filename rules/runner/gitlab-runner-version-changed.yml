@@ -1,0 +1,55 @@
+schema: 1
+id: gitlab-runner-version-changed
+title: The GitLab Runner version differs between the two jobs
+applies:
+  - build
+difference: >-
+  the passing job and the failing job ran on GitLab Runner builds with different versions
+symptoms:
+  - text: >-
+      features may not be available or may not work properly when the runner version and the GitLab version differ; the sources do not describe a specific failure
+    basis: range
+mechanism: >-
+  GitLab says the Runner major.minor version should stay in sync with the GitLab major.minor version and that features may not work properly when they differ, so two jobs on runners upgraded between the runs can behave differently.
+detect:
+  all:
+    - changed: ci.runner.version
+    - a: ci.runner.executor
+      present: 'true'
+    - b: ci.runner.executor
+      present: 'true'
+severity: low
+provenance:
+  - url: https://docs.gitlab.com/runner/
+    kind: vendor-doc
+    verified: '2026-10-24'
+    section: Runner and GitLab version compatibility
+fixtures:
+  positive:
+    - name: gitlab-runner 19.5.0 then 19.6.0
+      a:
+        attrs:
+          ci.runner.version: 19.5.0
+          ci.runner.executor: docker+machine
+      b:
+        attrs:
+          ci.runner.version: 19.6.0
+          ci.runner.executor: docker+machine
+  negative:
+    - name: same runner version
+      a:
+        attrs:
+          ci.runner.version: 19.6.0
+          ci.runner.executor: docker+machine
+      b:
+        attrs:
+          ci.runner.version: 19.6.0
+          ci.runner.executor: docker+machine
+    - name: GitHub runner application versions carry no executor
+      a:
+        attrs:
+          ci.runner.version: 2.337.0
+      b:
+        attrs:
+          ci.runner.version: 2.338.0
+status: active

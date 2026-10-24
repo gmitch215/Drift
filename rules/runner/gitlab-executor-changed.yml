@@ -1,0 +1,46 @@
+schema: 1
+id: gitlab-executor-changed
+title: The GitLab Runner executor differs between the two jobs
+applies:
+  - build
+difference: >-
+  the passing job and the failing job ran on different executors, such as a Docker executor and a shell or instance executor
+symptoms:
+  - text: >-
+      a job that relied on a clean container may see leftover state or a different set of installed tools on a non-container executor, and the reverse
+    basis: inferred
+mechanism: >-
+  The Docker executor gives each job a clean, isolated environment from an image, while the shell and instance executors run on the host with manually installed dependencies, so a change of executor changes the files and tools the job sees.
+detect:
+  changed: ci.runner.executor
+severity: medium
+provenance:
+  - url: https://docs.gitlab.com/runner/executors/
+    kind: vendor-doc
+    verified: '2026-10-24'
+    section: Docker, instance and shell executors, clean build environment
+fixtures:
+  positive:
+    - name: docker+machine then shell
+      a:
+        attrs:
+          ci.runner.executor: docker+machine
+      b:
+        attrs:
+          ci.runner.executor: shell
+  negative:
+    - name: same executor
+      a:
+        attrs:
+          ci.runner.executor: docker+machine
+      b:
+        attrs:
+          ci.runner.executor: docker+machine
+    - name: one job reports no executor
+      a:
+        attrs:
+          ci.runner.executor: docker+machine
+      b:
+        attrs:
+          ci.runner.image: node:22
+status: active
