@@ -23,6 +23,7 @@ object Capture {
         hardware: Boolean = false,
         project: Boolean = false,
         keepIdentifiers: Boolean = false,
+        transport: String? = null,
     ): Capsule {
         val attrs = linkedMapOf<String, Attribute>()
 
@@ -36,15 +37,20 @@ object Capture {
             return if (result != null && result.exitCode == 0) result.output else null
         }
 
-        add("drift.platform", host.platform, "drift")
         add("os.name", host.os, "host")
         add("os.arch", normalizeArch(host.arch), "host")
-        add("kotlin.version", KotlinBuild.VERSION, "kotlin")
-        add("kotlin.target", host.platform, "drift")
+        if (transport == null) {
+            add("drift.platform", host.platform, "drift")
+            add("kotlin.version", KotlinBuild.VERSION, "kotlin")
+            add("kotlin.target", host.platform, "drift")
+        } else {
+            add("capture.transport", transport, transport)
+        }
 
         val env = host.env()
         val declared = env[RUNTIME_ENV]?.takeIf { it.isNotBlank() }
-        add("runtime.platform", declared ?: host.platform, if (declared == null) "drift" else "env")
+        val runtime = declared ?: host.platform.takeIf { transport == null }
+        add("runtime.platform", runtime, if (declared == null) "drift" else "env")
         add("ci.runner.label", env[RUNNER_ENV], "env")
         for ((name, value) in env) {
             if (name == RUNTIME_ENV) continue
