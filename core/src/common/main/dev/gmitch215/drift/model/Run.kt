@@ -96,6 +96,7 @@ data class Run(
     val steps: List<Step> = emptyList(),
     val symptoms: List<Symptom> = emptyList(),
     val capsule: Capsule? = null,
+    val samples: List<Sample> = emptyList(),
 ) {
     /**
      * The `run:<field>` facts a rule can read, as text. A field is present only when the run has
@@ -123,13 +124,17 @@ data class Run(
         return out
     }
 
-    fun toJson(): JsonObject = obj(
-        "schema" to JsonInt(SCHEMA),
-        "id" to JsonString(id),
-        "outcome" to JsonString(outcome.name.lowercase()),
-        "capsule" to (capsule?.toJson() ?: JsonNull),
-        "steps" to JsonArray(steps.map { it.toJson() }),
-        "symptoms" to JsonArray(symptoms.map { it.toJson() }),
+    /** `samples` is written only when a run recorded some, so older records keep their bytes. */
+    fun toJson(): JsonObject = JsonObject(
+        buildMap {
+            put("schema", JsonInt(SCHEMA))
+            put("id", JsonString(id))
+            put("outcome", JsonString(outcome.name.lowercase()))
+            put("capsule", capsule?.toJson() ?: JsonNull)
+            put("steps", JsonArray(steps.map { it.toJson() }))
+            put("symptoms", JsonArray(symptoms.map { it.toJson() }))
+            if (samples.isNotEmpty()) put("samples", JsonArray(samples.map { it.toJson() }))
+        },
     )
 
     fun canonical(): String = CanonicalJson.encode(toJson())
@@ -153,6 +158,7 @@ data class Run(
                 capsule = o.require("capsule").let {
                     if (it == JsonNull) null else Capsule.fromJson(it)
                 },
+                samples = o.fields["samples"]?.array()?.map(Sample::fromJson).orEmpty(),
             )
         }
 

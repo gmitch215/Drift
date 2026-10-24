@@ -9,6 +9,7 @@ import dev.gmitch215.drift.model.Capsule
 import dev.gmitch215.drift.model.Dimension
 import dev.gmitch215.drift.model.Run
 import dev.gmitch215.drift.model.RunOutcome
+import dev.gmitch215.drift.model.Sample
 import dev.gmitch215.drift.model.Step
 import dev.gmitch215.drift.model.StepConclusion
 import dev.gmitch215.drift.symptom.Symptom
@@ -50,6 +51,29 @@ class RunTest {
         assertEquals(run.hash(), Run.parse(run.canonical()).hash())
         val bare = Run("2", RunOutcome.UNKNOWN)
         assertEquals(bare, Run.parse(bare.canonical()))
+    }
+
+    @Test
+    fun samplesRoundTripAndAbsentMeasurementsStayAbsent() {
+        val samples = listOf(Sample(0, 120, 80, 10, 4096), Sample(1, 130), Sample(0, 125, 70))
+        val sampled = run.copy(samples = samples)
+        assertEquals(sampled, Run.parse(sampled.canonical()))
+        assertEquals(sampled.canonical(), Run.parse(sampled.canonical()).canonical())
+        val text = sampled.canonical()
+        assertEquals(3, "\"wallMs\"".toRegex().findAll(text).count())
+        assertEquals(1, "\"peakKb\"".toRegex().findAll(text).count())
+        assertEquals(2, "\"userMs\"".toRegex().findAll(text).count())
+        assertEquals(null, Run.parse(text).samples[1].peakKb)
+        assertEquals(false, Run.parse(text).samples[1].passed)
+        assertNotEquals(run.hash(), sampled.hash())
+    }
+
+    @Test
+    fun aRecordWithoutSamplesKeepsItsBytes() {
+        assertEquals(false, "samples" in run.canonical())
+        val old = run.canonical()
+        assertEquals(emptyList(), Run.parse(old).samples)
+        assertEquals(old, Run.parse(old).copy(samples = emptyList()).canonical())
     }
 
     @Test

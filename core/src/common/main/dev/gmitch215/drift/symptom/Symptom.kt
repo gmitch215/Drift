@@ -12,12 +12,13 @@ import dev.gmitch215.drift.json.obj
 import dev.gmitch215.drift.json.require
 import dev.gmitch215.drift.json.string
 
-enum class SymptomKind { SIGNATURE, EXIT, SIGNAL, STEP, DURATION, TRANSPORT }
+enum class SymptomKind { SIGNATURE, EXIT, SIGNAL, STEP, DURATION, TRANSPORT, SLOWER, MEMORY }
 
 /**
  * One piece of evidence from a log. `value` is already normalized (see [Signature]), `line` is the
  * 1-based line of the first occurrence and `count` the number of occurrences with the same job,
- * kind and value. A `DURATION` value is whole milliseconds as text.
+ * kind and value. A `DURATION` value is whole milliseconds as text. `SLOWER` and `MEMORY` come
+ * from repeated runs, not from a log (see [Performance]); their value reads `2.5 times slower`.
  */
 data class Symptom(
     val kind: SymptomKind,
