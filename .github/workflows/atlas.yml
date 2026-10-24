@@ -272,7 +272,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v7
         with:
-          node-version: '24.20.0'
+          node-version: '24.22.1'
           cache: 'npm'
           cache-dependency-path: tools/browsers/package-lock.json
       - name: Build Studio Web
@@ -318,7 +318,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v7
         with:
-          node-version: '24.20.0'
+          node-version: '24.22.1'
       - name: Install Wrangler
         run: npm install --global wrangler@4.146.0
       - name: Build Workers

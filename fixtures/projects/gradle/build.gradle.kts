@@ -1,8 +1,8 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.android.library) apply false
-    id("com.android.application") version "9.0.0" apply false
-    id("org.springframework.boot") version "3.3.4" apply false
+    id("com.android.application") version "9.4.1" apply false
+    id("org.springframework.boot") version "3.5.16" apply false
 }
 
 java {

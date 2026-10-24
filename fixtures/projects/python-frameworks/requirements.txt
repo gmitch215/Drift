@@ -1,8 +1,8 @@
-django==5.0.14
-fastapi==0.99.1
+django==5.2.18
+fastapi==0.162.0
 flask==2.3.3
-numpy==2.0.2
-pandas==2.0.3
-pydantic==2.12.5
-scipy==1.12.3
-torch==2.6.0
+numpy==2.5.4
+pandas==2.3.3
+pydantic==2.14.1
+scipy==1.18.1
+torch==2.14.1

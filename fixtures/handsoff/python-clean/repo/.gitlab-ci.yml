@@ -1,5 +1,5 @@
 test:
-  image: python:3.12
+  image: python:3.15
   script:
     - python -m pip install -r requirements.txt
     - pytest

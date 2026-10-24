@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "next": "16.4.1",
-    "vite": "8.3.4",
-    "react-router": "8.4.0",
+    "next": "16.4.3",
+    "vite": "8.3.5",
+    "react-router": "8.5.0",
     "@angular/core": "22.2.3",
     "react-native": "0.88.0",
-    "prisma": "7.10.0",
-    "@prisma/client": "7.10.0",
-    "astro": "7.4.0",
-    "nuxt": "4.6.1"
+    "prisma": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "astro": "7.4.2",
+    "nuxt": "4.6.2"
   }
 }
