@@ -138,26 +138,30 @@ object UpgradeStory {
         val range = report.of(Group.OUTSIDE_RANGE).size
         val unknown = report.of(Group.UNKNOWN).size
         val move = "moving to ${moveTo(report.targets.map { it.target })}"
-        val first = if (will > 0) {
-            "${changes(will)} will likely break this environment when $move."
-        } else {
-            "No documented change is known to break this environment when $move."
+        val lead = when {
+            will > 0 -> "${changes(will)} will likely break this environment when $move."
+            may > 0 -> "${changes(may)} may break this environment when $move."
+            else -> "No documented change is known to break this environment when $move."
         }
-        val more = will > 0
-        val second = if (may > 0) " ${changes(may, more)} may break." else ""
-        val crossed = if (boundary > 0) {
-            " ${changes(boundary, more)} apply to these versions; nothing in the capsule shows " +
-                "they are used."
-        } else {
-            ""
+        val more = will > 0 || may > 0
+        val parts = buildList {
+            if (will > 0 && may > 0) add("${changes(may, true)} may break.")
+            if (boundary > 0) {
+                val one = boundary == 1
+                val used = if (one) "it is" else "they are"
+                val apply = if (one) "applies" else "apply"
+                add(
+                    "${changes(boundary, more)} $apply to these versions; " +
+                        "nothing in the capsule shows $used used.",
+                )
+            }
+            if (range > 0) {
+                val leave = if (range == 1) "leaves" else "leave"
+                add("${changes(range, more)} $leave a documented compatible range.")
+            }
+            if (unknown > 0) add("${changes(unknown, more)} cannot be judged.")
         }
-        val outside = if (range > 0) {
-            " ${changes(range, more)} leave a documented compatible range."
-        } else {
-            ""
-        }
-        val third = if (unknown > 0) " ${changes(unknown, more)} cannot be judged." else ""
-        return first + second + crossed + outside + third
+        return (listOf(lead) + parts).joinToString(" ")
     }
 
     private fun changes(n: Int, more: Boolean = false): String {

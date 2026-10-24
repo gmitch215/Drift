@@ -52,8 +52,7 @@ class UpgradeStoryTest {
             UpgradeStory.headline(report(Group.VERSION_BOUNDARY to 11)),
         )
         assertEquals(
-            "No documented change is known to break this environment when $head " +
-                "2 changes may break.",
+            "2 changes may break this environment when $head",
             UpgradeStory.headline(report(Group.MAY_BREAK to 2)),
         )
         assertEquals(
@@ -65,6 +64,16 @@ class UpgradeStoryTest {
             "No documented change is known to break this environment when $head",
             UpgradeStory.headline(report()),
         )
+        assertEquals(
+            "3 changes may break this environment when $head 1 more change applies to these " +
+                "versions; nothing in the capsule shows it is used.",
+            UpgradeStory.headline(report(Group.MAY_BREAK to 3, Group.VERSION_BOUNDARY to 1)),
+        )
+        assertEquals(
+            "No documented change is known to break this environment when $head " +
+                "1 change leaves a documented compatible range.",
+            UpgradeStory.headline(report(Group.OUTSIDE_RANGE to 1)),
+        )
     }
 
     @Test
@@ -74,7 +83,8 @@ class UpgradeStoryTest {
         val crossed = view.report.of(Group.VERSION_BOUNDARY).size
         assertTrue(will + crossed >= 1, "the sample move should have a finding")
         assertTrue(will == 0 || view.headline.startsWith("${changesOf(will)} will likely break"))
-        assertTrue(crossed == 0 || view.headline.contains("${changesOf(crossed)} apply"))
+        val applies = if (crossed == 1) "change applies" else "changes apply"
+        assertTrue(crossed == 0 || view.headline.contains(applies))
         assertTrue(view.headline.contains("Drupal 11, PHP 8.3 and Symfony 7.1"))
     }
 
