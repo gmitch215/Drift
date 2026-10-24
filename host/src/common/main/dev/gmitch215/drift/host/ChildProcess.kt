@@ -10,6 +10,9 @@ internal interface ChildProcess {
     /** The exit code of the direct child, or null while it runs. Never blocks. */
     fun exitCode(): Int?
 
+    /** What the child used, read after [exitCode] returned a code; null when not measurable. */
+    fun usage(): ResourceUsage? = null
+
     fun kill()
 
     fun close()
@@ -61,8 +64,9 @@ internal fun pumpUntilExit(
                 lines.feed(buf.copyOf(got))
             }
             lines.flush()
+            val usage = child.usage()
             child.close()
-            return CommandResult(if (killed) TIMED_OUT_EXIT_CODE else exit, "")
+            return CommandResult(if (killed) TIMED_OUT_EXIT_CODE else exit, "", usage)
         }
         val expired =
             timeoutMillis != null && mark.elapsedNow().inWholeMilliseconds >= timeoutMillis

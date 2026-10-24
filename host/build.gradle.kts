@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     id("drift.kmp")
@@ -14,6 +15,13 @@ kotlin {
                     withMacos()
                 }
             }
+        }
+    }
+    targets.withType<KotlinNativeTarget>().matching {
+        it.name.startsWith("linux") || it.name.startsWith("macos")
+    }.configureEach {
+        compilations.getByName("main").cinterops.create("spawn") {
+            definitionFile.set(file("src/posix/cinterop/spawn.def"))
         }
     }
     sourceSets {

@@ -1,0 +1,73 @@
+package = dev.gmitch215.drift.host.spawn
+headers = spawn.h
+---
+#include <spawn.h>
+#include <unistd.h>
+#ifdef __APPLE__
+#include <crt_externs.h>
+#define DRIFT_ENVIRON (*_NSGetEnviron())
+#else
+extern char **environ;
+#define DRIFT_ENVIRON environ
+#endif
+
+static int drift_spawn(char *const *argv, int readFd, int writeFd, int *pid) {
+    posix_spawn_file_actions_t actions;
+    int rc = posix_spawn_file_actions_init(&actions);
+    if (rc != 0) return rc;
+    rc = posix_spawn_file_actions_adddup2(&actions, writeFd, 1);
+    if (rc == 0) rc = posix_spawn_file_actions_adddup2(&actions, writeFd, 2);
+    if (rc == 0) rc = posix_spawn_file_actions_addclose(&actions, readFd);
+    if (rc == 0 && writeFd > 2) rc = posix_spawn_file_actions_addclose(&actions, writeFd);
+    pid_t child = 0;
+    if (rc == 0) rc = posix_spawnp(&child, argv[0], &actions, NULL, argv, DRIFT_ENVIRON);
+    posix_spawn_file_actions_destroy(&actions);
+    if (rc == 0) *pid = (int) child;
+    return rc;
+}
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/resource.h>
+#include <sys/wait.h>
+
+static int drift_reap(int pid, int *status, long long *used) {
+    struct rusage ru;
+    int r = wait4(pid, status, WNOHANG, &ru);
+    if (r > 0) {
+        used[0] = (long long) ru.ru_utime.tv_sec * 1000 + ru.ru_utime.tv_usec / 1000;
+        used[1] = (long long) ru.ru_stime.tv_sec * 1000 + ru.ru_stime.tv_usec / 1000;
+#ifdef __APPLE__
+        used[2] = (long long) ru.ru_maxrss / 1024;
+#else
+        used[2] = (long long) ru.ru_maxrss;
+#endif
+    }
+    return r;
+}
+
+static long long drift_self_peak_kb(void) {
+#ifdef __linux__
+    FILE *f = fopen("/proc/self/status", "r");
+    if (f) {
+        char line[256];
+        long long kb = -1;
+        while (fgets(line, sizeof line, f)) {
+            if (strncmp(line, "VmHWM:", 6) == 0) {
+                kb = atoll(line + 6);
+                break;
+            }
+        }
+        fclose(f);
+        if (kb >= 0) return kb;
+    }
+#endif
+    struct rusage ru;
+    if (getrusage(RUSAGE_SELF, &ru) != 0) return 0;
+#ifdef __APPLE__
+    return (long long) ru.ru_maxrss / 1024;
+#else
+    return (long long) ru.ru_maxrss;
+#endif
+}

@@ -105,4 +105,25 @@ class HostRunTest {
         assertTrue(!findProgram("tool", ":/c", executable))
         assertEquals(listOf("./tool", "/c/tool"), seen)
     }
+
+    private class Gone(private val used: ResourceUsage?) : ChildProcess {
+        override fun read(buf: ByteArray, millis: Int) = -1
+
+        override fun exitCode() = 0
+
+        override fun usage() = used
+
+        override fun kill() = Unit
+
+        override fun close() = Unit
+    }
+
+    @Test
+    fun theResultCarriesTheUsageTheChildReported() {
+        val used = ResourceUsage(5, 6, null)
+        assertEquals(used, pumpUntilExit(Gone(used), null) {}.usage)
+        assertNull(pumpUntilExit(Gone(null), null) {}.usage)
+        val fake = FakeHost(commands = mapOf(listOf("t") to CommandResult(0, "x")))
+        assertNull(fake.run(listOf("t")) {}?.usage)
+    }
 }

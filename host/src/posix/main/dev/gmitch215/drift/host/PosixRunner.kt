@@ -2,10 +2,14 @@
 
 package dev.gmitch215.drift.host
 
+import dev.gmitch215.drift.host.spawn.drift_reap
+import dev.gmitch215.drift.host.spawn.drift_self_peak_kb
+import dev.gmitch215.drift.host.spawn.drift_spawn
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointerVar
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.IntVar
+import kotlinx.cinterop.LongVar
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.allocArray
 import kotlinx.cinterop.convert
@@ -18,29 +22,22 @@ import kotlinx.cinterop.set
 import kotlinx.cinterop.toKString
 import kotlinx.cinterop.value
 import platform.posix.EAGAIN
+import platform.posix.ENOMEM
 import platform.posix.F_SETFL
 import platform.posix.O_NONBLOCK
 import platform.posix.SIGKILL
-import platform.posix.STDERR_FILENO
-import platform.posix.STDOUT_FILENO
-import platform.posix.WNOHANG
 import platform.posix.X_OK
-import platform.posix._exit
 import platform.posix.access
-import platform.posix.dup2
 import platform.posix.errno
-import platform.posix.execvp
 import platform.posix.fcntl
-import platform.posix.fork
 import platform.posix.getenv
 import platform.posix.pipe
 import platform.posix.usleep
-import platform.posix.waitpid
 import platform.posix.close as posixClose
 import platform.posix.kill as posixKill
 import platform.posix.read as posixRead
 
-// fork and exec rather than posix_spawn (absent from platform.posix); popen hides the pid
+// posix_spawn through C: a forked child of this runtime must not run Kotlin before exec
 internal fun posixRunner(
     argv: List<String>,
     timeoutMillis: Long?,
@@ -51,23 +48,16 @@ internal fun posixRunner(
     if (pipe(fds) != 0) return@memScoped null
     val cargv = allocArray<CPointerVar<ByteVar>>(argv.size + 1)
     argv.forEachIndexed { i, arg -> cargv[i] = arg.cstr.getPointer(this) }
-    val pid = fork()
-    if (pid == 0) {
-        // only C calls from here on: the child of a multithreaded runtime must not allocate
-        dup2(fds[1], STDOUT_FILENO)
-        dup2(fds[1], STDERR_FILENO)
-        posixClose(fds[0])
-        posixClose(fds[1])
-        execvp(cargv[0], cargv)
-        _exit(127)
-    }
+    val pid = alloc<IntVar>()
+    val floorKb = drift_self_peak_kb()
+    val rc = drift_spawn(cargv, fds[0], fds[1], pid.ptr)
     posixClose(fds[1])
-    if (pid < 0) {
+    if (rc != 0) {
         posixClose(fds[0])
-        return@memScoped null
+        return@memScoped if (rc == EAGAIN || rc == ENOMEM) null else CommandResult(127, "")
     }
     fcntl(fds[0], F_SETFL, O_NONBLOCK)
-    pumpUntilExit(PosixChild(pid, fds[0]), timeoutMillis, onOutput)
+    pumpUntilExit(PosixChild(pid.value, fds[0], floorKb), timeoutMillis, onOutput)
 }
 
 private fun resolves(program: String?): Boolean =
@@ -75,8 +65,11 @@ private fun resolves(program: String?): Boolean =
         access(it, X_OK) == 0
     }
 
-private class PosixChild(private val pid: Int, private val fd: Int) : ChildProcess {
+// the child starts with this process's peak resident size, so a peak at or under it is unknown
+private class PosixChild(private val pid: Int, private val fd: Int, private val floorKb: Long) :
+    ChildProcess {
     private var reaped: Int? = null
+    private var used: ResourceUsage? = null
 
     override fun read(buf: ByteArray, millis: Int): Int {
         val n = posixRead(fd, buf.refTo(0), buf.size.convert()).toInt()
@@ -89,13 +82,19 @@ private class PosixChild(private val pid: Int, private val fd: Int) : ChildProce
         reaped?.let { return it }
         memScoped {
             val status = alloc<IntVar>()
-            val r = waitpid(pid, status.ptr, WNOHANG)
+            val times = allocArray<LongVar>(3)
+            val r = drift_reap(pid, status.ptr, times)
             if (r == 0) return null
             val s = status.value
             reaped = if (r < 0) -1 else waitStatusCode(s)
+            if (r > 0) {
+                used = ResourceUsage(times[0], times[1], times[2].takeIf { it > floorKb })
+            }
         }
         return reaped
     }
+
+    override fun usage(): ResourceUsage? = used
 
     override fun kill() {
         posixKill(pid, SIGKILL)

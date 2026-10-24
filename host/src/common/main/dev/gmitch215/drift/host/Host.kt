@@ -2,7 +2,13 @@ package dev.gmitch215.drift.host
 
 import dev.gmitch215.drift.model.Attribute
 
-data class CommandResult(val exitCode: Int, val output: String)
+/**
+ * What the child cost, in whole milliseconds and KiB. A field is null when the platform cannot
+ * measure it, never zero: absent means unknown.
+ */
+data class ResourceUsage(val userMs: Long?, val systemMs: Long?, val peakKb: Long?)
+
+data class CommandResult(val exitCode: Int, val output: String, val usage: ResourceUsage? = null)
 
 enum class Capability { PROCESS, FILES, ENV }
 
@@ -21,7 +27,8 @@ interface Host {
     /**
      * Like [run], but hands the merged output to [onOutput] while the process runs. The result
      * carries the exit code and an empty `output`; the callback has seen all of it. Past
-     * [timeoutMillis] the child is killed and the result carries [TIMED_OUT_EXIT_CODE].
+     * [timeoutMillis] the child is killed and the result carries [TIMED_OUT_EXIT_CODE]. A host
+     * that can measure the child fills [CommandResult.usage].
      */
     fun run(
         argv: List<String>,

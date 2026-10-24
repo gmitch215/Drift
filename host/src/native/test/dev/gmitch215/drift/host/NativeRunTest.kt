@@ -12,7 +12,8 @@ class NativeRunTest {
         val seen = mutableListOf<String>()
         val script = "printf 'one\\ntwo\\nthree'; exit 7"
         val result = host.run(listOf("sh", "-c", script)) { seen += it }
-        assertEquals(CommandResult(7, ""), result)
+        assertEquals(7, result?.exitCode)
+        assertEquals("", result?.output)
         assertEquals("one\ntwo\nthree", seen.joinToString(""))
     }
 
