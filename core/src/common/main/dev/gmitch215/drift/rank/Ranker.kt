@@ -16,6 +16,8 @@ import dev.gmitch215.drift.model.Dimension
 import dev.gmitch215.drift.model.Run
 import dev.gmitch215.drift.spectrum.Element
 import dev.gmitch215.drift.spectrum.Ochiai
+import dev.gmitch215.drift.symptom.FailureSignature
+import dev.gmitch215.drift.symptom.Symptom
 import dev.gmitch215.drift.history.Evidence as HistoryEvidence
 
 /**
@@ -34,11 +36,28 @@ import dev.gmitch215.drift.history.Evidence as HistoryEvidence
  * - `difference`: changed, with no support.
  *
  * Never `confirmed`: that needs an experiment.
+ *
+ * Conditioned on a failure (a `failure` argument that is not null), evidence has a class and the
+ * tiers follow it. A probe or rule is mechanistic when its symptom matches the failure (see
+ * [ProbeSymptoms] and [FailureSignature]) and observational otherwise:
+ * - `known`: a mechanistic rule whose matching symptom is verified.
+ * - `plausible`: a mechanistic probe that reads the candidate's path, or a mechanistic rule whose
+ *   matching symptoms are all inferred.
+ * - `correlated`: an observational probe or rule match, a probe in the candidate's dimension, or
+ *   a spectrum score of at least [Weights.MIN_CORRELATED].
+ * - `difference`: changed, with no support.
+ *
+ * An empty `failure` conditions on a failure that shows nothing, so all evidence is
+ * observational. A null `failure` keeps the unconditioned policy above.
  */
 object Ranker {
     /** Two captures and no history: no spectrum, so no candidate is `correlated`. */
-    fun rank(green: Capsule, red: Capsule, rules: List<Rule> = Rules.all): Ranking =
-        build(green, red, null, null, null, null, rules)
+    fun rank(
+        green: Capsule,
+        red: Capsule,
+        rules: List<Rule> = Rules.all,
+        failure: List<Symptom>? = null,
+    ): Ranking = build(green, red, null, null, null, null, rules, failure)
 
     /**
      * The transition of [history] with its runs as spectrum input. Greens that did not execute
@@ -51,6 +70,7 @@ object Ranker {
         history: List<Run>,
         job: String? = null,
         rules: List<Rule> = Rules.all,
+        failure: List<Symptom>? = null,
     ): Ranking {
         val result = GreenToRed.of(transition, job)
         val note = TransitionNote(result.kind, result.steps)
@@ -60,7 +80,7 @@ object Ranker {
             return Ranking(emptyList(), emptyList(), emptyList(), emptyList(), note)
         }
         val evidence = FailingStep.of(transition.red)?.let { HistoryEvidence.of(history, it) }
-        return build(green, red, transition.green, transition.red, evidence, note, rules)
+        return build(green, red, transition.green, transition.red, evidence, note, rules, failure)
     }
 
     private fun build(
@@ -71,7 +91,10 @@ object Ranker {
         history: HistoryEvidence?,
         note: TransitionNote?,
         rules: List<Rule>,
+        failure: List<Symptom>?,
     ): Ranking {
+        val signature = failure?.let(::FailureSignature)
+        val byId = rules.associateBy { it.id }
         val diff = CapsuleDiff.diff(green, red)
         val greenEnv = Detect.env(green, greenRun)
         val redEnv = Detect.env(red, redRun)
@@ -93,22 +116,46 @@ object Ranker {
             val dimension = change.dimension ?: return@mapNotNull null
             val weight = Weights.dimensions.getValue(dimension)
             val items = mutableListOf(
-                EvidenceItem(EvidenceKind.ATTRIBUTE, change.path, weight.logOdds, weight.id),
+                EvidenceItem(
+                    EvidenceKind.ATTRIBUTE,
+                    change.path,
+                    weight.logOdds,
+                    weight.id,
+                    signature?.let { EvidenceClass.OBSERVATIONAL },
+                ),
             )
             val linked = probes.filter { ProbeLinks.informs(it, change.path) }
             val broad = probes.filter { Dimension.ofProbe(it) == dimension && it !in linked }
-            linked.forEachIndexed { i, id ->
-                val w = if (i == 0) Weights.probe.logOdds else 0L
-                items += EvidenceItem(EvidenceKind.PROBE, "probe:$id", w, Weights.probe.id)
+            var strong = 0
+            for (id in linked) {
+                val ref = "probe:$id"
+                if (signature == null || ProbeSymptoms.explains(id, signature)) {
+                    val cls = signature?.let { EvidenceClass.MECHANISTIC }
+                    val first = strong++ == 0
+                    items += item(EvidenceKind.PROBE, ref, Weights.probe, cls, first)
+                } else {
+                    val cls = EvidenceClass.OBSERVATIONAL
+                    items += item(EvidenceKind.PROBE, ref, Weights.probeObservational, cls)
+                }
             }
             for (id in broad) {
-                val w = Weights.probeDimension
-                items += EvidenceItem(EvidenceKind.PROBE, "probe:$id", w.logOdds, w.id)
+                val cls = signature?.let { EvidenceClass.OBSERVATIONAL }
+                items += item(EvidenceKind.PROBE, "probe:$id", Weights.probeDimension, cls)
             }
             val mine = matches.filter { m -> m.evidence.any { it.ref == change.path } }
+            val ruleBases = mutableListOf<Basis>()
             for (m in mine) {
-                val w = Weights.rules.getValue(m.severity)
-                items += EvidenceItem(EvidenceKind.RULE, "rule:${m.ruleId}", w.logOdds, w.id)
+                val ref = "rule:${m.ruleId}"
+                val basis =
+                    if (signature == null) m.basis else matchedBasis(byId[m.ruleId], signature)
+                if (basis != null) {
+                    ruleBases += basis
+                    val cls = signature?.let { EvidenceClass.MECHANISTIC }
+                    items += item(EvidenceKind.RULE, ref, Weights.rules.getValue(m.severity), cls)
+                } else {
+                    val cls = EvidenceClass.OBSERVATIONAL
+                    items += item(EvidenceKind.RULE, ref, Weights.ruleObservational, cls)
+                }
             }
             val after = change.after
             val s = if (scored != null && after != null) {
@@ -127,9 +174,9 @@ object Ranker {
                 )
             }
             val tier = when {
-                mine.any { it.basis == Basis.VERIFIED } -> Tier.KNOWN
-                mine.isNotEmpty() || linked.isNotEmpty() -> Tier.PLAUSIBLE
-                broad.isNotEmpty() -> Tier.CORRELATED
+                Basis.VERIFIED in ruleBases -> Tier.KNOWN
+                ruleBases.isNotEmpty() || strong > 0 -> Tier.PLAUSIBLE
+                mine.isNotEmpty() || linked.isNotEmpty() || broad.isNotEmpty() -> Tier.CORRELATED
                 spectrum != null && spectrum.score >= Weights.MIN_CORRELATED -> Tier.CORRELATED
                 else -> Tier.DIFFERENCE
             }
@@ -157,6 +204,24 @@ object Ranker {
             history?.excluded.orEmpty().sortedWith(compareBy({ it.runId }, { it.reason })),
             note,
         )
+    }
+
+    private fun item(
+        kind: EvidenceKind,
+        ref: String,
+        w: Weight,
+        cls: EvidenceClass?,
+        counts: Boolean = true,
+    ) = EvidenceItem(kind, ref, if (counts) w.logOdds else 0L, w.id, cls)
+
+    private fun matchedBasis(rule: Rule?, failure: FailureSignature): Basis? {
+        val hits = rule?.symptoms.orEmpty()
+            .filter { it.basis != Basis.RANGE && failure.matchesText(it.text) }
+        return when {
+            hits.isEmpty() -> null
+            hits.any { it.basis == Basis.VERIFIED } -> Basis.VERIFIED
+            else -> Basis.INFERRED
+        }
     }
 
     private fun withProbabilities(candidates: List<Candidate>): List<Candidate> {

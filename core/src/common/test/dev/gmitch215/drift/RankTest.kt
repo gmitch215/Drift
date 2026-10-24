@@ -15,13 +15,19 @@ import dev.gmitch215.drift.model.Dimension
 import dev.gmitch215.drift.model.ProbeResult
 import dev.gmitch215.drift.model.ProbeStatus
 import dev.gmitch215.drift.model.Stability
+import dev.gmitch215.drift.rank.EvidenceClass
 import dev.gmitch215.drift.rank.EvidenceKind
 import dev.gmitch215.drift.rank.ProbeLinks
+import dev.gmitch215.drift.rank.ProbeSymptoms
 import dev.gmitch215.drift.rank.Ranker
+import dev.gmitch215.drift.rank.Ranking
 import dev.gmitch215.drift.rank.Tier
 import dev.gmitch215.drift.rank.Weights
 import dev.gmitch215.drift.studio.Facts
 import dev.gmitch215.drift.studio.StudioState
+import dev.gmitch215.drift.symptom.FailureSignature
+import dev.gmitch215.drift.symptom.Symptom
+import dev.gmitch215.drift.symptom.SymptomKind
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -698,4 +704,150 @@ class RankTest {
             Sha256.hex(json),
         )
     }
+
+    // #region failure classes
+    private fun failure(text: String, vararg exits: String) =
+        listOf(Symptom(SymptomKind.SIGNATURE, text, 1)) +
+            exits.map { Symptom(SymptomKind.EXIT, it, 1) }
+
+    private fun limits(cpu: String, memory: String, cpuProbe: String, memoryProbe: String) =
+        capsule(
+            "limits",
+            listOf(attr("cgroup.cpu.max", cpu), attr("cgroup.memory.max", memory)),
+            listOf(
+                probe("resources.cgroup-cpu", cpuProbe),
+                probe("resources.cgroup-memory", memoryProbe),
+            ),
+        )
+
+    private val roomy = limits("max 100000", "max", "unlimited\n", "unlimited\n")
+    private val tight = limits("25000 100000", "1073741824", "limited cpus=0.25\n", "limited\n")
+    private val quota = "pool: cpu quota <n>/<n> is below one full cpu, refusing to start"
+
+    private fun tiers(r: Ranking) = r.candidates.associate { it.path to it.tier }
+
+    @Test
+    fun withoutAFailureBothLimitProbesSupportTheirOwnPath() {
+        val r = Ranker.rank(roomy, tight, emptyList())
+        assertEquals(Tier.PLAUSIBLE, tiers(r).getValue("cgroup.cpu.max"))
+        assertEquals(Tier.PLAUSIBLE, tiers(r).getValue("cgroup.memory.max"))
+        assertTrue(r.candidates.flatMap { it.evidence }.all { it.cls == null })
+        assertEquals(r.toJson(), Ranker.rank(roomy, tight, emptyList(), null).toJson())
+        assertTrue(""""class"""" !in CanonicalJson.encode(r.toJson()))
+    }
+
+    @Test
+    fun aProbeCountsAsMechanisticOnlyWhenItsSymptomIsTheObservedFailure() {
+        val r = Ranker.rank(roomy, tight, emptyList(), failure(quota, "1"))
+        assertEquals(
+            mapOf("cgroup.cpu.max" to Tier.PLAUSIBLE, "cgroup.memory.max" to Tier.CORRELATED),
+            tiers(r),
+        )
+        assertEquals(listOf("cgroup.cpu.max", "cgroup.memory.max"), r.candidates.map { it.path })
+        val cpu = r.candidates.first().evidence.single { it.kind == EvidenceKind.PROBE }
+        val memory = r.candidates.last().evidence.single { it.kind == EvidenceKind.PROBE }
+        assertEquals(EvidenceClass.MECHANISTIC, cpu.cls)
+        assertEquals(Weights.probe.id, cpu.id)
+        assertEquals(EvidenceClass.OBSERVATIONAL, memory.cls)
+        assertEquals(Weights.probeObservational.id, memory.id)
+        assertEquals(0L, memory.weight)
+        assertTrue(""""class":"mechanistic"""" in CanonicalJson.encode(r.toJson()))
+    }
+
+    @Test
+    fun theExitCodeOfAKillExplainsTheMemoryProbe() {
+        val r = Ranker.rank(roomy, tight, emptyList(), failure("", "137"))
+        assertEquals(
+            mapOf("cgroup.cpu.max" to Tier.CORRELATED, "cgroup.memory.max" to Tier.PLAUSIBLE),
+            tiers(r),
+        )
+        assertEquals("cgroup.memory.max", r.candidates.first().path)
+    }
+
+    @Test
+    fun aFailureThatShowsNothingLeavesEveryProbeObservational() {
+        val r = Ranker.rank(roomy, tight, emptyList(), emptyList())
+        assertEquals(listOf(Tier.CORRELATED, Tier.CORRELATED), r.candidates.map { it.tier })
+        val classes = r.candidates.flatMap { it.evidence }.map { it.cls }
+        assertTrue(classes.all { it == EvidenceClass.OBSERVATIONAL })
+        assertEquals(listOf(null, null), r.candidates.map { it.probability })
+    }
+
+    @Test
+    fun anObservationalProbeKeepsTheAttributeScoreAndOnlyLiftsTheTier() {
+        val r = Ranker.rank(roomy, tight, emptyList(), failure("boom"))
+        for (c in r.candidates) assertEquals(c.evidence.first().weight, c.score)
+    }
+
+    @Test
+    fun onlyTheFirstMechanisticProbeCarriesWeight() {
+        val a = capsule(
+            "a",
+            listOf(attr("env.TZ", "UTC")),
+            listOf(probe("process.timezone", "UTC\n"), probe("resources.locale-env", "a")),
+        )
+        val b = capsule(
+            "b",
+            listOf(attr("env.TZ", "Asia/Tokyo")),
+            listOf(probe("process.timezone", "JST\n"), probe("resources.locale-env", "b")),
+        )
+        val c = Ranker.rank(a, b, emptyList(), failure("date <time> does not match the UTC day"))
+            .candidates.single()
+        val probes = c.evidence.filter { it.kind == EvidenceKind.PROBE }
+        assertEquals(listOf(Weights.probe.logOdds, 0L), probes.map { it.weight })
+        assertTrue(probes.all { it.cls == EvidenceClass.MECHANISTIC })
+    }
+
+    private fun ruleWith(basis: String, text: String) = demoRule(
+        GCC_14,
+        "symptoms" to """[{"text":"$text","basis":"$basis"}]""",
+    )
+
+    private fun candidateFor(rule: Rule, failure: List<Symptom>?) =
+        Ranker.rank(cc("13.2.1"), cc("14.2.0"), listOf(rule), failure).candidates.single()
+
+    @Test
+    fun aRuleIsKnownOnlyWhenItsVerifiedSymptomIsTheObservedFailure() {
+        val rule = ruleWith("verified", "ImportError: cannot import name legacy_api")
+        val hit = candidateFor(rule, failure("ImportError: cannot import name legacy_api"))
+        assertEquals(Tier.KNOWN, hit.tier)
+        assertEquals(Basis.VERIFIED, hit.basis)
+        assertEquals(EvidenceClass.MECHANISTIC, hit.evidence.last().cls)
+        assertEquals(Weights.rules.getValue(rule.severity).id, hit.evidence.last().id)
+
+        val miss = candidateFor(rule, failure("KeyError: DATABASE_URL"))
+        assertEquals(Tier.CORRELATED, miss.tier)
+        assertEquals(Basis.INFERRED, miss.basis)
+        assertEquals(EvidenceClass.OBSERVATIONAL, miss.evidence.last().cls)
+        assertEquals(Weights.ruleObservational.id, miss.evidence.last().id)
+        assertEquals(miss.evidence.first().weight, miss.score)
+        assertEquals(listOf("demo-rule"), miss.matches.map { it.ruleId })
+
+        assertEquals(Tier.KNOWN, candidateFor(rule, null).tier)
+    }
+
+    @Test
+    fun aMatchingInferredSymptomIsPlausibleAndAProseSymptomNeverMatches() {
+        val inferred = ruleWith("inferred", "ImportError: cannot import name legacy_api")
+        val seen = failure("ImportError: cannot import name legacy_api")
+        assertEquals(Tier.PLAUSIBLE, candidateFor(inferred, seen).tier)
+        val prose = ruleWith("verified", "the import fails on the new release")
+        assertEquals(Tier.CORRELATED, candidateFor(prose, seen).tier)
+        val range = ruleWith("range", "ImportError: cannot import name legacy_api")
+        assertEquals(Tier.CORRELATED, candidateFor(range, seen).tier)
+    }
+
+    @Test
+    fun theProbeSymptomTableCoversEveryLinkedProbe() {
+        assertEquals(ProbeLinks.attributes.keys, ProbeSymptoms.phrases.keys)
+        for ((id, phrases) in ProbeSymptoms.phrases) {
+            assertTrue(phrases.isNotEmpty(), id)
+            for (p in phrases) {
+                assertTrue(p == p.lowercase() && p.all { it.code in 32..126 }, "$id $p")
+            }
+        }
+        assertTrue(ProbeSymptoms.exits.keys.all { it in ProbeSymptoms.phrases })
+        assertTrue(!ProbeSymptoms.explains("kotlin.int.parse", FailureSignature(failure("int"))))
+    }
+    // #endregion
 }

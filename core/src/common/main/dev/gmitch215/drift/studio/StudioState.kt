@@ -14,6 +14,8 @@ import dev.gmitch215.drift.rank.Bundle
 import dev.gmitch215.drift.rank.Candidate
 import dev.gmitch215.drift.rank.Ranker
 import dev.gmitch215.drift.rank.Weights
+import dev.gmitch215.drift.symptom.Performance
+import dev.gmitch215.drift.symptom.Symptom
 
 /** What the two capsules hold, counted over the union of both sides. */
 data class Facts(val attributes: Int, val probes: Int) {
@@ -37,21 +39,38 @@ data class StudioState(
     val competing: List<Candidate>,
     val bundles: List<Bundle>,
     val unattached: List<RuleMatch>,
+    val performance: Performance? = null,
 ) {
-    fun toJson(): JsonObject = obj(
-        "facts" to facts.toJson(),
-        "changed" to changed.toJson(),
-        "relevant" to JsonArray(relevant.map { it.toJson() }),
-        "competing" to JsonArray(competing.map { it.toJson() }),
-        "bundles" to JsonArray(bundles.map { it.toJson() }),
-        "unattached" to JsonArray(unattached.map { it.toJson() }),
-        "weights" to Weights.toJson(),
+    /** `performance` is written only when the runs carried samples. */
+    fun toJson(): JsonObject = JsonObject(
+        buildMap {
+            put("facts", facts.toJson())
+            put("changed", changed.toJson())
+            put("relevant", JsonArray(relevant.map { it.toJson() }))
+            put("competing", JsonArray(competing.map { it.toJson() }))
+            put("bundles", JsonArray(bundles.map { it.toJson() }))
+            put("unattached", JsonArray(unattached.map { it.toJson() }))
+            put("weights", Weights.toJson())
+            performance?.let { put("performance", it.toJson()) }
+        },
     )
 
     companion object {
-        fun of(green: Capsule, red: Capsule, rules: List<Rule> = Rules.all): StudioState {
+        /**
+         * [performance] symptoms, when there are any, condition the ranking as the failure, next to
+         * [failure], the symptoms already read from the failing run.
+         */
+        fun of(
+            green: Capsule,
+            red: Capsule,
+            rules: List<Rule> = Rules.all,
+            performance: Performance? = null,
+            failure: List<Symptom> = emptyList(),
+        ): StudioState {
             val changed = CapsuleDiff.diff(green, red)
-            val ranking = Ranker.rank(green, red, rules)
+            val measured = performance?.symptoms.orEmpty()
+            val conditioned = if (measured.isEmpty()) null else failure + measured
+            val ranking = Ranker.rank(green, red, rules, conditioned)
             val relevant = ranking.candidates
             val top = relevant.firstOrNull()?.tier
             return StudioState(
@@ -65,6 +84,7 @@ data class StudioState(
                 competing = relevant.filter { it.tier == top }.takeIf { it.size > 1 }.orEmpty(),
                 bundles = ranking.bundles,
                 unattached = ranking.unattached,
+                performance = performance,
             )
         }
     }

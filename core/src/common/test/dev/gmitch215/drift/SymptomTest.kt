@@ -1,5 +1,6 @@
 package dev.gmitch215.drift
 
+import dev.gmitch215.drift.symptom.FailureSignature
 import dev.gmitch215.drift.symptom.Signature
 import dev.gmitch215.drift.symptom.Symptom
 import dev.gmitch215.drift.symptom.SymptomExtractor
@@ -359,4 +360,63 @@ class SymptomTest {
             Signature.normalize(text)
         }
     }
+
+    // #region failure signature
+    private fun seen(vararg symptoms: Symptom) = FailureSignature(symptoms.toList())
+
+    @Test
+    fun aFailureSignatureReadsTextSymptomsAndExitCodes() {
+        val f = seen(
+            Symptom(SIGNATURE, "OSError: [Errno <n>] Too many open files", 1),
+            Symptom(SIGNAL, "SIGKILL", 2),
+            Symptom(TRANSPORT, "connection reset", 3),
+            Symptom(EXIT, "137", 4),
+            Symptom(STEP, "secret step", 5),
+        )
+        assertTrue(f.mentions("too many open files"))
+        assertTrue(f.mentions("sigkill"))
+        assertTrue(f.mentions("connection reset"))
+        assertTrue(!f.mentions("secret step"))
+        assertTrue(!f.mentions("137"))
+        assertTrue(f.hasExit("137"))
+        assertTrue(!f.hasExit("1"))
+        assertTrue(!f.isEmpty)
+        assertTrue(seen().isEmpty)
+        assertTrue(seen(Symptom(STEP, "x", 1)).isEmpty)
+    }
+
+    @Test
+    fun aPhraseMatchesFromTheStartOfAWordSoAStemMatchesButAnInnerFragmentDoesNot() {
+        val f = seen(Symptom(SIGNATURE, "boom: the worker was throttled, out of memory", 1))
+        assertTrue(!f.mentions("oom"))
+        assertTrue(f.mentions("throttl"))
+        assertTrue(f.mentions("out of memory"))
+        assertTrue(!f.mentions("ttled"))
+        assertTrue(!f.mentions(""))
+        assertTrue(seen(Symptom(SIGNATURE, "oom-kill", 1)).mentions("oom"))
+    }
+
+    @Test
+    fun aProseSymptomMatchesOnItsDistinctiveTokensOnly() {
+        val line = "AttributeError: 'Flask' object has no attribute 'before_first_request'"
+        val f = seen(Symptom(SIGNATURE, line, 1))
+        assertTrue(f.matchesText(line))
+        assertTrue(!f.matchesText("raises attributeerror on startup"))
+        assertTrue(f.matchesText("code that calls before_first_request fails"))
+        assertTrue(!f.matchesText("the application fails with an error on startup"))
+        assertTrue(!f.matchesText("an object has no attribute"))
+        assertTrue(!f.matchesText("ERROR"))
+        assertTrue(!f.matchesText(""))
+        assertTrue(!seen().matchesText("AttributeError"))
+    }
+
+    @Test
+    fun aTokenWithAnInnerDotOrADigitIsDistinctive() {
+        val f = seen(Symptom(SIGNATURE, "cannot read recovery.conf; glibc_2.36 not found", 1))
+        assertTrue(f.matchesText("a data directory that holds recovery.conf."))
+        assertTrue(f.matchesText("needs GLIBC_2.36"))
+        assertTrue(!f.matchesText("a.b"))
+        assertTrue(!f.matchesText("abc"))
+    }
+    // #endregion
 }

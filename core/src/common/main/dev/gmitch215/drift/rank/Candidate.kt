@@ -18,6 +18,12 @@ enum class Tier { DIFFERENCE, CORRELATED, PLAUSIBLE, KNOWN }
 
 enum class EvidenceKind { ATTRIBUTE, PROBE, RULE, SPECTRUM }
 
+/**
+ * `mechanistic` evidence carries a symptom that matches the observed failure; everything else a
+ * ranking read is `observational`. Only a ranking conditioned on a failure sets a class.
+ */
+enum class EvidenceClass { OBSERVATIONAL, MECHANISTIC }
+
 /** A fact a rule match touched: an attribute path, `probe:<id>` or `run:<field>`. */
 data class Evidence(val ref: String) {
     fun toJson(): JsonObject = obj("ref" to JsonString(ref))
@@ -28,12 +34,21 @@ data class Evidence(val ref: String) {
  * `rule:<id>`; [EvidenceItem.weight] is its log-odds in micro-units and [EvidenceItem.id] names the
  * [Weights] row it came from.
  */
-data class EvidenceItem(val kind: EvidenceKind, val ref: String, val weight: Long, val id: String) {
-    fun toJson(): JsonObject = obj(
-        "kind" to JsonString(kind.name.lowercase()),
-        "ref" to JsonString(ref),
-        "weight" to JsonInt(weight),
-        "id" to JsonString(id),
+data class EvidenceItem(
+    val kind: EvidenceKind,
+    val ref: String,
+    val weight: Long,
+    val id: String,
+    val cls: EvidenceClass? = null,
+) {
+    fun toJson(): JsonObject = JsonObject(
+        buildMap {
+            put("kind", JsonString(kind.name.lowercase()))
+            put("ref", JsonString(ref))
+            put("weight", JsonInt(weight))
+            put("id", JsonString(id))
+            if (cls != null) put("class", JsonString(cls.name.lowercase()))
+        },
     )
 }
 

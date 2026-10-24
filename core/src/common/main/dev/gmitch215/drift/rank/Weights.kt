@@ -83,10 +83,22 @@ object Weights {
         "a probe in the same dimension differed but does not read this path; no ratio beat 1",
     )
 
+    val probeObservational = Weight(
+        "probe.observational",
+        FixedPoint.ONE,
+        "a probe that reads this path differed but its symptom is not the observed failure",
+    )
+
     val rules: Map<Severity, Weight> = mapOf(
         Severity.HIGH to Weight("rule.high", 24_000_000, "documented mechanism, severe symptom"),
         Severity.MEDIUM to Weight("rule.medium", 12_000_000, "documented mechanism, usual symptom"),
         Severity.LOW to Weight("rule.low", 6_000_000, "documented mechanism, mild symptom"),
+    )
+
+    val ruleObservational = Weight(
+        "rule.observational",
+        FixedPoint.ONE,
+        "a rule matched but none of its symptoms is the observed failure",
     )
 
     /** Ratio of a perfect score at full coverage; lower scores and coverage scale it toward 1. */
@@ -97,7 +109,8 @@ object Weights {
     )
 
     val all: List<Weight> =
-        dimensions.values.toList() + probe + probeDimension + rules.values.toList() + spectrum
+        dimensions.values.toList() + probe + probeDimension + probeObservational +
+            rules.values.toList() + ruleObservational + spectrum
 
     /** [spectrum] scaled by an Ochiai [score] and a history [coverage], both in micro-units. */
     fun spectrumRatio(score: Long, coverage: Long): Long {
