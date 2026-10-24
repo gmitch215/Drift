@@ -1,13 +1,20 @@
 package dev.gmitch215.drift.studio.ui
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.v2.runComposeUiTest
+import androidx.compose.ui.unit.dp
+import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -28,6 +35,42 @@ class HomeScreenTest {
         onNodeWithText("Home").performClick()
         onNodeWithTag("home:atlas").performScrollTo().performClick()
         onNodeWithText("Atlas").assertIsSelected()
+    }
+
+    private fun ComposeUiTest.openingACaseLeavesTheOtherTabsInPlace(width: Int) {
+        val case = CaseView.of("locale-tz-date-2.driftcase", File(path).readBytes())
+        setContent {
+            Box(Modifier.width(width.dp)) {
+                StudioApp(dark = false, picker = CasePicker { it(case) })
+            }
+        }
+        val tabs =
+            listOf("Home", "Atlas", "Investigation", "CI", "Upgrade", "Contract", "Bisect", "Set")
+        val before = tabs.map { onNodeWithText(it).getUnclippedBoundsInRoot() }
+        onNodeWithTag("home:open").performScrollTo().performClick()
+        onNodeWithText("Case").assertIsSelected()
+        onNodeWithText("Home").performClick()
+        val after = tabs.map { onNodeWithText(it).getUnclippedBoundsInRoot() }
+        assertEquals(before, after)
+    }
+
+    @Test
+    fun openingACaseLeavesTheOtherTabsInPlaceOnDesktop() = runComposeUiTest {
+        openingACaseLeavesTheOtherTabsInPlace(1000)
+    }
+
+    @Test
+    fun openingACaseLeavesTheOtherTabsInPlaceAtPhoneWidth() = runComposeUiTest {
+        openingACaseLeavesTheOtherTabsInPlace(360)
+    }
+
+    @Test
+    fun theDiagnoseActionOpensTheCiScreen() = runComposeUiTest {
+        setContent { StudioApp(dark = false) }
+        onNodeWithText(CI_ABOUT_HOME).assertExists()
+        onNodeWithTag("home:ci").performClick()
+        onNodeWithText("CI").assertIsSelected()
+        onNodeWithTag("ci:sample").assertExists()
     }
 
     @Test

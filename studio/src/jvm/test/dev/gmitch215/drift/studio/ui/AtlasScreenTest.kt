@@ -292,6 +292,38 @@ class AtlasScreenTest {
         onNodeWithTag("score").assertTextEquals("Score: 1 correct, 0 wrong, 1 skipped")
     }
 
+    private fun ComposeUiTest.nextProbeShowsTheQuestionAndTheScore(width: Int?) {
+        setContent {
+            if (width == null) {
+                AtlasScreen(dataset, fixture)
+            } else {
+                Box(Modifier.width(width.dp)) { AtlasScreen(dataset, fixture) }
+            }
+        }
+        waitUntil(timeoutMillis = 30_000) {
+            onAllNodesWithText("Measuring this device").fetchSemanticsNodes().isEmpty()
+        }
+        onNodeWithTag("mode:predict").performClick()
+        onNodeWithTag("choice:unknown").performScrollTo().performClick()
+        onNodeWithTag("next").performScrollTo().performClick()
+        waitForIdle()
+        onNodeWithTag("score").assertIsDisplayed()
+        val next = PredictView.of(PredictState(dataset, position = 1))!!
+        onNodeWithText("Probe ${next.index + 1} of ${next.count}: ${next.probeId}")
+            .assertIsDisplayed()
+        if (width == null) onNodeWithText(next.question).assertIsDisplayed()
+    }
+
+    @Test
+    fun theNextProbeScrollsBackToTheQuestionAndScoreOnDesktop() = runComposeUiTest {
+        nextProbeShowsTheQuestionAndTheScore(null)
+    }
+
+    @Test
+    fun theNextProbeScrollsBackToTheQuestionAndScoreAtPhoneWidth() = runComposeUiTest {
+        nextProbeShowsTheQuestionAndTheScore(360)
+    }
+
     @Test
     fun theAppOpensOnHomeAndTheTabsReachTheOtherScreens() = runComposeUiTest {
         setContent { StudioApp(dataset) }

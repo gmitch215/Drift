@@ -67,13 +67,14 @@ private enum class Mode(val label: String) {
 
 private enum class Tab(val label: String) {
     HOME("Home"),
-    CASE("Case"),
     ATLAS("Atlas"),
     INVESTIGATION("Investigation"),
+    CI("CI"),
     UPGRADE("Upgrade"),
     CONTRACT("Contract"),
     BISECT("Bisect"),
     SET("Set"),
+    CASE("Case"),
 }
 
 /** Lets the app ask the platform for a case file; [onOpened] gets the result, good or not. */
@@ -144,6 +145,7 @@ fun StudioApp(
                                 }
                             }
                         },
+                        onCi = { tab = Tab.CI },
                         onSample = { tab = Tab.INVESTIGATION },
                         onAtlas = { tab = Tab.ATLAS },
                         onUpgrade = { tab = Tab.UPGRADE },
@@ -157,6 +159,8 @@ fun StudioApp(
                     Tab.ATLAS -> AtlasScreen(dataset, measure, saver)
 
                     Tab.INVESTIGATION -> StudioScreen(samples)
+
+                    Tab.CI -> CiScreen(files)
 
                     Tab.UPGRADE -> UpgradeScreen(files)
 
@@ -215,9 +219,10 @@ fun AtlasScreen(
     }
 
     val palette = LocalPalette.current
+    val page = rememberScrollState()
+    LaunchedEffect(predict.position, predict.version) { page.scrollTo(0) }
     Box(
-        Modifier.fillMaxSize().background(palette.canvas)
-            .verticalScroll(rememberScrollState()),
+        Modifier.fillMaxSize().background(palette.canvas).verticalScroll(page),
         contentAlignment = Alignment.TopCenter,
     ) {
         Column(

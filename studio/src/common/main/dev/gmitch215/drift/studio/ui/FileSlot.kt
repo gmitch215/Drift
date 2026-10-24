@@ -21,6 +21,7 @@ internal fun FileSlot(
     chosen: String?,
     canPick: Boolean,
     samples: List<Pair<String, () -> Unit>>,
+    extra: @Composable () -> Unit = {},
     onPick: () -> Unit,
 ) {
     Section(title) {
@@ -50,6 +51,7 @@ internal fun FileSlot(
                 StudioText("Chosen: $chosen", Modifier.testTag("$tag:chosen"), Type.mono)
             }
         }
+        extra()
     }
 }
 

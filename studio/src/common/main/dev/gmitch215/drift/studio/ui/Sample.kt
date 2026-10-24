@@ -1,6 +1,7 @@
 package dev.gmitch215.drift.studio.ui
 
 import dev.gmitch215.drift.fixtures.Fixtures
+import dev.gmitch215.drift.fixtures.SampleLogFixtures
 import dev.gmitch215.drift.fixtures.SetFixtures
 import dev.gmitch215.drift.fixtures.UpgradeFixtures
 import dev.gmitch215.drift.model.Capsule
@@ -20,6 +21,14 @@ fun samples(): List<Sample> {
     val green = capsule(GREEN_RUN)
     return RED_RUNS.map { Sample("Failing Run $it", green, capsule(it)) }
 }
+
+class CiSample(val passing: String, val failing: String, val job: String)
+
+fun ciSample() = CiSample(
+    SampleLogFixtures.text("$GREEN_RUN.log"),
+    SampleLogFixtures.text("${RED_RUNS.first()}.log"),
+    "Docker E2E",
+)
 
 fun sampleState(): StudioState = samples().first().state
 

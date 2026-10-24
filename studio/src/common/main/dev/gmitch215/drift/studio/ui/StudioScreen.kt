@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,12 +41,7 @@ const val INVESTIGATION_ABOUT =
 @Composable
 fun StudioScreen(samples: List<Sample> = samples()) {
     var sampleIndex by remember { mutableStateOf(0) }
-    var showAll by remember { mutableStateOf(false) }
-    var selected by remember { mutableStateOf<String?>(null) }
     val sample = samples[sampleIndex]
-    val level = if (showAll) DetailLevel.DETAIL else DetailLevel.SUMMARY
-    val view = StudioView.of(sample.state, level)
-    val reading = Plain.reading(sample.state)
 
     val palette = LocalPalette.current
     Box(
@@ -70,68 +66,79 @@ fun StudioScreen(samples: List<Sample> = samples()) {
                     verticalArrangement = Arrangement.spacedBy(Space.s),
                 ) {
                     samples.forEachIndexed { i, s ->
-                        Choice(s.name, i == sampleIndex) {
-                            sampleIndex = i
-                            selected = null
-                        }
+                        Choice(s.name, i == sampleIndex) { sampleIndex = i }
                     }
                 }
                 Muted("Each is compared with passing run $GREEN_RUN.", style = Type.small)
             }
-            Panel {
-                Column(verticalArrangement = Arrangement.spacedBy(Space.s)) {
-                    Muted("Result")
-                    Heading(reading.headline, Modifier.testTag("summary"))
-                    reading.evidence?.let { StudioText(it, Modifier.testTag("evidence")) }
-                    Muted(reading.caution, style = Type.body)
-                }
+            key(sampleIndex) { InvestigationResult(sample.state) }
+            Rule()
+            Muted(FOOTER)
+        }
+    }
+}
+
+/** The ranked result for one pair of capsules; it keeps its own selection and detail level. */
+@Composable
+internal fun InvestigationResult(state: StudioState, more: @Composable () -> Unit = {}) {
+    var showAll by remember { mutableStateOf(false) }
+    var selected by remember { mutableStateOf<String?>(null) }
+    val view = StudioView.of(state, if (showAll) DetailLevel.DETAIL else DetailLevel.SUMMARY)
+    val reading = Plain.reading(state)
+    Panel {
+        Column(verticalArrangement = Arrangement.spacedBy(Space.s)) {
+            Muted("Result")
+            Heading(reading.headline, Modifier.testTag("summary"))
+            reading.evidence?.let { StudioText(it, Modifier.testTag("evidence")) }
+            Muted(reading.caution, style = Type.body)
+        }
+    }
+    state.performance?.ranges?.takeIf { it.isNotEmpty() }?.let {
+        Section("Run Time and Memory Ranges") { RangeChart(it) }
+    }
+    Section("Differences Ranked by Evidence") {
+        Muted(Glossary.TIER, style = Type.body)
+        if (view.candidates.isEmpty()) {
+            Muted("No difference between these runs is ranked.", style = Type.body)
+        }
+        view.candidates.forEach { row ->
+            CandidateItem(state, row, row.path == selected) {
+                selected = if (selected == row.path) null else row.path
             }
-            Section("Differences Ranked by Evidence") {
-                Muted(Glossary.TIER, style = Type.body)
-                if (view.candidates.isEmpty()) {
-                    Muted("No difference between these runs is ranked.", style = Type.body)
-                }
-                view.candidates.forEach { row ->
-                    CandidateItem(sample.state, row, row.path == selected) {
-                        selected = if (selected == row.path) null else row.path
-                    }
-                }
-                if (view.hidden > 0 || showAll) {
-                    val label = "Show ${view.hidden} More Differences"
-                    Choice(
-                        if (showAll) "Show Fewer Differences" else label,
-                        null,
-                        Modifier.testTag("show-all"),
-                        Role.Button,
-                    ) { showAll = !showAll }
-                }
+        }
+        if (view.hidden > 0 || showAll) {
+            val label = "Show ${view.hidden} More Differences"
+            Choice(
+                if (showAll) "Show Fewer Differences" else label,
+                null,
+                Modifier.testTag("show-all"),
+                Role.Button,
+            ) { showAll = !showAll }
+        }
+    }
+    Disclosure("Technical Details") {
+        Column(verticalArrangement = Arrangement.spacedBy(Space.l)) {
+            Section("How Drift Narrowed It Down") {
+                val funnel = StudioView.of(state).funnel
+                Muted(
+                    "Of ${funnel[0].count} facts in the capsules, ${funnel[1].count} " +
+                        "differ, ${funnel[2].count} can be ranked and " +
+                        "${funnel[3].count} are tied at the top.",
+                    style = Type.body,
+                )
+                FunnelPlot(StudioView.of(state))
             }
-            Disclosure("Technical Details") {
-                Column(verticalArrangement = Arrangement.spacedBy(Space.l)) {
-                    Section("How Drift Narrowed It Down") {
-                        val funnel = StudioView.of(sample.state).funnel
-                        Muted(
-                            "Of ${funnel[0].count} facts in the capsules, ${funnel[1].count} " +
-                                "differ, ${funnel[2].count} can be ranked and " +
-                                "${funnel[3].count} are tied at the top.",
-                            style = Type.body,
-                        )
-                        FunnelPlot(StudioView.of(sample.state))
-                    }
-                    val extras = StudioView.of(sample.state, DetailLevel.FULL).extras
-                    if (extras.isNotEmpty()) {
-                        Section("Other Findings") {
-                            Panel {
-                                Column {
-                                    extras.forEach { StudioText(it, style = Type.monoSmall) }
-                                }
-                            }
+            val extras = StudioView.of(state, DetailLevel.FULL).extras
+            if (extras.isNotEmpty()) {
+                Section("Other Findings") {
+                    Panel {
+                        Column {
+                            extras.forEach { StudioText(it, style = Type.monoSmall) }
                         }
                     }
                 }
             }
-            Rule()
-            Muted(FOOTER)
+            more()
         }
     }
 }

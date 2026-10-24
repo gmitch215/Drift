@@ -37,6 +37,20 @@ val embedSet = tasks.register<EmbedFixtures>("embedSet") {
     outputDir = layout.buildDirectory.dir("generated/set")
 }
 
+val stageSampleLogs = tasks.register<Sync>("stageSampleLogs") {
+    from(rootProject.layout.projectDirectory.dir("fixtures/drangler/logs")) {
+        include("36702683742.log", "36995781138.log")
+    }
+    into(layout.buildDirectory.dir("sample-logs"))
+}
+
+val embedSampleLogs = tasks.register<EmbedFixtures>("embedSampleLogs") {
+    dependsOn(stageSampleLogs)
+    fixtures = layout.buildDirectory.dir("sample-logs")
+    objectName = "SampleLogFixtures"
+    outputDir = layout.buildDirectory.dir("generated/sample-logs")
+}
+
 tasks.withType<AbstractCopyTask>()
     .matching { it.name == "wasmJsBrowserDistribution" }
     .configureEach {
@@ -68,6 +82,7 @@ kotlin {
             kotlin.srcDir(embedAtlas)
             kotlin.srcDir(embedUpgrade)
             kotlin.srcDir(embedSet)
+            kotlin.srcDir(embedSampleLogs)
         }
 
         commonMain.dependencies {
