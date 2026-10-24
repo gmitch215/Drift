@@ -19,10 +19,12 @@ import dev.gmitch215.drift.lab.DecisionRule
 import dev.gmitch215.drift.lab.FakeExecutor
 import dev.gmitch215.drift.lab.Ingest
 import dev.gmitch215.drift.lab.RawTrial
+import dev.gmitch215.drift.lab.Verify
 import dev.gmitch215.drift.model.Attribute
 import dev.gmitch215.drift.model.Capsule
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -85,6 +87,64 @@ class ArchiveCommandTest {
         assertEquals(0, json.statusCode)
         val parsed = CanonicalJson.parse(json.stdout.trim()) as JsonObject
         assertEquals(JsonBool(true), parsed["ok"])
+    }
+
+    @Test
+    fun verifyWithoutJUnitPrintsTheCoreReportAndWritesNoFile() {
+        val bytes = packed()
+        val result = drift("verify out.driftcase")
+        assertEquals(Verify.open(bytes).text() + "\n", result.stdout)
+        assertFalse(disk.files.keys.any { it.endsWith(".xml") })
+    }
+
+    @Test
+    fun verifyJUnitHasOneTestcasePerTextCheckAndTheSameOutput() {
+        packed()
+        val text = drift("verify out.driftcase").stdout
+        val result = drift("verify out.driftcase --junit out.xml")
+        assertEquals(0, result.statusCode, result.stderr)
+        assertEquals(text, result.stdout)
+        val xml = assertNotNull(disk.files["out.xml"])
+        val checks = text.lines().filter { Regex("^(PASS|SKIP) ").containsMatchIn(it) }
+        val skipped = checks.count { it.startsWith("SKIP ") }
+        assertEquals(14, checks.size)
+        assertTrue(xml.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<testsuites>\n"))
+        assertTrue(
+            "<testsuite name=\"drift verify\" tests=\"14\" failures=\"0\" errors=\"0\" " +
+                "skipped=\"$skipped\">" in xml,
+            xml,
+        )
+        assertEquals(14, Regex("<testcase ").findAll(xml).count(), xml)
+        assertTrue("<testcase name=\"tar\" classname=\"drift verify\"/>" in xml, xml)
+        for (line in checks) {
+            val name = line.substringAfter(' ').substringBefore(':')
+            assertTrue("<testcase name=\"$name\" classname=\"drift verify\"" in xml, name)
+        }
+    }
+
+    @Test
+    fun verifyJUnitNamesTheFailingCheckWithItsMessage() {
+        val path = tamperedArchive()
+        val result = drift("verify bad.driftcase --junit bad.xml")
+        assertEquals(1, result.statusCode)
+        val xml = assertNotNull(disk.files["bad.xml"])
+        assertTrue(
+            "<testcase name=\"manifest\" classname=\"drift verify\"><failure message=\"" +
+                "FAIL manifest: $path was changed; expected " in xml,
+            xml,
+        )
+        assertTrue("verification failed: FAIL manifest" in result.stderr, result.stderr)
+    }
+
+    private fun tamperedArchive(): String {
+        val bytes = packed()
+        val files = assertIs<TarRead.Entries>(Tar.read(bytes)).files.toMutableMap()
+        val path = files.keys.sorted().first {
+            it.startsWith("results/0") && "\"status\":\"fail\"" in files.getValue(it)
+        }
+        files[path] = files.getValue(path).replace("\"status\":\"fail\"", "\"status\":\"pass\"")
+        archives.files["bad.driftcase"] = Tar.write(files)
+        return path
     }
 
     @Test

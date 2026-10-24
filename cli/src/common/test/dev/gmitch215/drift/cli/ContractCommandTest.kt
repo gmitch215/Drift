@@ -189,6 +189,34 @@ class ContractCommandTest {
         assertTrue("\"status\":\"breaks\"" in broken.stdout)
     }
 
+    private fun junitSuite(failures: Int, skipped: Int, testcase: String) =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<testsuites>\n" +
+            "  <testsuite name=\"drift contract verify\" tests=\"1\" failures=\"$failures\" " +
+            "errors=\"0\" skipped=\"$skipped\">\n" +
+            "    $testcase\n" +
+            "  </testsuite>\n</testsuites>\n"
+
+    @Test
+    fun verifyJUnitHasOneTestcasePerAssertionAndLeavesTheTextOutputAlone() {
+        val on = separating()
+        val open = "<testcase name=\"attribute env.TZ\" classname=\"drift contract verify\""
+        val plain = run("contract", "verify", "c.json", "r1.json", on = on)
+        val broken = run("contract", "verify", "c.json", "r1.json", "--junit", "b.xml", on = on)
+        assertEquals(1, broken.statusCode)
+        assertEquals(plain.stdout, broken.stdout)
+        val failure = "$open><failure message=\"expected UTC, found Asia/Tokyo\"/></testcase>"
+        val suite = junitSuite(failures = 1, skipped = 0, testcase = failure)
+        assertEquals(suite, files.files["b.xml"])
+        val green = run("contract", "verify", "c.json", "g2.json", "--junit", "g.xml", on = on)
+        assertEquals(0, green.statusCode, green.stderr)
+        val pass = "$open/>"
+        assertEquals(junitSuite(failures = 0, skipped = 0, testcase = pass), files.files["g.xml"])
+        val bare = run("contract", "verify", "c.json", "bare.json", "--junit", "u.xml", on = on)
+        assertEquals(0, bare.statusCode, bare.stderr)
+        val skip = "$open><skipped message=\"cannot be checked in this environment\"/></testcase>"
+        assertEquals(junitSuite(failures = 0, skipped = 1, testcase = skip), files.files["u.xml"])
+    }
+
     @Test
     fun verifyNeedsExactlyOneEnvironment() {
         val on = separating()
