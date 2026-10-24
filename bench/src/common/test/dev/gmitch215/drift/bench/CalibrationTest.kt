@@ -26,6 +26,7 @@ class CalibrationTest {
     private fun lab(dir: String = "probed", onCapsule: (String) -> Unit = {}) = Lab.parse(
         BenchData.text("scenarios.json"),
         BenchData.text("split.json"),
+        excluded = Lab.UNPROBED,
     ) {
         onCapsule(it)
         BenchData.text("$dir/$it")
@@ -150,8 +151,8 @@ class CalibrationTest {
         val v = Evaluate.versusRandom(OBSERVED)
         val one = v.obj("top1")
         val three = v.obj("top3")
-        assertEquals(21L, one.require("hits").long())
-        assertEquals(45L, one.require("scenarios").long())
+        assertEquals(46L, one.require("hits").long())
+        assertEquals(105L, one.require("scenarios").long())
         assertTrue(one.require("p_at_least_micro").long() < 50_000)
         assertTrue(three.require("p_at_least_micro").long() < 50_000)
     }
@@ -215,13 +216,13 @@ class CalibrationTest {
 
     @Test
     fun theProbedPairsCarryProbeDifferencesAndRuleMatches() {
-        assertEquals(49, OBSERVED.size)
-        assertEquals(14, OBSERVED.count { it.probes.isNotEmpty() })
-        assertEquals(14, OBSERVED.count { o -> o.ranked.any { it.probe } })
-        assertEquals(20, OBSERVED.sumOf { o -> o.ranked.count { it.probe } })
-        assertEquals(7, OBSERVED.count { it.rules.isNotEmpty() })
+        assertEquals(115, OBSERVED.size)
+        assertEquals(41, OBSERVED.count { it.probes.isNotEmpty() })
+        assertEquals(31, OBSERVED.count { o -> o.ranked.any { it.probe } })
+        assertEquals(43, OBSERVED.sumOf { o -> o.ranked.count { it.probe } })
+        assertEquals(25, OBSERVED.count { it.rules.isNotEmpty() })
         assertTrue(originalObserved.all { it.probes.isEmpty() })
-        assertEquals(8, originalObserved.count { it.rules.isNotEmpty() })
+        assertEquals(25, originalObserved.count { it.rules.isNotEmpty() })
         assertTrue(removedObserved.all { o -> o.probes.isEmpty() && o.ranked.none { it.probe } })
         assertEquals(OBSERVED.map { it.changed }, removedObserved.map { it.changed })
     }
@@ -229,9 +230,12 @@ class CalibrationTest {
     @Test
     fun everyDevProbeAgreementReadsTheCandidatePathSoTheLinkChangesNoTier() {
         val candidates = OBSERVED.flatMap { it.ranked }
-        assertEquals(3, candidates.count { it.dimensionProbe })
-        assertTrue(candidates.filter { it.dimensionProbe }.all { it.probe })
-        assertEquals(25, candidates.count { it.tier == Tier.PLAUSIBLE })
+        assertEquals(8, candidates.count { it.dimensionProbe })
+        assertTrue(
+            candidates.filter { it.dimensionProbe && !it.probe }
+                .all { it.rules.isNotEmpty() || it.tier == Tier.DIFFERENCE },
+        )
+        assertEquals(62, candidates.count { it.tier == Tier.PLAUSIBLE })
         val plausible = candidates.filter { it.tier == Tier.PLAUSIBLE }
         assertTrue(plausible.all { it.probe || it.rules.isNotEmpty() })
         assertTrue(candidates.none { it.tier == Tier.CORRELATED })
@@ -456,7 +460,10 @@ class CalibrationTest {
 
     @Test
     fun theCalibrationFilesAreByteIdenticalToARegeneration() {
-        val c = Calibrate.run(Inputs(lab("probed"), lab("capsules")), SEED)
+        val c = Calibrate.run(
+            Inputs(lab("probed"), lab("capsules")) { BenchData.text("results/$it") },
+            SEED,
+        )
         assertEquals(BenchData.text("calibration/fit.json"), c.fit)
         assertEquals(BenchData.text("calibration/evaluation.json"), c.evaluation)
         assertEquals(PINNED_FIT_SHA256, Sha256.hex(c.fit))
@@ -568,10 +575,10 @@ class CalibrationTest {
     fun thePowerTableIsGeneratedFromTheCurrentCounts() {
         val rows = (analysis().obj("power").require("rows") as JsonArray).items
             .associate { (it as JsonObject).let { r -> r.require("id").string() to r } }
-        assertEquals(77L, rows.getValue("top1_vs_random").require("needed").long())
-        assertEquals(303L, rows.getValue("top3_vs_random").require("needed").long())
-        assertEquals(211L, rows.getValue("top1_vs_alphabetical").require("needed").long())
-        assertEquals(45L, rows.getValue("top3_vs_random").require("now").long())
+        assertEquals(60L, rows.getValue("top1_vs_random").require("needed").long())
+        assertEquals(165L, rows.getValue("top3_vs_random").require("needed").long())
+        assertEquals(4697L, rows.getValue("top1_vs_alphabetical").require("needed").long())
+        assertEquals(105L, rows.getValue("top3_vs_random").require("now").long())
         assertEquals(62L, rows.getValue("bundle_honesty").require("needed").long())
         assertEquals(383L, rows.getValue("stuck_rate").require("needed").long())
     }
@@ -621,14 +628,15 @@ class CalibrationTest {
     private companion object {
         const val SEED = 20261006L
         const val PINNED_FIT_SHA256 =
-            "fbbb6f45b04e77b495b5d42bc37d695d91f69dc54f250154e65bd3094624a31c"
+            "25eb0d753bf51a8630f532140a5e594ec1a42f8b945b2c2bd371a73a5192d524"
         const val PINNED_EVALUATION_SHA256 =
-            "b55ca827569c59cc0cdb620474adce9093b601a5a82df5e7d2f9155d5cd4d507"
+            "030fdf0455aea0e8440c4cbe56a8a7b7dbfd45f433442cbd61bf159518b831a5"
 
         val OBSERVED: List<Observed> by lazy {
             Lab.parse(
                 BenchData.text("scenarios.json"),
                 BenchData.text("split.json"),
+                excluded = Lab.UNPROBED,
             ) { BenchData.text("probed/$it") }.observeDev()
         }
     }

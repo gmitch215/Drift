@@ -85,7 +85,8 @@ class CommittedDataTest {
 
     @Test
     fun theProbedCapsulesAreTheDevScenariosOnly() {
-        val dev = split.dev.toSet()
+        assertTrue(Lab.UNPROBED.all { it in split.dev })
+        val dev = split.dev.toSet() - Lab.UNPROBED
         val files = root.resolve("data/probed").listDirectoryEntries().map { it.name }.toSet()
         assertEquals(dev.flatMap { listOf("$it.green.json", "$it.red.json") }.toSet(), files)
     }
