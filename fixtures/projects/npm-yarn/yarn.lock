@@ -3,9 +3,7 @@
 
 
 "@types/node@^20.14.0":
-  version "20.14.12"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.14.12.tgz#abc"
-  integrity sha512-abc
+  version "20.19.43"
 
 js-tokens@^3.0.0:
   version "3.0.2"
@@ -16,8 +14,7 @@ js-tokens@^3.0.0 || ^4.0.0:
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#ghi"
 
 lodash@^4.17.21:
-  version "4.17.21"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#jkl"
+  version "4.18.1"
 
 react@^18.2.0:
   version "18.3.1"

@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation 'org.springframework:spring-core:5.3.30'
+    implementation 'org.springframework:spring-core:5.3.39'
 }
 
 task header(type: Exec) {

@@ -4,6 +4,6 @@
   "private": true,
   "dependencies": {
     "esbuild": "0.28.2",
-    "next": "16.4.1"
+    "next": "16.4.3"
   }
 }
