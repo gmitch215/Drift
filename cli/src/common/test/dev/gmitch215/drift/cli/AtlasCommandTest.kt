@@ -8,6 +8,7 @@ import dev.gmitch215.drift.fixtures.AtlasVariants
 import dev.gmitch215.drift.hash.Sha256
 import dev.gmitch215.drift.host.FakeHost
 import dev.gmitch215.drift.host.systemHost
+import dev.gmitch215.drift.scan.atlas.Transcripts
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -121,6 +122,29 @@ class AtlasCommandTest {
     }
 
     @Test
+    fun hereRejectsAVersionWithoutAColumn() {
+        val result = drift("atlas here --version 9.9.9")
+        assertEquals(1, result.statusCode)
+        assertTrue("no recorded column for kotlin 9.9.9" in result.stderr, result.stderr)
+    }
+
+    @Test
+    fun hereWritesTheDeviceTranscript() {
+        val result = drift("atlas here --out device.txt")
+        assertEquals(0, result.statusCode, result.stderr)
+        assertTrue(result.stdout.startsWith("this device: fake-linux, kotlin "), result.stdout)
+        val device = Transcripts.read("device.txt", disk.files.getValue("device.txt"))
+        assertEquals("fake-linux", device.target)
+    }
+
+    @Test
+    fun hereExitStatusIsZeroOrTen() {
+        val result = drift("atlas here --exit-status")
+        assertTrue(result.statusCode == 0 || result.statusCode == 10, result.stderr)
+        assertTrue(result.stdout.startsWith("this device: "), result.stdout)
+    }
+
+    @Test
     fun buildWritesTheGoldenDataset() {
         val result = drift("atlas build jvm.txt macos.txt wasm.txt --out dataset.json")
         assertEquals(0, result.statusCode, result.stderr)
@@ -204,6 +228,19 @@ class AtlasCommandTest {
     }
 
     @Test
+    fun showOracleListsTheKindOfEveryDivergentLine() {
+        built()
+        val oracle = drift("atlas show dataset.json --oracle")
+        assertEquals(0, oracle.statusCode, oracle.stderr)
+        assertEquals(ORACLE_SHA, Sha256.hex(oracle.stdout))
+        assertTrue(oracle.stdout.startsWith("atlas oracle: one kind for every divergent line\n"))
+        assertTrue("documented-contract (reportable): 1^nan\n" in oracle.stdout, oracle.stdout)
+        val both = drift("atlas show dataset.json --oracle --probe kotlin.nope")
+        assertEquals(1, both.statusCode)
+        assertTrue("--oracle and --probe cannot be combined" in both.stderr, both.stderr)
+    }
+
+    @Test
     fun diffComparesTwoKotlinVersionsOfADataset() {
         val files = MemoryCaseFiles(
             names.associateWith { AtlasFixtures.text(it) }.toMutableMap().apply {
@@ -242,13 +279,15 @@ class AtlasCommandTest {
     private companion object {
         val ARM = setOf("aarch64", "arm64")
         const val DATASET_SHA =
-            "52cdbb80cf4e6b84ca62191a33efb5f214ae7b1dd38316226777d0e1b4f16f1e"
+            "30fad6394bf85d3f8687b7932531cc6a544afebad6af469fe551ffe41a382c93"
         const val COMPARE_DETAIL_SHA =
             "566dc95c2feaef903c7d1bcc06dfd3f0279879db0465b2eb0248a26d4aedfc75"
         const val COMPARE_FULL_SHA =
             "3672f81fd558e4a0e7e8d80a57a08c38f432813171d48254b163f1642ea02954"
         const val MATRIX_SHA =
             "800483af48794ce8823777cd9d70becd41d54bc27d351e4bc566124fa4bab254"
+        const val ORACLE_SHA =
+            "897ac37b3e616e2d4763ca3d4dea79f33f7cc5d7cf9e6990c992400c31e313a9"
         const val DIFF_WASM_SHA =
             "b04a84a8804b7ae389607e0d6f93888f498d5865b22133c4dab0572152a578de"
         const val REPRO_FLOAT_SHA =

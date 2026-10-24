@@ -3,6 +3,7 @@ package dev.gmitch215.drift.studio.ui
 import dev.gmitch215.drift.fixtures.AtlasFixtures
 import dev.gmitch215.drift.host.Host
 import dev.gmitch215.drift.host.systemHost
+import dev.gmitch215.drift.scan.atlas.Atlas
 import dev.gmitch215.drift.scan.atlas.Comparison
 import dev.gmitch215.drift.scan.atlas.Dataset
 import dev.gmitch215.drift.scan.atlas.Transcripts
@@ -35,17 +36,7 @@ fun interface DeviceMeasure {
 }
 
 object Devices {
-    private const val UNKNOWN = "unknown"
-
-    /**
-     * The column label of a device: the platform, the [runtime] name and version when known and
-     * the OS family. It carries nothing else about the machine.
-     */
-    fun id(host: Host, runtime: String? = null): String {
-        val os = host.os.takeIf { it != UNKNOWN && !host.platform.startsWith(it) }
-        return listOfNotNull(host.platform, runtime?.takeIf { it.isNotBlank() }, os)
-            .joinToString("-")
-    }
+    fun id(host: Host, runtime: String? = null): String = Atlas.deviceLabel(host, runtime)
 
     /** The engine, its major version and the OS family read from a browser's user agent. */
     fun browser(userAgent: String): String {

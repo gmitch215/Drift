@@ -9,6 +9,7 @@ import dev.gmitch215.drift.json.JsonString
 import dev.gmitch215.drift.json.obj
 import dev.gmitch215.drift.scan.atlas.ColumnKey
 import dev.gmitch215.drift.scan.atlas.Dataset
+import dev.gmitch215.drift.scan.atlas.Oracle
 import dev.gmitch215.drift.scan.atlas.ProbeComparison
 import dev.gmitch215.drift.scan.atlas.ProbeEntry
 import dev.gmitch215.drift.scan.atlas.label
@@ -161,6 +162,11 @@ data class AtlasView(
                     val other = differed.joinToString(", ").ifEmpty { "none" }
                     add("same as this device: $same")
                     add("differs from this device: $other")
+                }
+                val oracle = Oracle.lines(p, v)
+                if (oracle.isNotEmpty()) {
+                    add("oracle on kotlin $v:")
+                    addAll(Oracle.describe(oracle, "  "))
                 }
                 addAll(cited(p))
             }

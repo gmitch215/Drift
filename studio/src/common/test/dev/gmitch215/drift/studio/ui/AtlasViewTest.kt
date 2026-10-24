@@ -224,6 +224,28 @@ class AtlasViewTest {
     }
 
     @Test
+    fun drillGivesEveryDivergentLineAnOracleKind() {
+        val state = AtlasState(dataset)
+        val pow = AtlasView.drill(state, "kotlin.math.pow-special-cases")
+        assertTrue("oracle on kotlin 2.4.20:" in pow)
+        assertTrue("  documented-contract (reportable): 1^nan" in pow)
+        val page = "    source: https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.math/pow.html"
+        assertTrue(page in pow)
+        assertTrue(pow.any { it.startsWith("  cross-version-change: 2^-1074") })
+        val crash = AtlasView.drill(state, "kotlin.int.overflow")
+        assertTrue("  crash (reportable): (whole probe)" in crash)
+        assertTrue("    failed on: cloudflare-jvm" in crash)
+        val beta = AtlasView.drill(AtlasState(dataset, "2.5.0-Beta1"), "kotlin.double.nan-bits")
+        assertTrue("  no-correctness-claim: neg-nan-raw" in beta)
+        assertTrue(AtlasView.drill(state, "kotlin.int.radix").none { it.startsWith("oracle on") })
+        for (id in dataset.probes.map { it.id }) {
+            val section = AtlasView.drill(state, id).dropWhile { !it.startsWith("oracle on") }
+                .takeWhile { it.startsWith("oracle on") || it.startsWith("  ") }
+            assertTrue(section.none { "regress" in it.lowercase() }, id)
+        }
+    }
+
+    @Test
     fun deviceIdNamesPlatformRuntimeAndOsFamilyOnly() {
         assertEquals("jvm-21-linux", Devices.id(FakeHost("jvm", "linux"), "21"))
         assertEquals("jvm-macos", Devices.id(FakeHost("jvm", "macos")))
