@@ -1,0 +1,316 @@
+== scenario 1 r1: 1-20261027T092118Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/1-20261027T092118Z
+scenario: 1
+commands led by the README (drift and copies): 4 (limit 5); all commands: 9; earlier rule: 4
+seconds: 53 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: PASS
+confusion:
+
+- The error-mode output said `your error text points at this: is not a function`. That line does not say what it points at, and I read it as a fragment.
+- The error-mode output said `2 other differences exist, but the error text does not point at them`, without naming them. I had to run `drift why --there there.json` with no error to see them. The README's error-mode example shows no such line.
+- The README's compare flow says to change one difference on the failing machine and rerun to isolate the cause. I did not run that, because it would change the server. So Node is the cause from the error text and `test.js`, not from Drift isolating it. The time zone and npm differences are unverified; the test does not use dates or npm, but I did not check that by experiment.
+- The README says to pin Node "in .tool-versions or your CI image". I could not see which of those the server's build uses, and nothing I read said where the build config lives.
+- The README says to "change the image or package that provides Node" if there is no version manager. I had no way to see how the server installs Node, so I did not know which of those applied.
+- `command -v -a node` failed on the server with `sh: 1: command: Illegal option -a`, because the shell there is dash. I used `ls` instead.
+- For `cold-cp.sh` I guessed `project/there.json` as the path under `/home/reader`. The script accepted it.
+
+== scenario 1 r2: 1-20261027T092220Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/1-20261027T092220Z
+scenario: 1
+commands led by the README (drift and copies): 4 (limit 5); all commands: 11; earlier rule: 6
+seconds: 64 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: PASS
+confusion:
+- The error-mode output says `your error text points at this: is not a function`. That line is a fragment of the error text, not an API or version name, and it took me a moment to see that the verdict rests on the Node line below it.
+- The no-error run lists three candidates and says the data cannot separate them. Only the error-mode run pinned it to Node. I used the error-mode verdict and checked it against the test source.
+- The "To be sure, change only Node version there ... and run it again there" step needs a Node 22 install on the server. I did not install anything on a machine I was only checking, so that step is not done.
+- First copy attempt: `cold-cp.sh 1 there /home/reader/there.json here` returned `path must be a plain relative path under /home/reader`. I had passed an absolute path, and `there.json` worked.
+
+== scenario 1 r3: 1-20261027T092333Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/1-20261027T092333Z
+scenario: 1
+commands led by the README (drift and copies): 4 (limit 5); all commands: 8; earlier rule: 4
+seconds: 52 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: PASS
+confusion:
+- `cold-cp.sh` rejected `/home/reader/there.json` with `path must be a plain relative path under /home/reader`. I copied with `there.json` and it worked. This came from the script, not the README.
+- Drift's `--error` answer says `2 other differences exist, but the error text does not point at them: Node version is the only one it names.` It does not name the two. I ran `drift why --there there.json` without `--error` to see them: Time zone database and npm version.
+- Drift's advice is `Use Node 22.23.3 there ... change the image or package that provides Node`, and the next step is `change only Node version there ... and run it again there`. The failing machine has no version manager I could find, so I could not make that change without installing Node 22 on the build server. I did not do that, so this step is not verified.
+- The README's example for `--there there.json --error "TypeError: Object.groupBy is not a function"` shows the same answer I got. I ran the command rather than trust the example.
+
+== scenario 2 r1: 2-20261027T092434Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/2-20261027T092434Z
+scenario: 2
+commands led by the README (drift and copies): 3 (limit 5); all commands: 7; earlier rule: 3
+seconds: 55 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: PASS
+confusion:
+- My syntax and path errors, not the README's: the first `cold-sh.sh` call had a malformed parameter block, so the parser dropped it. `cold-cp.sh` rejected `/home/reader/project/there.json` ("path must be a plain relative path under /home/reader"), so I resent it as `project/there.json`.
+- README, "Install Drift on both": I did not install anything. `drift` was already on PATH on both machines, and both runs printed output.
+- README and drift's "Use Python 3.12.15 there": the build server has no 3.12 on PATH, only `/usr/local/bin/python3` at 3.10.22. The README says to change "the image or package that provides Python" when there is no version manager, but it does not say how to add a Python version to that machine. I did not run the "To be sure, change only that and run it again there" step, because it would change the build server and I had no way to install a Python there.
+- The minimum of 3.11 comes from my general knowledge of the standard library (`tomllib` shipped in 3.11), not from drift or the README. Drift's suggestion is an exact patch version, 3.12.15, and I have not checked that any 3.11+ build works on the build server.
+- "What I found: your error text points at this: no module named" is garbled and does not name `tomllib`.
+- Drift's answer lists only the Python version. Its output does not say whether the other saved facts (OS, time zone, environment) were compared and matched. I checked only the `test.py` hash myself.
+
+== scenario 2 r2: 2-20261027T092540Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/2-20261027T092540Z
+scenario: 2
+commands led by the README (drift and copies): 3 (limit 5); all commands: 7; earlier rule: 4
+seconds: 46 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: PASS
+confusion:
+- My first copy, `cold-cp.sh 2 there /home/reader/there.json here`, failed with `path must be a plain relative path under /home/reader`. The brief's wording "<path under /home/reader>" led me to the absolute path. `there.json` worked.
+- README, "Compare two machines": "copy the file to the machine where the program works" does not say how. I used `cold-cp.sh`.
+- Drift: "Use Python 3.12.15 there. Pin the version so the two stay equal, for example in .tool-versions." The output gives the exact patch version, not a minimum. Nothing in the output says 3.11 would be enough. I used the 3.12 suggestion, and the 3.11 minimum is my own knowledge. The pin suggestion does not apply here because the build server has no version manager. I followed the next line instead: "If there is no version manager there, change the image or package that provides Python."
+- Drift: "What I found: your error text points at this: no module named". I could not tell what "this" referred to.
+- Drift: "To be sure, change only that and run it again there." I did not do this. It would mean installing Python on the build server, and the brief limits me to checks.
+
+== scenario 2 r3: 2-20261027T092635Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/2-20261027T092635Z
+scenario: 2
+commands led by the README (drift and copies): 3 (limit 5); all commands: 6; earlier rule: 3
+seconds: 45 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: PASS
+confusion:
+- `cold-cp.sh` rejected the absolute path from the brief's pattern: `path must be a plain relative path under /home/reader`. I used `project/there.json`, and the copy landed in `here:project/`. An `ls` on here confirmed `there.json` is there.
+- Drift's cause line, `your error text points at this: no module named`, matched the phrase "no module named", not the module `tomllib`. Drift never mentions `tomllib` or Python 3.11. I linked `tomllib` to 3.11 from general knowledge of the standard library.
+- Drift's fix says "Use Python 3.12.15 there" and suggests `.tool-versions` or a CI image. I did not check for a version manager or whether 3.12.15 can be installed there. Any 3.11 or newer would satisfy the import, which is my inference, not something Drift said.
+- The README's "To be sure, change only that and run it again there" step is not done. Confirming it needs a newer Python on the server, and I did not install anything there.
+- Side effect: I left `there.json` in `/home/reader/project` on both machines.
+
+== scenario 3 r1: 3-20261027T092730Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/3-20261027T092730Z
+scenario: 3
+commands led by the README (drift and copies): 3 (limit 5); all commands: 5; earlier rule: 3
+seconds: 51 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: PASS
+confusion:
+- `cold-cp.sh` usage says `<path under /home/reader>`, but an absolute path was rejected: `path must be a plain relative path under /home/reader`. I retried with `project/there.json`, which worked.
+- Drift's output said `Set TZ=UTC there`, which is a settings change. The `gmtime` fix that keeps the code the only thing that changes came from my reading of `test.py`, not from Drift.
+
+== scenario 3 r2: 3-20261027T092830Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/3-20261027T092830Z
+scenario: 3
+commands led by the README (drift and copies): 3 (limit 5); all commands: 8; earlier rule: 3
+seconds: 47 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: PASS
+confusion:
+- `cold-cp.sh` rejected my first copy with `path must be a plain relative path under /home/reader`. I had passed an absolute path. That was my mistake, and it used one command.
+- Drift's advice "Set TZ=UTC there. That fixes only that machine. Making the code name its zone (UTC) gives the same answer everywhere." put the machine-setting fix first. The second sentence gave the code fix I used. The brief rules out machine settings as the answer, so I took the code fix.
+- The README's save example did not say which folder to run `--save` from. I ran it from `/home/reader/project`, and the output said where the file went.
+
+== scenario 3 r3: 3-20261027T092928Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/3-20261027T092928Z
+scenario: 3
+commands led by the README (drift and copies): 3 (limit 5); all commands: 6; earlier rule: 3
+seconds: 46 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: PASS
+confusion:
+
+- `cold-cp.sh` rejected `/home/reader/project/there.json` with "path must be a plain relative path under /home/reader". I reran it with `project/there.json`. This is the script's rule, not the README's.
+- The README's `drift why --error` example is a PHP case, and my run printed "Your error text matches no known failure phrase, so the answer is the same as without it." I did not know whether to follow the error-only path or the saved-capture path. I took the saved-capture path, since the README says that is the way to compare two machines.
+- Drift's "UTC here" is from its output. I did not check the laptop's `TZ` or `/etc/localtime` myself.
+- I did not find where `TZ=America/New_York` is set on the build server (profile, service unit, CI config). Drift does not say, and I did not search for it, so I cannot say what to remove to fix the server itself.
+
+== scenario 4 r1: 4-20261027T093024Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/4-20261027T093024Z
+scenario: 4
+commands led by the README (drift and copies): 4 (limit 5); all commands: 7; earlier rule: 4
+seconds: 54 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: PASS
+confusion:
+- The README says `--reply --works` "prints one line to copy back to where you started". Running `command -v git | drift why --reply --works` on the laptop with no session printed `I could not read that as the output of a check Drift asks for, and there is no session here.` No copy-back line appeared. I guessed that piping the laptop's output into the session on the build server would work, by running `printf '%s\n' '/usr/bin/git' | drift why --reply --works` there. Drift accepted it. This was a guess.
+- The README's "Try It" example output shows a PHP-version comparison, and I did not know whether it was meant to match my case. I followed the drift output's requests instead.
+- The first `drift why --error` answer, `I found no environment fact in this error text`, did not name git. Drift's next check (`command -v git`) is what pointed at it.
+- I did not read `test.py` itself. The traceback showed the call on line 3, which was enough to locate the cause.
+- Drift suggested "change only that and run it again there" to confirm. I did not install git on the build server, because that changes a machine I was only asked to diagnose.
+
+== scenario 4 r2: 4-20261027T093128Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/4-20261027T093128Z
+scenario: 4
+commands led by the README (drift and copies): 7 (limit 5); all commands: 10; earlier rule: 7
+seconds: 63 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: FAIL ( commands-7-over-5;)
+confusion:
+- `drift why --reply --works` on the laptop printed "I could not read that as the output of a check Drift asks for, and there is no session here." The README says `--reply --works` prints a line to copy back, and drift said the session was in the folder where I ran `drift why --error`. I could not tell whether the working-side check belonged on the laptop or on the build server. I switched to the README's "Compare two machines" route (`--save` and `--there`), which worked.
+- My `command -v git drift python3` printed nothing, not even a path for `drift` or `python3`, which both run. I could not read an empty result as "not found" on its own, so I confirmed with `ls` and `shutil.which`.
+- `cold-cp.sh` rejected my first path with "path must be a plain relative path under /home/reader". The usage line says `<path under /home/reader>` and does not give the form. I used `project/there.json` and it copied to `project/there.json` on the laptop.
+- The README says the session lives in the folder where you run drift, so `drift why --error` and `drift why --save` wrote files into `/home/reader/project` on the build server. I did not check that directory afterward, so the leftover `.drift/` and `there.json` are unverified.
+
+== scenario 4 r3: 4-20261027T093240Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/4-20261027T093240Z
+scenario: 4
+commands led by the README (drift and copies): 4 (limit 5); all commands: 7; earlier rule: 4
+seconds: 51 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: PASS
+confusion:
+- The laptop run of `command -v git | drift why --reply --works` printed `I could not read that as the output of a check Drift asks for, and there is no session here.` The README said that command "prints one line to copy back to where you started", and it printed nothing like that. I had to guess that the session lived on the build server and pipe the answer there.
+- Drift's first ask was "run command -v git where it fails and paste the result." On the build server that produced empty output, and I piped the empty output anyway. Drift read it as "not installed there." I did not know whether empty output counts as an answer; drift accepted it.
+- I checked only `command -v git` and four fixed paths. I did not search the whole filesystem, so "not installed" rests on those checks.
+- Verification is missing: drift says "change only that and run it again there," and I did not install git on the build server, so `python3 test.py` has not been re-run there.
+
+== scenario 5 r1: 5-20261027T093341Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/5-20261027T093341Z
+scenario: 5
+commands led by the README (drift and copies): 4 (limit 5); all commands: 9; earlier rule: 5
+seconds: 54 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: PASS
+confusion:
+- `cold-cp.sh` rejected the absolute path `/home/reader/there.json` with "path must be a plain relative path under /home/reader". No README line told me this, so I used `there.json`.
+- Drift's first fix, "run ulimit -n 1024 before the command", did not work on this box. The README's fallback line, "If ulimit -n 1024 says 'Operation not permitted', the hard limit is the cap (64 there)", was the one that applied. I ran the first step, got that exact error, and then went to the next step.
+- Drift names three places to raise the hard limit: the service unit (`LimitNOFILE`), `/etc/security/limits.conf`, or the container's `--ulimit`. I checked `/etc/security/limits.conf` and `/etc/security/limits.d` for a `nofile` line (none), found no `docker` binary, and saw no `CI` or runner variables. I could not find which one sets the 64. Guess: whatever starts the shell on the build server sets it. That is unverified, and I did not check the service configs or the CI setup.
+- The error text has single quotes, so I had to escape them inside `cold-sh.sh`. No README line led me there.
+
+== scenario 5 r2: 5-20261027T093444Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/5-20261027T093444Z
+scenario: 5
+commands led by the README (drift and copies): 3 (limit 5); all commands: 9; earlier rule: 3
+seconds: 56 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: PASS
+confusion:
+- `cold-cp.sh` rejected the absolute path `/home/reader/there.json` with "path must be a plain relative path under /home/reader". The brief's `<path under /home/reader>` read as absolute to me. I retried with `there.json` and it worked.
+- My command 8 grepped `/proc/self/limits` for `nofile`, which never appears there. The line is `Max open files`. I re-ran with `open files` in the next check. This was my mistake, not the README's.
+- Drift's "What to try next" said to run `ulimit -n 1024` on there first. I ran it and it failed with "Operation not permitted". The README does not say the hard limit caps the soft one. The fallback text in drift's output covered it, so I followed that path.
+- Drift says to "change only that and run it again there". I could not do that as uid 1000, so the fix is unverified on the server.
+- The container suggestion (`--ulimit nofile=...`) is drift's. I inferred from PID 1 being `sleep` that the server runs in a container and did not confirm it.
+
+== scenario 5 r3: 5-20261027T093550Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/5-20261027T093550Z
+scenario: 5
+commands led by the README (drift and copies): 3 (limit 5); all commands: 11; earlier rule: 3
+seconds: 75 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: PASS
+confusion:
+- My first `drift why --error` call failed with `(eval):1: unmatched '`. The error text has apostrophes around `/dev/null` and the wrapper uses single quotes. This was my quoting, not drift's. I rebuilt the text with `printf`.
+- Drift said `Run ulimit -n where it works. If you run it there with | drift why --reply --works`. "Where it works" and "there" can read as the same machine. I ran `ulimit -n` on the laptop and sent `1024` into the server's drift session. Drift accepted it.
+- Drift's advice was to run `ulimit -n 1024` before the command. That fails with `Operation not permitted`. Drift did name this case, but I had to search the server to find where the hard limit is set.
+- Guess: PID 1 is `sleep`, so the build server is probably a container started with a 64 limit, and the fix belongs in its start command. I did not confirm this. `ps` is not installed on the server and the shell's parent PID is 0, so I could not find the launcher.
+- Not checked: the laptop's hard limit.
+- Used 12 of 15 commands.
+
+== scenario 6 r1: 6-20261027T093716Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/6-20261027T093716Z
+scenario: 6
+commands led by the README (drift and copies): 3 (limit 5); all commands: 11; earlier rule: 3
+seconds: 159 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: PASS
+confusion:
+- The brief gives the path form as `<path under /home/reader>`. I tried `/home/reader/project/there.json` and `cold-cp.sh` rejected it: "path must be a plain relative path under /home/reader". I guessed `project/there.json`, which worked.
+- Drift's advice: "Install tinyfmt 2.0.0 there and commit the lockfile so both places install the same version." Read literally, this suggests `package.json` needs a change, but it already says 2.0.0. The gap is the lockfile. Drift's "What I found" listed only the installed version, not that the lockfiles differ. I found that by reading the files.
+- "Install tinyfmt 2.0.0 there" gives no command. The build server has no registry access, so the lockfile has to be regenerated on a machine that does.
+- "To be sure, change only that and run it again there": I could not run that as written. The scratch check above is an approximation.
+- `drift why --save` writes into the current directory. I ran it in the project folder, so `project/there.json` now exists on both machines, and I copied it to here's `project/`. Remove it from the project before committing.
+
+== scenario 6 r2: 6-20261027T094004Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/6-20261027T094004Z
+scenario: 6
+commands led by the README (drift and copies): 3 (limit 5); all commands: 8; earlier rule: 3
+seconds: 51 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: PASS
+confusion:
+- The README's "Compare two machines" flow says the save writes to "the current directory". I passed `/tmp/there.json`, which printed `Saved this machine to /tmp/there.json.` and then suggested `drift why --there /tmp/there.json`. The file is not on the laptop, so I copied it to `/home/reader/there.json` on the build server, then ran `cold-cp.sh` on that relative path. Nothing in the README says where the capture must live.
+- `cold-cp.sh` rejected my absolute path with `path must be a plain relative path under /home/reader`, which the README does not mention. I had to use a relative path.
+- The `drift why --there` result said "it most likely fails there because tinyfmt is locked to 1.1.0 there". That matched the files, but drift does not say which file it read. I checked `package-lock.json` and `node_modules` myself.
+- Drift said: "To be sure, change only that and run it again there." This is a suggestion, not a request for output. I did not run it on the build server.
+- I do not know how the build server installs dependencies. `package.json` says 2.0.0, yet `node_modules` holds 1.1.0. `npm ci` would refuse a lockfile that disagrees with `package.json`, so something installed from the old lock or copied `node_modules` over. The brief's "dependency list has not changed" is true of `package.json` but not of the lockfile.
+
+== scenario 6 r3: 6-20261027T094106Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/6-20261027T094106Z
+scenario: 6
+commands led by the README (drift and copies): 3 (limit 5); all commands: 7; earlier rule: 3
+seconds: 53 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: PASS
+confusion:
+
+- My first copy failed: `cold-cp.sh 6 there /home/reader/project/there.json here` returned "path must be a plain relative path under /home/reader". I had read the brief's `<path under /home/reader>` as allowing an absolute path. The retry with `project/there.json` worked.
+- I did not run drift's "To be sure, change only that and run it again there" step. I did not want to change the build server, so the fix rests on the diff and not on a rerun.
+- The README's error step assumes a traceback or an error name. This test prints a `FAIL` line and exits 1, with no error name, so I left out `--error` and ran the comparison without it. The README does not say what to do for a failure like this.
+- Nothing I read explains why the server's lock file is 1.1.0 while its `package.json` says 2.0.0. It could be an old checkout or an install that used an old lock. I did not check.
+
+== scenario 8 r1: 8-20261027T094209Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/8-20261027T094209Z
+scenario: 8
+commands led by the README (drift and copies): 4 (limit 5); all commands: 13; earlier rule: 6
+seconds: 81 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): no
+verdict: PASS
+confusion:
+- `issue.md` was not in the cold-reader folder (`Read` failed; `ls` showed only `.remember`). I found it at `/home/reader/project/issue.md` on the failing machine, at command 13.
+- `cold-cp.sh` returned "path must be a plain relative path under /home/reader" for `/tmp/there.json` and for `/home/reader/there.json`. A relative `there.json` worked. The README does not mention this.
+- The capture saved on the failing machine has `"label":"here"`. On the working machine drift then said "this machine against its own saved capture" and "Nothing I can read differs." I could not tell which side drift compared.
+- The README's "What It Looks At" lists Git. The capture has no git fact, and git is missing on both sandboxes, so drift was silent on the one thing the report points at.
+- I did not pass the error line to drift with `--error`. The README's compare flow is `drift why --there there.json --error "..."`, and I had the error line only at command 13. I stopped at the 15-command limit before trying it.
+- Nothing in the README or drift output pointed to git. The git cause comes from the report and general knowledge.
+
+== scenario 8 r2: 8-20261027T094340Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/8-20261027T094340Z
+scenario: 8
+commands led by the README (drift and copies): 5 (limit 5); all commands: 13; earlier rule: 5
+seconds: 71 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: PASS
+confusion:
+- The brief says `issue.md` is in the brief folder. It is not there; that folder holds only `.remember/`. I found the report at `/home/reader/project/issue.md` on both machines and read it there.
+- I ran the save-and-compare flow without `--error` first, because I did not yet have the report text. Drift's answer was "Compared 67 facts; none differ."
+- Drift says "Nothing I can read differs between this machine and the saved capture of itself" on the working machine, although the capture came from the failing machine. The wording reads as if both sides are the same machine. I could not tell whether this is a bug or a confusing message.
+- The README says drift looks at "Tool versions, such as Node, Python, Git and npm." The capture has no git entry on either side, and drift did not say git was missing or not compared. "none differ" therefore reads as a clean result for git, which it is not.
+- The README's example output says a missing tool is "reported as 'not installed there'." I did not see that wording, and git's absence was not reported that way.
+- `cold-cp.sh` rejected `/home/reader/project/there.json` with "path must be a plain relative path under /home/reader". It accepted `project/there.json`.
+- My error-text run was not the exact report line. Backticks in double quotes broke the shell (`Syntax error: EOF in backquote substitution`), and I ran the final check with `error: unknown option show-current`. Drift returned the same "none differ" result.
+- Commands used: 15 (including one local `ls`), which is the limit. The `Read` attempt on `issue.md` failed as well. I did not guess a cause beyond the report text plus general git knowledge.
+
+== scenario 8 r3: 8-20261027T094501Z
+run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/8-20261027T094501Z
+scenario: 8
+commands led by the README (drift and copies): 6 (limit 5); all commands: 10; earlier rule: 6
+seconds: 74 (limit 600)
+answer matches key: yes
+drift output mentions an accepted term (heuristic, a person confirms by reading the transcript): yes
+verdict: FAIL ( commands-6-over-5;)
+confusion:
+- The brief says `issue.md` is in this folder. It was not: the local listing showed only `.remember`. It is at `/home/reader/project/issue.md` on the failing machine. Nothing in the README pointed there.
+- The README's "Compare two machines" section says the second run compares against another machine. Drift's answer was "this machine against its own saved capture", with "Compared 67 facts; none differ". I could not tell whether the capture came from a different machine.
+- The README says the capture covers Git ("Tool versions, such as Node, Python, Git and npm"). Neither capture has a git row, and git is not on PATH on either machine. I had no way to confirm the 2.20.1 in the report.
+- The README's "Compare" output tells you to "Copy there.json to the machine where it works", but both machines already held `issue.md` before any copy, so I could not tell whether they are separate machines.
+- `cold-cp.sh` rejected an absolute path; it wanted `project/there.json`. That came from the script, not drift.
+- My first `--error` call failed on backtick quoting. That was my command, not drift's output.
+- I did not confirm the git cause through drift. I stopped at 12 of 15 commands, near the time limit, with no comparison that could show a git difference.
+
