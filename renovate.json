@@ -13,6 +13,12 @@
         "pin",
         "digest"
       ]
+    },
+    {
+      "matchFileNames": [
+        "fixtures/**"
+      ],
+      "enabled": false
     }
   ]
 }
