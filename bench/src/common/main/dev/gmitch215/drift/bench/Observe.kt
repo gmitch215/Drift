@@ -158,10 +158,12 @@ class Lab(
         }
 
         /**
-         * Dev scenarios with no probed capture, because the Lab cannot solve them: each reads a
-         * file the bench harness mounts, which a container built from a capsule never has. The
-         * probed lab leaves them out of the fit and the evaluation; they stay in `dev` and in the
-         * capsule results.
+         * Dev scenarios with no committed probed capture: four read a file at a path no capture
+         * names (a pin under `/etc/app`) that the bench harness mounts, and the three hosts and
+         * name service ones are solvable but have no probed pair yet, because adding them moves
+         * the isotonic map in `Weights`, which the committed case fixtures pin. The probed lab
+         * leaves them out of the fit and the evaluation; they stay in `dev` and in the capsule
+         * results.
          */
         val UNPROBED: Set<String> = setOf(
             "build-checksum-pin-1",

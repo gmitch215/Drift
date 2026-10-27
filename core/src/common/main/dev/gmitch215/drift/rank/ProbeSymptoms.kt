@@ -106,6 +106,15 @@ object ProbeSymptoms {
             "heap space",
             "enomem",
         ),
+        "resources.fs-tmp-fsync" to listOf(
+            "fsync",
+            "temporary",
+            "/tmp",
+            "timed out",
+            "timeout",
+            "database is locked",
+            "disk",
+        ),
         "resources.locale-env" to zone + listOf(
             "locale",
             "lang",

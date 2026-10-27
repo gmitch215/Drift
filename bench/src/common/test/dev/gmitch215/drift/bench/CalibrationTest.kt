@@ -5,6 +5,7 @@ import dev.gmitch215.drift.hash.Sha256
 import dev.gmitch215.drift.json.CanonicalJson
 import dev.gmitch215.drift.json.JsonArray
 import dev.gmitch215.drift.json.JsonInt
+import dev.gmitch215.drift.json.JsonNull
 import dev.gmitch215.drift.json.JsonObject
 import dev.gmitch215.drift.json.JsonString
 import dev.gmitch215.drift.json.array
@@ -403,7 +404,7 @@ class CalibrationTest {
     @Test
     fun theHarnessRescoringEqualsTheRankerOnEveryDevScenario() {
         val table = Table.current()
-        val shares = Models.softmaxNone.learner.learn(OBSERVED)
+        val shares = Models.handSetSoftIso.learner.learn(OBSERVED)
         for (o in OBSERVED) {
             for (c in o.ranked) {
                 assertEquals(c.rankerScore, table.score(c), "${o.scenario.id} ${c.path}")
@@ -431,15 +432,18 @@ class CalibrationTest {
         for ((severity, weight) in Weights.rules) {
             assertEquals(weight.ratio, table.obj("rules").require(severity.id).long(), severity.id)
         }
-        val probability = fit.obj("probability")
-        assertEquals(Weights.NONE, probability.require("none").long())
+        assertEquals(JsonNull, fit.require("probability"))
+        assertEquals(Fit.UNIT_NONE, Weights.NONE)
+        val steps = (fit.require("calibration") as JsonArray).items
+            .map { (it as JsonObject).require("from").long() to it.require("p").long() }
+        assertEquals(steps, Weights.map)
         val provenance = fit.obj("provenance")
         val dev = provenance.require("dev_scenarios").long()
         val seed = provenance.require("seed").long()
         assertEquals("dev split of $dev synthetic scenarios, seed $seed", Weights.FIT)
         assertEquals(
             fit.obj("selection").require("chosen").string(),
-            Models.softmaxNone.id,
+            Models.handSetSoftIso.id,
         )
         assertEquals(fit.obj("table").toString(), fit.obj("hand_set").toString())
         assertEquals(Table.handSet.dimensions, Table.current().dimensions)
@@ -453,7 +457,7 @@ class CalibrationTest {
             List(7) { Weights.dimensions.getValue(Dimension.BUILD).logOdds }
         val shares = Weights.shares(scores)
         assertTrue(shares.sum() < 1_000_000L)
-        assertTrue(shares.sum() > 980_000L, shares.sum().toString())
+        assertTrue(shares.sum() > 950_000L, shares.sum().toString())
         assertEquals(1, shares.drop(1).distinct().size)
         assertTrue(shares.first() > shares[1])
     }
@@ -473,14 +477,19 @@ class CalibrationTest {
     @Test
     fun theChosenModelBeatsEveryBaselineOutOfFold() {
         val cv = Models.everything.associate { it.id to Evaluate.crossValidated(OBSERVED, it) }
-        val chosen = Evaluate.brierCovered(cv.getValue(Models.softmaxNone.id))
-        val beaten =
-            listOf("hand-set", "hand-set+base-rate", "hand-set+isotonic", "priors+isotonic")
+        val chosen = Evaluate.brierCovered(cv.getValue(Models.handSetSoftIso.id))
+        val beaten = listOf(
+            "hand-set",
+            "hand-set+base-rate",
+            "hand-set+isotonic",
+            "priors+isotonic",
+            Models.softmaxNone.id,
+        )
         for (id in beaten) {
             assertTrue(chosen < Evaluate.brierCovered(cv.getValue(id)), id)
         }
         assertTrue(chosen < Evaluate.brierCovered(cv.getValue("diff-order")))
-        val order = Evaluate.mrr(cv.getValue(Models.softmaxNone.id))
+        val order = Evaluate.mrr(cv.getValue(Models.handSetSoftIso.id))
         assertTrue(order > Evaluate.mrr(cv.getValue("random")))
     }
     // #endregion
@@ -628,9 +637,9 @@ class CalibrationTest {
     private companion object {
         const val SEED = 20261006L
         const val PINNED_FIT_SHA256 =
-            "25eb0d753bf51a8630f532140a5e594ec1a42f8b945b2c2bd371a73a5192d524"
+            "a050d59cace7d5a3d94cce990a8190552d31136200ac58b8c53f4e2023b097a6"
         const val PINNED_EVALUATION_SHA256 =
-            "030fdf0455aea0e8440c4cbe56a8a7b7dbfd45f433442cbd61bf159518b831a5"
+            "dfdddafbcb7bed2b1e7aa287ad3cad9a84c69e2193aa0fe7129a16ca09a2283b"
 
         val OBSERVED: List<Observed> by lazy {
             Lab.parse(

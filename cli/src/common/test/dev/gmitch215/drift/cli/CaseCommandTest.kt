@@ -284,14 +284,14 @@ class CaseCommandTest {
     }
 
     private companion object {
-        const val DIAGNOSE_SHA = "e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08"
+        const val DIAGNOSE_SHA = "83c35a87e4f48696684ac6817e31b04e5b9b1bf3c37452d6cbc8c12a030c187c"
         const val SUMMARY = "9 changes differ with the same support, and tool.node.version " +
             "ranks first " +
             "only by hand-set weights,\nso the data does not name one cause.\n"
         const val DETAIL_SHA = "56ee0ec4661e13a7239dca691c950420f9d3c12263958d861d89658ce0e03f85"
-        const val FULL_SHA = "bb94266673db8d2cc232c772d69e3ff597a1b35390bb2a7f3d4c835b0cc0d914"
+        const val FULL_SHA = "74289afd18b6519569ae886391e085809062b278635b4fc48fa15613b6586779"
         const val NEXT_SHA = "de3ef79dd2aceeecced8abb0d3d7aae857f895ed732417a229da1fecea8808b6"
-        const val SHOW_SHA = "dddf6039a883a9f8296e130f8f21d1409c43512ce95d1dc0d7f18e27276371df"
+        const val SHOW_SHA = "e74420bacb477898aef258e0dd8d1240946e7b92d0472ca04a5f9351c852264b"
         val CASE_SHAS = mapOf<String, String>(
             "case.json" to
                 "155b274f7a63ffd8504b0926fc7c037a4bbb47eb7bee9d2b52aab263746866ad",
@@ -306,9 +306,9 @@ class CaseCommandTest {
             "hypotheses/prior.json" to
                 "08e67506939404f86ced95ffd63f8e2cacb582d2c4245ea5142ac2c389775ebf",
             "hypotheses/ranking.json" to
-                "03c1c42706e20d7ed23fe3d02fd381ccfad023d05045c20cfdf80d84c58a7deb",
+                "f45f10960520fd7597b567c8f6d185e2a798d39e4c2bb2cfd52568de3257f8ee",
             "manifest.json" to
-                "2a334d4ccf58e6a001e373368a7c21e296a8627128014da11ff9ca8b6cdff8d3",
+                "4669195f1fb04ac8877c696bd6e1e67857e04b14fec28be2b7a66e58d2fbc415",
             "observations/0001.json" to
                 "fba59c9eb763701f21af088b3aa24736721e56792d1b4bf68d341a3b3abfdb4f",
             "observations/0002.json" to

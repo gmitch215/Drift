@@ -22,25 +22,43 @@ data class Weight(val id: String, val ratio: Long, val reason: String) {
  * Every number the ranker uses to compare candidates, in one place. The evidence weights are
  * hand-set guesses and are NOT calibrated: they order candidates and a score is not a
  * probability. The fit on the DriftBench dev split (`bench/data/calibration/fit.json`) tried
- * fitted dimension priors, a fitted probe and rule ratio and isotonic maps, and none beat these
- * values out of fold, so they stay.
+ * fitted dimension priors, a fitted probe and rule ratio, a fitted [NONE] and isotonic maps, and
+ * no fitted weight replaced these values, so they stay.
  *
  * What the fit did support is a probability for a ranking whose candidates rest on their
- * attribute change alone ([shares]): each candidate's share of the posterior against its rivals
- * and [NONE], the weight of "no listed candidate is the cause". A ranking with a probe, rule or
- * spectrum item gets no probability. Probes occurred in 13 of the 45 dev scenarios; on those
- * rankings the shares with the hand-set probe ratio scored worse out of fold than saying one in
- * n, and a fitted ratio scored no better. No dev scenario has a rule match or a history, so rule
- * and spectrum weights are untested.
+ * attribute change alone ([probabilities]): each candidate's share of the posterior against its
+ * rivals and [NONE], read through the isotonic [map], which gives the rate at which candidates
+ * with that share were the cause. The map is fit on every scenario of [FIT] and is not held out;
+ * out of fold, over the rankings that print a probability, it scored a Brier of 0.170 against
+ * 0.173 for saying one in n and 0.184 for the shares alone. The values are rates, not shares, and
+ * a ranking's values need not add up to one. A ranking with a probe, rule or spectrum item gets
+ * no probability: on rankings with a probe the shares with the hand-set probe ratio scored worse
+ * out of fold than saying one in n, and a fitted ratio scored no better. No dev scenario has a
+ * history, so spectrum weights are untested.
  */
 object Weights {
     const val ID = "hand-set-1"
     const val CALIBRATED = false
 
-    /** Weight of "no listed candidate is the cause" against the evidence ratios, fit on [FIT]. */
-    const val NONE = 250_000L
+    /** Weight of "no listed candidate is the cause" in the shares [map] reads; it is not fit. */
+    const val NONE = 1_000_000L
 
-    const val FIT = "dev split of 49 synthetic scenarios, seed 20261006"
+    const val FIT = "dev split of 115 synthetic scenarios, seed 20261006"
+
+    /**
+     * The isotonic map from a share to a probability, both in micro-units: a share takes the
+     * value of the last step whose first share is at most it, the first step if none is.
+     */
+    val map: List<Pair<Long, Long>> = listOf(
+        68L to 34_483L,
+        35_294L to 71_429L,
+        48_193L to 104_478L,
+        187_500L to 176_471L,
+        217_391L to 362_319L,
+        600_000L to 666_667L,
+        847_059L to 666_667L,
+        900_000L to 736_842L,
+    )
 
     /** Fewer included passing runs than this say nothing: one pass makes every change perfect. */
     const val MIN_PASSES = 2
@@ -129,6 +147,12 @@ object Weights {
         return e.map { (2 * it * FixedPoint.ONE + total) / (2 * total) }
     }
 
+    /** The value of [map] at [share]. */
+    fun mapped(share: Long): Long = (map.lastOrNull { it.first <= share } ?: map.first()).second
+
+    /** [shares] of a ranking's [scores], each read through [map]. */
+    fun probabilities(scores: List<Long>): List<Long> = shares(scores).map(::mapped)
+
     fun toJson(): JsonObject = obj(
         "id" to JsonString(ID),
         "calibrated" to JsonBool(CALIBRATED),
@@ -136,6 +160,9 @@ object Weights {
             "calibrated" to JsonBool(true),
             "covers" to JsonArray(listOf(JsonString("attribute"))),
             "fit" to JsonString(FIT),
+            "map" to JsonArray(
+                map.map { (from, p) -> obj("from" to JsonInt(from), "p" to JsonInt(p)) },
+            ),
             "none" to JsonInt(NONE),
             "uncovered" to JsonArray(
                 listOf(JsonString("probe"), JsonString("rule"), JsonString("spectrum")),

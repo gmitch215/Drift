@@ -36,6 +36,7 @@ object ProbeLinks {
         "process.timezone" to listOf("env.TZ"),
         "resources.cgroup-cpu" to listOf("cgroup.cpu."),
         "resources.cgroup-memory" to listOf("cgroup.memory."),
+        "resources.fs-tmp-fsync" to listOf("fs.tmp.type"),
         "resources.locale-env" to listOf("env.LANG", "env.LC_", "env.TZ"),
         "resources.missing-file" to listOf("runtime.platform"),
         "text.case-mapping" to drift,

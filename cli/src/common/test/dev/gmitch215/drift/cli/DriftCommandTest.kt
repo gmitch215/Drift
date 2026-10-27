@@ -381,6 +381,6 @@ class DriftCommandTest {
     }
 
     private companion object {
-        const val DIAGNOSE_SHA = "4b0dd0232480f40e8a6dda20280c4026b196a65d339cb142a9e8cd5eac5fff8a"
+        const val DIAGNOSE_SHA = "99f637b2314ac9a6b75f2a212313f80ee376521a1248a2219910bd391ed838f7"
     }
 }

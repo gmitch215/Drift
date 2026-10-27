@@ -317,8 +317,10 @@ class RankHistoryTest {
         assertEquals(listOf(Tier.DIFFERENCE), ranking.candidates.map { it.tier }.distinct())
         assertEquals(5, ranking.excluded.size)
         assertTrue(ranking.candidates.all { it.spectrum == null })
-        val shares = ranking.candidates.map { it.probability!! }
-        assertTrue(shares.sum() < 1_000_000L, shares.toString())
+        assertEquals(
+            Weights.probabilities(ranking.candidates.map { it.score }),
+            ranking.candidates.map { it.probability },
+        )
     }
 
     @Test
@@ -364,6 +366,6 @@ class RankHistoryTest {
     // #endregion
 
     private companion object {
-        const val DRANGLER_SHA = "8e8ee393b035d2c3d4a37c8547e287a0ec776a0f9b82e007cd4c512c6365753d"
+        const val DRANGLER_SHA = "87f3f400ded68a9c56a2153f23ee527d7c2c1ae782235cca1c0e59953d444cc0"
     }
 }

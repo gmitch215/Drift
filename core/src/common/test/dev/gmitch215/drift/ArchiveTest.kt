@@ -338,7 +338,7 @@ class ArchiveTest {
 
     private companion object {
         const val GOLDEN_ARCHIVE =
-            "be4bf6e76aa8e04d152bfd8ba157235c" + "6a6f0480c959b6bbada585e112495ab7"
+            "14c8dc390a7afa0f2739b72b1823d699" + "f6f69e95b64b28bb2ba6339a981123b1"
         const val GOLDEN_REPORT =
             "d9ad60d7a95a4d4d9277f0ba6b42c920" + "62afb85bed6f1d4e0182e28456e2b5e1"
     }

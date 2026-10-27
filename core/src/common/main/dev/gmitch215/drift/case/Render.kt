@@ -131,12 +131,14 @@ object Render {
                             .ifEmpty { "none" },
                     8,
                 )
-                val share = (c["probability"] as? JsonInt)?.value
+                val probability = (c["probability"] as? JsonInt)?.value
                 val fit = (weights["probability"] as? JsonObject)?.get("fit") as? JsonString
-                if (share != null && fit != null) {
+                if (probability != null && fit != null) {
                     out.text(
-                        "probability ${FixedPoint.format(share)}: its share against the other " +
-                            "candidates and none, calibrated on the ${fit.value}",
+                        "probability ${FixedPoint.format(probability)}: its share against the " +
+                            "other candidates and none, mapped to the rate at which candidates " +
+                            "with that share were the cause in the ${fit.value} (fit on them, " +
+                            "not held out)",
                         8,
                     )
                 }

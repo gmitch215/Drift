@@ -160,14 +160,23 @@ object Models {
                 val cause = o.scenario.cause?.path
                 val decoys = o.scenario.decoys.map { it.path }.toSet()
                 val p = if (o.changed.isEmpty()) 0 else Metrics.MICRO / o.changed.size
-                val prior = { path: String ->
-                    Dimension.of(path)?.let { Table.handSet.dimensions[it] } ?: 0L
-                }
-                val byPrior = o.changed.sortedWith(compareBy({ -prior(it) }, { it }))
-                Pred(o, byPrior.map { Entry(it, it == cause, it in decoys, null, false, p) })
+                Pred(
+                    o,
+                    priorOrder(o.changed).map {
+                        Entry(it, it == cause, it in decoys, null, false, p)
+                    },
+                )
             }
         },
     )
+
+    /** The changed attributes, largest hand-set dimension prior first, then path. */
+    fun priorOrder(changed: List<String>): List<String> {
+        val prior = { path: String ->
+            Dimension.of(path)?.let { Table.handSet.dimensions[it] } ?: 0L
+        }
+        return changed.sortedWith(compareBy({ -prior(it) }, { it }))
+    }
 
     private val flat = Table(
         Table.handSet.dimensions.mapValues { Metrics.MICRO },

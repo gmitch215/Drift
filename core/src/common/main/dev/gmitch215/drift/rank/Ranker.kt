@@ -227,8 +227,8 @@ object Ranker {
     private fun withProbabilities(candidates: List<Candidate>): List<Candidate> {
         val covered = candidates.all { c -> c.evidence.all { it.kind == EvidenceKind.ATTRIBUTE } }
         if (!covered) return candidates
-        val shares = Weights.shares(candidates.map { it.score })
-        return candidates.mapIndexed { i, c -> c.copy(probability = shares[i]) }
+        val probabilities = Weights.probabilities(candidates.map { it.score })
+        return candidates.mapIndexed { i, c -> c.copy(probability = probabilities[i]) }
     }
 
     private fun bundle(sorted: List<Candidate>): Pair<List<Candidate>, List<Bundle>> {

@@ -200,7 +200,7 @@ class RankTest {
 
     @Test
     fun theLinkTableNamesRealProbesPrefixesAndAClaimedDimension() {
-        assertEquals(33, ProbeLinks.attributes.size)
+        assertEquals(34, ProbeLinks.attributes.size)
         for ((id, prefixes) in ProbeLinks.attributes) {
             assertTrue(id.substringBefore('.') != "kotlin", id)
             for (prefix in prefixes) assertTrue(Dimension.of(prefix) != null, "$id $prefix")
@@ -353,8 +353,11 @@ class RankTest {
     fun theWeightsSayTheyAreNotCalibrated() {
         assertEquals(false, Weights.CALIBRATED)
         val json = CanonicalJson.encode(StudioState.of(green, red).toJson())
+        val map = Weights.map.joinToString(",", "[", "]") { (from, p) ->
+            """{"from":$from,"p":$p}"""
+        }
         val probability = """"probability":{"calibrated":true,"covers":["attribute"],""" +
-            """"fit":"${Weights.FIT}","none":${Weights.NONE},""" +
+            """"fit":"${Weights.FIT}","map":$map,"none":${Weights.NONE},""" +
             """"uncovered":["probe","rule","spectrum"]}"""
         assertTrue(""""weights":{"calibrated":false,"id":"hand-set-1",$probability}""" in json)
     }
@@ -432,12 +435,13 @@ class RankTest {
     @Test
     fun aLoneAttributeChangeGetsItsShareAgainstNone() {
         val c = rank(go("1.21"), go("1.24")).candidates.single()
-        assertEquals(Weights.shares(listOf(c.score)).single(), c.probability)
-        assertTrue(c.probability!! in 923_000L..923_100L, c.probability.toString())
+        assertEquals(Weights.probabilities(listOf(c.score)).single(), c.probability)
+        assertEquals(750_000L, Weights.shares(listOf(c.score)).single())
+        assertEquals(666_667L, c.probability)
     }
 
     @Test
-    fun sharesAddUpToLessThanOneAndFollowTheScore() {
+    fun probabilitiesFollowTheScore() {
         val a = capsule(
             "a",
             listOf(
@@ -458,10 +462,29 @@ class RankTest {
         )
         val ranked = rank(a, b).candidates
         val p = ranked.map { it.probability!! }
-        assertTrue(p.sum() < FixedPoint.ONE, p.toString())
         assertEquals(p.sortedDescending(), p)
         assertTrue(p.last() < p.first())
-        assertEquals(Weights.shares(ranked.map { it.score }), p)
+        assertEquals(Weights.probabilities(ranked.map { it.score }), p)
+    }
+
+    @Test
+    fun theMapReadsTheLastStepAtOrBelowAShareAndTheFirstStepBelowAllOfThem() {
+        for ((from, p) in Weights.map) {
+            assertEquals(p, Weights.mapped(from), "step $from")
+        }
+        assertEquals(Weights.map.first().second, Weights.mapped(0))
+        assertEquals(Weights.map.last().second, Weights.mapped(FixedPoint.ONE))
+        assertEquals(
+            Weights.map.map { it.second }.sorted(),
+            Weights.map.map { it.second },
+        )
+    }
+
+    @Test
+    fun theProbabilitiesOfARankingNeedNotAddUpToOne() {
+        val tied = Weights.probabilities(List(3) { FixedPoint.ln(3_000_000) })
+        assertEquals(1, tied.distinct().size)
+        assertTrue(tied.sum() > FixedPoint.ONE, tied.toString())
     }
 
     @Test
@@ -694,13 +717,16 @@ class RankTest {
                 "\"weight\":405465}],\"path\":\"env.HOME\",\"probability\":null,\"rules\":[]," +
                 "\"score\":405465,\"spectrum\":null,\"tier\":\"difference\"}],\"unattached\":" +
                 "[],\"weights\":{\"calibrated\":false,\"id\":\"hand-set-1\",\"probability\":{" +
-                "\"calibrated\":true,\"covers\":[\"attribute\"],\"fit\":\"dev split of 49 syn" +
-                "thetic scenarios, seed 20261006\",\"none\":250000,\"uncovered\":[\"probe\"," +
-                "\"rule\",\"spectrum\"]}}}"
+                "\"calibrated\":true,\"covers\":[\"attribute\"],\"fit\":\"dev split of 115 s" +
+                "ynthetic scenarios, seed 20261006\",\"map\":[{\"from\":68,\"p\":34483},{\"" +
+                "from\":35294,\"p\":71429},{\"from\":48193,\"p\":104478},{\"from\":187500,\"" +
+                "p\":176471},{\"from\":217391,\"p\":362319},{\"from\":600000,\"p\":666667}," +
+                "{\"from\":847059,\"p\":666667},{\"from\":900000,\"p\":736842}],\"none\":" +
+                "1000000,\"uncovered\":[\"probe\",\"rule\",\"spectrum\"]}}}"
         val json = CanonicalJson.encode(StudioState.of(green, red, emptyList()).toJson())
         assertEquals(expected, json)
         assertEquals(
-            "9723d44169d407bd8f388dc07aadde16b4574bdb3f31e4671aa366fdd51fafc0",
+            "ee7d31d10b8986b8c83af6165d7c735371893317185a7b78ab55d97c720bf9ec",
             Sha256.hex(json),
         )
     }

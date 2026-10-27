@@ -185,11 +185,12 @@ class RenderTest {
             emptyList(),
         )
         val p = Planner.from(r, Frame.environments("laptop", "runner"), Options(2, 1, 1))
-        val share = FixedPoint.format(r.candidates.single().probability!!)
-        val line = "probability $share: its share against the other candidates and none, " +
-            "calibrated on the ${Weights.FIT}"
+        val value = FixedPoint.format(r.candidates.single().probability!!)
+        val line = "probability $value: its share against the other candidates and none, " +
+            "mapped to the rate at which candidates with that share were the cause in the " +
+            "${Weights.FIT} (fit on them, not held out)"
         assertTrue(line in flat(Render.render(r, p, Detail.FULL)))
-        assertFalse("probability $share" in flat(Render.render(r, p, Detail.DETAIL)))
+        assertFalse("probability $value" in flat(Render.render(r, p, Detail.DETAIL)))
         assertFalse("probability 0" in flat(text(Detail.FULL)))
     }
 

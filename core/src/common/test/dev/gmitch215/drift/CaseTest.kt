@@ -48,9 +48,9 @@ class CaseTest {
         "hypotheses/prior.json" to
             "52b86d80446543b83d2ef343e1de80afd2a805ce23cec5707a2f1bf168405040",
         "hypotheses/ranking.json" to
-            "8e8ee393b035d2c3d4a37c8547e287a0ec776a0f9b82e007cd4c512c6365753d",
+            "87f3f400ded68a9c56a2153f23ee527d7c2c1ae782235cca1c0e59953d444cc0",
         "manifest.json" to
-            "b6d53208e6995a806b75aa70fe3345977958bd322d908f999b05762415d244cb",
+            "a0b1240ff553615b8c9dc935a8af1d993ce0af50abf3ae097adcbe8718854102",
         "observations/0001.json" to
             "fba59c9eb763701f21af088b3aa24736721e56792d1b4bf68d341a3b3abfdb4f",
         "observations/0002.json" to

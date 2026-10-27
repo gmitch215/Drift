@@ -3,7 +3,7 @@
 		{
 			"a": "node:22.12.0-alpine3.20",
 			"archive": "INC-13.driftcase",
-			"archiveSha256": "b4b20bdcb4d3c5e44687564c570fc0be77de505e84607a936720ec18def65aeb",
+			"archiveSha256": "60bd8ea19526c496a17cbd7e0c3665b5e93e284eb095ef05efa2f35f4f6a890b",
 			"b": "node:22.12.0-alpine3.21",
 			"capture": "drift capture --tools --probes inside the image after apk add gcompat (the Linux binary is glibc)",
 			"causeKey": "os.release.VERSION_ID",
@@ -47,7 +47,7 @@
 		{
 			"a": "node:16.13.0",
 			"archive": "INC-07.driftcase",
-			"archiveSha256": "9563f7b5eb41ef680b138675f0666776dab4eb1accf8185e2749ee1786fa5d64",
+			"archiveSha256": "7f1a6d4658f762978cc7a32b7fb7ed06e515d56764f7fb73261b31f7de8d4227",
 			"b": "node:17.0.0",
 			"capture": "drift capture --tools --probes inside each image",
 			"causeKey": "tool.node.version",
@@ -131,7 +131,7 @@
 		{
 			"a": "eclipse-temurin:17 (javac 17.0.20.1)",
 			"archive": "INC-11.driftcase",
-			"archiveSha256": "874b08baea9821f9be9ce6a1416feba9353cde0454d5bc88ab8a6706ea90da37",
+			"archiveSha256": "53e91559c161cbf3be0a15ad99dc42820600e3ecb2672957db8f1dc1d41a33ac",
 			"b": "eclipse-temurin:21 (javac 21.0.12.1)",
 			"capture": "drift capture --tools --probes inside each image",
 			"causeKey": "tool.java.version",
@@ -199,7 +199,7 @@
 		{
 			"a": "node:18.16.0-bullseye-slim",
 			"archive": "INC-12.driftcase",
-			"archiveSha256": "70f99c642d0fa9759fc90f67d41299dfe6662c4bc401caa8cb8a252228326a26",
+			"archiveSha256": "d69b90eb613a9f49833030df2bd6d0be8478bb6a08f655ed49f76ed7f3e90b8f",
 			"b": "node:18.16.0-bookworm-slim",
 			"capture": "drift capture --tools --probes inside each image",
 			"causeKey": "os.release.VERSION_ID",
@@ -243,7 +243,7 @@
 		{
 			"a": "ruby:3.3.6-alpine3.20 with g++ and make (gcc 13.2.1)",
 			"archive": "INC-14.driftcase",
-			"archiveSha256": "fcfbbe202d69494008280582c225a27b98761ac65fa4cfece300050a5eedc398",
+			"archiveSha256": "1c4da134c546c62071abf43c4b409ef1f7ee951a92e283f7854b3a86dde46e53",
 			"b": "ruby:3.3.6-alpine3.21 with g++ and make (gcc 14.2.0)",
 			"capture": "drift capture --tools --probes inside each image after apk add gcompat (the Linux binary is glibc)",
 			"causeKey": "tool.cc.version",

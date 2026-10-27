@@ -69,7 +69,8 @@ data class Spectrum(val ef: Int, val nf: Int, val ep: Int, val score: Long) {
  * [Candidate.coverage] is the lowest per-run coverage of the history behind the spectrum (null
  * without one). A candidate with a [Candidate.bundle] id cannot be told apart from the other
  * members by the data, so it is never the cause on its own. [Candidate.probability] (micro-units)
- * is the candidate's share of the posterior, see [Weights.shares]; it is null unless every
+ * is the candidate's share of the posterior read through the isotonic map of
+ * [Weights.probabilities], fit on the dev scenarios and not held out; it is null unless every
  * candidate of the ranking rests on its attribute change alone.
  */
 data class Candidate(
