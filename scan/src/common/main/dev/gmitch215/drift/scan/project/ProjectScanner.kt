@@ -49,6 +49,8 @@ object ProjectScanner {
             Out("wordpress").also { wordpress(files, it) },
             Out("symfony").also { symfonyConfig(files, it) },
             Out("python").also { python(files, it) },
+            Out("pins").also { pins(files, it) },
+            Out("checksums").also { checksums(files, it) },
             Out("go").also { go(files, it) },
             Out("r").also { renv(files, it) },
             Out("dart").also { pubspec(files, it) },

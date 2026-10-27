@@ -69,9 +69,13 @@ object Redactor {
     // a dotted quad in a version-named env or a v-prefixed value is a version, not an ip
     private fun maskAddresses(name: String, text: String): String {
         val versionShaped = versionName.containsMatchIn(name) || versionValue.containsMatchIn(text)
-        val v4 = if (versionShaped) text else ipv4.replace(text, MASK)
-        return ipv6.replace(v4, MASK)
+        val v4 = if (versionShaped) text else ipv4.replace(text) { maskUnlessLoopback(it) }
+        return ipv6.replace(v4) { maskUnlessLoopback(it) }
     }
+
+    // loopback names no host, and a proxy setting needs it to reproduce
+    private fun maskUnlessLoopback(match: MatchResult): String =
+        if (match.value.startsWith("127.") || match.value == "::1") match.value else MASK
 
     fun redact(attribute: Attribute): Attribute {
         val name = attribute.path.substringAfter("env.", "")

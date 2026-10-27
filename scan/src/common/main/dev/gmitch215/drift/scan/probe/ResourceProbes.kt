@@ -39,4 +39,21 @@ internal val resourceProbes = listOf(
         val env = host.env()
         for (name in listOf("LANG", "LC_ALL", "LC_CTYPE", "TZ")) line(name, env[name])
     },
+    Probe("resources.fs-tmp-fsync", Family.RESOURCES, setOf(Capability.WRITE_FILES)) {
+        val samples = host.syncNanos("/tmp", FSYNC_ROUNDS)?.takeIf { it.isNotEmpty() }
+            ?: error("no write and fsync in /tmp")
+        line("fs.tmp.fsync", fsyncBucket(samples.sorted()[samples.size / 2]))
+    },
 )
+
+private const val FSYNC_ROUNDS = 25
+
+internal fun fsyncBucket(nanos: Long): String = when {
+    nanos < MILLI -> "<1ms"
+    nanos < 10 * MILLI -> "1-10ms"
+    nanos < 100 * MILLI -> "10-100ms"
+    nanos < 1_000 * MILLI -> "100ms-1s"
+    else -> ">1s"
+}
+
+private const val MILLI = 1_000_000L

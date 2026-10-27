@@ -31,6 +31,20 @@ data class CiRequest(
     val out: String? = null,
 )
 
+/** What [CiCheck.fetch] read: the failing run, a passing run if any, and their job logs. */
+class CiRuns(
+    val repo: CiRepo,
+    val provider: CiProviderKind,
+    val failing: CiRunInfo,
+    val passing: CiRunInfo?,
+    val job: CiJobInfo,
+    val jobs: List<CiJobInfo>,
+    val red: Run,
+    val green: Run?,
+    val failingLabel: String,
+    val passingLabel: String?,
+)
+
 sealed interface CiOutcome {
     data class Compared(val report: CiReport) : CiOutcome
 
@@ -49,7 +63,11 @@ object CiCheck {
         CiOutcome.Stopped(e.kind, e.message.orEmpty())
     }
 
-    private fun compare(host: Host, files: CaseFiles, request: CiRequest): CiReport {
+    /**
+     * Finds the failing run and reads its job log into a [Run]. With [needPassing] false a
+     * checkout with no earlier passing run still answers, with [CiRuns.passing] null.
+     */
+    fun fetch(host: Host, request: CiRequest, needPassing: Boolean = true): CiRuns {
         validate(request)
         if (Capability.PROCESS !in host.capabilities) {
             throw CiStop(
@@ -72,28 +90,65 @@ object CiCheck {
             CiProviderKind.GITLAB -> GitlabCi(host, repo.host)
         }
         val failing = provider.failedRun(repo, repo.branch, request.commit, request.run)
-        val passing = provider.passingRun(repo, failing, request.good)
+        val passing = if (needPassing) {
+            provider.passingRun(repo, failing, request.good)
+        } else {
+            try {
+                provider.passingRun(repo, failing, request.good)
+            } catch (e: CiStop) {
+                if (e.kind != CiProblemKind.NO_PASSING_RUN) throw e
+                null
+            }
+        }
         val redSummary = provider.summary(repo, failing)
-        val greenSummary = provider.summary(repo, passing)
         val redJobs = provider.jobs(redSummary)
-        val greenJobs = provider.jobs(greenSummary)
         val redJob = failingJob(redJobs, request.job, failing)
-        val greenJob = greenJobs.filter { it.name == redJob.name }
-            .let { same -> same.lastOrNull { !it.failed } ?: same.lastOrNull() }
-            ?: throw CiStop(
-                CiProblemKind.NO_JOB,
-                "the passing run ${passing.id} has no job named ${redJob.name}; its jobs are " +
-                    "${greenJobs.joinToString(", ") { it.name }}. Pass --good to choose " +
-                    "another passing run or --job to compare another job.",
-            )
-        val redLog = provider.log(repo, failing, redJob)
-        val greenLog = provider.log(repo, passing, greenJob)
-
-        val sameCommit = failing.sha == passing.sha
+        val sameCommit = failing.sha == passing?.sha
         val redLabel = failing.sha.take(SHORT) + if (sameCommit) "@${failing.id}" else ""
-        val greenLabel = passing.sha.take(SHORT) + if (sameCommit) "@${passing.id}" else ""
+        val redLog = provider.log(repo, failing, redJob)
         val red = imported(provider, redLog, redSummary, redLabel, redJob, failing)
-        val green = imported(provider, greenLog, greenSummary, greenLabel, greenJob, passing)
+        var green: Run? = null
+        var greenLabel: String? = null
+        if (passing != null) {
+            val greenSummary = provider.summary(repo, passing)
+            val greenJobs = provider.jobs(greenSummary)
+            val greenJob = greenJobs.filter { it.name == redJob.name }
+                .let { same -> same.lastOrNull { !it.failed } ?: same.lastOrNull() }
+                ?: throw CiStop(
+                    CiProblemKind.NO_JOB,
+                    "the passing run ${passing.id} has no job named ${redJob.name}; its jobs " +
+                        "are ${greenJobs.joinToString(", ") { it.name }}. Pass --good to " +
+                        "choose another passing run or --job to compare another job.",
+                )
+            val greenLog = provider.log(repo, passing, greenJob)
+            greenLabel = passing.sha.take(SHORT) + if (sameCommit) "@${passing.id}" else ""
+            green = imported(provider, greenLog, greenSummary, greenLabel, greenJob, passing)
+        }
+        return CiRuns(
+            repo,
+            kind,
+            failing,
+            passing,
+            redJob,
+            redJobs,
+            red,
+            green,
+            redLabel,
+            greenLabel,
+        )
+    }
+
+    private fun compare(host: Host, files: CaseFiles, request: CiRequest): CiReport {
+        val runs = fetch(host, request)
+        val repo = runs.repo
+        val failing = runs.failing
+        val passing = runs.passing!!
+        val redJob = runs.job
+        val redJobs = runs.jobs
+        val redLabel = runs.failingLabel
+        val greenLabel = runs.passingLabel!!
+        val red = runs.red
+        val green = runs.green!!
         val redCapsule = red.capsule!!
         val greenCapsule = green.capsule!!
 
@@ -107,7 +162,7 @@ object CiCheck {
         write(files, dir, greenLabel to green, redLabel to red, ranking, plan)
         return CiReport(
             repo,
-            kind,
+            runs.provider,
             failing,
             passing,
             redJob.name,

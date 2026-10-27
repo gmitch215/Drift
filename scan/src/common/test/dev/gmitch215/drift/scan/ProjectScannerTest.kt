@@ -43,6 +43,28 @@ class ProjectScannerTest {
         pairs.associate { "$prefix${it.first}" to it.second }
 
     @Test
+    fun aVersionFileOfTheProjectIsAPinForItsTool() {
+        fun pins(files: Map<String, String>) = ProjectScanner.scan(FakeHost(files = files))
+            .filter { it.path.startsWith("project.pins.") }.associate { it.path to it.value }
+        assertEquals(
+            mapOf("project.pins.node" to "18.19.0", "project.pins.python" to "3.9"),
+            pins(mapOf(".nvmrc" to "# lts\nv18.19.0\n", ".python-version" to "3.9\n")),
+        )
+        assertEquals(mapOf("project.pins.node" to "20"), pins(mapOf(".node-version" to "20")))
+        val sum = "3e34e52bb51b5b63087200744a69c631497c49ea948659c7225bcb8e5fef19ac"
+        assertEquals(
+            mapOf("project.checksums.vendor/a.txt" to sum),
+            ProjectScanner.scan(
+                FakeHost(files = mapOf("SHA256SUMS" to "$sum  vendor/a.txt\nbad\n")),
+            )
+                .filter { it.path.startsWith("project.checksums.") }
+                .associate { it.path to it.value },
+        )
+        assertEquals(emptyMap(), pins(mapOf(".nvmrc" to "\n")))
+        assertEquals(emptyMap(), pins(emptyMap()))
+    }
+
+    @Test
     fun composerReadsPlatformConstraintsAndLockedVersionsWithDirectFirst() {
         assertEquals(
             withPrefix(

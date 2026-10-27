@@ -128,6 +128,171 @@ class CaptureTest {
     }
 
     @Test
+    fun limitsComeFromTheProcessLimitsFile() {
+        val got = facts(files = mapOf("/proc/self/limits" to PROC_LIMITS))
+        assertEquals(
+            mapOf(
+                "limits.cpu" to "unlimited:unlimited",
+                "limits.fsize" to "100000:100000",
+                "limits.data" to "unlimited:unlimited",
+                "limits.stack" to "8388608:unlimited",
+                "limits.core" to "0:0",
+                "limits.nproc" to "unlimited:unlimited",
+                "limits.nofile" to "1024:2048",
+                "limits.memlock" to "8388608:8388608",
+                "limits.as" to "unlimited:unlimited",
+            ),
+            got.filterKeys { it.startsWith("limits.") },
+        )
+        val source = Capture.run(
+            FakeHost(files = mapOf("/proc/self/limits" to PROC_LIMITS)),
+            "t",
+        ).attributes.single { it.path == "limits.nofile" }
+        assertEquals("/proc/self/limits", source.source)
+        assertEquals(Stability.STATIC, source.stability)
+    }
+
+    @Test
+    fun theOpenFilesLimitIsLeftOutWhereTheRuntimeRaisesItAtStart() {
+        val files = mapOf("/proc/self/limits" to PROC_LIMITS)
+        for (platform in listOf("jvm", "wasm")) {
+            val got = Capture.run(FakeHost(platform = platform, files = files), "t")
+                .attributes.associate { it.path to it.value }
+            assertNull(got["limits.nofile"], platform)
+            assertEquals("0:0", got["limits.core"], platform)
+        }
+        for (platform in listOf("linux", "ssh", "android")) {
+            val got = Capture.run(FakeHost(platform = platform, files = files), "t")
+                .attributes.associate { it.path to it.value }
+            assertEquals("1024:2048", got["limits.nofile"], platform)
+        }
+    }
+
+    @Test
+    fun noLimitsFileOrAMalformedLineGivesNoAttribute() {
+        fun limitKeys(got: Map<String, String>) = got.keys.filter { it.startsWith("limits.") }
+        assertEquals(emptyList(), limitKeys(facts()))
+        assertEquals(emptyList(), limitKeys(facts(os = "macos")))
+        assertEquals(emptyList(), limitKeys(facts(files = mapOf("/proc/self/limits" to "\n"))))
+        val text = "Max open files            many                 2048                 files\n" +
+            "Max core file size        0                    \n" +
+            "Max file size             -1                   -1                   bytes\n" +
+            "Max processes             4096                 8192                 processes\n"
+        val got = facts(files = mapOf("/proc/self/limits" to text))
+        assertEquals(listOf("limits.nproc"), limitKeys(got))
+        assertEquals("4096:8192", got["limits.nproc"])
+    }
+
+    @Test
+    fun fsTypeIsTheFilesystemOfTheLongestMountThatHoldsThePath() {
+        val mounts = MOUNTINFO + "3800 3739 0:99 / /mnt/with\\040space rw - xfs /dev/x rw\n"
+        assertEquals("overlay", SystemFacts.fsType(mounts, "/"))
+        assertEquals("overlay", SystemFacts.fsType(mounts, "/tmpfile"))
+        assertEquals("tmpfs", SystemFacts.fsType(mounts, "/tmp"))
+        assertEquals("tmpfs", SystemFacts.fsType(mounts, "/tmp/build/out"))
+        assertEquals("ext4", SystemFacts.fsType(mounts, "/bindtest/a.txt"))
+        assertEquals("ext4", SystemFacts.fsType(mounts, "/etc/hosts"))
+        assertEquals("xfs", SystemFacts.fsType(mounts, "/mnt/with space/data"))
+        assertNull(SystemFacts.fsType(null, "/tmp"))
+        assertNull(SystemFacts.fsType(mounts, null))
+        assertNull(SystemFacts.fsType("3739 1 0:1 / / rw\n", "/"))
+    }
+
+    @Test
+    fun localeNamesComeFromTheArchiveAndTheDirectoryListing() {
+        val archive = "\u0000\u0001C\u0000POSIX\u0000en_US.utf8\u0000\u0002de_DE@euro\u0000" +
+            "LC_CTYPE\u0000ab\u0000utf8\u0000"
+        assertEquals(
+            "C,C.utf8,POSIX,de_DE@euro,en_US.utf8",
+            SystemFacts.locales(archive, "C.utf8\nPOSIX\n"),
+        )
+        assertEquals("C.utf8", SystemFacts.locales(null, "C.utf8\nlocale-archive\n"))
+        assertEquals("", SystemFacts.locales(null, ""))
+    }
+
+    @Test
+    fun hostsNamesEveryCustomEntryAndKeepsLoopbackAddresses() {
+        val hosts = "127.0.0.1\tlocalhost\n127.0.1.1\tworkstation\n127.0.0.1 db.internal\n" +
+            "::1\tlocalhost ip6-localhost ip6-loopback\n127.0.0.2 cache.internal api.internal\n" +
+            "fe00::\tip6-localnet\nff02::1\tip6-allnodes\n" +
+            "172.17.0.3\thost\n# 10.0.0.1 commented\n10.0.0.9 vault.internal # note\n"
+        assertEquals(
+            listOf(
+                "db.internal@127.0.0.1",
+                "cache.internal@127.0.0.2",
+                "api.internal@127.0.0.2",
+                "host",
+                "vault.internal",
+            ),
+            SystemFacts.hostNames(hosts),
+        )
+        assertEquals(
+            listOf("vault.internal"),
+            SystemFacts.hostNames("10.0.0.2 f54aee10db6e vault.internal\n", "f54aee10db6e"),
+        )
+        assertEquals(emptyList(), SystemFacts.hostNames("127.0.0.1 localhost\n"))
+        assertNull(SystemFacts.hostNames(null))
+    }
+
+    @Test
+    fun nsswitchRecordsTheSourcesOfTheHostsDatabase() {
+        val text = "# comment\npasswd:         files\nhosts:          files   dns # inline\n"
+        assertEquals("files dns", SystemFacts.nsswitchHosts(text))
+        assertEquals(
+            "files mdns4_minimal [NOTFOUND=return] dns",
+            SystemFacts.nsswitchHosts("hosts: files mdns4_minimal [NOTFOUND=return] dns\n"),
+        )
+        assertNull(SystemFacts.nsswitchHosts("passwd: files\n"))
+        assertNull(SystemFacts.nsswitchHosts(null))
+    }
+
+    @Test
+    fun cpuAffinityCountsTheCpusTheProcessMayUse() {
+        val status = "Name:\tgrep\nCpus_allowed_list:\t0-23\nMems_allowed_list:\t0\n"
+        assertEquals("24", SystemFacts.cpuAffinity(status))
+        assertEquals("7", SystemFacts.cpuAffinity("Cpus_allowed_list:\t0-3,8,10-11\n"))
+        assertEquals("1", SystemFacts.cpuAffinity("Cpus_allowed_list:\t5\n"))
+        assertNull(SystemFacts.cpuAffinity("Cpus_allowed_list:\tx\n"))
+        assertNull(SystemFacts.cpuAffinity("Name:\tgrep\n"))
+    }
+
+    @Test
+    fun newSystemFactsComeFromTheHostAndAreAbsentWithoutTheirSources() {
+        val files = mapOf(
+            "/proc/self/mountinfo" to MOUNTINFO,
+            "/etc/hosts" to "127.0.0.1 localhost\n127.0.0.1\tdb.internal\n172.17.0.3\thost\n",
+            "/etc/nsswitch.conf" to "hosts: dns\n",
+            "/proc/self/status" to "Cpus_allowed_list:\t0-23\n",
+        )
+        val commands = mapOf(
+            listOf("readlink", "/proc/self/cwd") to CommandResult(0, "/work\n"),
+            listOf("ls", "-1", "/usr/lib/locale") to CommandResult(0, "C.utf8\nlocale-archive\n"),
+            listOf("ls", "-1", "/sys/class/net") to CommandResult(0, "lo\neth0\n"),
+        )
+        val got = Capture.run(FakeHost(files = files, commands = commands), "t")
+            .attributes.associate { it.path to it.value }
+        assertEquals("overlay", got["fs.cwd.type"])
+        assertEquals("tmpfs", got["fs.tmp.type"])
+        assertEquals("C.utf8", got["locale.installed"])
+        assertEquals("db.internal@127.0.0.1,host", got["network.hosts.names"])
+        assertEquals("dns", got["network.nsswitch.hosts"])
+        assertEquals("eth0,lo", got["network.interfaces"])
+        assertEquals("24", got["cpu.affinity"])
+
+        val bare = facts(os = "macos")
+        val absent = listOf(
+            "fs.tmp.type",
+            "fs.cwd.type",
+            "locale.installed",
+            "network.hosts.names",
+            "network.nsswitch.hosts",
+            "network.interfaces",
+            "cpu.affinity",
+        )
+        for (path in absent) assertNull(bare[path], path)
+    }
+
+    @Test
     fun memoryLimitIsPresentOnlyWhenTheCgroupCapsMemory() {
         val key = "cgroup.memory.limit"
         val v2 = "/sys/fs/cgroup/memory.max"
@@ -415,6 +580,125 @@ class CaptureTest {
         assertEquals("al went to alabama; usertools stay", byPath.getValue("env.NOTE").value)
         assertEquals("/home/user/bin:~/bin", byPath.getValue("env.PATH").value)
     }
+
+    @Test
+    fun shellFlavorIsTheBaseNameOfWhatBinShLinksTo() {
+        assertEquals("dash", SystemFacts.shellName("/usr/bin/dash\n"))
+        assertEquals("busybox", SystemFacts.shellName("/bin/busybox"))
+        assertNull(SystemFacts.shellName("/bin/sh\n"))
+        assertNull(SystemFacts.shellName("dash"))
+        assertNull(SystemFacts.shellName(""))
+        assertNull(SystemFacts.shellName(null))
+        val link = FakeHost(
+            commands = mapOf(
+                listOf("readlink", "-f", "/bin/sh") to CommandResult(0, "/usr/bin/bash\n"),
+            ),
+        )
+        assertEquals(
+            "bash",
+            Capture.run(link, "t").attributes.single { it.path == "tool.sh.flavor" }.value,
+        )
+        assertNull(facts()["tool.sh.flavor"])
+        assertNull(facts(os = "windows")["tool.sh.flavor"])
+    }
+
+    @Test
+    fun kernelSettingsAndClockSourceAreOneWordFromTheirFixedFiles() {
+        val got = facts(
+            files = mapOf(
+                "/proc/sys/vm/max_map_count" to "262144\n",
+                "/proc/sys/fs/file-max" to "9223372036854775807\n",
+                "/proc/sys/net/core/somaxconn" to "4096 8192\n",
+                "/proc/sys/vm/swappiness" to "60\n",
+                "/sys/devices/system/clocksource/clocksource0/current_clocksource" to "kvm-clock\n",
+            ),
+        )
+        assertEquals("262144", got["sysctl.vm.max_map_count"])
+        assertEquals("9223372036854775807", got["sysctl.fs.file-max"])
+        assertEquals("kvm-clock", got["clock.source"])
+        assertNull(got["sysctl.net.core.somaxconn"])
+        assertNull(got["sysctl.vm.swappiness"])
+        assertNull(facts()["clock.source"])
+        assertNull(facts()["sysctl.vm.max_map_count"])
+    }
+
+    @Test
+    fun ipv6IsTrueOnlyWhenANonLoopbackAddressIsListed() {
+        val loopback = "00000000000000000000000000000001 01 80 10 80       lo\n"
+        val global = "20010db8000000000000000000000001 02 40 00 80 eth0\n"
+        assertEquals(
+            "true",
+            facts(files = mapOf("/proc/net/if_inet6" to loopback + global))["network.ipv6"],
+        )
+        assertEquals(
+            "false",
+            facts(files = mapOf("/proc/net/if_inet6" to loopback))["network.ipv6"],
+        )
+        assertNull(facts()["network.ipv6"])
+        val disabled = "/proc/sys/net/ipv6/conf/all/disable_ipv6"
+        assertEquals("true", facts(files = mapOf(disabled to "1\n"))["network.ipv6.disabled"])
+        assertEquals("false", facts(files = mapOf(disabled to "0\n"))["network.ipv6.disabled"])
+        assertNull(facts(files = mapOf(disabled to "maybe\n"))["network.ipv6.disabled"])
+    }
+
+    @Test
+    fun resolverFilesGiveCountsAndFlagsButNeverAnAddressOrName() {
+        val text = "# generated\nsearch corp.example internal.example\n" +
+            "nameserver 127.0.0.53\noptions edns0 ndots:5 timeout:2\n"
+        val host = FakeHost(files = mapOf("/etc/resolv.conf" to text))
+        val got = Capture.run(host, "t").attributes.associate { it.path to it.value }
+        assertEquals("1", got["network.dns.nameservers"])
+        assertEquals("true", got["network.dns.loopback"])
+        assertEquals("2", got["network.dns.search"])
+        assertEquals("edns0,ndots,timeout", got["network.dns.options"])
+        val canonical = Capture.run(host, "t").canonical()
+        assertFalse("127.0.0.53" in canonical, canonical)
+        assertFalse("corp.example" in canonical, canonical)
+    }
+
+    @Test
+    fun resolverLoopbackNeedsEveryServerLocalAndCountsAreZeroWhenEmpty() {
+        val mixed = "nameserver 127.0.0.53\nnameserver 10.0.0.2\n"
+        val got = facts(files = mapOf("/etc/resolv.conf" to mixed))
+        assertEquals("2", got["network.dns.nameservers"])
+        assertEquals("false", got["network.dns.loopback"])
+        assertNull(got["network.dns.search"])
+        assertNull(got["network.dns.options"])
+        val empty = facts(files = mapOf("/etc/resolv.conf" to "# none\n"))
+        assertEquals("0", empty["network.dns.nameservers"])
+        assertNull(empty["network.dns.loopback"])
+        val domain = facts(files = mapOf("/etc/resolv.conf" to "domain a.example\n"))
+        assertEquals("1", domain["network.dns.search"])
+        assertNull(facts()["network.dns.nameservers"])
+    }
 }
 
 private val OS_NAMES = setOf("linux", "macos", "windows", "android", "ios", "freebsd", "unknown")
+
+private val PROC_LIMITS = """
+    Limit                     Soft Limit           Hard Limit           Units
+    Max cpu time              unlimited            unlimited            seconds
+    Max file size             100000               100000               bytes
+    Max data size             unlimited            unlimited            bytes
+    Max stack size            8388608              unlimited            bytes
+    Max core file size        0                    0                    bytes
+    Max resident set          unlimited            unlimited            bytes
+    Max processes             unlimited            unlimited            processes
+    Max open files            1024                 2048                 files
+    Max locked memory         8388608              8388608              bytes
+    Max address space         unlimited            unlimited            bytes
+    Max file locks            unlimited            unlimited            locks
+    Max pending signals       123739               123739               signals
+    Max msgqueue size         819200               819200               bytes
+    Max nice priority         0                    0
+    Max realtime priority     0                    0
+    Max realtime timeout      unlimited            unlimited            us
+""".trimIndent()
+
+private val MOUNTINFO = """
+3739 155 0:61 / / rw,relatime - overlay overlay rw,lowerdir=/l,upperdir=/u,workdir=/w,nouserxattr
+3741 3739 0:182 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw
+3783 3739 0:187 / /tmp rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs rw,inode64
+3784 3739 252:0 /srv/bind-src /bindtest ro,relatime - ext4 /dev/mapper/vg-lv rw
+3789 3739 259:0 /docker/containers/0123abcd/hosts /etc/hosts rw,relatime - ext4 /dev/nvme0n1 rw
+""".trimIndent() + "\n"

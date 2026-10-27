@@ -9,6 +9,7 @@ import dev.gmitch215.drift.redact.Redactor
 import dev.gmitch215.drift.scan.probe.Probe
 import dev.gmitch215.drift.scan.probe.ProbeRunner
 import dev.gmitch215.drift.scan.project.ProjectScanner
+import dev.gmitch215.drift.scan.scanner.ProjectTools
 import dev.gmitch215.drift.scan.scanner.Scanners
 
 object Capture {
@@ -82,7 +83,10 @@ object Capture {
         for ((path, attr) in CGROUP_FILES) add(attr, host.readText(path), path)
         SystemFacts.scan(host).forEach { attrs[it.path] = it }
 
-        if (tools) Scanners.scan(host).forEach { attrs[it.path] = it }
+        if (tools && transport == null) {
+            Scanners.scan(host).forEach { attrs[it.path] = it }
+            ProjectTools.scan(host).forEach { attrs[it.path] = it }
+        }
         if (project) ProjectScanner.scan(host).forEach { attrs[it.path] = it }
         if (hardware) host.facts().forEach { attrs[it.path] = it }
 

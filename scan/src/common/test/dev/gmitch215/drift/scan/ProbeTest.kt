@@ -10,6 +10,7 @@ import dev.gmitch215.drift.rank.ProbeLinks
 import dev.gmitch215.drift.scan.probe.Catalog
 import dev.gmitch215.drift.scan.probe.Family
 import dev.gmitch215.drift.scan.probe.ProbeRunner
+import dev.gmitch215.drift.scan.probe.fsyncBucket
 import dev.gmitch215.drift.scan.scanner.Scanners
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -199,6 +200,7 @@ class ProbeTest {
                 "/etc/os-release" to "ID=alpine\n",
                 "/sys/fs/cgroup/cpu.max" to "max 100000\n",
                 "/sys/fs/cgroup/memory.max" to "max\n",
+                "/proc/self/mountinfo" to "3 1 0:1 / / rw - overlay overlay rw\n",
             ),
         )
         val paths = Capture.run(host, "t").attributes.map { it.path } +
@@ -208,5 +210,27 @@ class ProbeTest {
                 assertTrue(paths.any { it.startsWith(prefix) }, "$id names no attribute: $prefix")
             }
         }
+    }
+
+    @Test
+    fun fsyncBucketsTheMedianOfTheWriteAndSyncTimes() {
+        assertEquals("<1ms", fsyncBucket(999_999))
+        assertEquals("1-10ms", fsyncBucket(1_000_000))
+        assertEquals("1-10ms", fsyncBucket(9_999_999))
+        assertEquals("10-100ms", fsyncBucket(10_000_000))
+        assertEquals("100ms-1s", fsyncBucket(999_999_999))
+        assertEquals(">1s", fsyncBucket(1_000_000_000))
+    }
+
+    @Test
+    fun theFsyncProbeReportsTheBucketOrIsUnavailable() {
+        val probe = Catalog.all.single { it.id == "resources.fs-tmp-fsync" }
+        val slow = ProbeRunner.run(FakeHost(sync = List(25) { 40_000_000L }), probe)
+        assertEquals(ProbeStatus.OK, slow.status)
+        assertEquals("fs.tmp.fsync = 10-100ms\n", slow.transcript)
+        assertEquals(ProbeStatus.UNAVAILABLE, ProbeRunner.run(FakeHost(), probe).status)
+        val wasm = ProbeRunner.run(FakeHost(platform = "wasm", capabilities = emptySet()), probe)
+        assertEquals(ProbeStatus.UNAVAILABLE, wasm.status)
+        assertEquals("requires write_files\n", wasm.transcript)
     }
 }

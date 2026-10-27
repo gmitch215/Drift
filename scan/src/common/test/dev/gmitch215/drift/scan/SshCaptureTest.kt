@@ -5,6 +5,8 @@ import dev.gmitch215.drift.host.FakeHost
 import dev.gmitch215.drift.host.FakeSsh
 import dev.gmitch215.drift.host.SshHost
 import dev.gmitch215.drift.host.SshTarget
+import dev.gmitch215.drift.scan.scanner.Scanners
+import dev.gmitch215.drift.scan.scanner.ToolRegistry
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -17,6 +19,7 @@ private val LINUX_FILES = mapOf(
     "/sys/fs/cgroup/memory.max" to "4294967296\n",
     "/proc/self/cgroup" to "0::/user.slice\n",
     "/proc/cmdline" to "BOOT_IMAGE=/vmlinuz quiet\n",
+    "/proc/self/limits" to "Max open files  1024  4096  files\n",
 )
 
 private val LINUX_COMMANDS = mapOf(
@@ -48,6 +51,7 @@ class SshCaptureTest {
         assertEquals("8", byPath.getValue("cpu.count").value)
         assertEquals("200000 100000", byPath.getValue("cgroup.cpu.max").value)
         assertEquals("v2", byPath.getValue("cgroup.version").value)
+        assertEquals("1024:4096", byPath.getValue("limits.nofile").value)
         assertEquals("quiet", byPath.getValue("kernel.cmdline").value)
         assertEquals("Asia/Tokyo", byPath.getValue("tz.system-zone").value)
         assertEquals("Asia/Tokyo", byPath.getValue("env.TZ").value)
@@ -93,24 +97,59 @@ class SshCaptureTest {
         assertEquals(
             listOf(
                 listOf("cat", "/etc/crypto-policies/config"),
+                listOf("cat", "/etc/hosts"),
+                listOf("cat", "/etc/nsswitch.conf"),
                 listOf("cat", "/etc/os-release"),
+                listOf("cat", "/etc/resolv.conf"),
                 listOf("cat", "/proc/cmdline"),
+                listOf("cat", "/proc/net/if_inet6"),
                 listOf("cat", "/proc/self/cgroup"),
+                listOf("cat", "/proc/self/limits"),
+                listOf("cat", "/proc/self/mountinfo"),
+                listOf("cat", "/proc/self/status"),
+                listOf("cat", "/proc/sys/fs/file-max"),
+                listOf("cat", "/proc/sys/fs/inotify/max_user_instances"),
+                listOf("cat", "/proc/sys/fs/inotify/max_user_watches"),
                 listOf("cat", "/proc/sys/kernel/apparmor_restrict_unprivileged_userns"),
+                listOf("cat", "/proc/sys/kernel/pid_max"),
+                listOf("cat", "/proc/sys/kernel/threads-max"),
+                listOf("cat", "/proc/sys/net/core/somaxconn"),
+                listOf("cat", "/proc/sys/net/ipv6/conf/all/disable_ipv6"),
+                listOf("cat", "/proc/sys/vm/max_map_count"),
+                listOf("cat", "/sys/devices/system/clocksource/clocksource0/current_clocksource"),
                 listOf("cat", "/sys/fs/cgroup/cpu.max"),
                 listOf("cat", "/sys/fs/cgroup/memory.max"),
                 listOf("cat", "/sys/fs/cgroup/memory/memory.limit_in_bytes"),
+                listOf("cat", "/usr/lib/locale/locale-archive"),
                 listOf("cat", "/usr/share/zoneinfo/+VERSION"),
                 listOf("cat", "/usr/share/zoneinfo/tzdata.zi"),
                 listOf("env"),
                 listOf("getconf", "_NPROCESSORS_ONLN"),
+                listOf("ls", "-1", "/sys/class/net"),
+                listOf("ls", "-1", "/usr/lib/locale"),
+                listOf("readlink", "-f", "/bin/sh"),
                 listOf("readlink", "/etc/localtime"),
+                listOf("readlink", "/proc/self/cwd"),
                 listOf("uname", "-r"),
                 listOf("uname", "-sm"),
             ),
             base.remoteRan.distinct().sortedBy { it.joinToString(" ") },
         )
-        assertEquals(17, base.remoteRan.size)
+        assertEquals(38, base.remoteRan.size)
+    }
+
+    @Test
+    fun toolScannersNeverRunOverSsh() {
+        val base = linux()
+        val remote = SshHost.open(base, SshTarget.parse("me@build-02")!!)
+        try {
+            val capsule = Capture.run(remote, "remote", tools = true, transport = "ssh")
+            assertTrue(capsule.attributes.none { it.path.startsWith("tool.") })
+        } finally {
+            remote.close()
+        }
+        val versions = (Scanners.all + ToolRegistry.all).map { it.command }
+        assertTrue(base.remoteRan.none { it in versions }, base.remoteRan.toString())
     }
 
     @Test

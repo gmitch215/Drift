@@ -12,8 +12,11 @@ class FakeHost(
     private val canRun: Boolean = true,
     private val facts: List<Attribute> = emptyList(),
     override val capabilities: Set<Capability> = Capability.entries.toSet(),
+    private val sync: List<Long>? = null,
 ) : Host {
     val ran = mutableListOf<List<String>>()
+
+    override fun syncNanos(dir: String, rounds: Int): List<Long>? = sync
 
     override fun env(): Map<String, String> = env
 

@@ -10,7 +10,7 @@ data class ResourceUsage(val userMs: Long?, val systemMs: Long?, val peakKb: Lon
 
 data class CommandResult(val exitCode: Int, val output: String, val usage: ResourceUsage? = null)
 
-enum class Capability { PROCESS, FILES, ENV }
+enum class Capability { PROCESS, FILES, ENV, WRITE_FILES }
 
 interface Host {
     val platform: String
@@ -38,6 +38,9 @@ interface Host {
         if (it.output.isNotEmpty()) onOutput(it.output)
         it.copy(output = "")
     }
+
+    /** Nanoseconds per write-and-fsync of a 4 KiB file in [dir], or null when the host cannot. */
+    fun syncNanos(dir: String, rounds: Int): List<Long>? = null
 
     fun facts(): List<Attribute> = emptyList()
 }

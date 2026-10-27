@@ -390,6 +390,11 @@ class DiffTest {
             "env.NO_PROXY" to Dimension.NETWORK,
             "limits.nofile" to Dimension.LIMITS,
             "network.loopback" to Dimension.NETWORK,
+            "network.hosts.names" to Dimension.NETWORK,
+            "network.interfaces" to Dimension.NETWORK,
+            "locale.installed" to Dimension.LOCALE,
+            "cpu.affinity" to Dimension.CPU,
+            "fs.tmp.type" to Dimension.OS,
             "browser.engine" to Dimension.BROWSER,
         )
         for ((path, dimension) in table) assertEquals(dimension, Dimension.of(path), path)
@@ -511,6 +516,28 @@ class DiffTest {
             )
             assertReversal(green, red)
         }
+    }
+
+    @Test
+    fun aSoftAndHardLimitPairIsALimitsChangeWithNoOrder() {
+        for ((before, after) in listOf(
+            "1024:1024" to "64:64",
+            "1024:1048576" to "1024:2048",
+            "unlimited:unlimited" to "0:0",
+        )) {
+            val diff = CapsuleDiff.diff(
+                capsule(attr("limits.core", before)),
+                capsule(attr("limits.core", after)),
+            )
+            val change = diff.changes.single()
+            assertEquals(Dimension.LIMITS, change.dimension)
+            assertEquals(DiffKind.CHANGED, change.kind)
+            assertEquals(Order.UNORDERED, change.order, "$before to $after")
+            assertEquals(before, change.before)
+            assertEquals(after, change.after)
+        }
+        val same = capsule(attr("limits.nofile", "1024:2048"))
+        assertTrue(CapsuleDiff.diff(same, same).isEmpty)
     }
 
     @Test

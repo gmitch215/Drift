@@ -291,6 +291,22 @@ class SshHostTest {
     }
 
     @Test
+    fun theLocaleAndNetworkReadsAreAllowedAndTheWriteProbeIsNot() {
+        val base = FakeSsh(
+            remoteFiles = mapOf("/etc/hosts" to "127.0.0.1 localhost\n"),
+            remoteCommands = mapOf(
+                listOf("ls", "-1", "/sys/class/net") to CommandResult(0, "lo\n"),
+            ),
+        )
+        val host = SshHost.open(base, target())
+        assertEquals("127.0.0.1 localhost\n", host.readText("/etc/hosts"))
+        assertEquals("lo\n", host.run(listOf("ls", "-1", "/sys/class/net"))?.output)
+        assertFailsWith<SshRefused> { host.run(listOf("ls", "-1", "/root")) }
+        assertFalse(Capability.WRITE_FILES in host.capabilities)
+        assertNull(host.syncNanos("/tmp", 25))
+    }
+
+    @Test
     fun theRemoteSystemComesFromUname() {
         val mac = SshHost.open(FakeSsh(uname = "Darwin arm64"), target())
         assertEquals("macos", mac.os)
