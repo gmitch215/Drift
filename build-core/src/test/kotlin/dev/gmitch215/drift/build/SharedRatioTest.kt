@@ -85,25 +85,25 @@ class SharedRatioTest {
     )
 
     @Test
-    fun readmeLineNamesEveryModuleAndTheTotal() {
-        val line = SharedRatio.readmeLine(sample)
+    fun pageLineNamesEveryModuleAndTheTotal() {
+        val line = SharedRatio.pageLine(sample)
         assertTrue("Shared code 83.3%: host 50.0%, core 100.0%" in line, line)
-        assertTrue(SharedRatio.README_MARKER in line)
+        assertTrue(SharedRatio.MARKER in line)
     }
 
     @Test
-    fun withReadmeLineReplacesOnlyTheMarkedLineAndKeepsItsIndent() {
+    fun withPageLineReplacesOnlyTheMarkedLineAndKeepsItsIndent() {
         val text = "# Title\n    <p data-shared-ratio>old</p>\ntail\n"
-        val updated = SharedRatio.withReadmeLine(text, sample)!!
+        val updated = SharedRatio.withPageLine(text, sample)!!
         val lines = updated.lines()
         assertEquals("# Title", lines[0])
-        assertEquals("    " + SharedRatio.readmeLine(sample), lines[1])
+        assertEquals("    " + SharedRatio.pageLine(sample), lines[1])
         assertEquals("tail", lines[2])
-        assertEquals(updated, SharedRatio.withReadmeLine(updated, sample))
+        assertEquals(updated, SharedRatio.withPageLine(updated, sample))
     }
 
     @Test
-    fun withReadmeLineIsNullWithoutAMarker() {
-        assertEquals(null, SharedRatio.withReadmeLine("no marker\n", sample))
+    fun withPageLineIsNullWithoutAMarker() {
+        assertEquals(null, SharedRatio.withPageLine("no marker\n", sample))
     }
 }

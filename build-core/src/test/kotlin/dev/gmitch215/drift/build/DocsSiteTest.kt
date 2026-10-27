@@ -14,10 +14,11 @@ import kotlin.test.assertTrue
 class DocsSiteTest {
     private class Repo(val root: File) {
         val template = "<title><!-- title --></title><meta content=\"<!-- description -->\">" +
-            "<nav><!-- nav --></nav><!-- hero --><main><!-- readme --></main><!-- pager -->"
+            "<nav><!-- nav --></nav><!-- guides --><!-- hero -->" +
+            "<main><!-- readme --></main><!-- pager -->"
         val icons = root.resolve("assets").also {
             it.mkdirs()
-            for (name in listOf("drift.png", "drift_128.png", "drift.ico")) {
+            for (name in listOf("drift.png", "drift_128.png", "drift.ico", "docs-render.js")) {
                 it.resolve(name).writeBytes(byteArrayOf(1, 2, 3))
             }
         }
@@ -38,8 +39,17 @@ class DocsSiteTest {
                     "    <div align=\"center\">\n    <img src=\"b\">\n    </div>\n</div>\n" +
                     "\n---\n\n" +
                     "## Start Here\n\nSee [usage](./ADVANCED_USAGE.md#run-it) " +
-                    "and [more](#start-here).\n\n## What It Does\n\n## Install and Run\n\n" +
+                    "and [more](#start-here).\n\n## What It Looks At\n\n## Install and Run\n\n" +
                     "## Try It\n",
+            )
+            root.resolve("docs").mkdirs()
+            for (page in DocsSiteBuilder.PAGES.filter { it.guide }) {
+                root.resolve(page.source).writeText("# ${page.title}\n\n## Part\n")
+            }
+            root.resolve("docs/install.md").writeText(
+                "# Install\n\nSee [usage](../ADVANCED_USAGE.md#run-it), " +
+                    "[limits](limits.md#part), " +
+                    "[home](../README.md) and [manual](../MANUAL.md).\n",
             )
             root.resolve("docs/manual").mkdirs()
             root.resolve("docs/manual/home.png").writeBytes(byteArrayOf(7, 7))
@@ -86,8 +96,11 @@ class DocsSiteTest {
         r.assemble()
         assertEquals(
             setOf(
-                "index.html", "manual.html", "advanced-usage.html", "technical-report.html",
+                "index.html", "docs.html", "why.html", "install.html", "try-it.html",
+                "portability-atlas.html", "architecture.html", "shared-code.html", "limits.html",
+                "manual.html", "advanced-usage.html", "technical-report.html",
                 "docs/manual/home.png", "drift.png", "drift_128.png", "drift.ico",
+                "docs-render.js",
                 "atlas/index.html", "engine/index.html", ".nojekyll", "CNAME",
             ),
             tree(r.out).keys,
@@ -165,9 +178,9 @@ class DocsSiteTest {
         val hrefs = Regex("href=\"([^\"]+)\"").findAll(path).map { it.groupValues[1] }.toList()
         assertEquals(
             listOf(
-                "index.html#what-it-does",
-                "index.html#install-and-run",
-                "index.html#try-it",
+                "index.html#what-it-looks-at",
+                "install.html",
+                "try-it.html",
                 "advanced-usage.html",
                 "technical-report.html",
             ),
@@ -180,9 +193,9 @@ class DocsSiteTest {
     fun aStepThatPointsAtAMissingHeadingFailsTheBuild() {
         val r = repo()
         r.root.resolve("README.md").writeText(
-            r.root.resolve("README.md").readText().replace("## Try It", "## Tried"),
+            r.root.resolve("README.md").readText().replace("## What It Looks At", "## Looks"),
         )
-        failure(r, "Diagnose", "index.html#try-it", "no such heading")
+        failure(r, "Learn", "index.html#what-it-looks-at", "no such heading")
     }
 
     @Test
@@ -191,9 +204,12 @@ class DocsSiteTest {
         r.assemble()
         val front = r.html("index.html")
         assertFalse("rel=\"prev\"" in front)
-        assertTrue("href=\"manual.html\" rel=\"next\"" in front)
+        assertTrue("href=\"docs.html\" rel=\"next\"" in front)
+        val limits = r.html("limits.html")
+        assertTrue("href=\"shared-code.html\" rel=\"prev\"" in limits)
+        assertTrue("href=\"manual.html\" rel=\"next\"" in limits)
         val manual = r.html("manual.html")
-        assertTrue("href=\"index.html\" rel=\"prev\"" in manual)
+        assertTrue("href=\"limits.html\" rel=\"prev\"" in manual)
         assertTrue("href=\"advanced-usage.html\" rel=\"next\"" in manual)
         val usage = r.html("advanced-usage.html")
         assertTrue("href=\"manual.html\" rel=\"prev\"" in usage)
@@ -206,7 +222,7 @@ class DocsSiteTest {
     @Test
     fun aTemplateWithoutAPlaceholderFailsAndNamesIt() {
         val r = repo()
-        for (slot in listOf("title", "description", "nav", "hero", "pager", "readme")) {
+        for (slot in listOf("title", "description", "nav", "guides", "hero", "pager", "readme")) {
             val broken = r.template.replace("<!-- $slot -->", "")
             val message = assertFailsWith<DocsSiteException> { r.assemble(broken) }.message!!
             assertTrue("<!-- $slot -->" in message, message)
@@ -235,7 +251,7 @@ class DocsSiteTest {
         assertTrue("<a href=\"advanced-usage.html\" aria-current=\"page\">Usage</a>" in usage)
         assertFalse("<a class=\"brand\" href=\"index.html\" aria-current" in usage)
         assertEquals(1, Regex("aria-current").findAll(usage.substringBefore("</nav>")).count())
-        for (label in listOf("Manual", "Usage", "Report", "Atlas", "Engine", "GitHub")) {
+        for (label in listOf("Guides", "Manual", "Usage", "Report", "Atlas", "Engine", "GitHub")) {
             assertTrue(">$label</a>" in usage, label)
         }
         assertTrue("<a href=\"atlas/#atlas\">Atlas</a>" in usage)
@@ -295,6 +311,59 @@ class DocsSiteTest {
     }
 
     @Test
+    fun guidesRenderAsPagesWithLinksResolvedFromTheirOwnFolder() {
+        val r = repo()
+        r.assemble()
+        val install = r.html("install.html")
+        assertTrue("<title>Install - Drift</title>" in install, install)
+        assertTrue("<a href=\"advanced-usage.html#run-it\">usage</a>" in install, install)
+        assertTrue("<a href=\"limits.html#part\">limits</a>" in install)
+        assertTrue("<a href=\"index.html\">home</a>" in install)
+        assertTrue("<a href=\"manual.html\">manual</a>" in install)
+        assertEquals(0, SiteLinks.scan(r.out).broken.size)
+    }
+
+    @Test
+    fun guidePagesCarryTheGuideListAndTheOtherPagesDoNot() {
+        val r = repo()
+        r.assemble()
+        val guide = r.html("limits.html")
+        val list = guide.substringAfter("<div class=\"guides\">").substringBefore("</div>")
+        val hrefs = Regex("href=\"([^\"]+)\"").findAll(list).map { it.groupValues[1] }.toList()
+        assertEquals(
+            listOf(
+                "docs.html",
+                "why.html",
+                "install.html",
+                "try-it.html",
+                "portability-atlas.html",
+                "architecture.html",
+                "shared-code.html",
+                "limits.html",
+            ),
+            hrefs,
+        )
+        assertTrue("<a href=\"limits.html\" aria-current=\"page\">Limits</a>" in list, list)
+        assertTrue("<a href=\"docs.html\" aria-current=\"page\">Guides</a>" in guide)
+        assertFalse("class=\"guides\"" in r.html("advanced-usage.html"))
+        assertFalse("class=\"guides\"" in r.html("index.html"))
+    }
+
+    @Test
+    fun aGuideLinkToAMissingFileOrHeadingFailsTheBuild() {
+        val r = repo()
+        val limits = r.root.resolve("docs/limits.md")
+        limits.writeText("# Limits\n\n## Part\n\n[x](nope.md)\n")
+        failure(r, "docs/limits.md", "nope.md", "not a file or directory")
+        limits.writeText("# Limits\n\n## Part\n\n[x](install.md#absent)\n")
+        failure(r, "docs/limits.md", "docs/install.md#absent", "no such heading")
+        limits.writeText("# Limits\n\n## Part\n\n[x](../../outside.md)\n")
+        failure(r, "outside the repository")
+        limits.delete()
+        failure(r, "docs/limits.md", "does not exist")
+    }
+
+    @Test
     fun aMissingIconIsRefusedAndTheSameInputsGiveTheSameBytes() {
         val r = repo()
         r.out.resolve("stale").mkdirs()
@@ -306,6 +375,9 @@ class DocsSiteTest {
         assertEquals(first, tree(r.out))
         r.icons.resolve("drift.ico").delete()
         failure(r, "drift.ico")
+        r.icons.resolve("drift.ico").writeBytes(byteArrayOf(1))
+        r.icons.resolve("docs-render.js").delete()
+        failure(r, "docs-render.js")
     }
 
     @Test
@@ -403,9 +475,14 @@ class DocsSiteTest {
         val front = out.resolve("index.html").readText()
         assertTrue("href=\"advanced-usage.html\"" in front)
         assertTrue("href=\"technical-report.html" in front)
-        assertTrue("<h2 id=\"install-and-run\">Install and Run</h2>" in front)
-        assertTrue("<h2 id=\"the-kotlin-portability-atlas\">" in front)
-        assertTrue("href=\"advanced-usage.html#install-and-uninstall\"" in front)
+        assertTrue("<h2 id=\"try-it\">Try It</h2>" in front)
+        assertTrue("href=\"install.html\"" in front && "href=\"limits.html\"" in front)
+        val install = out.resolve("install.html").readText()
+        assertTrue("href=\"advanced-usage.html#install-and-uninstall\"" in install)
+        assertTrue("<h2 id=\"build-from-source\">" in install)
+        val architecture = out.resolve("architecture.html").readText()
+        assertTrue("<code class=\"language-mermaid\">flowchart TD" in architecture)
+        assertTrue(out.resolve("docs-render.js").isFile)
         val hrefs = Regex("href=\"[^\"]*\"").findAll(front).joinToString { it.value }
         assertFalse("ADVANCED_USAGE.md" in hrefs)
         assertTrue("<h2 id=\"command-index\">" in out.resolve("advanced-usage.html").readText())
@@ -420,7 +497,7 @@ class DocsSiteTest {
         for (page in DocsSiteBuilder.PAGES) {
             val html = out.resolve(page.file).readText()
             assertFalse("<!--" in html, page.file)
-            assertTrue("<table>" in html && "language-" in html, page.file)
+            if (!page.guide) assertTrue("<table>" in html && "language-" in html, page.file)
         }
     }
 }

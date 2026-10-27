@@ -30,13 +30,14 @@ import java.net.URLDecoder
 
 class DocsSiteException(message: String) : RuntimeException(message)
 
-/** A Markdown file at the repository root and the page it becomes. */
+/** A Markdown file in the repository and the page it becomes. */
 class DocsPage(
     val source: String,
     val file: String,
     val title: String,
     val description: String,
     val front: Boolean = false,
+    val guide: Boolean = false,
 )
 
 abstract class DocsSite : DefaultTask() {
@@ -93,10 +94,10 @@ object DocsSiteBuilder {
     const val PLACEHOLDER = "<!-- readme -->"
 
     private val SLOTS =
-        listOf("title", "description", "nav", "hero", "pager").map { "<!-- $it -->" } +
+        listOf("title", "description", "nav", "guides", "hero", "pager").map { "<!-- $it -->" } +
             PLACEHOLDER
 
-    private val ICONS = listOf("drift.png", "drift_128.png", "drift.ico")
+    private val ASSETS = listOf("drift.png", "drift_128.png", "drift.ico", "docs-render.js")
 
     val PAGES = listOf(
         DocsPage(
@@ -105,6 +106,62 @@ object DocsSiteBuilder {
             "Drift",
             "Why it passes here and fails there",
             front = true,
+        ),
+        DocsPage(
+            "docs/README.md",
+            "docs.html",
+            "Documentation",
+            "The guides, the manual and the reference documents.",
+            guide = true,
+        ),
+        DocsPage(
+            "docs/why.md",
+            "why.html",
+            "Why",
+            "Every flow of drift why, with real output.",
+            guide = true,
+        ),
+        DocsPage(
+            "docs/install.md",
+            "install.html",
+            "Install",
+            "Downloads, package managers, the install script and building from source.",
+            guide = true,
+        ),
+        DocsPage(
+            "docs/try-it.md",
+            "try-it.html",
+            "Try It",
+            "Commands to run against the recorded fixtures, with their output.",
+            guide = true,
+        ),
+        DocsPage(
+            "docs/portability-atlas.md",
+            "portability-atlas.html",
+            "Kotlin Portability Atlas",
+            "The probes, the columns and how to read them.",
+            guide = true,
+        ),
+        DocsPage(
+            "docs/architecture.md",
+            "architecture.html",
+            "Architecture",
+            "The modules, their dependencies and the investigation chain.",
+            guide = true,
+        ),
+        DocsPage(
+            "docs/shared-code.md",
+            "shared-code.html",
+            "Shared Code",
+            "How much of the code every target shares.",
+            guide = true,
+        ),
+        DocsPage(
+            "docs/limits.md",
+            "limits.html",
+            "Limits",
+            "What Drift cannot do, by platform.",
+            guide = true,
         ),
         DocsPage(
             "MANUAL.md",
@@ -127,6 +184,7 @@ object DocsSiteBuilder {
     )
 
     private val NAV = listOf(
+        Triple("Guides", "docs.html", "Install, try it, the Atlas, the design and the limits."),
         Triple("Manual", "manual.html", "What each Studio screen shows, with pictures."),
         Triple("Usage", "advanced-usage.html", "Every command and flag, with real output."),
         Triple("Report", "technical-report.html", "The design, the evidence and the numbers."),
@@ -136,9 +194,9 @@ object DocsSiteBuilder {
     )
 
     private val STEPS = listOf(
-        Triple("Learn", "index.html#what-it-does", "What Drift records, ranks and proves."),
-        Triple("Install", "index.html#install-and-run", "A release archive, a package or source."),
-        Triple("Diagnose", "index.html#try-it", "Run a first diagnosis on a recorded failure."),
+        Triple("Learn", "index.html#what-it-looks-at", "What Drift reads and compares."),
+        Triple("Install", "install.html", "A release archive, a package or source."),
+        Triple("Diagnose", "try-it.html", "Run a first diagnosis on a recorded failure."),
         Triple("Use", "advanced-usage.html", "Every command and flag, with real output."),
         Triple("Read", "technical-report.html", "The design, the evidence and the numbers."),
     )
@@ -203,15 +261,16 @@ object DocsSiteBuilder {
                 .replace("<!-- title -->", SiteRender.escape(title))
                 .replace("<!-- description -->", SiteRender.escape(description))
                 .replace("<!-- nav -->", nav(r.page))
+                .replace("<!-- guides -->", guides(r.page))
                 .replace("<!-- hero -->", hero)
                 .replace("<!-- pager -->", pager(r.page))
                 .replace(PLACEHOLDER, r.html.trimEnd())
             write(out, r.page.file, html)
         }
-        for (icon in ICONS) {
-            val file = icons.resolve(icon)
-            if (!file.isFile) throw DocsSiteException("the icon directory has no $icon")
-            file.copyTo(out.resolve(icon))
+        for (asset in ASSETS) {
+            val file = icons.resolve(asset)
+            if (!file.isFile) throw DocsSiteException("the assets directory has no $asset")
+            file.copyTo(out.resolve(asset))
         }
         for (image in images) {
             val target = out.resolve(image)
@@ -275,7 +334,8 @@ object DocsSiteBuilder {
 
     private fun normalize(page: DocsPage, path: String): String {
         val parts = ArrayDeque<String>()
-        for (part in path.split('/')) {
+        val dir = page.source.substringBeforeLast('/', "")
+        for (part in "$dir/$path".split('/')) {
             when (part) {
                 "", "." -> Unit
 
@@ -341,7 +401,9 @@ object DocsSiteBuilder {
         val steps = STEPS.joinToString("\n") { (label, href, text) ->
             "<li>${card(label, href, text)}</li>"
         }
-        val more = NAV.drop(3).joinToString("\n") { (label, href, text) -> card(label, href, text) }
+        val more = NAV.takeLast(3).joinToString("\n") { (label, href, text) ->
+            card(label, href, text)
+        }
         val logo = "<img src=\"drift.png\" alt=\"\" width=\"96\" height=\"96\">"
         return "<div class=\"hero\">\n$logo\n" +
             "<h1>Drift</h1>\n<p class=\"lead\">${SiteRender.escape(tagline)}</p>\n</div>\n" +
@@ -369,9 +431,19 @@ object DocsSiteBuilder {
             "${if (current.front) " aria-current=\"page\"" else ""}>" +
             "<img src=\"drift_128.png\" alt=\"\" width=\"28\" height=\"28\">Drift</a>"
         val items = NAV.map { (label, href) ->
-            link(href, label, PAGES.firstOrNull { it.file == href })
+            val page = PAGES.firstOrNull { it.file == href }
+            link(href, label, if (current.guide && href == "docs.html") current else page)
         }
         return (listOf(brand) + items).joinToString("\n")
+    }
+
+    private fun guides(current: DocsPage): String {
+        if (!current.guide) return ""
+        val items = PAGES.filter { it.guide }.joinToString("\n") {
+            val here = if (it == current) " aria-current=\"page\"" else ""
+            "<a href=\"${it.file}\"$here>${SiteRender.escape(it.title)}</a>"
+        }
+        return "<div class=\"guides\">\n$items\n</div>"
     }
 }
 

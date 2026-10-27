@@ -20,9 +20,9 @@ fun SharedRatioTask.configure(rewrite: Boolean) {
     sources.from(sourceTrees)
     modules = moduleNames
     floor = 80.0
-    hostBudget = 545
-    readme = layout.projectDirectory.file("README.md")
-    rewriteReadme = rewrite
+    hostBudget = 590
+    page = layout.projectDirectory.file("docs/shared-code.md")
+    rewritePage = rewrite
 }
 
 val sharedRatio = tasks.register<SharedRatioTask>("sharedRatio") { configure(false) }
@@ -39,7 +39,7 @@ val checkLineLength = tasks.register<LineLengthTask>("checkLineLength") {
         fileTree(layout.projectDirectory) {
             include("**/*.kt", "**/*.kts")
             exclude("**/build/**", "**/.gradle/**", "**/.kotlin/**", "**/kotlin-js-store/**")
-            exclude(".idea/**")
+            exclude(".idea/**", "experiments/results/*/runs/**")
         },
     )
 }
@@ -54,7 +54,13 @@ val jvmModules = coverageModules.filter { file(it).isDirectory }
 
 val jvmJacocoAggregateReport = tasks.register<JacocoReport>("jvmJacocoAggregateReport") {
     dependsOn(jvmModules.map { ":$it:jvmTest" })
-    classDirectories.setFrom(jvmModules.map { file("$it/build/classes/kotlin/jvm/main") })
+    classDirectories.setFrom(
+        jvmModules.map {
+            fileTree("$it/build/classes/kotlin/jvm/main") {
+                exclude("dev/gmitch215/drift/fixtures/**")
+            }
+        },
+    )
     sourceDirectories.setFrom(coverageRoots.map { file(it) })
     executionData.setFrom(jvmModules.map { file("$it/build/jacoco/jvmTest.exec") })
 

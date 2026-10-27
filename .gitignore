@@ -15,3 +15,7 @@ local.properties
 tools/perf/stage/
 docs/submission/
 !fixtures/projects/**/node_modules/
+experiments/results/*/runs/
+experiments/corpus-id/runs/
+experiments/corpus-id/batches/
+__pycache__/

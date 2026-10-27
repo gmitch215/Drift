@@ -1,0 +1,51 @@
+(() => {
+    const MERMAID = 'https://cdn.jsdelivr.net/npm/mermaid@12.1.0/dist/mermaid.esm.min.mjs';
+    const KATEX = 'https://cdn.jsdelivr.net/npm/katex@0.18.11/dist/';
+    const blocks = [...document.querySelectorAll('pre > code.language-mermaid, pre > code.language-math')];
+    const isMath = (code) => code.classList.contains('language-math');
+    const scheme = matchMedia('(prefers-color-scheme: dark)');
+    let count = 0;
+
+    async function draw(code, mermaid, katex) {
+        const pre = code.parentElement;
+        const view = document.createElement('div');
+        view.className = 'docs-render';
+        try {
+            if (isMath(code)) {
+                katex.render(code.textContent, view, { displayMode: true, throwOnError: true });
+            } else {
+                await mermaid.parse(code.textContent);
+                view.innerHTML = (await mermaid.render(`docs-mermaid-${count++}`, code.textContent)).svg;
+            }
+            if (pre.nextElementSibling?.matches('.docs-render')) pre.nextElementSibling.remove();
+            pre.after(view);
+            pre.hidden = true;
+        } catch (error) {
+            pre.hidden = false;
+            console.warn('docs block left as source', error);
+        }
+    }
+
+    async function run() {
+        const mermaid = blocks.some((code) => !isMath(code)) ? (await import(MERMAID)).default : null;
+        const katex = blocks.some(isMath) ? (await import(`${KATEX}katex.min.mjs`)).default : null;
+        if (katex) {
+            document.head.append(
+                Object.assign(document.createElement('link'), { rel: 'stylesheet', href: `${KATEX}katex.min.css` })
+            );
+        }
+        const render = () => {
+            mermaid?.initialize({
+                startOnLoad: false,
+                securityLevel: 'strict',
+                suppressErrorRendering: true,
+                theme: scheme.matches ? 'dark' : 'default'
+            });
+            return Promise.all(blocks.map((code) => draw(code, mermaid, katex)));
+        };
+        await render();
+        scheme.addEventListener('change', render);
+    }
+
+    if (blocks.length) run().catch((error) => console.warn('docs render unavailable', error));
+})();

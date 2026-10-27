@@ -70,23 +70,23 @@ object SharedRatio {
         return out.toString()
     }
 
-    const val README_MARKER = "data-shared-ratio"
+    const val MARKER = "data-shared-ratio"
 
-    fun readmeLine(result: Map<String, Lines>): String {
+    fun pageLine(result: Map<String, Lines>): String {
         val shared = result.values.sumOf { it.shared }
         val platform = result.values.sumOf { it.platform }
         val modules = result.entries.joinToString(", ") {
             "%s %.1f%%".format(it.key, percent(it.value.shared, it.value.platform))
         }
         val total = "%.1f%%".format(percent(shared, platform))
-        return "<p style=\"text-align: center;\" $README_MARKER>Shared code $total: $modules</p>"
+        return "<p $MARKER>Shared code $total: $modules</p>"
     }
 
-    fun withReadmeLine(text: String, result: Map<String, Lines>): String? {
+    fun withPageLine(text: String, result: Map<String, Lines>): String? {
         val lines = text.split("\n").toMutableList()
-        val at = lines.indexOfFirst { README_MARKER in it }
+        val at = lines.indexOfFirst { MARKER in it }
         if (at < 0) return null
-        lines[at] = lines[at].takeWhile { it == ' ' } + readmeLine(result)
+        lines[at] = lines[at].takeWhile { it == ' ' } + pageLine(result)
         return lines.joinToString("\n")
     }
 
@@ -138,10 +138,10 @@ abstract class SharedRatioTask : DefaultTask() {
 
     @get:InputFile
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val readme: RegularFileProperty
+    abstract val page: RegularFileProperty
 
     @get:Input
-    abstract val rewriteReadme: Property<Boolean>
+    abstract val rewritePage: Property<Boolean>
 
     @TaskAction
     fun check() {
@@ -149,13 +149,13 @@ abstract class SharedRatioTask : DefaultTask() {
         print(SharedRatio.table(result))
         val problems =
             SharedRatio.violations(result, floor.get(), hostBudget.get()).toMutableList()
-        val file = readme.get().asFile
+        val file = page.get().asFile
         val text = file.readText()
-        val current = SharedRatio.withReadmeLine(text, result)
+        val current = SharedRatio.withPageLine(text, result)
         if (current == null) {
-            problems += "${file.name} has no line marked ${SharedRatio.README_MARKER}"
+            problems += "${file.name} has no line marked ${SharedRatio.MARKER}"
         } else if (current != text) {
-            if (rewriteReadme.get()) {
+            if (rewritePage.get()) {
                 file.writeText(current)
             } else {
                 problems += "${file.name} shared-ratio line is stale; " +

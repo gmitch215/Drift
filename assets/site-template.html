@@ -272,6 +272,39 @@
                 max-width: 100%;
             }
 
+            .guides {
+                display: flex;
+                flex-wrap: wrap;
+                gap: var(--u) calc(var(--u) * 4);
+                margin: 0 0 calc(var(--u) * 6);
+                padding-bottom: calc(var(--u) * 3);
+                border-bottom: 1px solid var(--line);
+            }
+            .guides a {
+                color: var(--muted);
+                font-size: 14px;
+                text-decoration: none;
+            }
+            .guides a:hover,
+            .guides a[aria-current] {
+                color: var(--accent-text);
+            }
+            .guides a[aria-current] {
+                text-decoration: underline;
+                text-decoration-color: var(--accent);
+                text-decoration-thickness: 2px;
+                text-underline-offset: 0.5em;
+            }
+            .docs-render {
+                margin: calc(var(--u) * 5) 0;
+                overflow-x: auto;
+                text-align: center;
+            }
+            .docs-render svg {
+                max-width: 100%;
+                height: auto;
+            }
+
             .pager {
                 display: flex;
                 flex-wrap: wrap;
@@ -311,6 +344,7 @@
             <div class="bar"><!-- nav --></div>
         </nav>
         <main>
+            <!-- guides -->
             <!-- hero -->
             <div class="readme"><!-- readme --></div>
             <!-- pager -->
@@ -319,5 +353,6 @@
             <a href="https://github.com/gmitch215/Drift">github.com/gmitch215/Drift</a> &middot;
             <a href="https://github.com/gmitch215/Drift/blob/master/LICENSE">MIT License</a>
         </footer>
+        <script type="module" src="docs-render.js"></script>
     </body>
 </html>
