@@ -1,0 +1,160 @@
+- id: "konsoletyper/teavm#479"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer names no cause; only suspects Maven modules"
+- id: "EndstoneMC/endstone#136"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 2670898906
+  quote: "Looks like it's a duplicate of #135 and should've been fixed in the latest dev build."
+  note: "maintainer says a known defect was fixed in the dev build"
+- id: "marcantondahmen/automad#188"
+  verdict: "user-error"
+  attribute: null
+  before: null
+  after: null
+  comment: 4349833661
+  quote: "Hi, just skip the mailto part. Email addresses are handled and obfuscated automatically when being inserted in any content field."
+  note: "mailto in content is unneeded; built-in obfuscation applies"
+- id: "PicGo/PicGo-Core#142"
+  verdict: "env-cause"
+  attribute: "unnamed"
+  before: null
+  after: null
+  comment: 1328009627
+  quote: "Yes because of `GFW`. You need add `backupDomain` for smms config."
+  note: "maintainer blames GFW blocking the smms domain; no attribute fits"
+- id: "leonlatsch/Photok#454"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request; no stated cause of a failure"
+- id: "fabiospampinato/vscode-todo-plus#5"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 331737326
+  quote: "Should be fixed on v1.5.0. Closing as duplicate of #7."
+  note: "maintainer says fixed in a release; defect not described"
+- id: "mottosso/Qt.py#293"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "design discussion, not a failure report"
+- id: "fabiospampinato/vscode-todo-plus#114"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 417087267
+  quote: "Should be fixed in v4.4.3. Thanks a lot for reporting the issue!"
+  note: "maintainer says fixed in v4.4.3; defect not described"
+- id: "EndstoneMC/endstone#106"
+  verdict: "user-error"
+  attribute: null
+  before: null
+  after: null
+  comment: 2546175114
+  quote: "Basically, just avoid setting it directly in PlayerJoinEvent."
+  note: "client-side bug; maintainer says the setting place causes it"
+- id: "autopilot-rs/autopy#75"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 2771921900
+  quote: "Must be fixed in release 4.0.1. Feel free to reopen if I missed something."
+  note: "maintainer says fixed in 4.0.1; defect not described"
+- id: "mottosso/Qt.py#215"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 314881709
+  quote: "Your suggestion for `.isEmpty()` sounds reasonable."
+  note: "maintainer accepts the reported layout check as a bug"
+- id: "gmitch215/MobChip#78"
+  verdict: "env-cause"
+  attribute: "runtime.platform"
+  before: null
+  after: null
+  comment: 1625824158
+  quote: "Paper uses Optionals for Memory instead of the default object"
+  note: "maintainer blames Paper's Optional-typed memory API"
+- id: "mottosso/Qt.py#313"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer hypothesises binding causes; reporter's anti-malware cause unconfirmed"
+- id: "RicterZ/doujinshi-dl#386"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 2630197153
+  quote: "All issues have been fixed, please upgrade to the latest version by source code"
+  note: "maintainer says the favorite count bug is fixed"
+- id: "EndstoneMC/endstone#111"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 2559852013
+  quote: "I can confirm that it has been fixed in the latest commit."
+  note: "maintainer confirms the crash is fixed in project code"
+- id: "fabiospampinato/vscode-todo-plus#138"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 430412106
+  quote: "This should be fixed in v4.9.0. The extension is now detecting the indentation on a per-file basis."
+  note: "earlier settings blame; final statement is a code change"
+- id: "ki-editor/ki-editor#576"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 2796312822
+  quote: "Basically, all the quirks around copy-paste stem from the fact that I wanted to use a unified algorithm for all selection modes"
+  note: "maintainer attributes the quirks to the project's unified paste design"
+- id: "EndstoneMC/endstone#406"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 4848758185
+  quote: "Both crashes reported here are now fixed on the `feat/26.30-support` branch (shipping in the next release)."
+  note: "maintainer traces both crashes to project code, now fixed"
+- id: "leonlatsch/Photok#41"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request; closed by the albums change"
+- id: "EndstoneMC/endstone#321"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 3765687588
+  quote: "I can confirm this is now fixed in https://github.com/EndstoneMC/endstone/commit/35f37f6e09611e86389cb8bf049026ed30fd4e6e."
+  note: "maintainer confirms a project commit fixed it; cause not described"

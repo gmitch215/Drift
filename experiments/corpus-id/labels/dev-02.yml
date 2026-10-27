@@ -1,0 +1,160 @@
+- id: "denoland/deno#8571"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "tracking issue closed with no cause stated"
+- id: "nodejs/node#12740"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer says a V8 defect fixed in a newer bundled V8; no reporter-side cause named"
+- id: "denoland/deno#28903"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer adds a workaround only; the hostname cause is the author's guess"
+- id: "dotnet/runtime#80580"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1398999852
+  quote: "I've made a mistake when checking the return value of a `mmap` to detect failed mapping."
+  note: "maintainer names the mmap failure check as the defect"
+- id: "astral-sh/ruff#1989"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1397411234
+  quote: "It's a limitation of the parser right now: (1) it can't parse `match` statements, and (2) it can't recover from errors gracefully."
+  note: "missing parser support; a limitation, judgment call"
+- id: "dotnet/runtime#96859"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "API proposal; no cause stated"
+- id: "microsoft/vscode#337234"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 5773984746
+  quote: "`ChatWidget` registered its `inputPartDisposable` before its list widget, so disposal clears the input-part holder first."
+  note: "maintainer's root-cause analysis of disposal ordering"
+- id: "moby/moby#48678"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer says fixed in v27.1.2 and asks about a forked install script; no cause stated"
+- id: "rust-lang/rust#105167"
+  verdict: "env-cause"
+  attribute: "ci.runner.label"
+  before: "macos-11"
+  after: "macos-latest"
+  comment: 1726389568
+  quote: "the solution is to use `runs-on: macos-11` on Rust versions below 1.54, rather than `runs-on: macos-latest`."
+  note: "maintainer blames the macos-latest runner's linker; macos-11 works; judgment call"
+- id: "dotnet/runtime#85814"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1536067188
+  quote: "We tell object writer to wrap things up in a finally but it doesn't make sense to wrap up if there was an exception."
+  note: "maintainer names the finally wrap as the defect; objwriter messages are a red herring"
+- id: "moby/moby#1321"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request; maintainer asks to close, no cause stated"
+- id: "rust-lang/rust#88704"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer blames a GCC/winpthreads bug fixed by #100178; bundled toolchain, not project code"
+- id: "moby/moby#39512"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request for a canonical Dockerfile; no defect or cause stated"
+- id: "moby/moby#33393"
+  verdict: "user-error"
+  attribute: null
+  before: null
+  after: null
+  comment: 304242040
+  quote: "You need the 3.2 file version;"
+  note: "maintainer says the stack file must be version 3.2, not 3; reporter confirms"
+- id: "microsoft/vscode#303341"
+  verdict: "env-cause"
+  attribute: "tool.electron.version"
+  before: "42.7.0"
+  after: null
+  comment: 5088827846
+  quote: "This was likely due to the https://github.com/electron/electron/issues/50200 issue in Electron which was present in VS Code 1.111.0 and 1.112.0."
+  note: "maintainer says likely an Electron defect fixed in 42.7.0; hedged, judgment call"
+- id: "rust-lang/rust#127649"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer assigns it to rustup, the toolchain manager; no project defect or reporter cause; judgment call"
+- id: "denoland/deno#31688"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer calls it a duplicate of #31595 and names a fix PR; no cause stated"
+- id: "rust-lang/rust#109790"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer says fixed in #109410; no cause stated in the thread"
+- id: "rust-lang/rust#164145"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 6120584979
+  quote: "Previously this cleanup happened concurrently as part of executing each test. Now it happens sequentially at the end, which makes things slower."
+  note: "maintainer explains the regression: temp cleanup moved from per-test to end of run"
+- id: "denoland/deno#23862"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: "closing"
+  quote: "regression deserializing JSON for some npm packages"
+  note: "closing title names a regression in npm JSON deserialization; maintainer agrees"

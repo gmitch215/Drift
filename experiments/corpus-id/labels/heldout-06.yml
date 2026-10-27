@@ -1,0 +1,160 @@
+- id: "EndstoneMC/endstone#288"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer says fixed in v0.10.10; no cause stated"
+- id: "EndstoneMC/endstone#190"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 2916767364
+  quote: "Can confirm this is a regression problem introduced by https://github.com/EndstoneMC/endstone/pull/180."
+  note: "maintainer confirms a regression from the project's own PR"
+- id: "autopilot-rs/autopy#82"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer offers a prebuilt wheel; no cause stated"
+- id: "ki-editor/ki-editor#564"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer says fixed in #578; no cause stated"
+- id: "mrusse/soularr#185"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer says fixed on dev branch; no cause stated"
+- id: "kotlin-telegram-bot/kotlin-telegram-bot#121"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer says fixed in PR 122; no cause stated"
+- id: "marcantondahmen/automad#66"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "question about project activity, not a defect report"
+- id: "marcantondahmen/automad#6"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request declined; no cause stated"
+- id: "kotlin-telegram-bot/kotlin-telegram-bot#98"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request; maintainer says fixed in PR 100, no defect stated"
+- id: "ki-editor/ki-editor#1"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "fix is rust-toolchain.toml; the rustup advice went to another user"
+- id: "JetBrains/markdown#45"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 716496582
+  quote: "It was an acceptable behaviour back then. I need to either make lexers more unicode-friendly or merge tokens post-lexing."
+  note: "maintainer names the project's lexer as the cause"
+- id: "JetBrains/markdown#38"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 557643942
+  quote: "It seems, I got wrong with whitelisting link endings because it should rather be blacklisting some common punctuation characters which can be used alongside the links."
+  note: "maintainer says the project's link-ending whitelist was wrong"
+- id: "mottosso/Qt.py#433"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer handover request, not a defect"
+- id: "ki-editor/ki-editor#505"
+  verdict: "env-cause"
+  attribute: "unnamed"
+  before: null
+  after: null
+  comment: 2571520968
+  quote: "This happens for Rust project but not Typescript project, due to how their LSP presents the Completion Items:"
+  note: "maintainer blames the LSP completion format (rust-analyzer vs typescript-language-server)"
+- id: "javierbrea/eslint-plugin-boundaries#296"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1687995418
+  quote: "But this is something to solve, because, as you said, it's wrong to assume that the lint command will be run from the same root directory always."
+  note: "maintainer calls the cwd-as-project-root assumption wrong"
+- id: "javierbrea/eslint-plugin-boundaries#96"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer says fixed in v2.1.0; no cause stated"
+- id: "autopilot-rs/autopy#99"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer says fixed in 4.0.1; no cause stated"
+- id: "marcantondahmen/automad#191"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "first maintainer comment blames repo and setup; second says fixed in latest release"
+- id: "openrndr/openrndr#157"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer cannot reproduce and asks a question; reporter's SDK guess not confirmed"
+- id: "gustavosett/Windows-11-Clipboard-History-For-Linux#134"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer asks for logs and closes for inactivity; no cause stated"

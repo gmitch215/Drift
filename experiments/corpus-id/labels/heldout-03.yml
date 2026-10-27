@@ -1,0 +1,160 @@
+- id: "denoland/deno#21656"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "fix commit link with no cause stated"
+- id: "php/php-src#15087"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 2246435865
+  quote: "Simple case of the implementation not matching the stubs."
+  note: "maintainer says the implementation does not match the stubs"
+- id: "php/php-src#10801"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1460765657
+  quote: "It's an optimizer bug in `remove_call` in sccp."
+  note: "maintainer names a bug in the sccp optimizer"
+- id: "fabiospampinato/vscode-todo-plus#140"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "enhancement shipped in v4.9.2; no cause stated"
+- id: "joBr99/nspanel-lovelace-ui#156"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "entity-name limit and AppDaemon log both suggested; no single cause"
+- id: "TasmoAdmin/TasmoAdmin#488"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainers list suspects only; reporter's libseccomp fix not confirmed by a maintainer"
+- id: "EndstoneMC/endstone#424"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "fix commit with no cause stated"
+- id: "TasmoAdmin/TasmoAdmin#454"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 4671915563
+  quote: "I traced this to the frontend status parsing path for partial/ethernet payloads"
+  note: "maintainer traces it to frontend status parsing; fixed in PR 1536"
+- id: "docker/cli#6062"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer places the fault in the daemon, outside this repository; no cause named"
+- id: "joBr99/nspanel-lovelace-ui#1079"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer blames an AppDaemon limit; no version or config difference named"
+- id: "joBr99/nspanel-lovelace-ui#233"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request; maintainer asks what fails, no cause stated"
+- id: "RicterZ/doujinshi-dl#433"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 4417677719
+  quote: "The site enforces a 15 requests/minute rate limit regardless of authentication method"
+  note: "upstream rate limit; maintainer adds a limiter the project lacked"
+- id: "docker/cli#1203"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request for relative mounts; no defect stated"
+- id: "javierbrea/eslint-plugin-boundaries#349"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "resolver and root-path explanations both given; later reframed as a feature request"
+- id: "RicterZ/doujinshi-dl#349"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer attributes it to the uploader or site, hedged"
+- id: "fabiospampinato/vscode-todo-plus#378"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer dropped the feature on purpose; no defect stated"
+- id: "docker/cli#4558"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer asks for the version; thread closed as stale"
+- id: "docker/cli#3064"
+  verdict: "user-error"
+  attribute: null
+  before: null
+  after: null
+  comment: 826831957
+  quote: "This is the expected behaviour for `docker context use`, as it configures the default context for the CLI to use."
+  note: "maintainer says the behaviour is expected and points to DOCKER_CONTEXT"
+- id: "docker/cli#1075"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "design questions about UIDs versus names; no cause stated"
+- id: "gmitch215/MobChip#79"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "acknowledgement with no cause stated"

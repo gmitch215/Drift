@@ -1,0 +1,160 @@
+- id: "rust-lang/rust#99083"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1179562819
+  quote: "I think this was caused by https://github.com/rust-lang/rust/pull/97513"
+  note: "maintainer names project PR 97513 as the cause"
+- id: "dotnet/runtime#116970"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer suspects JCC and a PR; no cause stated, closed as viper-only"
+- id: "moby/moby#36677"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "by design per one maintainer; a later BuildKit comment gives a second cause"
+- id: "dotnet/runtime#132991"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainers could not reproduce; closing PR title names no cause"
+- id: "dotnet/runtime#108644"
+  verdict: "user-error"
+  attribute: null
+  before: null
+  after: null
+  comment: 2399029760
+  quote: "Looks like this didn't happen in your case, probably because of how the static library was linked."
+  note: "maintainer blames how the reporter linked a static library"
+- id: "moby/moby#4199"
+  verdict: "user-error"
+  attribute: null
+  before: null
+  after: null
+  comment: 35459542
+  quote: "That'd be because of line 5 in their Makefile. You should try commenting that out."
+  note: "maintainer blames the reporter's GOPATH contents and a Makefile clone step"
+- id: "moby/moby#20997"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 193800159
+  quote: "Right, that sounds like a possible race condition between the command being run, and libnetwork updating the `/etc/hosts` file."
+  note: "maintainer names a libnetwork race on /etc/hosts updates"
+- id: "dotnet/runtime#88031"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "declined feature request; maintainers state no defect or cause"
+- id: "nodejs/node#8545"
+  verdict: "env-cause"
+  attribute: "unnamed"
+  before: null
+  after: null
+  comment: 247335172
+  quote: "`npm ERR! Cannot read property 'uid' of undefined` is raised because your chrooted environment `/etc/passwd` file does not contain the uid npm is trying to switch to."
+  note: "maintainer blames the chroot's missing passwd and group entries"
+- id: "denoland/deno#6053"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 637753589
+  quote: "Most likely caused by #5929"
+  note: "maintainer attributes the panic to project PR 5929"
+- id: "rust-lang/rust#157743"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "cause is upstream LLVM, not project code or reporter environment"
+- id: "nodejs/node#34527"
+  verdict: "env-cause"
+  attribute: "limits.memory"
+  before: null
+  after: null
+  comment: 664424574
+  quote: "Looking at the test, this is most likely due to the process running out of memory."
+  note: "maintainer says SIGKILL most likely from memory exhaustion"
+- id: "microsoft/vscode#307751"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 4256811089
+  quote: "This likely root cause of the error is overpopulating of chat request with images in BASE64 format, which has been fixed in this PR"
+  note: "maintainer names base64 image overpopulation in chat requests"
+- id: "nodejs/node#10203"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "closed for lack of participation; no cause stated"
+- id: "dotnet/runtime#78170"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1310949575
+  quote: "Notice that the stores to arg7 and arg9 are too wide. After #67336 they are properly sized."
+  note: "JIT store-width defect; fixed by a PR not backported to 6.0"
+- id: "php/php-src#14543"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "two stated causes (_GNU_SOURCE, stale build files); none confirmed"
+- id: "dotnet/runtime#126040"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "regression tied to PR 125574, closed as accepted trade-off"
+- id: "nodejs/node#45723"
+  verdict: "env-cause"
+  attribute: "os.name"
+  before: null
+  after: null
+  comment: 1336251089
+  quote: "SIGINT isn't a thing on Windows. Libuv emulates it but that only goes so far."
+  note: "maintainer says SIGINT does not exist on Windows; not a bug"
+- id: "php/php-src#20492"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 3536511583
+  quote: "This is fixed on master with the ZEND_NONSTRING attribute, but because the attribute is in a public header this addition wasn't backported."
+  note: "warning from a missing attribute; fix not backported"
+- id: "nodejs/node#26872"
+  verdict: "user-error"
+  attribute: null
+  before: null
+  after: null
+  comment: 475943839
+  quote: "Even if Node.js itself guarded against add-ons that don't clean up after themselves, you'll still run into issues with different add-ons biting each other. Ergo, the best solution is to fix the add-on."
+  note: "maintainer says the reporter's add-on must not leave errors queued"

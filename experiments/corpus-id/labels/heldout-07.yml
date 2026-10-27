@@ -1,0 +1,160 @@
+- id: "JetBrains/markdown#31"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "fix in a release with no cause stated"
+- id: "git-bahn/git-graph#52"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer guesses the terminal; no confirmed cause or fix"
+- id: "javierbrea/eslint-plugin-boundaries#196"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer says a negative specifier works and asks for config; closed inactive"
+- id: "autopilot-rs/autopy#98"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "fix in a release with no cause stated"
+- id: "autopilot-rs/autopy#64"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "fix in a release with no cause stated"
+- id: "marcantondahmen/automad#132"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer lists several causes (cURL, server config, corrupted cache); no single cause"
+- id: "kotlin-telegram-bot/kotlin-telegram-bot#114"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "fix PR link with no cause stated"
+- id: "openrndr/openrndr#66"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 583569709
+  quote: "`fromPoints` should check the last point for repeat to prevent this"
+  note: "maintainer says fromPoints should check for a repeated last point"
+- id: "git-bahn/git-graph#83"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer first says not a bug, later says kind of bug; conflicting"
+- id: "jpenilla/MiniMOTD#38"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request closed for lack of response; no cause stated"
+- id: "gustavosett/Windows-11-Clipboard-History-For-Linux#42"
+  verdict: "env-cause"
+  attribute: "unnamed"
+  before: null
+  after: null
+  comment: 3675865143
+  quote: "the failure is actually caused by a broken external repository configured on your system (lizardbyte/sunshine), which is missing a Release file for Ubuntu Jammy."
+  note: "maintainer blames a broken apt repository on the reporter's system; no key fits"
+- id: "halilozercan/compose-richtext#179"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer describes his own Maven Central release; no cause for the reporter"
+- id: "marcantondahmen/automad#160"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 3316185686
+  quote: "the alpha release from today includes a fix that only injects block assets when needed."
+  note: "maintainer ships a fix so block assets are injected only when needed"
+- id: "javierbrea/eslint-plugin-boundaries#477"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 5129870317
+  quote: "the warning is incorrectly pointing to the v5-to-v6 migration guide."
+  note: "maintainer agrees the warning links to the wrong migration guide"
+- id: "marcantondahmen/automad#47"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1102302829
+  quote: "I just released a patch that handles type errors caused by extensions that may return null instead of a string."
+  note: "maintainer patches handling of null returned by extensions"
+- id: "jpenilla/MiniMOTD#352"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "closed not planned; maintainer suspects another mod, hedged; no key fits"
+- id: "javierbrea/eslint-plugin-boundaries#322"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer asks for an example config; closed for inactivity; no cause stated"
+- id: "jpenilla/MiniMOTD#29"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer can only assume SubServers is the cause; hedged"
+- id: "autopilot-rs/autopy#83"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "fix in a release with no cause stated"
+- id: "gustavosett/Windows-11-Clipboard-History-For-Linux#64"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request declined; no failure cause"

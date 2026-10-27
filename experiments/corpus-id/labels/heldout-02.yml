@@ -1,0 +1,160 @@
+- id: "python/cpython#87285"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer proposes a sleep(0) workaround and states no cause"
+- id: "denoland/deno#7623"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request; the closing reference is a PR title with no cause"
+- id: "denoland/deno#24670"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "stated cause is the remote server TLS config, which fits no verdict"
+- id: "microsoft/vscode#321633"
+  verdict: "env-cause"
+  attribute: "unnamed"
+  before: null
+  after: null
+  comment: 4900453957
+  quote: "That makes this an extension issue rather than something actionable in VS Code core as filed."
+  note: "third-party installed extension is the stated cause; no attribute fits"
+- id: "astral-sh/ruff#14676"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainers call the rule opinionated; no defect or usage cause stated"
+- id: "rust-lang/rust#88256"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 907803883
+  quote: "This is caused by two different hash values calculated in"
+  note: "duplicate diagnostics from differing hashes in rustc_errors"
+- id: "rust-lang/rust#94643"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "closed as similar to another issue; maintainer retracts the fixed claim"
+- id: "php/php-src#10670"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainers conflict: RTLD_DEEPBIND named as cause, then not a PHP bug"
+- id: "EndstoneMC/endstone#469"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "fix in a later release with no cause stated"
+- id: "denoland/deno#26306"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "fix in a later release with no cause stated"
+- id: "php/php-src#19771"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "hedged fix reference with no cause stated"
+- id: "php/php-src#7979"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1018442730
+  quote: "this really looks like an implementation bug"
+  note: "maintainer calls it an implementation bug"
+- id: "denoland/deno#21921"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "fix PR link with no cause stated"
+- id: "fabiospampinato/vscode-todo-plus#87"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "enhancement request; implemented feature is not a defect"
+- id: "denoland/deno#6080"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 638422617
+  quote: "changing the paths should hot-fix this problem, but ultimately we need to fix it in Deno."
+  note: "absolute paths in the .graph cache file; fix belongs in Deno"
+- id: "astral-sh/ruff#21284"
+  verdict: "env-cause"
+  attribute: "unnamed"
+  before: null
+  after: null
+  comment: 3494327021
+  quote: "this is an issue specific to Zed and should be fixed in Zed instead of requiring every LSP to special case Zed"
+  note: "editor client (Zed) is the stated cause; no attribute fits"
+- id: "denoland/deno#15603"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "fix PR link with no cause stated"
+- id: "denoland/deno#596"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "fix PR link with no cause stated"
+- id: "php/php-src#9357"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1407136311
+  quote: "I'm fairly certain this is the same root cause as in GH-10398 and is probably fixed by GH-10407."
+  note: "same root cause as GH-10398; hedged, confirmed in a later comment"
+- id: "EndstoneMC/endstone#289"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "fix in a later release with no cause stated"

@@ -1,0 +1,160 @@
+- id: "microsoft/vscode#312098"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer describes a partial revert of the fix, not the cause of the access-denied error"
+- id: "denoland/deno#34926"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 4633120236
+  quote: "In non-`hmr` builds the op did a hard `state.take()`, so bootstrapping without a snapshot panics with the error you saw."
+  note: "later maintainer comment reopens and names a regression; earlier 'expected' reply is superseded"
+- id: "denoland/deno#23263"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 2041629263
+  quote: "Since we don't really polyfill `AsyncResource` (due to technical limitation) we might want to return any number from `asyncId()` method"
+  note: "runtime lacks an AsyncResource polyfill; maintainer states it and says it was fixed upstream"
+- id: "astral-sh/ruff#1113"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1340160621
+  quote: "This was a regression that was introduced in v0.0.145 but fixed in v0.0.151"
+  note: "maintainer names a regression in the project, fixed in a later release"
+- id: "konsoletyper/teavm#175"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "class library question; maintainer offers a workaround and states no cause"
+- id: "php/php-src#7894"
+  verdict: "user-error"
+  attribute: null
+  before: null
+  after: null
+  comment: 1006471150
+  quote: "Technically this behavior is correct: without FILTER_NULL_ON_FAILURE, the filter only"
+  note: "maintainer says the behaviour is documented and correct; reporter's expectation was wrong"
+- id: "astral-sh/ruff#7806"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1756721539
+  quote: "That should eliminate the vast, vast majority of false positives."
+  note: "maintainer agrees the rule flagged class-scope definitions falsely; fix restricts the rule"
+- id: "php/php-src#15432"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 2293548903
+  quote: "so the heap corruption is likely caused by an UAF."
+  note: "maintainer names a use-after-free in mysqlnd; the cause is hedged with likely"
+- id: "php/php-src#10119"
+  verdict: "env-cause"
+  attribute: "tool.openssl.version"
+  before: null
+  after: null
+  comment: 2792270409
+  quote: "This was due to OpenSSL issues that have been mostly fixed in later versions."
+  note: "OpenSSL 3.0.x library performance issue; OpenSSL is a library, not a listed tool form"
+- id: "mottosso/Qt.py#22"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request; no failure and no cause stated"
+- id: "php/php-src#18174"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainers could not reproduce and asked for a reproducer; no cause stated"
+- id: "php/php-src#8150"
+  verdict: "env-cause"
+  attribute: "tool.php.version"
+  before: "8.0.0"
+  after: "7.4.4"
+  comment: 1049868039
+  quote: "that has changed as of PHP 8.0.0, and PHP-7.4 won't get regular bug fixes anyway"
+  note: "maintainer ties the locale-localised float output to PHP 7.4; the locale setting is also named"
+- id: "docker/cli#4340"
+  verdict: "env-cause"
+  attribute: "tool.docker.version"
+  before: null
+  after: null
+  comment: 1587827949
+  quote: "Docker 23.0 and up use BuildKit by default (older versions required `DOCKER_BUILDKIT=1` to be set to enable it)."
+  note: "default builder changed to BuildKit at 23.0; reporter's Docker version is not stated"
+- id: "konsoletyper/teavm#1200"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer incorporates the fix and asks for reproducers; no cause stated in MAINT text"
+- id: "joBr99/nspanel-lovelace-ui#380"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request answered with a config key on main; no failure cause stated"
+- id: "joBr99/nspanel-lovelace-ui#630"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1364592315
+  quote: "I think found the issue anyways, try to update to 3.7.2 and restart the appdaemon container"
+  note: "maintainer says the issue is found and fixed in release 3.7.2"
+- id: "SkinsRestorer/SkinsRestorer#2080"
+  verdict: "user-error"
+  attribute: null
+  before: null
+  after: null
+  comment: 3665553791
+  quote: "This never meant no updates. It only means the plugin won't attempt to install an update automatically."
+  note: "maintainer says noupdate.txt only stops automatic installs; update messages are intended"
+- id: "TasmoAdmin/TasmoAdmin#824"
+  verdict: "env-cause"
+  attribute: "tool.php.version"
+  before: "8.1"
+  after: "7.4.33"
+  comment: 1465009813
+  quote: "Yeah the minimum PHP version was bumped to PHP 8.1 due to PHP 7.4 being end of life."
+  note: "project raised its minimum PHP; fix is a PHP upgrade on the reporter's side"
+- id: "actions/runner#258"
+  verdict: "env-cause"
+  attribute: "tool.powershell.version"
+  before: null
+  after: null
+  comment: 613534463
+  quote: "It looks like PowerShell 7 release and has fixed the problem on the Hosted runner."
+  note: "maintainer hedges with 'looks like'; the default Windows shell is the named cause"
+- id: "TasmoAdmin/TasmoAdmin#875"
+  verdict: "env-cause"
+  attribute: "unnamed"
+  before: null
+  after: null
+  comment: 1528719320
+  quote: "I should change it to be more generic about missing the curl PHP extension."
+  note: "missing PHP curl extension after the PHP 8 install; no listed attribute fits"

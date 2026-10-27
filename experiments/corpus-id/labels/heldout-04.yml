@@ -1,0 +1,160 @@
+- id: "konsoletyper/teavm#898"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer gives a workaround; no cause stated for the failure"
+- id: "docker/cli#1002"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 390918305
+  quote: "The prompt was reverted in https://github.com/docker/cli/pull/1008, so this is fixed in Docker 18.05 and up"
+  note: "prompt added by the CLI was reverted; fixed in 18.05"
+- id: "fabiospampinato/vscode-todo-plus#33"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request answered with a workaround and a separate fix; no single cause"
+- id: "docker/cli#5898"
+  verdict: "env-cause"
+  attribute: "tool.go.version"
+  before: "1.23"
+  after: "1.24"
+  comment: 2703108907
+  quote: "we currently use go1.23 for packaging the docker engine, and it looks like go1.24 has regressions that cause random segfaults."
+  note: "packager built the engine with Go 1.24, which the maintainer blames"
+- id: "fabiospampinato/vscode-todo-plus#276"
+  verdict: "env-cause"
+  attribute: "tool.vscode.version"
+  before: null
+  after: null
+  comment: 667553507
+  quote: "I think this got fixed in one of the subsequent vscode releases."
+  note: "maintainer says a later VS Code release fixed it"
+- id: "kotlin-telegram-bot/kotlin-telegram-bot#24"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request; fixed in 0.3.4 with no cause stated"
+- id: "SkinsRestorer/SkinsRestorer#451"
+  verdict: "user-error"
+  attribute: null
+  before: null
+  after: null
+  comment: 803042842
+  quote: "jar seems to be corrupt. Please download again from releases here https://github.com/SkinsRestorer/SkinsRestorerX/releases/latest"
+  note: "reporter's jar was corrupt; maintainer asks for a fresh download"
+- id: "SkinsRestorer/SkinsRestorer#1611"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "fix named for 15.3.1 but no cause stated"
+- id: "javierbrea/eslint-plugin-boundaries#350"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer first called it a docs typo, then defended the naming"
+- id: "JetBrains/markdown#130"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1737077267
+  quote: "It seems that there is a bug/oddity in the native backend that affected the generated binaries after upgrading to the Kotlin `1.9.0`."
+  note: "maintainer adds a library workaround for a Kotlin 1.9.0 native backend change"
+- id: "RicterZ/doujinshi-dl#376"
+  verdict: "env-cause"
+  attribute: "tool.nhentai.version"
+  before: null
+  after: null
+  comment: 2619290302
+  quote: "find all the nhentai binary files: `find / -type f -name nhentai` and `rm` the v5.3 version"
+  note: "an old v5.3 install stayed on the reporter's system"
+- id: "openrndr/openrndr#423"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 5469782863
+  quote: "Problem may be somewhere here, it treats the seconds parameter as an `Int`."
+  note: "maintainer confirms the bug and suspects Int/Double parameter handling"
+- id: "konsoletyper/teavm#66"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 75234231
+  quote: "The problem was: I made all methods of ResourceAccessor class to be injectable."
+  note: "maintainer's own change to method injection caused it"
+- id: "TasmoAdmin/TasmoAdmin#609"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1203171591
+  quote: "Looks to be with `null` being passed into those Sonoff fix functions - we def need to add some tests around there."
+  note: "maintainer traces PHP 8.1 notices to null inputs in project code"
+- id: "leonlatsch/Photok#534"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 3461661836
+  quote: "The album covers are actually the full resolution pictures."
+  note: "album grid loads full-size pictures, not thumbnails"
+- id: "actions/runner#1396"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 932674077
+  quote: "Before the fix, we blindly deleted the runner settings file when an ephemeral runner exit."
+  note: "runner deleted its settings on ephemeral exit; fixed in PR 1384"
+- id: "kotlin-telegram-bot/kotlin-telegram-bot#157"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request delivered in #246; no cause stated"
+- id: "actions/runner#412"
+  verdict: "user-error"
+  attribute: null
+  before: null
+  after: null
+  comment: 610719686
+  quote: "since the runner process is running as user `runner`, when you mount `/` into container, runner lost permission to everything."
+  note: "reporter mounted / into the service container"
+- id: "marcantondahmen/automad#26"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "promised fix with no cause stated"
+- id: "mottosso/Qt.py#151"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "compatibility request closed as not planned; no cause for a failure"

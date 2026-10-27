@@ -1,0 +1,160 @@
+- id: "kotlin-telegram-bot/kotlin-telegram-bot#166"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer only says fixed in #234; no cause stated"
+- id: "RicterZ/doujinshi-dl#428"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 4181126714
+  quote: "`search_parser()` was calling `.json()` directly on the HTTP response without error handling, causing an unhandled `JSONDecodeError` when the server returns an empty or non-JSON response"
+  note: "maintainer calls it a bug in the plugin; fixed by upgrading the plugin"
+- id: "openrndr/openrndr#127"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer posts a GLFW workaround; closing title names GLFW but states no cause"
+- id: "kotlin-telegram-bot/kotlin-telegram-bot#338"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "missing Bot API field added in 10.0.0; no defect or environment cause stated"
+- id: "leonlatsch/Photok#130"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "launch code works with no connection; maintainer asks for repro steps, no cause stated"
+- id: "ki-editor/ki-editor#497"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer calls the nested search a designed feature; no reporter error or environment cause stated"
+- id: "marcantondahmen/automad#5"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer explains the headless API design; no error or cause stated"
+- id: "ki-editor/ki-editor#597"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer agrees to a scoped feature change; no defect or cause stated"
+- id: "marcantondahmen/automad#151"
+  verdict: "env-cause"
+  attribute: "limits.disk-quota"
+  before: null
+  after: null
+  comment: 2879819089
+  quote: "Hi, this is the expected behavior. Since v2 it is possible to define a maximum distance quota in the config. The default is 2048 MB."
+  note: "default 2048 MB disk quota exceeded by files in the install directory"
+- id: "autopilot-rs/autopy#94"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer asks for a platform wheel and says 4.0.1 fixes it; no cause stated"
+- id: "leonlatsch/Photok#386"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 2453030098
+  quote: "there is a known bug that very big images can not be displayed in full size because of disabled super sampling (due to the chosen encryption algorithm)"
+  note: "maintainer names a known bug in full-size image display; album preview uses the full image"
+- id: "gmitch215/MobChip#92"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1751512661
+  quote: "RecipeItemStack (known as Ingredient) required a `#buildChoices` method in order to be read properly. This method wasn't necessary anymore in 1.18, and I added it everywhere *except* 1.17 for some reason."
+  note: "maintainer says the 1.17 build lacked a method the other versions have"
+- id: "gmitch215/MobChip#84"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "two numbered remedies: a SNAPSHOT version and a repo outage; no single cause"
+- id: "JetBrains/markdown#98"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "first fix only says Fixed in #100; second failure is deprecated API with no stated cause"
+- id: "marcantondahmen/automad#29"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 894784034
+  quote: "Still, you are right it shouldn't be possible and therefore it is fixed in the latest release."
+  note: "maintainer calls it a defect though only authenticated users can exploit it"
+- id: "marcantondahmen/automad#113"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 2440170712
+  quote: "the error was due to overflowing text not being rendered at all."
+  note: "third-party CodeFlask overflow; project fixed it by enabling text wrap"
+- id: "ki-editor/ki-editor#1253"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "closed by a fix in #1299; no cause stated in a maintainer comment"
+- id: "leonlatsch/Photok#740"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 5505894655
+  quote: "The bug is that it continues playing. That should not be the case right now"
+  note: "maintainer calls continued playback the bug; the missing setting is a feature"
+- id: "JetBrains/markdown#70"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 785438526
+  quote: "Joel has removed the `.module` file from faulty 0.1.45 release so builds should be fine again"
+  note: "maintainer calls the published 0.1.45 release faulty; project-side publishing defect"
+- id: "JetBrains/markdown#117"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer says fix in 0.4.1; cause is only the author's Safari regex report"

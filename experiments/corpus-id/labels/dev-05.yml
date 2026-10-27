@@ -1,0 +1,160 @@
+- id: "javierbrea/eslint-plugin-boundaries#294"
+  verdict: "env-cause"
+  attribute: "config.boundaries.elements.pattern"
+  before: "entities/packages/*"
+  after: "entities/**/*"
+  comment: 1605957040
+  quote: "the problem seems to be in the pattern that you are using to detect each entity."
+  note: "maintainer blames the double-star glob; single-star pattern fixes it"
+- id: "joBr99/nspanel-lovelace-ui#302"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request; maintainer cites LCD panel limits and no card theming"
+- id: "openrndr/openrndr#381"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "closing comment says fixed and names no cause"
+- id: "leonlatsch/Photok#160"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 988287668
+  quote: "When selecting all, the item count is used to add all items. The item count also includes all placeholders, added by paging."
+  note: "index-based multi-selection counts paging placeholders"
+- id: "TasmoAdmin/TasmoAdmin#21"
+  verdict: "env-cause"
+  attribute: "tool.tasmota.version"
+  before: "5.10.0j"
+  after: "5.10.0c"
+  comment: 361697254
+  quote: "before 5.10.0j the json answers were translated. i would suggest you to at least update to 5.10.0j."
+  note: "maintainer names old firmware with translated JSON answers"
+- id: "konsoletyper/teavm#1209"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 4937394028
+  quote: "the only reason is this method is not tested"
+  note: "method left untested, so unsupported on WasmGC"
+- id: "mottosso/Qt.py#465"
+  verdict: "env-cause"
+  attribute: "project.python.PyQt6"
+  before: "PyQt5"
+  after: "PyQt6"
+  comment: 4203318383
+  quote: "Yeah, PyQt6 requires using the fully qualified enum values."
+  note: "unqualified enums fail on the PyQt6 binding; worked on PyQt5"
+- id: "fabiospampinato/vscode-todo-plus#137"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 429047215
+  quote: "This should be fixed in v4.8.3, there was a typo in webpack's configuration."
+  note: "maintainer names a webpack config typo; reporter still failed on 4.8.4"
+- id: "RicterZ/doujinshi-dl#355"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer says try 0.5.15; no cause stated"
+- id: "JetBrains/markdown#121"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1628541558
+  quote: "AFAIU this is a deprecation warning issued when using a library built with old kotlin versions. We need to bump used kotlin dependency."
+  note: "library published with old Kotlin; maintainers bumped their build"
+- id: "actions/runner#3823"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: 2830674648
+  quote: "Those missing data is causing the JITConfig runner fail to start."
+  note: "cause is missing backend data, outside reporter env and project code"
+- id: "gustavosett/Windows-11-Clipboard-History-For-Linux#127"
+  verdict: "env-cause"
+  attribute: "unnamed"
+  before: null
+  after: null
+  comment: 3815039493
+  quote: "Unfortunately, there is an incompatibility between Nvidia drivers and WebKitGTK."
+  note: "Nvidia driver and WebKitGTK incompatibility; no attribute fits"
+- id: "PicGo/PicGo-Core#31"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 595769701
+  quote: "next version will update to v2"
+  note: "project used smms API v1, deprecated upstream; moved to v2"
+- id: "JetBrains/markdown#32"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 545919475
+  quote: "It turned out to be bloody Kotlin JS."
+  note: "Kotlin JS behaviour; maintainer rewrote project code"
+- id: "EndstoneMC/endstone#102"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 2522270605
+  quote: "This again seems to be related to the broken `BlockSource` which was fixed in 0.5.6.dev70."
+  note: "hedged with seems; names a BlockSource defect fixed in dev70"
+- id: "RicterZ/doujinshi-dl#350"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer says try 0.5.13; no cause stated"
+- id: "EndstoneMC/endstone#248"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 3263968992
+  quote: "It looks like this is a regression introduced by the fix for #242, which is causing the problem."
+  note: "regression from the earlier fix for #242"
+- id: "EndstoneMC/endstone#351"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 4605343294
+  quote: "It's a recursive lock of the scheduler's (non-recursive) task mutex on a single thread"
+  note: "scheduler self-relock on cancel; fixed on v0.11"
+- id: "konsoletyper/teavm#827"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "fix-title closing reference and workaround only; no cause stated"
+- id: "fabiospampinato/vscode-todo-plus#52"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "fixed in v1.11.1; reporter's commit guess not confirmed"

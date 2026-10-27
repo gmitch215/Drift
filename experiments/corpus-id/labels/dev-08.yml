@@ -1,0 +1,160 @@
+- id: "mrusse/soularr#41"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer blames slskd bug, then reporter setup; no single cause"
+- id: "kotlin-telegram-bot/kotlin-telegram-bot#207"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer blames Jitpack-side publish failure, a third-party service"
+- id: "autopilot-rs/autopy#74"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer suggests a wheel and says fixed in 4.0.1; no cause stated"
+- id: "marcantondahmen/automad#148"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "author guesses PHP 8.2; maintainer asks about PHP and says fixed in alpha 27 without naming a cause"
+- id: "openrndr/openrndr#404"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 3065445285
+  quote: "So it gets stuck in the while loop with elements in the queue forever."
+  note: "maintainer traces the infinite loop to fatLineCurveCurve in project code"
+- id: "gmitch215/MobChip#69"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer blames CodeMC Jenkins cancelling the build; a build-service fault"
+- id: "mrusse/soularr#54"
+  verdict: "env-cause"
+  attribute: "env.SLSKD_UMASK"
+  before: "000"
+  after: "022"
+  comment: 2541651461
+  quote: "Permissions issues are usually fixed by adding the SLSKD_UMASK env var to your Slskd docker compose."
+  note: "maintainer leans to permissions; SLSKD_UMASK 000 fixed it"
+- id: "jpenilla/MiniMOTD#53"
+  verdict: "env-cause"
+  attribute: "runtime.platform"
+  before: "Waterfall"
+  after: "Travertine"
+  comment: 808602912
+  quote: "switching to Travertine caused the problem immediately."
+  note: "maintainer blames Travertine; Waterfall works and Travertine fails"
+- id: "datatags/MobChipLite#5"
+  verdict: "env-cause"
+  attribute: "tool.paper.version"
+  before: null
+  after: null
+  comment: 2988559721
+  quote: "Seems like this is due to Paper not yet remapping plugins"
+  note: "maintainer blames Paper not remapping plugins; reporter upgraded Paper"
+- id: "gmitch215/MobChip#8"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1249838868
+  quote: "EntityAnimation's `EMPTY`'s NamespacedKey was invalid (my part)"
+  note: "maintainer names two MobChip wrapper errors and the fix"
+- id: "actions/runner-images#736"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainers blame GitHub hosted-runner service faults, not reporter env or repo code"
+- id: "jpenilla/MiniMOTD#112"
+  verdict: "env-cause"
+  attribute: "runtime.platform"
+  before: "Paper"
+  after: "Spigot"
+  comment: 1192112411
+  quote: "Yeah, that confirms it is a spigot issue."
+  note: "maintainer confirms the failure is Spigot; Paper works"
+- id: "JetBrains/markdown#34"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer says fix is in master; states no cause"
+- id: "jpenilla/MiniMOTD#104"
+  verdict: "env-cause"
+  attribute: "unnamed"
+  before: null
+  after: null
+  comment: 1174034442
+  quote: "This is a create issue and is perfectly fixable from their side"
+  note: "maintainer blames the Create mod conflict; no attribute fits; feature request"
+- id: "gmitch215/MobChip#76"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1598198523
+  quote: "The Illusioner class is missing from the NMS Mapper, so it is part of a separate bug."
+  note: "maintainer names a missing Illusioner entry in the NMS mapper"
+- id: "javierbrea/eslint-plugin-boundaries#448"
+  verdict: "user-error"
+  attribute: null
+  before: null
+  after: null
+  comment: 4376894973
+  quote: "Since each file in your structure is its own element, you should use"
+  note: "maintainer says reporter's default folder mode config was wrong; docs also misled"
+- id: "investbrainapp/investbrain#150"
+  verdict: "env-cause"
+  attribute: "tool.php.version"
+  before: "8.4"
+  after: "8.3"
+  comment: 3500402447
+  quote: "I suspect there was some regression in php 8.3.26 or 8.3.27."
+  note: "maintainer suspects a PHP 8.3.x regression (hedged); fix bumps Dockerfile to PHP 8.4"
+- id: "gmitch215/MobChip#80"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request; maintainer gives a design answer, no defect or environment cause"
+- id: "javierbrea/eslint-plugin-boundaries#160"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer thanks reporter and says fixed in v2.5.1; states no cause"
+- id: "jpenilla/MiniMOTD#102"
+  verdict: "env-cause"
+  attribute: "unnamed"
+  before: null
+  after: null
+  comment: 1137703161
+  quote: "You need to either downgrade loader to 0.13.x for that version, or manually install the newest adventure-platform-fabric mod"
+  note: "loader or adventure-platform-fabric mod version; maintainer gives two fixes"

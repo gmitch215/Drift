@@ -1,0 +1,32 @@
+- id: "JetBrains/markdown#28"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 410723298
+  quote: "That's what happens in our case; since we use GFM autolinks, it's even worse."
+  note: "maintainer ties link-in-link output to the parser, fixed in pre-5"
+- id: "autopilot-rs/autopy#86"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 2771906612
+  quote: "Must be fixed in release 4.0.1."
+  note: "maintainer says the fix ships in 4.0.1"
+- id: "jpenilla/MiniMOTD#211"
+  verdict: "env-cause"
+  attribute: "tool.paper.version"
+  before: "1.21.1 build 76"
+  after: "1.21-38"
+  comment: 2341601793
+  quote: "The Paper bug is fixed in 1.21.1 build 76"
+  note: "maintainer blames a Paper server bug fixed in a later build"
+- id: "investbrainapp/investbrain#51"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 2705299458
+  quote: "Turns out switching the container from Debian to Alpine (#65) meant the entrypoint was running with `sh` as the default shell instead of `bash`, which broke the {{ unfurling."
+  note: "maintainer blames Alpine switch for broken entrypoint; env suspicions hedged"

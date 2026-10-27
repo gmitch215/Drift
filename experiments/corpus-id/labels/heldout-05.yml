@@ -1,0 +1,160 @@
+- id: "TasmoAdmin/TasmoAdmin#389"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "closed as stale; no cause stated"
+- id: "git-bahn/git-graph#51"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "closed with 'Fixed in #56'; no cause stated"
+- id: "EndstoneMC/endstone#238"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "points to existing BlockCommandSender; does not say reporter was wrong"
+- id: "JetBrains/markdown#27"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "closed with 'Fixed in' a version; no cause stated"
+- id: "gmitch215/MobChip#52"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "guesses reflection and Paper NMS; no single cause stated"
+- id: "RicterZ/doujinshi-dl#197"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "workaround and 'fixed in 0.4.12'; no cause stated"
+- id: "EndstoneMC/endstone#539"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 5750243593
+  quote: "It was our bug. Endstone reimplements some of BDS's `Scoreboard` methods, and `ScoreboardIdentityRef::removeFromObjective` freed a scoreboard identity without first removing that entry's score from the objective."
+  note: "maintainer names a bug in Endstone's scoreboard code"
+- id: "fabiospampinato/vscode-todo-plus#13"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer accepts the formatting change; no defect stated"
+- id: "EndstoneMC/endstone#423"
+  verdict: "env-cause"
+  attribute: "unnamed"
+  before: null
+  after: null
+  comment: 5218632989
+  quote: "BDS only publishes the server advertisement when the world's `LANBroadcast` flag is on."
+  note: "two env causes of equal weight: server.properties and level.dat"
+- id: "EndstoneMC/endstone#185"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "closing commit title names the fix, not the cause"
+- id: "mottosso/Qt.py#8"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer says the request is not solvable; no defect stated"
+- id: "openrndr/openrndr#24"
+  verdict: "env-cause"
+  attribute: "unnamed"
+  before: null
+  after: null
+  comment: 578277824
+  quote: "It happens when the system dpi is set to something that is not a multiple of 96."
+  note: "system DPI setting; no attribute key fits"
+- id: "jpenilla/MiniMOTD#88"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "closed as out of scope; no cause stated"
+- id: "javierbrea/eslint-plugin-boundaries#314"
+  verdict: "user-error"
+  attribute: null
+  before: null
+  after: null
+  comment: 1798598879
+  quote: "it seems that you are using a \"folder\" pattern, and trying to match files."
+  note: "maintainer says the reporter's pattern mode is wrong"
+- id: "EndstoneMC/endstone#115"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer blames BDS itself; not env, code or user"
+- id: "mrusse/soularr#48"
+  verdict: "env-cause"
+  attribute: "config.download_dir"
+  before: "/downloads/slskd"
+  after: "/downloads"
+  comment: 2512973591
+  quote: "Your imports are probably failing due to a config issue with the Lidarr import folder."
+  note: "maintainer hedges; reporter names the download_dir key"
+- id: "autopilot-rs/autopy#85"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "closed with 'Must be fixed in release 4.0.1'; no cause stated"
+- id: "EndstoneMC/endstone#426"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 4936348134
+  quote: "The outbound `ClientboundMapItemDataPacket` patch coupled pixel and decoration handling with an OR, so a texture packet with no decorations returned before the custom renderer ran."
+  note: "maintainer names the OR in Endstone's outbound patch"
+- id: "leonlatsch/Photok#36"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request; closing PR title names no cause"
+- id: "ki-editor/ki-editor#1212"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "maintainer hints at detection and asks Windows version; no cause stated"

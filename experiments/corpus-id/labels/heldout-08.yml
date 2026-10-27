@@ -1,0 +1,8 @@
+- id: "gustavosett/Windows-11-Clipboard-History-For-Linux#47"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 3691295173
+  quote: "fixed, it was a race condition during system startup; the clipboard was attempting to start before the interface was 100% ready."
+  note: "maintainer final diagnosis is a startup race; earlier apt-source claim superseded"

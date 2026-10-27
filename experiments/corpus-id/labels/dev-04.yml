@@ -1,0 +1,160 @@
+- id: "mottosso/Qt.py#139"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request answered by a QtCompat module; no cause stated"
+- id: "fabiospampinato/vscode-todo-plus#124"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 422785654
+  quote: "It should be fixed in v4.4.5"
+  note: "maintainer ships a fix in v4.4.5; also corrects provider and file assumptions"
+- id: "konsoletyper/teavm#12"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 54990891
+  quote: "I suppose I made mistake concerning time zones, so tests pass only in UTC+04."
+  note: "maintainer's own timezone-dependent unit tests; not a reporter setting"
+- id: "konsoletyper/teavm#407"
+  verdict: "env-cause"
+  attribute: "unnamed"
+  before: "0.1"
+  after: "0.2.0-dev-70"
+  comment: 518373223
+  quote: "You can't use Flavour 0.1 with TeaVM 0.6-dev, you should switch to Flavour 0.2-dev instead."
+  note: "reporter's Flavour dependency too old for TeaVM 0.6-dev; Maven coordinates not in thread"
+- id: "EndstoneMC/endstone#175"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 2889201880
+  quote: "`ActorDamageEvent` will no longer fire if the `damage_sensor` determines that no damage should be dealt."
+  note: "maintainer fixes two event-firing bugs in the project"
+- id: "TasmoAdmin/TasmoAdmin#691"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1281938800
+  quote: "This was fixed in https://github.com/TasmoAdmin/TasmoAdmin/releases/tag/v2.1.1"
+  note: "fix shipped in v2.1.1; no cause stated beyond the typo in the issue"
+- id: "actions/runner#377"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "enhancement request closed by shipping v2 hashFiles; no stated cause"
+- id: "docker/cli#1291"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 418417696
+  quote: "I believe this is already fixed in master and thus will be in 18.09."
+  note: "maintainer hedges; race already fixed in master"
+- id: "TasmoAdmin/TasmoAdmin#624"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1215790553
+  quote: "I must have missed that when reworking the device layer."
+  note: "maintainer's device-layer rework dropped the device write"
+- id: "openrndr/openrndr#312"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1162868638
+  quote: "Fixed in 43e607336f32e0250f1415b7981441d1ae1cbe49"
+  note: "fixed by a commit; the issue asks for an exception instead of silent ignore"
+- id: "mottosso/Qt.py#267"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 359025281
+  quote: "It seems like all you need to do is add the correct values to the `_misplaced_members` dict."
+  note: "project's membership mapping lacked QtPrintSupport"
+- id: "joBr99/nspanel-lovelace-ui#946"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1690281860
+  quote: "I cannot remember why this was added, but I guess to limit it on cardEntities, there is less space for test on us-p than on the landscape versions."
+  note: "project cut the text to four characters; maintainer removes the limit"
+- id: "docker/cli#6708"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 3686306301
+  quote: "looks like this was introduced in https://github.com/docker/cli/commit/9c10a9c9ac62137d24d65ba39eb54a16f4259c8e (part of https://github.com/docker/cli/pull/6685)"
+  note: "maintainer traces the build break to a commit in the project"
+- id: "konsoletyper/teavm#106"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "manual build and Scala question; a limitation, not a stated defect"
+- id: "actions/runner#334"
+  verdict: "env-cause"
+  attribute: "runtime.container.image"
+  before: "quay.io/pypa/manylinux2010_x86_64"
+  after: "quay.io/pypa/manylinux2014_x86_64"
+  comment: 585833745
+  quote: "is there a document somewhere describing the job-container limitation that we can point customers to?"
+  note: "job container's old glibc cannot run node12; maintainer blames the container"
+- id: "docker/cli#2552"
+  verdict: "env-cause"
+  attribute: "unnamed"
+  before: "2020-05-27T20:24:00"
+  after: "2020-05-27T20:24:00Z"
+  comment: 635271396
+  quote: "specifying the `--since` without the `Z` will use that date/time according to the local date on the client"
+  note: "client's local timezone differs from the UTC daemon; no variable named"
+- id: "TasmoAdmin/TasmoAdmin#1066"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1873495373
+  quote: "I changed it to to the default of 24 minutes before gc - but with the default of 1% so will be around 1/100 will do the cleanup"
+  note: "maintainer changes the project's session garbage-collection settings"
+- id: "joBr99/nspanel-lovelace-ui#136"
+  verdict: "user-error"
+  attribute: null
+  before: null
+  after: null
+  comment: 1095170711
+  quote: "this has been changed with release 2.4.12, are you on the newest version? documentation looks fine"
+  note: "reporter ran release 2.3; maintainer says the docs are fine"
+- id: "mottosso/Qt.py#383"
+  verdict: "code-defect"
+  attribute: null
+  before: null
+  after: null
+  comment: 1431854488
+  quote: "It seems to me like the definition of a optional requirement."
+  note: "project made types-PySide2 a hard install requirement; maintainer says optional"
+- id: "SkinsRestorer/SkinsRestorer#620"
+  verdict: "unclear"
+  attribute: null
+  before: null
+  after: null
+  comment: null
+  quote: null
+  note: "feature request closed by a config option; no cause stated"
