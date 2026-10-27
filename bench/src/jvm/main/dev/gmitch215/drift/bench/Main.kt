@@ -12,6 +12,10 @@ private const val USAGE = """usage: bench <command> --root <bench dir> [options]
   ingest --prepared <dir> [--drift <binary>]   validate outputs, write results and capsules
   probed --solved <dir> [--strict]   copy the baseline capsules of solve cases to data/probed;
                                 skip a case that lacks one (--strict exits 1 when any is skipped)
+  solves --solved <dir>[,<dir>...]   score the certificates of solve cases against the injected
+                                causes and write data/solves/dev.json
+  split                         recompute the split from data/scenarios.json; exit 1 when it
+                                differs from data/split.json
   calibrate                     fit on the dev split, write data/calibration/*.json
   evidence [--out <file>]       score the failure-conditioned ranker on the dev scenarios that
                                 have probed captures; print the JSON or write it to <file>
@@ -77,6 +81,26 @@ fun main(args: Array<String>) {
                 println("imported ${result.imported.size} scenarios from $solved")
                 println("skipped ${result.skipped.size}")
                 if ("--strict" in opts && result.skipped.isNotEmpty()) exitProcess(1)
+            }
+
+            "solves" -> {
+                val dirs = csv(opts["--solved"]).ifEmpty { error("--solved is required") }
+                print(work.writeSolves(dirs.map { Path.of(it) }).report("dev"))
+            }
+
+            "split" -> {
+                val scenarios = work.loadScenarios()
+                val split = SplitRule.splitScenarios(scenarios)
+                println(
+                    "dev ${split.dev.size}, test ${split.test.size}, " +
+                        "held-out templates ${Freeze.holdoutTemplates(scenarios).size}, " +
+                        "test_sha256 ${split.testSha256}",
+                )
+                if (!work.splitMatchesCommitted()) {
+                    System.err.println("data/split.json differs from data/scenarios.json")
+                    exitProcess(1)
+                }
+                println("matches data/split.json")
             }
 
             "calibrate" -> println("chosen ${work.writeCalibration().chosen.id}")

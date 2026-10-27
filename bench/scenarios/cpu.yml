@@ -26,11 +26,9 @@ templates:
       cpuset: "0"
     cause:
       dimension: cpu
-      path: cpu.count
+      path: cpu.affinity
       attribute: CPUs the process may run on
       direction: lower
-    visible: false
-    note: The capsule reads the host CPU count, so a cpuset is not visible in it.
 
   - id: cpu-model-flag-base
     title: An instruction is missing on the red CPU model (a container cannot vary the CPU)
@@ -124,11 +122,9 @@ templates:
       cpuset: "0"
     cause:
       dimension: cpu
-      path: cpu.count
+      path: cpu.affinity
       attribute: CPUs the process may run on
       direction: lower
-    visible: false
-    note: The capsule reads the host CPU count, so a cpuset is not visible in it.
 
   - id: cpu-arch-wheel
     title: A prebuilt package has no build for the red architecture (a container cannot vary it)

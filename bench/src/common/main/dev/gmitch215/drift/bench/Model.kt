@@ -23,8 +23,18 @@ class Arm(
     val args: List<String>,
     val gate: Int,
     val rate: Int,
+    val shell: String? = null,
+    val workspace: Map<String, String> = emptyMap(),
 ) {
-    fun toJson(): JsonObject = obj(
+    fun toJson(): JsonObject = base().let {
+        val extra = buildMap {
+            if (shell != null) put("shell", JsonString(shell))
+            if (workspace.isNotEmpty()) put("workspace", strings(workspace))
+        }
+        if (extra.isEmpty()) it else JsonObject(it.fields + extra)
+    }
+
+    private fun base(): JsonObject = obj(
         "image" to JsonString(image),
         "env" to strings(env),
         "memory" to JsonString(memory),
@@ -53,6 +63,8 @@ class Arm(
             args = f.list("args"),
             gate = f.int("gate"),
             rate = f.int("rate"),
+            shell = f.strOrNull("shell"),
+            workspace = f.strings("workspace"),
         )
     }
 }

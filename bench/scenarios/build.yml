@@ -56,7 +56,7 @@ templates:
     runtime: sh
     program: |
       if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
-      ver=$(sed -n 's/^{{lib}}==//p' /etc/app/lock.txt)
+      ver=$(sed -n 's/^{{lib}}==//p' requirements.txt)
       case "$ver" in
         {{bad}}) echo "ImportError: cannot import name legacy_api from {{lib}} ($ver)"; exit 1 ;;
       esac
@@ -65,17 +65,17 @@ templates:
     base:
       image: "debian:12-slim"
     green:
-      files:
-        /etc/app/lock.txt: "{{lib}}=={{good}}\n"
+      workspace:
+        requirements.txt: "{{lib}}=={{good}}\n"
     red:
-      files:
-        /etc/app/lock.txt: "{{lib}}=={{bad}}\n"
+      workspace:
+        requirements.txt: "{{lib}}=={{bad}}\n"
     cause:
       dimension: build
-      path: "deps.{{lib}}.version"
+      path: "project.python.{{lib}}"
       attribute: locked release of {{lib}}
       direction: higher
-    visible: false
+    note: The pin is the workspace's requirements.txt, which the project capture reads.
 
   - id: build-npm-subcommand
     title: A build step runs an npm subcommand the red npm does not have
@@ -248,25 +248,25 @@ templates:
     program: |
       if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
       set -e
-      sha256sum -c /etc/app/pins.sha256
+      sha256sum -c SHA256SUMS
       echo ok
     signature: FAILED
     base:
       image: "debian:12-slim"
-      files:
-        "/opt/vendor/{{lib}}.txt": "{{body}}"
     green:
-      files:
-        /etc/app/pins.sha256: "{{good}}  /opt/vendor/{{lib}}.txt\n"
+      workspace:
+        "vendor/{{lib}}.txt": "{{body}}"
+        SHA256SUMS: "{{good}}  vendor/{{lib}}.txt\n"
     red:
-      files:
-        /etc/app/pins.sha256: "{{stale}}  /opt/vendor/{{lib}}.txt\n"
+      workspace:
+        "vendor/{{lib}}.txt": "{{body}}"
+        SHA256SUMS: "{{stale}}  vendor/{{lib}}.txt\n"
     cause:
       dimension: build
-      path: "deps.{{lib}}.checksum"
+      path: "project.checksums.vendor/{{lib}}.txt"
       attribute: pinned checksum of {{lib}}
       direction: changed
-    visible: false
+    note: The pin is the workspace's SHA256SUMS, which the project capture reads; the vendored file is a workspace file in both arms.
 
   - id: build-version-pin
     title: A build script pins a toolchain version other than the one installed
@@ -275,11 +275,13 @@ templates:
     variants:
       - tool: node
         probe: 'node --version | sed "s/^v//; s/\..*//"'
+        file: .nvmrc
         image: "node:20-slim"
         good: "20"
         bad: "18"
       - tool: python
         probe: 'python3 --version | cut -d" " -f2 | cut -d. -f1,2'
+        file: .python-version
         image: "python:3.12-slim"
         good: "3.12"
         bad: "3.9"
@@ -287,7 +289,7 @@ templates:
     program: |
       if [ "$BENCH_FLAKE" != 1 ]; then echo ok; exit 0; fi
       set -e
-      want=$(cat /etc/app/pin)
+      want=$(cat {{file}})
       have=$({{probe}})
       if [ "$want" != "$have" ]; then
         echo "version pin mismatch: {{tool}} want $want, have $have"
@@ -298,17 +300,17 @@ templates:
     base:
       image: "{{image}}"
     green:
-      files:
-        /etc/app/pin: "{{good}}\n"
+      workspace:
+        "{{file}}": "{{good}}\n"
     red:
-      files:
-        /etc/app/pin: "{{bad}}\n"
+      workspace:
+        "{{file}}": "{{bad}}\n"
     cause:
       dimension: build
       path: "project.pins.{{tool}}"
       attribute: pinned {{tool}} version
       direction: changed
-    visible: false
+    note: The pin is the workspace's version file, which the project capture reads.
 
   - id: build-javac-release
     title: A build passes javac a --release newer than the red JDK

@@ -80,11 +80,9 @@ templates:
         /etc/hosts: "127.0.0.1 localhost\n"
     cause:
       dimension: network
-      path: network.hosts
+      path: network.hosts.names
       attribute: hosts file
       direction: changed
-    visible: false
-    note: The capsule does not read /etc/hosts yet.
 
   - id: network-proxy-decoy
     title: The proxy variable, with an unrelated no-proxy list changed beside it
@@ -265,11 +263,9 @@ templates:
         /etc/hosts: "127.0.0.1 localhost\n127.0.0.2 {{host}}\n"
     cause:
       dimension: network
-      path: network.hosts
+      path: network.hosts.names
       attribute: hosts file
       direction: changed
-    visible: false
-    note: The capsule does not read /etc/hosts yet.
 
   - id: network-nsswitch-order
     title: The red name service switch drops the files source, so a hosts entry no longer resolves
@@ -301,11 +297,9 @@ templates:
         /etc/nsswitch.conf: "passwd: files\ngroup: files\nhosts: dns\n"
     cause:
       dimension: network
-      path: network.nsswitch
+      path: network.nsswitch.hosts
       attribute: name service switch
       direction: changed
-    visible: false
-    note: The capsule does not read /etc/nsswitch.conf yet.
 
   - id: network-interface-missing
     title: The red container has no network interface that is up besides loopback
@@ -341,8 +335,6 @@ templates:
       network: none
     cause:
       dimension: network
-      path: network.mode
+      path: network.interfaces
       attribute: container network mode
       direction: changed
-    visible: false
-    note: The capsule does not read network interfaces yet.

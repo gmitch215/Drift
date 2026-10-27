@@ -51,15 +51,15 @@ templates:
     base:
       image: "debian:12-slim"
     green:
-      interpreter: bash
+      shell: bash
     red:
-      interpreter: sh
+      shell: dash
     cause:
       dimension: userland
-      path: tool.shell.flavor
-      attribute: shell that runs the script
+      path: tool.sh.flavor
+      attribute: shell behind /bin/sh
       direction: changed
-    visible: false
+    note: The green image links /bin/sh to bash and the red image keeps dash; both arms run sh.
 
   - id: userland-grep-perl
     title: A script uses a grep option that BusyBox does not implement
@@ -236,15 +236,15 @@ templates:
     base:
       image: "debian:12-slim"
     green:
-      interpreter: bash
+      shell: bash
     red:
-      interpreter: sh
+      shell: dash
     cause:
       dimension: userland
-      path: tool.shell.flavor
-      attribute: shell that runs the script
+      path: tool.sh.flavor
+      attribute: shell behind /bin/sh
       direction: changed
-    visible: false
+    note: The green image links /bin/sh to bash and the red image keeps dash; both arms run sh.
 
   - id: userland-gnu-long-options
     title: A script passes a GNU long option that BusyBox does not know

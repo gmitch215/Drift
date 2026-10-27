@@ -4,12 +4,17 @@ import dev.gmitch215.drift.json.CanonicalJson
 import dev.gmitch215.drift.json.JsonObject
 import dev.gmitch215.drift.json.JsonString
 import java.nio.file.Path
+import kotlin.io.path.copyTo
+import kotlin.io.path.createDirectories
+import kotlin.io.path.createTempDirectory
 import kotlin.io.path.exists
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.readText
+import kotlin.io.path.writeText
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class CommittedDataTest {
@@ -23,6 +28,25 @@ class CommittedDataTest {
         val (text, splitText) = work.generate()
         assertEquals(text, root.resolve("data/scenarios.json").readText())
         assertEquals(splitText, root.resolve("data/split.json").readText())
+    }
+
+    @Test
+    fun theSplitCommandReproducesTheCommittedSplit() {
+        assertTrue(work.splitMatchesCommitted())
+    }
+
+    @Test
+    fun theSplitCommandFailsWhenAScenarioIsMissing() {
+        val copy = createTempDirectory("bench-split")
+        try {
+            copy.resolve("data").createDirectories()
+            root.resolve("data/split.json").copyTo(copy.resolve("data/split.json"))
+            copy.resolve("data/scenarios.json")
+                .writeText(Generator.scenariosJson(scenarios.drop(1)))
+            assertFalse(Work(copy).splitMatchesCommitted())
+        } finally {
+            copy.toFile().deleteRecursively()
+        }
     }
 
     @Test

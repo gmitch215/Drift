@@ -60,6 +60,8 @@ class Work(private val root: Path) {
 
     fun split(): Split = SplitRule.splitScenarios(loadScenarios())
 
+    fun splitMatchesCommitted(): Boolean = split().toJson() == data.resolve("split.json").readText()
+
     fun writeGenerated() {
         val (scenarios, split) = generate()
         data.createDirectories()
@@ -116,6 +118,26 @@ class Work(private val root: Path) {
             imported += dir.name
         }
         return ProbedImport(imported, skipped)
+    }
+
+    /**
+     * Scores the `certificate.json` of every case directory under the [solved] directories against
+     * the injected causes and writes `data/solves/dev.json`. A test id is refused.
+     */
+    fun writeSolves(solved: List<Path>): SolveScore {
+        val cases = solved.flatMap { dir ->
+            dir.listDirectoryEntries().filter { it.isDirectory() }.map { case ->
+                val file = case.resolve("certificate.json")
+                SolvedCase(case.name, if (file.exists()) file.readText() else null)
+            }
+        }
+        val truths = loadScenarios().map {
+            SolveTruth(it.id, it.klass, it.cause?.path, it.bundle.map { b -> b.path })
+        }
+        val ranks = SolveBench.ranks(data.resolve("calibration/evaluation.json").readText())
+        val score = SolveBench.score(devIds(), truths, cases, ranks)
+        data.resolve("solves").createDirectories().resolve("dev.json").writeText(score.toJson())
+        return score
     }
 
     private fun result(id: String) = data.resolve("results/$id").readText()
@@ -180,6 +202,11 @@ class Work(private val root: Path) {
                 dir.resolve("$name.plan").writeText(Harness.plan(s, arm))
                 dir.resolve("$name.env").writeText(Harness.env(arm))
                 dir.resolve("$name.sh").writeText(Harness.script(s, name, arm))
+                for ((path, content) in arm.workspace.toSortedMap()) {
+                    val file = dir.resolve(Harness.workspacePath(name, path))
+                    file.parent.createDirectories()
+                    file.writeText(content)
+                }
                 arm.files.toSortedMap().values.forEachIndexed { i, content ->
                     val file = dir.resolve(Harness.filePath(name, i))
                     file.parent.createDirectories()
@@ -198,6 +225,12 @@ class Work(private val root: Path) {
         for ((arm, file) in capsules) dir.resolve("capsule.$arm.json").writeText(file.readText())
         val workspace = dir.resolve("workspace").createDirectories()
         workspace.resolve(Dimensions.runtimes.getValue(s.runtime).first).writeText(s.source)
+        for ((path, content) in s.green.workspace) {
+            if (s.red.workspace[path] != content) continue
+            val file = workspace.resolve(path)
+            file.parent.createDirectories()
+            file.writeText(content)
+        }
         dir.resolve("solve.sh").writeText(Harness.solveScript(s))
     }
 

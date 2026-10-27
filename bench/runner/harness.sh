@@ -24,9 +24,18 @@ dir=${BENCH_DIR:-/bench}
 cd "$dir" || exit 2
 . "$dir/$arm.plan"
 drift=${DRIFT_BIN:-/opt/drift}
+flags=--tools
+if [ -n "$PROJECT" ]; then
+    work=${TMPDIR:-/tmp}/ws-$arm
+    mkdir -p "$work"
+    cp -R "$dir"/. "$work"/
+    cp -R "$dir/$arm.ws"/. "$work"/
+    cd "$work" || exit 2
+    flags="--tools --project"
+fi
 if [ -x "$drift" ]; then
     echo "CAPSULE-BEGIN"
-    "$drift" capture --label "$arm" --tools
+    "$drift" capture --label "$arm" $flags
     echo "CAPSULE-END"
 fi
 i=0

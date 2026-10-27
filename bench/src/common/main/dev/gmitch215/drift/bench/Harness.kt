@@ -1,5 +1,7 @@
 package dev.gmitch215.drift.bench
 
+import dev.gmitch215.drift.lab.SolveOptions
+
 /** Text of the files the runner hands to a container: the per-arm plan and the docker command. */
 object Harness {
     const val MEMORY = "512m"
@@ -33,6 +35,7 @@ object Harness {
         append("CMD=").append(quote(command(scenario, arm))).append('\n')
         append("SIG=").append(quote(scenario.signature)).append('\n')
         append("SIGCODE=").append(quote(scenario.signatureExit?.toString() ?: "")).append('\n')
+        if (arm.workspace.isNotEmpty()) append("PROJECT=1\n")
     }
 
     /** The arm's variables as `export` lines that `native.sh` and `harness.ps1` read. */
@@ -44,6 +47,7 @@ object Harness {
         val settings = listOf(scenario.green, scenario.red).flatMap { arm ->
             listOfNotNull(
                 "files".takeIf { arm.files.isNotEmpty() },
+                "workspace".takeIf { arm.workspace.isNotEmpty() },
                 "ulimits".takeIf { arm.ulimits.isNotEmpty() },
                 "cpuset".takeIf { arm.cpuset != null },
                 "memory".takeIf { arm.memory != MEMORY },
@@ -54,8 +58,15 @@ object Harness {
         return if (settings.isEmpty()) null else "container settings: " + settings.joinToString()
     }
 
+    /** Path under the scenario directory of a workspace file of an arm. */
+    fun workspacePath(armName: String, path: String): String = "$armName.ws/$path"
+
     /** Host path under the scenario directory for the nth file mount of an arm. */
     fun filePath(armName: String, index: Int): String = "files/$armName/$index"
+
+    /** The tag of a Debian image whose `/bin/sh` is linked to [shell]. */
+    fun shellTag(image: String, shell: String): String =
+        "drift-bench-sh-$shell:" + image.replace(Regex("[^A-Za-z0-9_.-]"), "-")
 
     /** The tag of an Alpine image with gcompat and libgcc added, which the glibc drift needs. */
     fun gcompatTag(image: String): String =
@@ -64,12 +75,22 @@ object Harness {
     /** A shell script that runs one arm; `DRIFT` names the Linux drift binary to mount, if any. */
     fun script(scenario: Scenario, armName: String, arm: Arm): String {
         val alpine = "alpine" in arm.image
-        val image = if (alpine) gcompatTag(arm.image) else arm.image
+        val shell = arm.shell
+        val image = when {
+            alpine -> gcompatTag(arm.image)
+            shell != null -> shellTag(arm.image, shell)
+            else -> arm.image
+        }
         val lines = mutableListOf<String>()
         lines += "#!/bin/sh"
         lines += "dir=\$(cd \"\$(dirname \"\$0\")\" && pwd)"
         if (alpine) {
             lines += "printf 'FROM %s\\n$GCOMPAT\\n' ${quote(arm.image)} | " +
+                "docker build --quiet --tag ${quote(image)} - > /dev/null || exit 1"
+        }
+        if (shell != null && !alpine) {
+            val args = "${quote(arm.image)} ${quote(shell)}"
+            lines += "printf 'FROM %s\\nRUN ln -sf %s /bin/sh\\n' $args | " +
                 "docker build --quiet --tag ${quote(image)} - > /dev/null || exit 1"
         }
         lines += "set -- docker run --rm --name ${quote("drift-bench-${scenario.id}-$armName")} \\"
@@ -133,6 +154,7 @@ object Harness {
         if (intermittent) {
             val gate = "permille=${scenario.red.gate},salt=${scenario.salt},env=BENCH_FLAKE"
             lines += "\t--gate ${quote(gate)} \\"
+            lines += "\t--pilot ${SolveOptions.MAX_PILOT} \\"
         }
         lines += "\t--drift-binary \"\$arms\" \\"
         lines += "\t> \"\$dir/solve.out\" 2> \"\$dir/solve.err\" &"
@@ -149,6 +171,7 @@ object Harness {
         lines += "\t\t'CONFIRMED EFFECT'*) v=confirmed-effect ;;"
         lines += "\t\tCONFIRMED*) v=confirmed ;;"
         lines += "\t\tNARROWED*) v=narrowed ;;"
+        lines += "\t\tNEEDS*) v=needs ;;"
         lines += "\t\tSTUCK*) v=stuck ;;"
         lines += "\t\t*) v=error ;;"
         lines += "\tesac"

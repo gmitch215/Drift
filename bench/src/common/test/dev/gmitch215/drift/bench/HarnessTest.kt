@@ -70,6 +70,35 @@ class HarnessTest {
     }
 
     @Test
+    fun anArmWithAShellBuildsAnImageWhoseBinShIsLinkedToIt() {
+        val bash = scenario("\"green\":{\"image\":\"debian:12-slim\",\"shell\":\"bash\"},$RED_Y")
+        val script = Harness.script(bash, "green", bash.green)
+        assertTrue(
+            "printf 'FROM %s\\nRUN ln -sf %s /bin/sh\\n' 'debian:12-slim' 'bash' | " +
+                "docker build --quiet --tag 'drift-bench-sh-bash:debian-12-slim' -" in script,
+            script,
+        )
+        assertTrue("'drift-bench-sh-bash:debian-12-slim' sh /bench/harness.sh green" in script)
+        assertTrue("ln -sf" !in Harness.script(bash, "red", bash.red))
+        assertTrue("\"shell\":\"bash\"" in bash.green.toJson().let { CanonicalJson.encode(it) })
+        assertTrue("shell" !in CanonicalJson.encode(bash.red.toJson()))
+    }
+
+    @Test
+    fun aWorkspaceArmNamesItsFilesAndAsksForTheProjectCapture() {
+        val pinned = scenario(
+            "\"green\":{\"image\":\"x\",\"workspace\":{\".nvmrc\":\"20\\n\"}},$RED_Y",
+        )
+        assertTrue("PROJECT=1\n" in Harness.plan(pinned, pinned.green))
+        assertTrue("PROJECT" !in Harness.plan(pinned, pinned.red))
+        assertEquals("green.ws/.nvmrc", Harness.workspacePath("green", ".nvmrc"))
+        assertEquals("container settings: workspace", Harness.nativeRefusal(pinned))
+        val json = CanonicalJson.encode(pinned.green.toJson())
+        assertTrue("\"workspace\":{\".nvmrc\":\"20\\n\"}" in json)
+        assertTrue("workspace" !in CanonicalJson.encode(pinned.red.toJson()))
+    }
+
+    @Test
     fun thePlanCarriesTrialsSaltGateAndTheSignature() {
         val plan = Harness.plan(s, s.red)
         assertEquals(
@@ -204,7 +233,7 @@ class HarnessTest {
             ~--case "@solved/h-1" \
 
         """.trimIndent()
-        val gateLine = gate?.let { "~--gate $it \\\n" } ?: ""
+        val gateLine = gate?.let { "~--gate $it \\\n~--pilot 30 \\\n" } ?: ""
         val watchdog = "( sleep \"@limit\"; echo timeout > \"@dir/solve.verdict\"; " +
             "kill -s TERM -- \"-@pid\"; sleep 10; kill -s KILL -- \"-@pid\" ) > /dev/null 2>&1 &\n"
         val tail = """
@@ -221,6 +250,7 @@ class HarnessTest {
             ~~'CONFIRMED EFFECT'*) v=confirmed-effect ;;
             ~~CONFIRMED*) v=confirmed ;;
             ~~NARROWED*) v=narrowed ;;
+            ~~NEEDS*) v=needs ;;
             ~~STUCK*) v=stuck ;;
             ~~*) v=error ;;
             ~esac

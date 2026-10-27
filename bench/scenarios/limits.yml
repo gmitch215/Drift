@@ -33,8 +33,7 @@ templates:
       path: limits.nofile
       attribute: open file descriptor limit
       direction: lower
-    visible: false
-    note: The capsule has no ulimit attribute yet.
+    visible: true
 
   - id: limits-fsize
     title: A program writes a file larger than the red file size limit
@@ -67,7 +66,7 @@ templates:
       path: limits.fsize
       attribute: file size limit
       direction: lower
-    visible: false
+    visible: true
 
   - id: limits-nofile-decoy
     title: The descriptor limit, with a memory limit and a log level changed beside it
@@ -113,7 +112,7 @@ templates:
         path: cgroup.memory.max
       - dimension: env
         path: env.LOG_LEVEL
-    visible: false
+    visible: true
 
   - id: limits-data
     title: A program reserves more memory than the red data segment limit allows
@@ -148,8 +147,7 @@ templates:
       path: limits.data
       attribute: data segment limit
       direction: lower
-    visible: false
-    note: The capsule has no ulimit attribute yet.
+    visible: true
 
   - id: limits-core
     title: A crash handler refuses to start when the red core file size limit is zero
@@ -186,8 +184,7 @@ templates:
       path: limits.core
       attribute: core file size limit
       direction: lower
-    visible: false
-    note: The capsule has no ulimit attribute yet.
+    visible: true
 
   - id: limits-cpu-time
     title: A job runs longer than the red CPU time limit and gets the signal for it
@@ -235,8 +232,7 @@ templates:
       path: limits.cpu
       attribute: CPU time limit
       direction: lower
-    visible: false
-    note: The capsule has no ulimit attribute yet.
+    visible: true
 
   - id: limits-nofile-pipe
     title: A program opens pipes until the red descriptor limit refuses the next one
@@ -271,5 +267,4 @@ templates:
       path: limits.nofile
       attribute: open file descriptor limit
       direction: lower
-    visible: false
-    note: The capsule has no ulimit attribute yet.
+    visible: true

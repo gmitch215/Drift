@@ -160,6 +160,8 @@ class Template(
             args = f.list("args"),
             gate = g,
             rate = if (f.has("rate")) f.int("rate") else rate ?: g,
+            shell = f.strOrNull("shell"),
+            workspace = f.strings("workspace"),
         )
     }
 
@@ -259,7 +261,7 @@ class Template(
     }
 
     companion object {
-        private val ARM_MAPS = setOf("env", "ulimits", "files")
+        private val ARM_MAPS = setOf("env", "ulimits", "files", "workspace")
         private val PLACEHOLDER = Regex("\\{\\{([^}]*)}}")
 
         fun fromJson(json: JsonValue, at: String = "template"): Template {
@@ -419,9 +421,13 @@ class Template(
 
             path.startsWith("limits.") -> path.substring(7).let { g.ulimits[it] != r.ulimits[it] }
 
-            path == "cpu.count" -> g.cpuset != r.cpuset
+            path == "cpu.affinity" -> g.cpuset != r.cpuset
 
-            path.startsWith("tool.shell.") -> g.interpreter != r.interpreter
+            path == "network.interfaces" -> g.network != r.network
+
+            path == "tool.sh.flavor" -> g.shell != r.shell
+
+            path.startsWith("project.") -> g.workspace != r.workspace
 
             path.startsWith("os.") || path.startsWith("tool.") -> g.image != r.image
 
@@ -431,6 +437,7 @@ class Template(
         fun sameConfig(g: Arm, r: Arm): Boolean = g.image == r.image && g.env == r.env &&
             g.memory == r.memory && g.cpus == r.cpus && g.cpuset == r.cpuset &&
             g.ulimits == r.ulimits && g.network == r.network && g.files == r.files &&
-            g.interpreter == r.interpreter && g.args == r.args
+            g.interpreter == r.interpreter && g.args == r.args && g.shell == r.shell &&
+            g.workspace == r.workspace
     }
 }
