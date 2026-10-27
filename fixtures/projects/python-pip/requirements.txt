@@ -1,7 +1,7 @@
 # pinned by pip-compile
 --index-url https://pypi.org/simple
 -r other.txt
-Django==5.1.2  # web
+Django==6.1.2  # web
 requests[socks]==2.32.3 ; python_version >= "3.8"
 numpy>=1.26
 pytest==8.*
