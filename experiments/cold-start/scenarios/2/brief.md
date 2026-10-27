@@ -1,0 +1,1 @@
+My settings reader passes its check on my laptop. On the build server, the same check fails with an error about a module that cannot be found. The code is the same copy on both machines. The project is in this folder, and the check is `test.py`. Tell me what is different between the two machines and what to change so the check passes there.

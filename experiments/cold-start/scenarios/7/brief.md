@@ -1,0 +1,1 @@
+Our CI job failed on the build server. The saved log from that run is `ci-failed-job.log` in this folder. The code is the same copy on both machines. The check is `test_report.py`, and it passes on my laptop. I cannot reach the build server. Someone told me to use drift. Tell me why the job failed on the server and what I should change so it passes there.

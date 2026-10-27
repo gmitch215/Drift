@@ -1,0 +1,1 @@
+My file check passes on my laptop. On the build server it fails partway through with an error about files. The code is the same copy on both machines, and I have not changed anything on the server's project. The project is in this folder, and the check is `test.py`. Tell me what is different on the build server and what I should change so the check passes there.

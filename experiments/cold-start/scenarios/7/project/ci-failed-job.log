@@ -1,0 +1,68 @@
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.1204410Z Current runner version: '2.329.0'
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.1219034Z ##[group]Operating System
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.1220211Z Ubuntu
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.1221007Z 24.04.3
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.1221562Z LTS
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.1222108Z ##[endgroup]
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.1222797Z ##[group]Runner Image
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.1223431Z Image: ubuntu-24.04
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.1224077Z Version: 20261019.287.1
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.1225017Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261019.287/images/ubuntu/Ubuntu2404-Readme.md
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.1226302Z ##[endgroup]
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.1229114Z ##[group]GITHUB_TOKEN Permissions
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.1229650Z Contents: read
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.1230120Z ##[endgroup]
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.1233371Z Secret source: Actions
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.1234012Z Prepare workflow directory
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.1567843Z Prepare all required actions
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.1612306Z Getting action download info
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.5081124Z Download action repository 'actions/checkout@v4'
+test (ubuntu-24.04)	Set up job	2026-10-24T14:02:08.6230517Z Download action repository 'actions/setup-python@v5'
+test (ubuntu-24.04)	Run actions/checkout@v4	2026-10-24T14:02:09.0012345Z ##[group]Run actions/checkout@v4
+test (ubuntu-24.04)	Run actions/checkout@v4	2026-10-24T14:02:09.0013011Z with:
+test (ubuntu-24.04)	Run actions/checkout@v4	2026-10-24T14:02:09.0013584Z   repository: example-org/report-tool
+test (ubuntu-24.04)	Run actions/checkout@v4	2026-10-24T14:02:09.0014102Z   fetch-depth: 1
+test (ubuntu-24.04)	Run actions/checkout@v4	2026-10-24T14:02:09.0014588Z   persist-credentials: true
+test (ubuntu-24.04)	Run actions/checkout@v4	2026-10-24T14:02:09.0015071Z ##[endgroup]
+test (ubuntu-24.04)	Run actions/checkout@v4	2026-10-24T14:02:09.4410932Z Syncing repository: example-org/report-tool
+test (ubuntu-24.04)	Run actions/checkout@v4	2026-10-24T14:02:09.4415520Z ##[group]Getting Git version info
+test (ubuntu-24.04)	Run actions/checkout@v4	2026-10-24T14:02:09.4420008Z ##[endgroup]
+test (ubuntu-24.04)	Run actions/checkout@v4	2026-10-24T14:02:09.9105533Z ##[group]Fetching the repository
+test (ubuntu-24.04)	Run actions/checkout@v4	2026-10-24T14:02:10.2836107Z ##[endgroup]
+test (ubuntu-24.04)	Run actions/checkout@v4	2026-10-24T14:02:10.3011784Z ##[group]Determining the checkout info
+test (ubuntu-24.04)	Run actions/checkout@v4	2026-10-24T14:02:10.3017630Z ##[endgroup]
+test (ubuntu-24.04)	Run actions/checkout@v4	2026-10-24T14:02:10.3341029Z ##[group]Checking out the ref
+test (ubuntu-24.04)	Run actions/checkout@v4	2026-10-24T14:02:10.3345981Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+test (ubuntu-24.04)	Run actions/checkout@v4	2026-10-24T14:02:10.3905512Z HEAD is now at 3c9e1a7 Add report labels
+test (ubuntu-24.04)	Run actions/checkout@v4	2026-10-24T14:02:10.3912874Z ##[endgroup]
+test (ubuntu-24.04)	Set up Python	2026-10-24T14:02:10.6100021Z ##[group]Run actions/setup-python@v5
+test (ubuntu-24.04)	Set up Python	2026-10-24T14:02:10.6100713Z with:
+test (ubuntu-24.04)	Set up Python	2026-10-24T14:02:10.6101245Z   python-version: 3.9
+test (ubuntu-24.04)	Set up Python	2026-10-24T14:02:10.6101770Z   check-latest: false
+test (ubuntu-24.04)	Set up Python	2026-10-24T14:02:10.6102244Z   cache: pip
+test (ubuntu-24.04)	Set up Python	2026-10-24T14:02:10.6102699Z   allow-prereleases: false
+test (ubuntu-24.04)	Set up Python	2026-10-24T14:02:10.6103156Z ##[endgroup]
+test (ubuntu-24.04)	Set up Python	2026-10-24T14:02:11.7720382Z Successfully set up CPython (3.9.18)
+test (ubuntu-24.04)	Show Python version	2026-10-24T14:02:11.8012098Z ##[group]Run python --version
+test (ubuntu-24.04)	Show Python version	2026-10-24T14:02:11.8012711Z shell: /usr/bin/bash -e {0}
+test (ubuntu-24.04)	Show Python version	2026-10-24T14:02:11.8013204Z ##[endgroup]
+test (ubuntu-24.04)	Show Python version	2026-10-24T14:02:12.0410377Z Python 3.9.18
+test (ubuntu-24.04)	Install dependencies	2026-10-24T14:02:12.0500932Z ##[group]Run python -m pip install --upgrade pip
+test (ubuntu-24.04)	Install dependencies	2026-10-24T14:02:12.0501604Z shell: /usr/bin/bash -e {0}
+test (ubuntu-24.04)	Install dependencies	2026-10-24T14:02:12.0502117Z ##[endgroup]
+test (ubuntu-24.04)	Install dependencies	2026-10-24T14:02:13.2214450Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.9.18/x64/lib/python3.9/site-packages
+test (ubuntu-24.04)	Run tests	2026-10-24T14:02:13.4401122Z ##[group]Run python test_report.py
+test (ubuntu-24.04)	Run tests	2026-10-24T14:02:13.4401780Z shell: /usr/bin/bash -e {0}
+test (ubuntu-24.04)	Run tests	2026-10-24T14:02:13.4402310Z env:
+test (ubuntu-24.04)	Run tests	2026-10-24T14:02:13.4402821Z   pythonLocation: /opt/hostedtoolcache/Python/3.9.18/x64
+test (ubuntu-24.04)	Run tests	2026-10-24T14:02:13.4403337Z ##[endgroup]
+test (ubuntu-24.04)	Run tests	2026-10-24T14:02:13.7011209Z   File "/home/runner/work/report-tool/report-tool/test_report.py", line 2
+test (ubuntu-24.04)	Run tests	2026-10-24T14:02:13.7011833Z     match status:
+test (ubuntu-24.04)	Run tests	2026-10-24T14:02:13.7012290Z           ^
+test (ubuntu-24.04)	Run tests	2026-10-24T14:02:13.7012741Z SyntaxError: invalid syntax
+test (ubuntu-24.04)	Run tests	2026-10-24T14:02:13.7531085Z ##[error]Process completed with exit code 1.
+test (ubuntu-24.04)	Post Run actions/checkout@v4	2026-10-24T14:02:13.7801946Z ##[group]Run actions/checkout@v4
+test (ubuntu-24.04)	Post Run actions/checkout@v4	2026-10-24T14:02:13.7802523Z ##[endgroup]
+test (ubuntu-24.04)	Post Run actions/checkout@v4	2026-10-24T14:02:13.8210457Z Cleaning up orphan processes
+test (ubuntu-24.04)	Complete job	2026-10-24T14:02:13.9011128Z Cleaning up orphan processes
+Error: Process completed with exit code 1.

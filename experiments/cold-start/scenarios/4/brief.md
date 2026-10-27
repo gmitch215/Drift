@@ -1,0 +1,1 @@
+My check script passes on my laptop. On the build server it fails at its first step with an error I do not understand. The code is the same copy on both machines. The project is in this folder, and the check is `test.py`. Tell me what is different on the build server and what I should change so the check passes there.

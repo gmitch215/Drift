@@ -1,0 +1,1 @@
+Someone sent me a bug report, and the text is in `issue.md` in this folder. The report describes a failure on their machine. I have no access to that machine and cannot run anything on it. Tell me which fact about their environment the report points at, and what they should check or change.

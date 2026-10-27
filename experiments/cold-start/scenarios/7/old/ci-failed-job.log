@@ -1,0 +1,87 @@
+Test Project (linux-x64)	Set up job	﻿2026-10-24T00:05:01.4710815Z Current runner version: '2.338.0'
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4734764Z ##[group]Runner Image Provisioner
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4735729Z Hosted Compute Agent
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4736534Z Version: 20261012.601
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4737275Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4738111Z Build Date: 2026-10-12T17:48:21Z
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4739055Z Worker ID: {83e41d46-e727-4110-8663-b30efb210215}
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4739951Z Region: eastus
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4740710Z Cloud: Azure
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4741330Z ##[endgroup]
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4743259Z ##[group]Operating System
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4744117Z Ubuntu
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4744760Z 24.04.5
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4745391Z LTS
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4746006Z ##[endgroup]
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4746629Z ##[group]Runner Image
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4747415Z Image: ubuntu-24.04
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4748061Z Version: 20261012.334.1
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4749440Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4751489Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4752830Z ##[endgroup]
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4754243Z ##[group]GITHUB_TOKEN Permissions
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4756704Z Contents: read
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4757403Z Metadata: read
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4758155Z ##[endgroup]
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4760774Z Secret source: Actions
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4762000Z Cache mode: write
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.4763174Z Prepare workflow directory
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.5190868Z Prepare all required actions
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.5244418Z Getting action download info
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.7498315Z Download action repository 'actions/checkout@v6' (SHA:d23441a48e516b6c34aea4fa41551a30e30af803)
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:01.8301622Z Download action repository 'actions/setup-java@v5' (SHA:b6effb05e454b25005698d916606bdc6ffcbf961)
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:02.0816885Z Download action repository 'actions/cache@v5' (SHA:caa296126883cff596d87d8935842f9db880ef25)
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:02.2321296Z Download action repository 'codecov/codecov-action@v7' (SHA:303a32d7a59b442fa8d48b6a1cc6825c09c847a5)
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:02.3328451Z Download action repository 'actions/upload-artifact@v7' (SHA:cf430e030ddbb5b0abf93d22962f4752f3646cd9)
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:02.6073961Z Getting action download info
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:02.7042731Z Download action repository 'actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd' (SHA:ed597411d8f924073f98dfc5c65a23a2325f34cd)
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:02.8892752Z Getting action download info
+Test Project (linux-x64)	Set up job	2026-10-24T00:05:03.0249211Z Complete job name: Test Project (linux-x64)
+Test Project (linux-x64)	Run Tests	2026-10-24T00:11:19.4755154Z > Task :cli:wasmJsNodeTest
+Test Project (linux-x64)	Run Tests	2026-10-24T00:11:31.5754758Z > Task :core:wasmJsNodeTest
+Test Project (linux-x64)	Run Tests	2026-10-24T00:11:38.6764441Z > Task :cli:linkReleaseExecutableLinuxX64
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0754329Z 
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0754997Z FAILURE: Build completed with 3 failures.
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0755294Z 
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0755320Z 
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0755698Z [Incubating] Problems report is available at: file:///home/runner/work/Drift/Drift/build/reports/problems/problems-report.html
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0756431Z 1: Task failed with an exception.
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0756806Z -----------
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0756970Z 
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0757104Z * What went wrong:
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0757639Z Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0758670Z Execution failed for task ':bench:jvmTest'.
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0759288Z > There were failing tests. See the report at: file:///home/runner/work/Drift/Drift/bench/build/reports/tests/jvmTest/index.html
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0760327Z 
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0760419Z * Try:
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0760836Z > Run with --scan to get full insights from a Build Scan (powered by Develocity).
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0761409Z ==============================================================================
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0761729Z 
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0761876Z 2: Task failed with an exception.
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0762217Z -----------
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0762487Z * What went wrong:
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0762843Z Execution failed for task ':bench:linuxX64Test'.
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0763857Z > There were failing tests. See the report at: file:///home/runner/work/Drift/Drift/bench/build/reports/tests/linuxX64Test/index.html
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0764615Z 
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0764730Z * Try:
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0765092Z > Run with --scan to get full insights from a Build Scan (powered by Develocity).
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0765487Z ==============================================================================
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0765693Z 
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0765809Z 3: Task failed with an exception.
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0766050Z -----------
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0766242Z * What went wrong:
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0766481Z Execution failed for task ':bench:wasmJsNodeTest'.
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0767114Z > There were failing tests. See the report at: file:///home/runner/work/Drift/Drift/bench/build/reports/tests/wasmJsNodeTest/index.html
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0767744Z 
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0767857Z * Try:
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0768278Z > Run with --scan to get full insights from a Build Scan (powered by Develocity).
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0768806Z ==============================================================================
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0769071Z 
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0769178Z BUILD FAILED in 7m 37s
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0769345Z 
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0769819Z You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0770379Z 
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0770916Z For more on this, please refer to https://docs.gradle.org/9.8.0/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0771671Z 187 actionable tasks: 181 executed, 6 from cache
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.0772031Z Configuration cache entry stored.
+Test Project (linux-x64)	Run Tests	2026-10-24T00:13:03.5055653Z ##[error]Process completed with exit code 1.

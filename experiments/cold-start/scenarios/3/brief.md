@@ -1,0 +1,1 @@
+My date check prints the wrong day on the build server. It prints the right day on my laptop. The code is the same copy on both machines, and I have not touched the settings on either. The project is in this folder, and the check is `test.py`. Tell me what is different between the two machines and what I should change so the check gives the same answer everywhere.

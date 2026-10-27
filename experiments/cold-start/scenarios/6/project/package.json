@@ -1,0 +1,10 @@
+{
+	"name": "orders",
+	"private": true,
+	"scripts": {
+		"test": "node test.js"
+	},
+	"dependencies": {
+		"tinyfmt": "2.0.0"
+	}
+}
