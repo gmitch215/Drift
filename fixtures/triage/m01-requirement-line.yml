@@ -1,0 +1,7 @@
+category: free-text
+facts:
+  - 'tool.php.required=>=8.2.0'
+  - 'tool.php.version=8.0.30'
+rules: []
+claims: []
+draft: false

@@ -1,0 +1,8 @@
+category: mixed
+facts:
+  - 'env.PUID=1000'
+  - 'env.UMASK=002'
+  - 'runtime.container.image=acme/app:3.2'
+rules: []
+claims: []
+draft: false

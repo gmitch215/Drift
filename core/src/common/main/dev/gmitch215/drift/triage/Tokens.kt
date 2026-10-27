@@ -68,7 +68,8 @@ internal object Tokens {
 
     /**
      * A dotted version at [from] (a leading `v` is skipped) as the token and its end index, or
-     * null. A token keeps its pre-release word and a `_NNN` update number; `+build` is skipped.
+     * null. A token keeps its pre-release word and a `_NNN` update number; `+build` and a Ruby
+     * `pNNN` patch level (`3.0.2p107`) are skipped.
      * A lone number of four digits or more (a year) and a date are not versions, and the text
      * must parse with [Version.parse].
      */
@@ -95,6 +96,9 @@ internal object Tokens {
         if (end + 1 < s.length && s[end] == '_' && isDigit(s[end + 1])) {
             end = digitsEnd(s, end + 1)
             token = end
+        } else if (segments >= 3 && end + 1 < s.length && s[end] == 'p' && isDigit(s[end + 1])) {
+            token = end
+            end = digitsEnd(s, end + 1)
         } else {
             val pre = preAt(s, end)
             if (pre > end) {

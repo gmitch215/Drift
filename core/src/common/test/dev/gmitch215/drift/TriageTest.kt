@@ -282,6 +282,269 @@ class TriageTest {
     }
     // #endregion
 
+    // #region mentions
+    private fun values(text: String, key: String, side: Side = Side.FAILING) =
+        run(text).facts.filter { it.key == key && it.side == side }.map { it.value }
+
+    @Test
+    fun aRequirementAndTheVersionFoundBecomeTwoFacts() {
+        val composer = run(
+            "Fatal error: Your dependencies require a PHP version \">= 8.2.0\". " +
+                "You are running 8.0.30.",
+        )
+        assertEquals(">=8.2.0", composer.value("tool.php.required"))
+        assertEquals("8.0.30", composer.value("tool.php.version"))
+        val yarn = run(
+            "error pkg@1.0.0: The engine \"node\" is incompatible with this module. " +
+                "Expected version \">=20.0.0\". Got \"18.19.0\"",
+        )
+        assertEquals(">=20.0.0", yarn.value("tool.node.required"))
+        assertEquals("18.19.0", yarn.value("tool.node.version"))
+        val pip = run("ERROR: Package 'demo' requires a different Python: 3.8.10 not in '>=3.10'")
+        assertEquals(">=3.10", pip.value("tool.python.required"))
+        assertEquals("3.8.10", pip.value("tool.python.version"))
+        val go = run("go: go.mod requires go >= 1.22 (running go 1.20; GOTOOLCHAIN=local)")
+        assertEquals(">=1.22", go.value("tool.go.required"))
+        assertEquals("1.20", go.value("tool.go.version"))
+        val gradle = run("Minimum supported Gradle version is 8.5. Current version is 8.2")
+        assertEquals("8.5", gradle.value("tool.gradle.required"))
+        assertEquals("8.2", gradle.value("tool.gradle.version"))
+    }
+
+    @Test
+    fun aRequirementNeedsAToolOnTheLineAndTheVersionFoundNeedsARequirement() {
+        for (text in listOf(
+            "This needs 2 more reviewers",
+            "The task requires a restart of the server",
+            "You are running 7.4.33",
+            "Expected version 1.2.3",
+        )) {
+            val facts = run(text).facts
+            assertTrue(
+                facts.none {
+                    it.key.endsWith(".required") || it.key.endsWith(".version")
+                },
+                text,
+            )
+        }
+    }
+
+    @Test
+    fun aToolTheTextRunsGetsAVersionKeyWithoutATableEntry() {
+        val r = run("$ skopeo --version\nskopeo version 1.13.3\n$ make test\nit takes make 2 hours")
+        assertEquals("1.13.3", r.value("tool.skopeo.version"))
+        assertNull(r.fact("tool.make.version"))
+        assertNull(run("skopeo version 1.13.3").fact("tool.skopeo.version"))
+        val apt = run("apt-get install -y mytool=2.1\nmytool 2.1.4 is what I see")
+        assertEquals("2.1.4", apt.value("tool.mytool.version"))
+        assertNull(run("$ ls -la\nls 2.5 megabytes").fact("tool.ls.version"))
+        assertEquals(
+            "24.0.7",
+            run("Docker version 24.0.7, build afdd53b").value("tool.docker.version"),
+        )
+        assertEquals("3.0.2", run("OpenSSL 3.0.2 15 Mar 2022").value("tool.openssl.version"))
+    }
+
+    @Test
+    fun pipOutputAndPinsNamePythonPackages() {
+        val r = run(
+            """
+            Collecting virtualenv
+              Downloading https://files.example/p/virtualenv-16.7.9-py2.py3-none-any.whl (3.4MB)
+            Successfully installed Flask-3.0.2 Jinja2-3.1.3 click-8.1.7
+            Requirement already satisfied: numpy in /usr/lib/python3 (1.26.4)
+            ${'$'} pip install requests==2.31.0 -r other.txt
+            """.trimIndent(),
+        )
+        assertEquals("16.7.9", r.value("project.python.virtualenv"))
+        assertEquals("3.0.2", r.value("project.python.flask"))
+        assertEquals("3.1.3", r.value("project.python.jinja2"))
+        assertEquals("8.1.7", r.value("project.python.click"))
+        assertEquals("1.26.4", r.value("project.python.numpy"))
+        assertEquals("2.31.0", r.value("project.python.requests"))
+        val none = run("if a == b then x==y and see Flask-3 or the 2.5 release")
+        assertTrue(none.facts.none { it.key.startsWith("project.python.") })
+    }
+
+    @Test
+    fun aBindingNameCarriesItsMajorVersionAndASide() {
+        val r = run("It raises an error in PyQt6 but works very well in PyQt5.")
+        assertEquals("6", r.value("project.python.pyqt"))
+        assertEquals("5", r.value("project.python.pyqt", Side.PASSING))
+        assertEquals("6", run("Built against Qt6 and GTK4").value("tool.qt.version"))
+        val none = run("QtCore.Qt.DisplayRole and utf8 and sha256 and pyqt66")
+        assertTrue(
+            none.facts.none {
+                it.key == "project.python.pyqt" || it.key == "tool.qt.version"
+            },
+        )
+    }
+
+    @Test
+    fun anImageIsReadFromARegistryPathADockerCommandOrADockerUrl() {
+        assertEquals(
+            listOf("ghcr.io/acme/tool:1.4"),
+            values("Using ghcr.io/acme/tool:1.4 in CI", "runtime.container.image"),
+        )
+        assertEquals(
+            listOf("nginx:1.25"),
+            values("docker run --rm -p 80:80 -e A=b nginx:1.25 sleep 1", "runtime.container.image"),
+        )
+        assertEquals(
+            listOf("centos"),
+            values("docker pull centos@sha256:0123abcd", "runtime.container.image"),
+        )
+        assertEquals(
+            listOf("centos:7"),
+            values("skopeo inspect docker://centos:7", "runtime.container.image"),
+        )
+        val sides = run("`quay.io/org/base:2` works but `quay.io/org/base:3` fails")
+        assertEquals("quay.io/org/base:3", sides.value("runtime.container.image"))
+        assertEquals("quay.io/org/base:2", sides.value("runtime.container.image", Side.PASSING))
+        val newer = run("The newer one (`quay.io/org/base:3`) does not have this problem.")
+        assertEquals("quay.io/org/base:3", newer.value("runtime.container.image", Side.PASSING))
+        val none = run("see https://github.com/acme/tool and docs.example.com/a/b")
+        assertNull(none.fact("runtime.container.image"))
+    }
+
+    @Test
+    fun anEnvironmentVariableIsReadFromAnEnvBlockAFlagOrAKeywordButNeverASecret() {
+        val compose = run(
+            """
+            services:
+              app:
+                environment:
+                  - PUID=1000
+                  - UMASK=002
+                  - API_TOKEN=abc123
+                  - LEVEL=${'$'}LEVEL_FROM_HOST
+                  - REGION_CODE: eu
+            """.trimIndent(),
+        )
+        assertEquals("1000", compose.value("env.PUID"))
+        assertEquals("002", compose.value("env.UMASK"))
+        assertNull(compose.fact("env.API_TOKEN"))
+        assertNull(compose.fact("env.LEVEL"))
+        assertEquals("eu", compose.value("env.REGION_CODE"))
+        assertEquals("fast", run("docker run -e FOO_MODE=fast img").value("env.FOO_MODE"))
+        assertEquals("debug", run("ENV LOG_LEVEL=debug").value("env.LOG_LEVEL"))
+        assertEquals("8", run("export HTTP_THREADS=8").value("env.HTTP_THREADS"))
+        assertEquals("UTC", run("environment:\n  - TZ=UTC").value("env.TZ"))
+        val none =
+            run("Environment:\n\nPHP: 8.2\n\nVERSION: 1.2.3\nNAME=value\nexport PASSWORD=hunter2")
+        assertTrue(none.facts.none { it.key.startsWith("env.") })
+    }
+
+    @Test
+    fun aServerPlatformIsReadFromALabelALogLineOrAJarName() {
+        val form = run("### Server Version\n\nPaper 1.20.1\n\n### Other\n\nnone")
+        assertEquals("paper", form.value("runtime.platform"))
+        assertEquals("1.20.1", form.value("tool.paper.version"))
+        val label = run("Server Core: Purpur-1.21-2300")
+        assertEquals("purpur", label.value("runtime.platform"))
+        assertEquals("1.21", label.value("tool.purpur.version"))
+        val log = run("This server is running Waterfall version git:Waterfall-Bootstrap:1.20")
+        assertEquals("waterfall", log.value("runtime.platform"))
+        val named = run("Paper version: 1.21-38-master@1f5db50")
+        assertEquals("1.21", named.value("tool.paper.version"))
+        val jar = run("at org.bukkit.Foo.bar(Foo.java:1) [spigot-api-1.19-R0.1-SNAPSHOT.jar:?]")
+        assertEquals("spigot", jar.value("runtime.platform"))
+        assertEquals("1.19", jar.value("tool.spigot.version"))
+        val none = run("I wrote a paper about forge and a quilt version of it")
+        assertNull(none.fact("runtime.platform"))
+        assertNull(run("Server Version: 1.21.6").fact("runtime.platform"))
+    }
+
+    @Test
+    fun aDockerVersionBlockAndAKernelLineGiveFacts() {
+        val block = run(
+            """
+            Client:
+             Version:      20.10.7
+             API version:  1.41
+            Server:
+             Engine:
+              Version:     20.10.7
+            """.trimIndent(),
+        )
+        assertEquals("20.10.7", block.value("tool.docker.version"))
+        val info =
+            run(
+                "Server Version: 24.0.5\nStorage Driver: overlay2\n" +
+                    "Kernel Version: 5.15.0-1068-azure",
+            )
+        assertEquals("24.0.5", info.value("tool.docker.version"))
+        assertEquals("5.15.0-1068-azure", info.value("kernel.release"))
+        assertNull(run("Version: 3.1\nServer Version: 4.2").fact("tool.docker.version"))
+    }
+
+    @Test
+    fun anErrnoLineNamesTheLimitItReports() {
+        assertEquals(
+            "exceeded",
+            run("write failed: Disk quota exceeded").value("limits.disk-quota"),
+        )
+        assertEquals("exceeded", run("EMFILE: Too many open files").value("limits.nofile"))
+        assertNull(run("the disk is fine and quota is not an issue").fact("limits.disk-quota"))
+    }
+
+    @Test
+    fun lookalikesOfAToolOrAPackageAreNotRead() {
+        val f = "`".repeat(3)
+        val http = run("$f\n> POST /v1.30/build\n$f\nPOST 1.30 again")
+        assertNull(http.fact("tool.post.version"))
+        assertNull(run("curl: (60) SSL certificate problem").fact("tool.curl.version"))
+        assertNull(run("$ curl 172.17.0.3").fact("tool.curl.version"))
+        assertEquals(
+            "8.7.1",
+            run("$ curl --version\ncurl 8.7.1 (x86_64)").value("tool.curl.version"),
+        )
+        assertNull(run("docker run should work").fact("runtime.container.image"))
+        assertEquals(
+            "alpine",
+            run("$f\ndocker run alpine\n$f").value("runtime.container.image"),
+        )
+        assertTrue(
+            run("$f\nif bitness==64:\n$f").facts.none {
+                it.key.startsWith("project.python.")
+            },
+        )
+        assertEquals(
+            "3.0.2",
+            run("$f\nFlask==3.0.2\n$f").value("project.python.flask"),
+        )
+        assertNull(run("the test expected 0: dotnet failed").fact("tool.dotnet.required"))
+        assertNull(run("./run-all.sh 2.5").fact("tool.run-all.sh.version"))
+    }
+
+    @Test
+    fun aChangedImageOrBindingMakesADraftWhenAnErrorIsQuoted() {
+        val image =
+            run("`quay.io/a/b:1` works but `quay.io/a/b:2` fails with `Error: layer missing`.")
+        val draft = assertNotNull(image.draft)
+        assertEquals("runtime.container.image", draft.key)
+        assertContains(draft.yaml, "eq: quay.io/a/b:1")
+        assertContains(draft.yaml, "eq: quay.io/a/b:2")
+        val rule = Drafts.build(
+            "triage-image-12345678",
+            "runtime.container.image",
+            "quay.io/a/b:1",
+            "quay.io/a/b:2",
+            image.facts.single { it.key == "run:signature" },
+            "2026-10-26",
+            Status.ACTIVE,
+            "12345678abcdef",
+        )
+        assertEquals(emptyList(), RuleCompiler.validate(rule))
+        assertEquals(emptyList(), Constraints.fixtures(rule))
+        val binding = run("PyQt5 works but PyQt6 fails with `AttributeError: no attribute foo`.")
+        assertEquals("project.python.pyqt", assertNotNull(binding.draft).key)
+        val same =
+            run("`quay.io/a/b:1` works and `quay.io/a/b:1` fails with `Error: layer missing`.")
+        assertNull(same.draft)
+    }
+    // #endregion
+
     // #region redaction and users
     @Test
     fun secretsAndUsernamesNeverReachTheResult() {

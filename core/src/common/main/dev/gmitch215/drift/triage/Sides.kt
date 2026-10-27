@@ -18,8 +18,22 @@ internal object Sides {
         "passing",
     )
 
-    private val passingAfter =
-        listOf("works", "worked", "working", "is fine", "passes", "passed", "fine")
+    private val passingAfter = listOf(
+        "works",
+        "worked",
+        "working",
+        "is fine",
+        "passes",
+        "passed",
+        "fine",
+        "does not have this problem",
+        "doesn't have this problem",
+        "does not have this issue",
+        "doesn't have this issue",
+        "is not affected",
+        "isn't affected",
+        "is unaffected",
+    )
     private val failingAfter = listOf("fails", "failed", "breaks", "crashes", "is broken", "broken")
 
     private fun starts(text: String, word: String) =

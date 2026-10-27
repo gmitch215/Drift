@@ -61,9 +61,19 @@ internal object Drafts {
     private const val TITLE_SIGNATURE = 60
     private const val PLACEHOLDER_DATE = "unverified"
 
+    /** Keys whose values are names, not versions: a rule says the name changed. */
+    private val named = setOf("runtime.container.image", "ci.runner.label", "runtime.platform")
+
+    private fun drafted(key: String) =
+        key.endsWith(".version") || key.startsWith("project.") || key in named
+
+    private fun moves(key: String, from: String, to: String) =
+        if (key in named) from != to else rises(key, from, to)
+
     /**
-     * A rule needs a symptom signature and one version key stated on both sides with the passing
-     * version below the failing one, and no rule that already holds on that key.
+     * A rule needs a symptom signature and one key stated on both sides, with the passing version
+     * below the failing one (a changed name for an image, a runner label or a platform), and no
+     * rule that already holds on that key.
      */
     fun suggest(
         facts: List<Fact>,
@@ -75,12 +85,12 @@ internal object Drafts {
         val sig = facts.firstOrNull { it.key == "run:signature" && it.side == Side.FAILING }
             ?: return null
         val covered = hits.filter { it.grade != Grade.SYMPTOM }.flatMap { it.facts }.toSet()
-        val pair = facts.filter { it.side == Side.FAILING && it.key.endsWith(".version") }
+        val pair = facts.filter { it.side == Side.FAILING && drafted(it.key) }
             .sortedBy { it.key }
             .firstNotNullOfOrNull { fv ->
                 val pv = facts.firstOrNull { it.side == Side.PASSING && it.key == fv.key }
                     ?: return@firstNotNullOfOrNull null
-                if (fv.key in covered || !rises(fv.key, pv.value, fv.value)) {
+                if (fv.key in covered || !moves(fv.key, pv.value, fv.value)) {
                     return@firstNotNullOfOrNull null
                 }
                 if (Dimension.of(fv.key) == null) return@firstNotNullOfOrNull null
@@ -155,12 +165,21 @@ internal object Drafts {
         status: Status,
         body: String,
     ): Rule {
+        val byName = key in named
         val detect = Detect.parse(
             obj(
                 "all" to JsonArray(
                     listOf(
-                        obj("a" to JsonString(key), "ver" to JsonString("<=$from")),
-                        obj("b" to JsonString(key), "ver" to JsonString(">=$to")),
+                        if (byName) {
+                            obj("a" to JsonString(key), "eq" to JsonString(from))
+                        } else {
+                            obj("a" to JsonString(key), "ver" to JsonString("<=$from"))
+                        },
+                        if (byName) {
+                            obj("b" to JsonString(key), "eq" to JsonString(to))
+                        } else {
+                            obj("b" to JsonString(key), "ver" to JsonString(">=$to"))
+                        },
                         obj("b" to JsonString("run:signature"), "has" to JsonString(sig.value)),
                     ),
                 ),
@@ -172,8 +191,11 @@ internal object Drafts {
             id = id,
             title = "Reported: $head after $key $from to $to",
             applies = listOf(Dimension.of(key)?.id ?: "runtime"),
-            difference = "the failing side has $key $to or newer and the passing side has $from " +
-                "or older",
+            difference = if (byName) {
+                "the failing side has $key $to and the passing side has $from"
+            } else {
+                "the failing side has $key $to or newer and the passing side has $from or older"
+            },
             symptoms = listOf(Symptom(sig.value, Basis.INFERRED)),
             mechanism = "Not established: drafted from one issue report that nobody has " +
                 "reproduced.",

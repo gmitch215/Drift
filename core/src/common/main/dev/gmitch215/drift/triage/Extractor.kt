@@ -20,9 +20,17 @@ internal data class Cand(
 internal class Extractor(val doc: Doc, private val bases: Map<Via, Int> = emptyMap()) {
     val out = mutableListOf<Cand>()
 
-    private val names: List<Pair<String, VersionField>> = Names.versions
+    val names: List<Pair<String, VersionField>> = (Names.versions + Evidence.fields(doc))
         .flatMap { f -> f.names.map { it to f } }
         .sortedWith(compareBy({ -it.first.length }, { it.first }))
+
+    /** The tool whose name starts at [at] in [low] and the index after it, or null. */
+    fun nameAt(low: String, at: Int): Pair<VersionField, Int>? {
+        val hit = names.firstOrNull { (n, _) ->
+            Tokens.wordAt(low, at, n) && Tokens.endsAt(low, at + n.length)
+        } ?: return null
+        return hit.second to at + hit.first.length
+    }
 
     fun run(): List<Cand> {
         sections()
@@ -31,6 +39,7 @@ internal class Extractor(val doc: Doc, private val bases: Map<Via, Int> = emptyM
             keyValue(i)
             toolLines(i)
             versions(i)
+            Requirements(this).run(i)
             operatingSystem(i, 0, doc.lines[i].length, Via.PATTERN, null)
             arch(i)
             browser(i, Via.PATTERN, false)
@@ -38,6 +47,7 @@ internal class Extractor(val doc: Doc, private val bases: Map<Via, Int> = emptyM
             platform(i)
         }
         Verbatim(this).run()
+        Mentions(this).run()
         return out
     }
 
@@ -63,16 +73,17 @@ internal class Extractor(val doc: Doc, private val bases: Map<Via, Int> = emptyM
         out += Cand(key, value, where, via, Span(i + 1, col + 1, length), Confidence(base))
     }
 
-    private fun emitVersion(
+    fun emitVersion(
         i: Int,
         f: VersionField,
         token: String,
         col: Int,
         via: Via,
         label: String?,
+        side: Side? = null,
     ) {
-        emit(i, f.key, token, col, token.length, via, label)
-        f.family?.let { emit(i, it.first, it.second, col, token.length, via, label) }
+        emit(i, f.key, token, col, token.length, via, label, side = side)
+        f.family?.let { emit(i, it.first, it.second, col, token.length, via, label, side = side) }
     }
     // #endregion
 
@@ -124,6 +135,8 @@ internal class Extractor(val doc: Doc, private val bases: Map<Via, Int> = emptyM
                 emit(i, "runtime.container.image", v, c, v.length, via, norm)
             }
 
+            bare in Names.platformLabels -> Mentions(this).platformValue(i, from, via, norm)
+
             bare in Names.localeLabels -> token(text, from)?.let { (v, c) ->
                 if (v.any { it == '_' || it == '.' } && v[0].isLetter()) {
                     emit(i, "env.LANG", v, c, v.length, via, norm, LOCALE_SCALE)
@@ -148,6 +161,7 @@ internal class Extractor(val doc: Doc, private val bases: Map<Via, Int> = emptyM
         val gaps = Names.gapWords + hit.first
         val (v, start) =
             afterName(text, Tokens.lower(text), from, hit.second.scheme, gaps) ?: return
+        if (hit.second.generic && (!v.contains('.') || address(v))) return
         emitVersion(i, hit.second, v, start, via, norm)
     }
 
@@ -266,7 +280,7 @@ internal class Extractor(val doc: Doc, private val bases: Map<Via, Int> = emptyM
                 val rightOk = Tokens.endsAt(low, end) || Tokens.isDigit(low[end])
                 if (free && rightOk && Tokens.wordAt(low, at, name) && ahead(low, at)) {
                     val hit = afterName(raw, low, end, field.scheme)
-                    if (hit != null) {
+                    if (hit != null && (!field.generic || dotted(low, end, hit))) {
                         for (k in at until end) used[k] = true
                         val anchored = doc.inCode[i] && at == first
                         val via = if (anchored) Via.TOOL else Via.PATTERN
@@ -277,6 +291,19 @@ internal class Extractor(val doc: Doc, private val bases: Map<Via, Int> = emptyM
             }
         }
     }
+
+    /**
+     * A generic name needs a dotted version or the word `version` before it, and four numbers
+     * joined by dots read as an address.
+     */
+    private fun dotted(low: String, end: Int, hit: Pair<String, Int>): Boolean {
+        val token = hit.first
+        return !address(token) &&
+            (token.contains('.') || low.substring(end, hit.second).contains("version"))
+    }
+
+    private fun address(token: String) =
+        token.split('.').let { p -> p.size == 4 && p.all { it.toIntOrNull() != null } }
 
     private fun ahead(low: String, at: Int) =
         at == 0 || low[at - 1] != '-' || at < 2 || low[at - 2] == ' '

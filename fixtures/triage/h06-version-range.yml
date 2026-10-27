@@ -1,5 +1,6 @@
 category: mixed
-facts: []
+facts:
+  - 'tool.node.required=>=18'
 rules: []
 claims: []
 draft: false

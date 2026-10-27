@@ -213,3 +213,27 @@ items:
   - id: triage-w10-dates-and-ids
     source: fixture
     body: w10-dates-and-ids
+  - id: triage-m01-requirement-line
+    source: fixture
+    body: m01-requirement-line
+  - id: triage-m02-engine-mismatch
+    source: fixture
+    body: m02-engine-mismatch
+  - id: triage-m03-image-pair
+    source: fixture
+    body: m03-image-pair
+  - id: triage-m04-compose-environment
+    source: fixture
+    body: m04-compose-environment
+  - id: triage-m05-pip-output
+    source: fixture
+    body: m05-pip-output
+  - id: triage-m06-server-form
+    source: fixture
+    body: m06-server-form
+  - id: triage-m07-docker-block
+    source: fixture
+    body: m07-docker-block
+  - id: triage-m08-lookalikes
+    source: fixture
+    body: m08-lookalikes

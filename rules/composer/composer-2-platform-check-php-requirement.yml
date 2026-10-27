@@ -1,0 +1,59 @@
+schema: 1
+id: composer-2-platform-check-php-requirement
+title: Composer's platform check stops the application when the running PHP is older than the dependencies require
+applies:
+  - runtime
+difference: >-
+  the failing side runs a PHP older than the version the installed Composer dependencies require, and the autoloader bootstrap includes the platform check
+symptoms:
+  - text: the application stops at start-up with a message from 'platform_check.php' that names the PHP version the dependencies require and the PHP version that is running
+    basis: inferred
+mechanism: >-
+  With the default platform-check value of php-only, Composer creates a platform_check.php file, requires it from the autoloader bootstrap and checks the PHP version there.
+detect:
+  all:
+    - b: tool.php.required
+      present: 'true'
+    - b: tool.php.version
+      present: 'true'
+    - b: run:signature
+      has: detected issues in your platform
+severity: high
+provenance:
+  - url: https://raw.githubusercontent.com/composer/composer/2.10.3/doc/06-config.md
+    kind: vendor-doc
+    verified: '2026-10-26'
+    section: platform-check
+fixtures:
+  positive:
+    - name: php 7.4.33 running against a requirement of php 8.2 or newer
+      a:
+        attrs:
+          tool.php.version: '8.2.12'
+      b:
+        attrs:
+          tool.php.version: '7.4.33'
+          tool.php.required: '>=8.2.0'
+        run:
+          signature: 'Fatal error: Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0".'
+  negative:
+    - name: the same versions with no platform error in the run
+      a:
+        attrs:
+          tool.php.version: '8.2.12'
+      b:
+        attrs:
+          tool.php.version: '7.4.33'
+          tool.php.required: '>=8.2.0'
+        run:
+          signature: 'PHP Warning: Undefined variable'
+    - name: a platform error with no stated requirement
+      a:
+        attrs:
+          tool.php.version: '8.2.12'
+      b:
+        attrs:
+          tool.php.version: '7.4.33'
+        run:
+          signature: 'Fatal error: Composer detected issues in your platform'
+status: pending-scanner

@@ -1,0 +1,8 @@
+category: free-text
+facts:
+  - 'run:signature=Error: layer missing'
+  - 'runtime.container.image=ghcr.io/acme/builder:2.1'
+  - 'runtime.container.image=ghcr.io/acme/builder:2.0@passing'
+rules: []
+claims: []
+draft: true

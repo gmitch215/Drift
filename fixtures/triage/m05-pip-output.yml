@@ -1,0 +1,8 @@
+category: beginner
+facts:
+  - 'project.python.click=8.1.7'
+  - 'project.python.flask=3.0.2'
+  - 'project.python.virtualenv=16.7.9'
+rules: []
+claims: []
+draft: false

@@ -1,0 +1,84 @@
+schema: 1
+id: git-branch-show-current-needs-2-22
+title: git branch --show-current needs Git 2.22
+applies:
+  - userland
+difference: >-
+  the failing side runs a Git release older than 2.22.0, which has no "--show-current" option for
+  "git branch"
+symptoms:
+  - text: >-
+      git branch --show-current fails with error: unknown option `show-current'
+    basis: inferred
+mechanism: >-
+  Git 2.22.0 added the --show-current subcommand to "git branch", so an older Git rejects it as an
+  unknown option.
+detect:
+  all:
+    - b: tool.git.version
+      ver: '<2.22.0'
+    - b: run:signature
+      has: "unknown option `show-current'"
+severity: medium
+provenance:
+  - url: https://raw.githubusercontent.com/git/git/v2.22.0/Documentation/RelNotes/2.22.0.txt
+    kind: release-note
+    verified: '2026-10-27'
+    section: >-
+      UI, Workflows & Features: "git branch" learned a new subcommand "--show-current".
+fixtures:
+  positive:
+    - name: git 2.45.4 to git 2.20.1 with the unknown option error
+      a:
+        attrs:
+          tool.git.version: '2.45.4'
+      b:
+        attrs:
+          tool.git.version: '2.20.1'
+        run:
+          signature: "error: unknown option `show-current'"
+    - name: git 2.21.0 is the last release without the option
+      a:
+        attrs:
+          tool.git.version: '2.22.0'
+      b:
+        attrs:
+          tool.git.version: '2.21.0'
+        run:
+          signature: "error: unknown option `show-current'"
+  negative:
+    - name: the failing side is 2.22.0, which has the option
+      a:
+        attrs:
+          tool.git.version: '2.45.4'
+      b:
+        attrs:
+          tool.git.version: '2.22.0'
+        run:
+          signature: "error: unknown option `show-current'"
+    - name: an old git without the error text
+      a:
+        attrs:
+          tool.git.version: '2.45.4'
+      b:
+        attrs:
+          tool.git.version: '2.20.1'
+    - name: an old git with another option error
+      a:
+        attrs:
+          tool.git.version: '2.45.4'
+      b:
+        attrs:
+          tool.git.version: '2.20.1'
+        run:
+          signature: "error: unknown option `no-such-thing'"
+    - name: unparsed git version is unknown, not a match
+      a:
+        attrs:
+          tool.git.version: '2.45.4'
+      b:
+        attrs:
+          tool.git.version: unparsed
+        run:
+          signature: "error: unknown option `show-current'"
+status: active

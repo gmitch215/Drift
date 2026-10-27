@@ -1,0 +1,49 @@
+schema: 1
+id: pyqt-6-removes-pyqt5-api
+title: PyQt6 removes exec_(), print_(), qApp and the Qt module that PyQt5 code uses
+applies:
+  - build
+difference: >-
+  side a is PyQt5 and side b is PyQt6; the PyQt5 spellings of these calls and names do not exist in PyQt6
+symptoms:
+  - text: AttributeError or ImportError on 'exec_', 'print_' or 'qApp', or on an import from the Qt module, in code that runs on PyQt5
+    basis: inferred
+mechanism: >-
+  The PyQt6 differences page lists all exec_() and print_() methods, qApp, the PYQT_CONFIGURATION dict and the Qt module as removed.
+detect:
+  all:
+    - a: project.python.pyqt
+      ver: '<6'
+    - b: project.python.pyqt
+      ver: '>=6'
+severity: high
+provenance:
+  - url: https://www.riverbankcomputing.com/static/Docs/PyQt6/pyqt5_differences.html
+    kind: vendor-doc
+    verified: '2026-10-26'
+    section: Differences Between PyQt6 and PyQt5
+fixtures:
+  positive:
+    - name: pyqt 5 to pyqt 6
+      a:
+        attrs:
+          project.python.pyqt: '5'
+      b:
+        attrs:
+          project.python.pyqt: '6'
+  negative:
+    - name: pyqt 6 to pyqt 5 (reverse direction)
+      a:
+        attrs:
+          project.python.pyqt: '6'
+      b:
+        attrs:
+          project.python.pyqt: '5'
+    - name: pyqt 6 on both sides
+      a:
+        attrs:
+          project.python.pyqt: '6'
+      b:
+        attrs:
+          project.python.pyqt: '6'
+status: pending-scanner

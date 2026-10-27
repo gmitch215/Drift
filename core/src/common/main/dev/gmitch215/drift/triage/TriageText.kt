@@ -57,6 +57,17 @@ object TriageText {
             sb.append("    source: ${c.source}\n")
         }
         sb.append('\n')
+        r.notEnvironment?.let {
+            sb.append("Not environment (${it.signal.id}) at line ${it.line}: ${it.text}\n\n")
+        }
+        if (r.ask.isNotEmpty()) {
+            section(sb, "Ask", r.ask.size)
+            for (a in r.ask) {
+                sb.append("  ${a.family}: ${a.piped()}\n")
+                sb.append("    ${a.sentence()}\n")
+            }
+            sb.append('\n')
+        }
         val d = r.draft
         if (d == null) {
             sb.append("Draft rule: none\n")
