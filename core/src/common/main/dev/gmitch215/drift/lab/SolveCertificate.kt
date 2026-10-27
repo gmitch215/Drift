@@ -37,6 +37,7 @@ object SolveCertificate {
         val reverse: ExperimentRun?,
         val replicate: ExperimentRun?,
         val diff: MeasuredDiff,
+        val removals: List<Removal> = emptyList(),
     )
 
     /**
@@ -218,7 +219,7 @@ object SolveCertificate {
         val agree = c.reverse?.outcome == Outcome.SUPPORTED ||
             c.replicate?.outcome == Outcome.SUPPORTED
         val measured = measured(c.diff, c.reverse ?: c.replicate)
-        return obj(
+        val base = obj(
             "confirmed" to JsonBool(confirmed),
             "isolation" to JsonString(
                 if (measured) MeasuredDiff.MEASURED else MeasuredDiff.PREDICTED,
@@ -252,6 +253,10 @@ object SolveCertificate {
                 "state" to JsonString(if (verdict.mechanism != null) "agrees" else "unexplained"),
                 "text" to (verdict.mechanism?.let { JsonString(it) } ?: JsonNull),
             ),
+        )
+        if (c.removals.isEmpty()) return base
+        return JsonObject(
+            base.fields + ("removal" to JsonArray(c.removals.map { it.toJson() })),
         )
     }
 

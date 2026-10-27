@@ -13,6 +13,11 @@ object SolveRender {
             "${r.hypotheses} candidate changes, $experiments experiments run in containers " +
                 "(${r.trials} trials, ${r.seconds} seconds), not on the original host.",
         )
+        for (step in r.verdict.steps) {
+            out.text("Next (${step.kind}): ${step.text}", 2)
+            step.command?.let { out.text("run: $it", 4) }
+            step.reply?.let { out.text("reply: $it", 4) }
+        }
         if (detail == Detail.SUMMARY) return out.finish()
         out.blank()
         out.text("Experiments (failures of trials, raw counts):")

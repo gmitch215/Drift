@@ -248,7 +248,7 @@ object Verify {
     private class RunView(val summary: JsonObject, val result: JsonObject) {
         val id: String = summary.require("id").string()
         val role: String = summary.require("role").string()
-        val reverse: Boolean get() = role == "reverse"
+        val reverse: Boolean get() = role == "reverse" || role == "removal"
         val flips: List<String> = summary.require("flips").array().map { it.string() }
         val recordedOutcome: String? = (result["outcome"] as? JsonString)?.value
         val derived: Pair<Arm, Arm> = arms(result)
@@ -931,7 +931,10 @@ object Verify {
                     }
                 }
 
-                VerdictKind.STUCK -> stuck(v, conditions, forwardSupported)?.let { return it }
+                VerdictKind.STUCK, VerdictKind.NEEDS -> {
+                    stuck(v, conditions, forwardSupported)?.let { return it }
+                    steps(v, kind)?.let { return it }
+                }
             }
             return pass("verdict", "${kind.label} follows from the recorded experiments")
         }
@@ -1039,6 +1042,41 @@ object Verify {
                     )
                 }
             }
+            return removal(v, conditions)
+        }
+
+        private fun removal(v: JsonObject, conditions: JsonObject): Check? {
+            val recorded = conditions["removal"]?.array()?.map { it.obj() }.orEmpty()
+            for ((status, role, key) in listOf(
+                Triple("necessary", "removal", "necessary"),
+                Triple("sufficient", "member", "sufficient"),
+            )) {
+                val shown = recorded.filter { it.require("status").string() == status }
+                    .map { it.require("member").string() }
+                val named = strings(v[key])
+                if (!same(named, shown)) {
+                    return fail(
+                        "verdict",
+                        "$key members of the verdict",
+                        shown.toString(),
+                        named.toString(),
+                    )
+                }
+                for (r in recorded.filter { it.require("status").string() == status }) {
+                    val member = r.require("member").string()
+                    val run = runById((r["experiment"] as? JsonString)?.value)
+                    if (run == null || run.role != role || !same(run.flips, listOf(member)) ||
+                        run.recordedOutcome != "supported"
+                    ) {
+                        return fail(
+                            "verdict",
+                            "a supported $role experiment for $member",
+                            "supported",
+                            run?.recordedOutcome,
+                        )
+                    }
+                }
+            }
             return null
         }
 
@@ -1098,6 +1136,35 @@ object Verify {
 
         private fun conditionsConfirmed(conditions: JsonObject): Boolean? =
             (conditions.require("confirmed") as? JsonBool)?.value
+
+        private fun steps(v: JsonObject, kind: VerdictKind): Check? {
+            val steps = v["steps"]?.array().orEmpty()
+            if (kind == VerdictKind.STUCK) {
+                return if (steps.isEmpty()) {
+                    null
+                } else {
+                    fail(
+                        "verdict",
+                        "STUCK gives no step",
+                        "none",
+                        steps.size,
+                    )
+                }
+            }
+            val whole = steps.all { step ->
+                val f = step.obj()
+                listOf("kind", "text").all { (f[it] as? JsonString)?.value?.isNotBlank() == true }
+            }
+            if (steps.isEmpty() || !whole) {
+                return fail(
+                    "verdict",
+                    "NEEDS gives its next steps",
+                    "a step with kind and text",
+                    "none",
+                )
+            }
+            return null
+        }
 
         private fun stuck(v: JsonObject, conditions: JsonObject?, supported: Boolean): Check? {
             if (conditions != null || supported) {

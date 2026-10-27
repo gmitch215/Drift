@@ -19,6 +19,7 @@ object ImageTagList {
     private const val LINE = 80
 
     val shapes: Map<String, List<Regex>> = linkedMapOf(
+        "alpine" to listOf(Regex("^$VERSION$")),
         "eclipse-temurin" to listOf(
             Regex("^\\d+-jdk(?:-(?:focal|jammy|noble)|-alpine(?:-\\d+\\.\\d+)?)?$"),
         ),

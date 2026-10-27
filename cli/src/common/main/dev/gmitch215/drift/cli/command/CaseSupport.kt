@@ -111,4 +111,5 @@ internal fun verdictExitCode(kind: VerdictKind): Int = when (kind) {
     VerdictKind.BUNDLE, VerdictKind.EFFECT -> 10
     VerdictKind.NARROWED -> 11
     VerdictKind.STUCK -> 12
+    VerdictKind.NEEDS -> 13
 }

@@ -115,6 +115,14 @@ object Controllability {
 
             path.startsWith("limits.") -> "run.sh passes --ulimit"
 
+            path == "cpu.affinity" -> "run.sh passes --cpuset-cpus"
+
+            path == "network.interfaces" -> "run.sh passes --network"
+
+            path == "network.hosts.names" -> "run.sh passes --add-host"
+
+            path == "network.nsswitch.hosts" -> "the Dockerfile sets the nsswitch hosts line"
+
             path.startsWith("tool.") ->
                 if (ci) "a setup action pins the version" else "the base image tag pins the version"
 

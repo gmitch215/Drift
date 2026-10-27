@@ -79,6 +79,7 @@ class Reproduction internal constructor(
     val envAll: Boolean,
     val dockerfile: String,
     val runScript: String,
+    val pinned: Boolean = false,
 ) {
     val image: String get() = if (digest == null) imageTag else "$imageTag@$digest"
     val total: Int get() = entries.size
@@ -165,11 +166,14 @@ class Reproduction internal constructor(
      */
     fun runLine(extra: List<String> = emptyList(), shellCommand: String = command): String =
         "docker run --rm " + (flags + extra).joinToString(" ") + " $tag sh -c " +
-            Reproduce.quote(shellCommand)
+            Reproduce.quote(if (pinned) Reproduce.STAGE + shellCommand else shellCommand)
 }
 
 object Reproduce {
     const val SCHEMA = 1L
+
+    /** Puts the workspace and the pin files into the container's own `/work` before a command. */
+    const val STAGE = "cp -R /src/. /work/ && cp -R /pins/. /work/ && "
 
     val conventions = listOf(
         "run.sh mounts the directory it is run from at /work and runs the command there",
@@ -220,6 +224,7 @@ object Reproduce {
         val pick: Pick?,
         val image: ImageDistro,
         val basis: String,
+        val pin: String? = null,
     ) {
         val ref: String get() = if (digest == null) tag else "$tag@$digest"
     }
@@ -245,8 +250,15 @@ object Reproduce {
         val locales = mutableSetOf<String>()
         var tz = false
         var npm: String? = null
+        val pinFiles: Map<String, String> = WorkspacePins.files(attrs)
+        var gnuUserland = false
+        var shBash = false
         var memory: String? = null
         var cpus: String? = null
+        var cpuset: String? = null
+        var network: String? = null
+        var nsswitch: String? = null
+        val hosts = mutableSetOf<String>()
         val ulimits = mutableMapOf<String, String>()
 
         fun build(): Reproduction {
@@ -281,6 +293,7 @@ object Reproduce {
                 envAll = envAll,
                 dockerfile = dockerfile,
                 runScript = runScript(flags, dockerfile),
+                pinned = pinFiles.isNotEmpty(),
             )
         }
 
@@ -293,11 +306,13 @@ object Reproduce {
             val named = words(command).firstNotNullOfOrNull { word ->
                 usable.firstOrNull { word in it.first.commands }
             }
-            val chosen = named ?: usable.firstOrNull()
+            val marked = usable.firstOrNull { (row, _) -> row.marker?.let { it in attrs } == true }
+            val chosen = named ?: marked ?: usable.firstOrNull()
             if (chosen != null) {
                 val (row, pick) = chosen
                 val why = when {
                     named != null -> "the command names a ${row.tool} tool"
+                    marked != null -> "the capsule's ${row.marker} comes from the ${row.tool} image"
                     usable.size == 1 -> "the only toolchain with a version an image tag can pin"
                     else -> "the first of ${usable.size} toolchains in table order"
                 }
@@ -307,6 +322,7 @@ object Reproduce {
             }
             val id = distro.id
             val release = distro.release
+            val pin = distro.version?.takeIf { id == "alpine" && ImageTable.alpinePatch(it) }
             val (tag, image) = when {
                 id == "ubuntu" && release != null ->
                     "ubuntu:$release" to ImageDistro(id, release)
@@ -315,7 +331,8 @@ object Reproduce {
                     "debian:$release-slim" to ImageDistro(id, release)
 
                 id == "alpine" ->
-                    (release?.let { "alpine:$it" } ?: "alpine") to ImageDistro(id, release)
+                    (pin ?: release)?.let { "alpine:$it" }.orEmpty().ifEmpty { "alpine" } to
+                        ImageDistro(id, release)
 
                 else -> "debian:12-slim" to ImageDistro("debian", "12")
             }
@@ -325,7 +342,7 @@ object Reproduce {
             } else {
                 "no toolchain with a usable version and no distribution attribute; generic base"
             }
-            return Base(tag, digests[tag], null, null, image, basis)
+            return Base(tag, digests[tag], null, null, image, basis, pin)
         }
 
         fun words(text: String): List<String> =
@@ -345,10 +362,15 @@ object Reproduce {
                 p == "cgroup.memory.max" -> memory(a.value.trim())
                 p == "cgroup.cpu.max" -> cpu(a.value.trim())
                 p.startsWith("limits.") -> limit(a)
+                p == "cpu.affinity" -> affinity(a.value.trim())
+                p == "network.interfaces" -> interfaces(a.value.trim())
+                p == "network.hosts.names" -> hostEntries(a.value.trim())
+                p == "network.nsswitch.hosts" -> nsswitchHosts(a.value.trim())
                 p == "os.arch" -> arch()
                 p == "os.name" -> osName(a.value)
                 p.startsWith("os.release.") || p == "os.version" -> osRelease(a)
                 p.startsWith("tool.") -> tool(a)
+                WorkspacePins.handles(p) -> pin(a)
                 p == "runtime.platform" && a.source != "drift" -> mirror(RUNTIME_ENV, a.value)
                 else -> Status.NOT_MIRRORED to unmapped(p)
             }
@@ -384,6 +406,15 @@ object Reproduce {
             else -> "no mapping for this attribute"
         }
 
+        fun pin(a: Attribute): Pair<Status, String> {
+            val file = WorkspacePins.fileOf(a.path)
+            return if (file != null && WorkspacePins.valid(a.path, a.value)) {
+                Status.MIRRORED to "written to $file in a copy of the workspace"
+            } else {
+                Status.NOT_MIRRORED to "not a plain version or digest, so no pin file is written"
+            }
+        }
+
         fun env(a: Attribute): Pair<Status, String> {
             val name = a.path.removePrefix("env.")
             val value = a.value
@@ -397,7 +428,8 @@ object Reproduce {
                 a.stability == Stability.VOLATILE ->
                     Status.NOT_MIRRORED to "volatile: set per process by the shell"
 
-                name in HOST_NAMES || HOST_PREFIXES.any { name.startsWith(it) } ->
+                name in HOST_NAMES ||
+                    (name !in XDG_DIRS && HOST_PREFIXES.any { name.startsWith(it) }) ->
                     Status.NOT_MIRRORED to "host identity: the container has its own"
 
                 !envAll && name !in envNames && !allowlisted(name) ->
@@ -453,6 +485,11 @@ object Reproduce {
             if ("${m.groupValues[1]}.UTF-8" in base.row?.locales.orEmpty()) {
                 return Status.MIRRORED to "run.sh: --env $name=$value; the image generates the " +
                     "locale"
+            }
+            val installed = attrs["locale.installed"]?.split(',')?.map { localeKey(it) }
+            if (installed != null && localeKey(value) !in installed) {
+                return Status.MIRRORED to "run.sh: --env $name=$value; the capsule's " +
+                    "locale.installed does not list it, so the image does not generate it"
             }
             locales += "${m.groupValues[1]}.UTF-8 UTF-8"
             return Status.MIRRORED to "run.sh: --env $name=$value; the locale is generated in " +
@@ -517,6 +554,67 @@ object Reproduce {
             return Status.MIRRORED to "run.sh: --ulimit $name=$text"
         }
 
+        fun affinity(value: String): Pair<Status, String> {
+            val n = value.toIntOrNull()?.takeIf { it > 0 }
+                ?: return Status.NOT_MIRRORED to "value is not a CPU count"
+            val online = attrs["cpu.count"]?.trim()?.toIntOrNull()
+            if (online != null && n >= online) {
+                return Status.MIRRORED to "every CPU is allowed: no --cpuset-cpus flag"
+            }
+            val text = if (n == 1) "0" else "0-${n - 1}"
+            cpuset = text
+            return Status.MIRRORED to "run.sh: --cpuset-cpus $text"
+        }
+
+        fun interfaces(value: String): Pair<Status, String> {
+            val names = value.split(',').filter { it.isNotEmpty() }
+            return when {
+                names == listOf("lo") -> {
+                    network = "none"
+                    Status.MIRRORED to "run.sh: --network none"
+                }
+
+                "eth0" in names && "lo" in names ->
+                    Status.MIRRORED to "the default bridge network has eth0 and lo"
+
+                else ->
+                    Status.PARTIAL to "the default bridge network has eth0 and lo; the " +
+                        "capsule lists $value"
+            }
+        }
+
+        fun hostEntries(value: String): Pair<Status, String> {
+            val tokens = value.split(',').filter { it.isNotEmpty() }
+            val mirrored = tokens.mapNotNull { LOOPBACK_ENTRY.matchEntire(it) }
+            for (m in mirrored) hosts += "${m.groupValues[1]}:${m.groupValues[2]}"
+            return when {
+                tokens.isEmpty() -> Status.NOT_MIRRORED to "no entries"
+
+                mirrored.size == tokens.size ->
+                    Status.MIRRORED to "run.sh: --add-host for ${tokens.size} entries"
+
+                mirrored.isEmpty() ->
+                    Status.NOT_MIRRORED to
+                        "the addresses of these entries are not recorded"
+
+                else ->
+                    Status.PARTIAL to "run.sh: --add-host for ${mirrored.size} of " +
+                        "${tokens.size} entries; the others have no recorded address"
+            }
+        }
+
+        fun nsswitchHosts(value: String): Pair<Status, String> {
+            if (base.image.alpine) {
+                return Status.PARTIAL to "musl reads no nsswitch.conf; the image resolves names " +
+                    "its own way"
+            }
+            if (!NSSWITCH_VALUE.matches(value)) {
+                return Status.NOT_MIRRORED to "sources other than words and [action] groups"
+            }
+            nsswitch = value
+            return Status.MIRRORED to "the image's /etc/nsswitch.conf hosts line is set"
+        }
+
         fun arch(): Pair<Status, String> = if (platform != null) {
             Status.MIRRORED to "--platform $platform in run.sh, for the build and the run " +
                 "(emulated when the Docker host has another architecture)"
@@ -543,8 +641,8 @@ object Reproduce {
                 key == "ID" || key == "name" -> Status.MIRRORED to "the image is ${image.id}"
 
                 versionLike && image.release != null && distro.release == image.release ->
-                    if (a.value == image.release) {
-                        Status.MIRRORED to "the image is ${image.id} ${image.release}"
+                    if (a.value == image.release || a.value == base.pin) {
+                        Status.MIRRORED to "the image is ${image.id} ${base.pin ?: image.release}"
                     } else {
                         Status.PARTIAL to "the image is ${image.id} ${image.release}; the point " +
                             "release is whatever the image holds"
@@ -584,6 +682,9 @@ object Reproduce {
                     val image = if (base.image.alpine) "busybox" else "gnu"
                     if (a.value == image) {
                         Status.MIRRORED to "the image's coreutils are $image"
+                    } else if (a.value == "gnu" && base.image.alpine && a.source == EDITED) {
+                        gnuUserland = true
+                        Status.MIRRORED to "apk add ${GNU_USERLAND.joinToString(" ")}"
                     } else {
                         Status.NOT_MIRRORED to
                             "the capsule's coreutils are ${a.value}; the image's are $image"
@@ -593,6 +694,19 @@ object Reproduce {
                 group == "coreutils" ->
                     Status.NOT_MIRRORED to
                         "comes with the base image; its version is not known offline"
+
+                group == "sh" && key == "flavor" -> {
+                    val image = if (base.image.alpine) "busybox" else "dash"
+                    if (a.value == image) {
+                        Status.MIRRORED to "the image's /bin/sh is $image"
+                    } else if (a.value == "bash" && !base.image.alpine) {
+                        shBash = true
+                        Status.MIRRORED to "RUN ln -sf bash /bin/sh at build"
+                    } else {
+                        Status.NOT_MIRRORED to
+                            "the capsule's /bin/sh is ${a.value}; the image's is $image"
+                    }
+                }
 
                 group == "git" ->
                     Status.NOT_MIRRORED to
@@ -702,10 +816,18 @@ object Reproduce {
             val list = mutableListOf<String>()
             platform?.let { list += "--platform $it" }
             list += "--user \"$(id -u):$(id -g)\""
-            list += "--volume \"\$PWD:/work\""
+            if (pinFiles.isEmpty()) {
+                list += "--volume \"\$PWD:/work\""
+            } else {
+                list += "--volume \"\$PWD:/src:ro\""
+                list += "--tmpfs /work:exec,mode=1777"
+            }
             list += "--env ${quote("HOME=/tmp")}"
             memory?.let { list += "--memory $it" }
             cpus?.let { list += "--cpus $it" }
+            cpuset?.let { list += "--cpuset-cpus $it" }
+            network?.let { list += "--network $it" }
+            for (entry in hosts.sorted()) list += "--add-host $entry"
             for ((name, value) in ulimits.toList().sortedBy { it.first }) {
                 list += "--ulimit $name=$value"
             }
@@ -740,6 +862,15 @@ object Reproduce {
                     "the unwinder library that the Drift executable loads; the capsule does not " +
                         "record it",
                 )
+            }
+            if (gnuUserland) {
+                for (name in GNU_USERLAND) {
+                    list += AddedPackage(
+                        name,
+                        manager,
+                        "the GNU userland the capsule records; the image's is BusyBox",
+                    )
+                }
             }
             if (locales.isNotEmpty() && !base.image.alpine) {
                 if (archiveMaybe()) {
@@ -806,7 +937,21 @@ object Reproduce {
                     out.append("\n")
                 }
             }
+            if (shBash) out.append("RUN ln -sf bash /bin/sh\n")
+            if (pinFiles.isNotEmpty()) {
+                out.append("RUN mkdir -p /pins")
+                for ((name, text) in pinFiles) {
+                    for (line in text.trimEnd().lines()) {
+                        out.append(" \\\n\t&& printf '%s\\n' ${quote(line)} >> /pins/$name")
+                    }
+                }
+                out.append("\n")
+            }
             npm?.let { out.append("RUN npm install -g npm@$it\n") }
+            nsswitch?.let {
+                out.append("RUN touch /etc/nsswitch.conf && sed -i '/^hosts:/d' /etc/nsswitch.conf")
+                out.append(" \\\n\t&& echo 'hosts: $it' >> /etc/nsswitch.conf\n")
+            }
             out.append("WORKDIR /work\n")
             return out.toString()
         }
@@ -825,19 +970,28 @@ object Reproduce {
             out.append("exec docker run --rm \\\n")
             for (flag in flags) out.append("\t$flag \\\n")
             out.append("\t\"\$@\" \\\n")
-            out.append("\t\"\$image\" sh -c ${quote(command)}\n")
+            val staged = if (pinFiles.isEmpty()) command else STAGE + command
+            out.append("\t\"\$image\" sh -c ${quote(staged)}\n")
             return out.toString()
         }
 
         // #endregion
     }
 
+    private const val EDITED = "intervention"
+    private val GNU_USERLAND = listOf("coreutils", "diffutils", "findutils", "grep", "sed")
     private const val ARCHIVE_STEP = "archive.debian.org"
     private const val ARCHIVE_MANAGER = "apt-sources"
     private val ARCHIVED_DEBIAN = setOf("9", "10")
     private val ENV_NAME = Regex("^[A-Za-z_][A-Za-z0-9_]*$")
-    private val HOST_PATH = Regex("^(/|~|\\\\\\\\|[A-Za-z]:[\\\\/])|/Users/|/home/")
+    private val LOOPBACK_ENTRY =
+        Regex("^([A-Za-z0-9_.-]+)@(127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})$")
+    private val NSSWITCH_VALUE = Regex("^[A-Za-z0-9_\\[\\]=!]+( [A-Za-z0-9_\\[\\]=!]+)*$")
+    private val HOST_PATH =
+        Regex("^(?!(?:~|/tmp|/var/tmp)(?:/|$))(/|~|\\\\\\\\|[A-Za-z]:[\\\\/])|/Users/|/home/")
     private val UTF8_LOCALE = Regex("^([a-z]{2,3}_[A-Z]{2})\\.(?:UTF-8|utf8|UTF8|utf-8)$")
+
+    private fun localeKey(name: String): String = name.lowercase().replace("-", "")
     private val NPM_VERSION = Regex("^\\d+\\.\\d+\\.\\d+$")
     private const val RUNTIME_ENV = "DRIFT_RUNTIME_PLATFORM"
     private val DRIFT_META = listOf("drift.", "kotlin.", "runtime.")
@@ -848,6 +1002,8 @@ object Reproduce {
         "TMPDIR", "TERM", "TERM_PROGRAM", "TERM_SESSION_ID", "DISPLAY", "COLORTERM",
     )
     private val HOST_PREFIXES = listOf("XDG_", "SSH_", "XPC_", "__CF", "DOCKER_")
+    private val XDG_DIRS =
+        setOf("XDG_CACHE_HOME", "XDG_CONFIG_HOME", "XDG_DATA_HOME", "XDG_STATE_HOME")
 
     private val ULIMITS = setOf(
         "core", "cpu", "data", "fsize", "locks", "memlock", "msgqueue", "nice", "nofile",

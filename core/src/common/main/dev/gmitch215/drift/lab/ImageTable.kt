@@ -36,7 +36,8 @@ internal data class Pick(val tag: String, val note: String?, val image: ImageDis
  * in a test command that name the toolchain; [prefixes] and [others] are what else changes when
  * the image does, on top of the distribution members every image has. [versionPaths] are the
  * attributes that can carry the version, the first one the capsule has first; [locales] are the
- * glibc locales the image already generates.
+ * glibc locales the image already generates. [marker] is the variable the official image sets, so a
+ * capsule that has it was taken inside that image.
  */
 internal class Row(
     val tool: String,
@@ -45,6 +46,7 @@ internal class Row(
     val others: List<String>,
     val versionPaths: List<String> = listOf("tool.$tool.version"),
     val locales: Set<String> = emptySet(),
+    val marker: String? = null,
     private val formula: (Map<String, String>, Distro) -> Pick?,
 ) {
     fun versionPath(attrs: Map<String, String>): String =
@@ -66,6 +68,10 @@ internal object ImageTable {
     private val otpMajor = Regex("^(\\d+)(?:\\.\\d+)*$")
 
     const val DEFAULT_DEBIAN = "bookworm"
+
+    /** Whether the registry publishes `alpine:[version]`, an exact point release. */
+    fun alpinePatch(version: String): Boolean =
+        ImageTags.repositories["alpine"]?.get("")?.contains(version) == true
 
     val distroPrefixes = listOf(
         "os.release.",
@@ -184,6 +190,7 @@ internal object ImageTable {
             setOf("java", "javac", "jar", "mvn", "mvnw", "gradle", "gradlew"),
             listOf("tool.gradle."),
             listOf("vendor build of the JDK", "bundled cacerts", "bundled tzdb"),
+            marker = "env.JAVA_VERSION",
         ) { attrs, d ->
             val raw = attrs["tool.java.version"] ?: return@Row null
             val major = Regex("^(?:1\\.)?(\\d+)").find(raw)?.groupValues?.get(1)
@@ -214,6 +221,7 @@ internal object ImageTable {
             setOf("node", "npm", "npx", "yarn", "pnpm", "corepack"),
             listOf("tool.npm.", "tool.yarn."),
             listOf("bundled npm", "bundled OpenSSL", "corepack"),
+            marker = "env.NODE_VERSION",
         ) { attrs, d ->
             val v = versioned(attrs, "tool.node.version", exact) ?: return@Row null
             val f = flavor(d)
@@ -225,6 +233,7 @@ internal object ImageTable {
             setOf("python", "python3", "pip", "pip3", "pytest", "poetry", "uv"),
             listOf("tool.pip."),
             listOf("bundled pip", "bundled setuptools", "sqlite"),
+            marker = "env.PYTHON_VERSION",
         ) { attrs, d ->
             val v = versioned(attrs, "tool.python.version", exact) ?: return@Row null
             slimFirst(v, flavor(d), "python")
@@ -234,6 +243,7 @@ internal object ImageTable {
             setOf("go"),
             emptyList(),
             listOf("bundled go toolchain"),
+            marker = "env.GOLANG_VERSION",
         ) { attrs, d ->
             val v = versioned(attrs, "tool.go.version", minor) ?: return@Row null
             val f = flavor(d)
@@ -249,6 +259,7 @@ internal object ImageTable {
             setOf("php", "composer", "phpunit"),
             emptyList(),
             listOf("bundled extensions", "php.ini defaults"),
+            marker = "env.PHP_VERSION",
         ) { attrs, d ->
             val raw = attrs["tool.php.version"] ?: return@Row null
             val v = Regex("^\\d+\\.\\d+\\.\\d+").find(raw)?.value ?: return@Row null
@@ -266,6 +277,7 @@ internal object ImageTable {
             setOf("cargo", "rustc", "rustup"),
             emptyList(),
             listOf("cargo", "rustfmt", "clippy"),
+            marker = "env.RUST_VERSION",
         ) { attrs, d ->
             val v = versioned(attrs, "tool.rust.version", exact) ?: return@Row null
             slimFirst(v, flavor(d), "rust")
@@ -275,6 +287,7 @@ internal object ImageTable {
             setOf("gcc", "g++", "cc", "c++", "make", "cmake"),
             listOf("tool.make."),
             listOf("binutils", "make"),
+            marker = "env.GCC_VERSION",
         ) { attrs, _ ->
             if (attrs["tool.cc.family"] != "gcc") return@Row null
             val v = versioned(attrs, "tool.cc.version", minor) ?: return@Row null
@@ -292,6 +305,7 @@ internal object ImageTable {
             setOf("ruby", "irb", "gem", "bundle", "bundler", "rake"),
             emptyList(),
             listOf("bundled gems", "bundler"),
+            marker = "env.RUBY_VERSION",
         ) { attrs, d ->
             val v = versioned(attrs, "tool.ruby.version", exact) ?: return@Row null
             slimFirst(v, flavor(d), "ruby")
@@ -303,6 +317,7 @@ internal object ImageTable {
             listOf("base and recommended packages"),
             listOf("tool.r.version", "env.R_BASE_VERSION"),
             setOf("en_US.UTF-8"),
+            marker = "env.R_BASE_VERSION",
         ) { attrs, _ ->
             val v = firstVersion(attrs, listOf("tool.r.version", "env.R_BASE_VERSION"))
                 ?: return@Row null
@@ -315,6 +330,7 @@ internal object ImageTable {
             emptyList(),
             listOf("Erlang/OTP", "rebar3", "hex"),
             listOf("tool.elixir.version", "env.ELIXIR_VERSION"),
+            marker = "env.ELIXIR_VERSION",
         ) { attrs, _ ->
             val v = firstVersion(attrs, listOf("tool.elixir.version", "env.ELIXIR_VERSION"))
                 ?: return@Row null

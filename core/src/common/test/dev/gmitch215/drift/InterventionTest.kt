@@ -107,6 +107,22 @@ class InterventionTest {
         Case("set-ulimit", Intervention.SetUlimit("nofile", "4096:4096"), listOf("limits.nofile")) {
             assertTrue("--ulimit nofile=4096:4096" in flags(it))
         },
+        Case("set-cpu-affinity", Intervention.SetCpuAffinity("1"), listOf("cpu.affinity")) {
+            assertTrue("--cpuset-cpus 0" in flags(it))
+        },
+        Case("set-network", Intervention.SetNetwork("lo"), listOf("network.interfaces")) {
+            assertTrue("--network none" in flags(it))
+        },
+        Case(
+            "set-hosts",
+            Intervention.SetHosts("db.internal@127.0.0.1"),
+            listOf("network.hosts.names"),
+        ) {
+            assertTrue("--add-host db.internal:127.0.0.1" in flags(it))
+        },
+        Case("set-nsswitch", Intervention.SetNsswitch("dns"), listOf("network.nsswitch.hosts")) {
+            assertTrue("echo 'hosts: dns' >> /etc/nsswitch.conf" in dockerfile(it))
+        },
         Case(
             "set-runtime",
             Intervention.SetRuntime("node", "20.11.1"),
@@ -166,11 +182,27 @@ class InterventionTest {
         assertEquals(
             setOf(
                 "set-env", "unset-env", "set-locale", "set-timezone", "set-cpu-limit",
-                "set-memory-limit", "set-ulimit", "set-runtime", "set-os", "set-platform",
+                "set-memory-limit", "set-ulimit", "set-cpu-affinity", "set-network", "set-hosts",
+                "set-nsswitch", "set-runtime", "set-os", "set-platform",
                 "set-flag", "set-file", "pin-dependency",
             ),
             cases.map { it.intervention.type }.toSet(),
         )
+    }
+
+    @Test
+    fun aSingleUlimitValueIsRecordedAsTheSoftAndHardPairCaptureReports() {
+        for ((value, recorded, flag) in listOf(
+            Triple("4096", "4096:4096", "--ulimit nofile=4096:4096"),
+            Triple("unlimited", "unlimited:unlimited", "--ulimit nofile=-1:-1"),
+            Triple("64:128", "64:128", "--ulimit nofile=64:128"),
+        )) {
+            val built = Arms.config(local, listOf(Intervention.SetUlimit("nofile", value)), "t")
+            val config = assertIs<ConfigResult.Built>(built, "$value: $built").config
+            val attribute = config.capsule.attributes.single { it.path == "limits.nofile" }
+            assertEquals(recorded, attribute.value, value)
+            assertTrue(flag in flags(config), "$value: ${flags(config)}")
+        }
     }
 
     @Test
@@ -251,6 +283,10 @@ class InterventionTest {
             Intervention.SetMemoryLimit("lots"),
             Intervention.SetUlimit("No File", "1"),
             Intervention.SetUlimit("nofile", " "),
+            Intervention.SetCpuAffinity("0"),
+            Intervention.SetNetwork("lo eth0"),
+            Intervention.SetHosts("db internal"),
+            Intervention.SetNsswitch("dns'; x"),
             Intervention.SetRuntime("Node", "1"),
             Intervention.SetRuntime("node", ""),
             Intervention.SetOs("", "11"),
@@ -332,6 +368,47 @@ class InterventionTest {
         )
         assertEquals(InterventionClass.MANUAL, kind("step:Docker E2E/Set up Node").kind)
         assertEquals(InterventionClass.AUTOMATIC_LOCAL, kind("env.NODE_ENV").kind)
+    }
+
+    @Test
+    fun cpuAffinityNetworkAndNameResolutionFactsAreSetByTheirOwnInterventions() {
+        val expected = mapOf(
+            "cpu.affinity" to ("set-cpu-affinity" to Intervention.SetCpuAffinity("1")),
+            "network.interfaces" to ("set-network" to Intervention.SetNetwork("lo")),
+            "network.nsswitch.hosts" to ("set-nsswitch" to Intervention.SetNsswitch("lo")),
+        )
+        for ((path, pair) in expected) {
+            assertEquals(pair.first, Interventions.via(path), path)
+            val toward = Interventions.toward(path, "x", pair.second.params.single().second)
+            assertEquals(pair.second, assertIs<Interventions.Toward.Sets>(toward).intervention)
+            val verdict = Controllability.classify(path, Environment.LOCAL)
+            assertEquals(InterventionClass.AUTOMATIC_LOCAL, verdict.kind, path)
+            assertEquals(pair.first, verdict.via, path)
+        }
+        val gone = Interventions.toward("network.hosts.names", "db@127.0.0.1", null)
+        assertEquals(
+            Intervention.SetHosts(""),
+            assertIs<Interventions.Toward.Sets>(gone).intervention,
+        )
+        assertEquals("set-hosts", Interventions.via("network.hosts.names"))
+        assertEquals(
+            InterventionClass.MANUAL,
+            Controllability.classify("cpu.model", Environment.LOCAL).kind,
+        )
+    }
+
+    @Test
+    fun removingTheCustomHostsEntriesDropsTheAddHostFlags() {
+        val hosted = ArmBase(
+            Capsule(
+                "h",
+                node.attributes + Attribute("network.hosts.names", "db.internal@127.0.0.1", "t"),
+            ),
+            "npm test",
+            Environment.LOCAL,
+        )
+        assertTrue("--add-host db.internal:127.0.0.1" in flags(config(hosted)))
+        assertTrue(flags(config(hosted, Intervention.SetHosts(""))).none { "--add-host" in it })
     }
 
     @Test
@@ -460,6 +537,99 @@ class InterventionTest {
         assertTrue("component:tzdata" in verdict.members && "tool.libc.version" in verdict.members)
         assertFalse("os.release.VERSION_ID" in verdict.notIsolated)
         assertTrue(verdict.reason.contains("${verdict.members.size} non-volatile"))
+    }
+
+    @Test
+    fun aPinIsIsolatedAndOnlyAPlainVersionOfAKnownPinIsValid() {
+        val base = ArmBase(
+            Capsule(
+                "pinned",
+                listOf(
+                    Attribute("tool.node.version", "20.11.1", "test"),
+                    Attribute("project.pins.node", "20", "test"),
+                ),
+            ),
+            "sh t.sh",
+            Environment.LOCAL,
+        )
+        val arms = pair(base, emptyList(), listOf(Intervention.SetPin("project.pins.node", "18")))
+        assertEquals(listOf("project.pins.node"), arms.diff.changed)
+        assertIs<BundleVerdict.Isolated>(arms.verdict)
+        assertTrue("printf '%s\\n' '18' >> /pins/.nvmrc" in arms.right.reproduction!!.dockerfile)
+        assertTrue(arms.left.reproduction!!.pinned && arms.right.reproduction.pinned)
+        assertIs<InterventionProblem.Invalid>(
+            refusal(base, Intervention.SetPin("project.pins.ruby", "3")),
+        )
+        assertIs<InterventionProblem.Invalid>(
+            refusal(base, Intervention.SetPin("project.pins.node", "lts/*")),
+        )
+        val toward = Interventions.toward("project.python.schemakit", "2.9.1", "3.0.0")
+        assertEquals(
+            Intervention.SetPin("project.python.schemakit", "3.0.0"),
+            assertIs<Interventions.Toward.Sets>(toward).intervention,
+        )
+        assertEquals(
+            InterventionClass.AUTOMATIC_LOCAL,
+            Controllability.classify("project.pins.node", Environment.LOCAL).kind,
+        )
+    }
+
+    @Test
+    fun aShellLinkIsIsolatedAndAnUnknownShellNameIsInvalid() {
+        val debian = ArmBase(
+            Capsule(
+                "debian",
+                listOf(
+                    Attribute("os.release.ID", "debian", "test"),
+                    Attribute("os.release.VERSION_ID", "12", "test"),
+                    Attribute("tool.sh.flavor", "dash", "test"),
+                ),
+            ),
+            "sh t.sh",
+            Environment.LOCAL,
+        )
+        val arms = pair(debian, emptyList(), listOf(Intervention.SetShell("bash")))
+        assertEquals(listOf("tool.sh.flavor"), arms.diff.changed)
+        assertIs<BundleVerdict.Isolated>(arms.verdict)
+        assertTrue("RUN ln -sf bash /bin/sh" in arms.right.reproduction!!.dockerfile)
+        assertFalse("ln -sf" in arms.left.reproduction!!.dockerfile)
+        assertIs<InterventionProblem.Invalid>(refusal(debian, Intervention.SetShell("Bash 5")))
+        val toward = Interventions.toward("tool.sh.flavor", "dash", "bash")
+        assertEquals(
+            Intervention.SetShell("bash"),
+            assertIs<Interventions.Toward.Sets>(toward).intervention,
+        )
+    }
+
+    @Test
+    fun aGnuUserlandOnAnAlpineBaseIsIsolatedAndBusyboxOnDebianIsRefused() {
+        val alpine = ArmBase(
+            Capsule(
+                "alpine",
+                listOf(
+                    Attribute("os.release.ID", "alpine", "test"),
+                    Attribute("os.release.VERSION_ID", "3.21.3", "test"),
+                    Attribute("tool.node.version", "22.12.0", "test"),
+                    Attribute("tool.coreutils.flavor", "busybox", "test"),
+                ),
+            ),
+            "sh t.sh",
+            Environment.LOCAL,
+        )
+        val arms = pair(alpine, emptyList(), listOf(Intervention.SetUserland("gnu")))
+        assertEquals(listOf("tool.coreutils.flavor"), arms.diff.changed)
+        assertIs<BundleVerdict.Isolated>(arms.verdict)
+        assertTrue("apk add" in arms.right.reproduction!!.dockerfile)
+        assertFalse("coreutils" in arms.left.reproduction!!.dockerfile)
+        assertIs<InterventionProblem.NotMirrored>(
+            refusal(local, Intervention.SetUserland("busybox")),
+        )
+        assertIs<InterventionProblem.Invalid>(refusal(local, Intervention.SetUserland("bsd")))
+        val toward = Interventions.toward("tool.coreutils.flavor", "busybox", "gnu")
+        assertEquals(
+            Intervention.SetUserland("gnu"),
+            assertIs<Interventions.Toward.Sets>(toward).intervention,
+        )
     }
 
     @Test

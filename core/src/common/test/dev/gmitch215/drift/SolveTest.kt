@@ -13,13 +13,17 @@ import dev.gmitch215.drift.json.JsonString
 import dev.gmitch215.drift.lab.Budget
 import dev.gmitch215.drift.lab.FailWhen
 import dev.gmitch215.drift.lab.FakeExecutor
+import dev.gmitch215.drift.lab.Intervention
+import dev.gmitch215.drift.lab.NextContext
 import dev.gmitch215.drift.lab.Outcome
 import dev.gmitch215.drift.lab.PilotRule
 import dev.gmitch215.drift.lab.RawTrial
 import dev.gmitch215.drift.lab.RunConfig
 import dev.gmitch215.drift.lab.SolveCertificate
+import dev.gmitch215.drift.lab.SolveNext
 import dev.gmitch215.drift.lab.SolveOptions
 import dev.gmitch215.drift.lab.SolveResult
+import dev.gmitch215.drift.lab.SolveVerdict
 import dev.gmitch215.drift.lab.Solver
 import dev.gmitch215.drift.lab.StuckWhy
 import dev.gmitch215.drift.lab.TrialSchedule
@@ -34,6 +38,8 @@ import dev.gmitch215.drift.plan.Hypothesis
 import dev.gmitch215.drift.plan.Options
 import dev.gmitch215.drift.plan.PlanWeights
 import dev.gmitch215.drift.plan.Planner
+import dev.gmitch215.drift.triage.Ask
+import dev.gmitch215.drift.triage.Asks
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -115,6 +121,24 @@ class SolveTest {
     }
 
     @Test
+    fun aLocaleTheArmGeneratesIsNotAMemberOfTheBundle() {
+        val cause = { arm: RunConfig -> has(arm, "env.LANG", "de_DE.UTF-8") }
+        val capture = { arm: RunConfig ->
+            val generated = if (cause(arm)) "C.utf8,de_DE.utf8" else "C.utf8"
+            with(arm.capsule, arm.label, "locale.installed" to generated)
+        }
+        val r = solve(
+            red = with(green, "lab-node-red", "env.LANG" to "de_DE.UTF-8"),
+            executor = FakeExecutor(capsules = capture, behave = failsWhen(cause)),
+        )
+        assertEquals(VerdictKind.CONFIRMED, r.verdict.kind, r.verdict.statement)
+        assertEquals(listOf("env.LANG"), r.verdict.set)
+        val forward = r.runs.first { it.kind == "forward" }.diff!!
+        assertEquals(listOf("env.LANG"), forward.changed)
+        assertTrue("locale.installed" in forward.ignored)
+    }
+
+    @Test
     fun aDifferentKotlinPlatformIsConfirmedAsTheDeclaredPlatform() {
         val wasm = with(green, "wasm-red", "runtime.platform" to "wasm")
         val r = solve(
@@ -189,6 +213,169 @@ class SolveTest {
         assertEquals("measured", r.runs.first { it.kind == "forward" }.diff!!.source)
     }
 
+    private fun alpineRed() = with(
+        green,
+        "lab-alpine-red",
+        "os.release.ID" to "alpine",
+        "os.release.VERSION_ID" to "3.21.3",
+        "os.release.PRETTY_NAME" to "Alpine Linux v3.21",
+        "tool.coreutils.flavor" to "busybox",
+        "tool.libc.family" to "musl",
+    )
+
+    private fun gnuEdit(arm: RunConfig) = arm.interventions.any { it is Intervention.SetUserland }
+
+    @Test
+    fun aMemberThatItsOwnInterventionRevertsAloneIsNamedWhenTheFailureNeedsIt() {
+        val cause = { arm: RunConfig -> has(arm, "os.release.ID", "alpine") && !gnuEdit(arm) }
+        val capture = { arm: RunConfig ->
+            if (cause(arm)) {
+                with(
+                    arm.capsule,
+                    arm.label,
+                    "tool.coreutils.flavor" to "busybox",
+                    "tool.libc.family" to "musl",
+                    "os.release.PRETTY_NAME" to "Alpine Linux v3.21",
+                )
+            } else {
+                arm.capsule
+            }
+        }
+        val r = solve(
+            red = alpineRed(),
+            executor = FakeExecutor(capsules = capture, behave = failsWhen(cause)),
+        )
+        val v = r.verdict
+        assertEquals(VerdictKind.BUNDLE, v.kind, v.statement)
+        assertEquals(listOf("tool.coreutils.flavor"), v.necessary, v.statement)
+        assertTrue("tool.coreutils.flavor alone is needed" in v.statement, v.statement)
+        assertTrue("tool.libc.family (" in v.statement, "untested members are listed")
+        val removal = r.runs.single { it.kind == "removal" }
+        assertEquals(Outcome.SUPPORTED, removal.outcome)
+        assertEquals(removal.control.trials.size, removal.treatment.trials.size)
+        assertTrue(removal.control.failures > 0 && removal.treatment.failures == 0)
+        assertTrue(r.trials <= options.budget.maxTrials)
+        val cert = CanonicalJson.encode(SolveCertificate.certificate(r.case)!!)
+        assertTrue("\"necessary\":[\"tool.coreutils.flavor\"]" in cert)
+        assertTrue("\"status\":\"necessary\"" in cert)
+        assertTrue(Verify.run(r.case).ok, Verify.run(r.case).text())
+    }
+
+    @Test
+    fun aMemberThatOneSettingReproducesAloneIsNamedAsSufficient() {
+        val noNpm = Capsule(
+            green.label,
+            green.attributes.filter { it.path != "tool.npm.version" },
+            green.probes,
+        )
+        val npmSet = { arm: RunConfig ->
+            arm.interventions.filterIsInstance<Intervention.SetRuntime>().firstOrNull {
+                it.tool == "npm"
+            }
+        }
+        val cause = { arm: RunConfig ->
+            (has(arm, "tool.node.version", "24.1.0") && npmSet(arm) == null) ||
+                npmSet(arm)?.version == "11.0.0"
+        }
+        val capture = { arm: RunConfig ->
+            val npm = if (has(arm, "tool.node.version", "24.1.0")) "11.0.0" else "10.9.2"
+            if (npmSet(arm) == null) {
+                with(arm.capsule, arm.label, "tool.npm.version" to npm)
+            } else {
+                arm.capsule
+            }
+        }
+        val r = Solver(
+            FakeExecutor(capsules = capture, behave = failsWhen(cause)),
+            MemoryCaseFiles(),
+            "case",
+            options,
+        ).solve(noNpm, with(noNpm, "lab-npm-red", "tool.node.version" to "24.1.0"))
+        assertEquals(VerdictKind.BUNDLE, r.verdict.kind, r.verdict.statement)
+        assertEquals(listOf("tool.npm.version"), r.verdict.sufficient, r.verdict.statement)
+        assertTrue("tool.npm.version alone reproduces the failure" in r.verdict.statement)
+        val member = r.runs.single { it.kind == "member" }
+        assertEquals(Outcome.SUPPORTED, member.outcome)
+        assertTrue(member.treatment.failures > 0 && member.control.failures == 0)
+        assertTrue(Verify.run(r.case).ok, Verify.run(r.case).text())
+    }
+
+    @Test
+    fun aMemberWhoseRevertLeavesTheFailureIsNotNamed() {
+        val cause = { arm: RunConfig -> has(arm, "os.release.ID", "alpine") }
+        val capture = { arm: RunConfig ->
+            if (cause(arm) && !gnuEdit(arm)) {
+                with(arm.capsule, arm.label, "tool.coreutils.flavor" to "busybox")
+            } else {
+                arm.capsule
+            }
+        }
+        val r = solve(
+            red = alpineRed(),
+            executor = FakeExecutor(capsules = capture, behave = failsWhen(cause)),
+        )
+        assertEquals(VerdictKind.BUNDLE, r.verdict.kind, r.verdict.statement)
+        assertTrue(r.verdict.necessary.isEmpty(), r.verdict.statement)
+        val removal = r.runs.single { it.kind == "removal" }
+        assertNotEquals(Outcome.SUPPORTED, removal.outcome)
+        assertTrue("does not decide it" in r.verdict.statement, r.verdict.statement)
+        val cert = CanonicalJson.encode(SolveCertificate.certificate(r.case)!!)
+        assertTrue("\"status\":\"not-shown\"" in cert)
+        assertTrue(Verify.run(r.case).ok, Verify.run(r.case).text())
+    }
+
+    @Test
+    fun aRemovalArmThatChangesMoreThanTheMemberIsNotCountedAsTestingIt() {
+        val cause = { arm: RunConfig -> has(arm, "os.release.ID", "alpine") && !gnuEdit(arm) }
+        val capture = { arm: RunConfig ->
+            when {
+                cause(arm) -> with(arm.capsule, arm.label, "tool.coreutils.flavor" to "busybox")
+                gnuEdit(arm) -> with(arm.capsule, arm.label, "tool.git.version" to "9.9.9")
+                else -> arm.capsule
+            }
+        }
+        val r = solve(
+            red = alpineRed(),
+            executor = FakeExecutor(capsules = capture, behave = failsWhen(cause)),
+        )
+        assertEquals(VerdictKind.BUNDLE, r.verdict.kind, r.verdict.statement)
+        assertTrue(r.verdict.necessary.isEmpty(), r.verdict.statement)
+        assertTrue("not this member alone" in r.verdict.statement, r.verdict.statement)
+    }
+
+    @Test
+    fun attributesOneInterventionSetsTogetherStayTogetherInTheMinimalSet() {
+        val cause = { arm: RunConfig -> has(arm, "os.release.VERSION_ID", "11") }
+        val capture = { arm: RunConfig ->
+            if (cause(arm)) {
+                with(arm.capsule, arm.label, "os.release.PRETTY_NAME" to "Debian GNU/Linux 11")
+            } else {
+                arm.capsule
+            }
+        }
+        val r = solve(
+            red = with(
+                green,
+                "lab-debian-11",
+                "os.release.VERSION_ID" to "11",
+                "os.release.PRETTY_NAME" to "Debian GNU/Linux 11",
+                "tool.libc.version" to "2.31",
+                "tool.coreutils.version" to "8.32",
+            ),
+            executor = FakeExecutor(capsules = capture, behave = failsWhen(cause)),
+        )
+        assertEquals(VerdictKind.BUNDLE, r.verdict.kind, r.verdict.statement)
+        val flips = r.runs.map { it.kind to it.flips }
+        assertEquals(
+            listOf("os.release.PRETTY_NAME", "os.release.VERSION_ID"),
+            r.verdict.set.sorted(),
+            "$flips",
+        )
+        assertTrue(r.runs.none { it.kind == "minimal" }, "one arm, so no subset is tried")
+        assertTrue(r.runs.none { it.kind == "removal" }, "an os member cannot be reverted alone")
+        assertTrue(Verify.run(r.case).ok, Verify.run(r.case).text())
+    }
+
     @Test
     fun aCauseOutsideTheBundleIsNeverConfirmedOnADecoy() {
         val cause = { arm: RunConfig -> has(arm, "kernel.release", "6.8.0-new") }
@@ -196,7 +383,7 @@ class SolveTest {
             red = red("kernel.release" to "6.8.0-new"),
             executor = FakeExecutor(behave = failsWhen(cause)),
         )
-        assertEquals(VerdictKind.STUCK, r.verdict.kind, r.verdict.statement)
+        assertEquals(VerdictKind.NEEDS, r.verdict.kind, r.verdict.statement)
         assertEquals(StuckWhy.UNCONTROLLABLE, r.verdict.why)
         assertTrue("kernel.release" in r.verdict.statement)
         assertTrue(r.runs.none { it.kind == "reverse" })
@@ -216,7 +403,7 @@ class SolveTest {
     @Test
     fun noReproductionInTheFailingContainerIsStuck() {
         val r = solve(executor = FakeExecutor(behave = { _, _ -> trial(false) }))
-        assertEquals(VerdictKind.STUCK, r.verdict.kind)
+        assertEquals(VerdictKind.NEEDS, r.verdict.kind)
         assertEquals(StuckWhy.NOT_REPRODUCED, r.verdict.why)
         assertEquals(2 * 30, r.trials)
         assertTrue("0 of 30" in r.verdict.statement)
@@ -235,7 +422,7 @@ class SolveTest {
             trial(arm.label == "failing baseline")
         }
         val r = solve(executor = FakeExecutor(behave = failingBaselineOnly))
-        assertEquals(VerdictKind.STUCK, r.verdict.kind, r.verdict.statement)
+        assertEquals(VerdictKind.NEEDS, r.verdict.kind, r.verdict.statement)
         assertEquals(StuckWhy.NOT_REPRODUCED, r.verdict.why)
         assertTrue(r.runs.any { it.kind == "forward" && it.outcome == Outcome.REFUTED })
         assertTrue("outside what the capsules" in r.verdict.statement)
@@ -247,6 +434,111 @@ class SolveTest {
         assertEquals(StuckWhy.BUDGET, r.verdict.why, r.verdict.statement)
         assertTrue("short by" in r.verdict.statement, r.verdict.statement)
         assertTrue(r.trials <= 18)
+    }
+
+    private fun steps(r: SolveResult) = r.verdict.steps.associateBy { it.kind }
+
+    @Test
+    fun aFailureThatDoesNotReproduceNeedsTheFailingMachineAndALongerPilot() {
+        val r = solve(executor = FakeExecutor(behave = { _, _ -> trial(false) }))
+        assertEquals(VerdictKind.NEEDS, r.verdict.kind, r.verdict.statement)
+        assertEquals(StuckWhy.NOT_REPRODUCED, r.verdict.why)
+        val steps = steps(r)
+        val capture = steps.getValue("capture")
+        val ask = Asks.captureAsk("why")
+        assertEquals(ask.line, capture.command)
+        assertEquals(ask.piped(), capture.reply)
+        assertEquals("drift why --save there.json", capture.command)
+        assertEquals("drift why --save there.json && drift why --reply < there.json", capture.reply)
+        val json = capture.toJson().fields
+        assertEquals(JsonString(Ask.CAPTURE), json["family"])
+        assertEquals(JsonString(ask.piped()), json["piped"])
+        assertEquals(JsonString("capture"), json["kind"])
+        assertEquals(setOf("kind", "text", "command", "reply", "family", "piped"), json.keys)
+        val pilot = steps.getValue("longer-pilot")
+        assertTrue("--pilot 30" in pilot.command.orEmpty(), "$pilot")
+        assertTrue("--run 'sh run-test.sh'" in pilot.command.orEmpty())
+        assertTrue("passing.json failing.json" in pilot.command.orEmpty())
+        assertNull(pilot.reply)
+        assertNull(pilot.ask)
+        assertEquals(setOf("kind", "text", "command", "reply"), pilot.toJson().fields.keys)
+        val cert = CanonicalJson.encode(SolveCertificate.certificate(r.case)!!)
+        assertTrue("\"steps\":[" in cert && "\"label\":\"NEEDS\"" in cert)
+        assertTrue(Verify.run(r.case).ok, Verify.run(r.case).text())
+    }
+
+    @Test
+    fun aDifferenceNoContainerCanSetNeedsTheManualExperiment() {
+        val cause = { arm: RunConfig -> has(arm, "kernel.release", "6.8.0-new") }
+        val r = solve(
+            red = red("kernel.release" to "6.8.0-new"),
+            executor = FakeExecutor(behave = failsWhen(cause)),
+        )
+        assertEquals(VerdictKind.NEEDS, r.verdict.kind, r.verdict.statement)
+        val manual = steps(r).getValue("manual-experiment")
+        assertEquals("drift next case", manual.command)
+        assertTrue("kernel.release" in manual.text, manual.text)
+        assertTrue(Verify.run(r.case).ok, Verify.run(r.case).text())
+    }
+
+    @Test
+    fun anExecutorFailureNeedsTheRerunWithTheFailingStep() {
+        val r = solve(
+            executor = FakeExecutor(problem = { "docker is not installed" }) { _, _ ->
+                trial(false)
+            },
+        )
+        assertEquals(VerdictKind.NEEDS, r.verdict.kind, r.verdict.statement)
+        val rerun = steps(r).getValue("rerun")
+        assertTrue("docker is not installed" in rerun.text)
+        assertTrue(rerun.command.orEmpty().startsWith("drift solve passing.json failing.json"))
+    }
+
+    @Test
+    fun aBudgetThatRanOutNeedsTheDoubledBudget() {
+        val r = solve(o = options.copy(budget = Budget(18, 60)))
+        assertEquals(VerdictKind.NEEDS, r.verdict.kind, r.verdict.statement)
+        val step = steps(r).getValue("raise-budget")
+        assertTrue("--budget trials=36,minutes=120" in step.command.orEmpty(), "$step")
+    }
+
+    private fun context(why: StuckWhy, detail: String, pilot: Int) = NextContext(
+        why,
+        detail,
+        options.copy(pilot = pilot),
+        "case",
+        emptyList(),
+        emptyList(),
+    )
+
+    @Test
+    fun aSizingShortfallNeedsALongerPilotAndIsGenuinelyStuckAtTheLongestPilot() {
+        val detail = "no count up to 30 trials per arm reaches power 0.800000"
+        val stuck = SolveVerdict(VerdictKind.STUCK, StuckWhy.BUDGET, detail)
+        val short = SolveNext.resolve(stuck, context(StuckWhy.BUDGET, detail, 8))
+        assertEquals(VerdictKind.NEEDS, short.kind)
+        assertEquals(listOf("longer-pilot"), short.steps.map { it.kind })
+        val longest = SolveNext.resolve(stuck, context(StuckWhy.BUDGET, detail, 30))
+        assertEquals(VerdictKind.STUCK, longest.kind)
+        assertTrue(longest.steps.isEmpty())
+        assertTrue("no arm of that size reaches the target power" in longest.statement)
+        val narrowed = stuck.copy(kind = VerdictKind.NARROWED)
+        assertEquals(narrowed, SolveNext.resolve(narrowed, context(StuckWhy.BUDGET, detail, 8)))
+    }
+
+    @Test
+    fun theUnmirroredAttributesAreNamedWhenTheContainerDoesNotShowTheFailure() {
+        val c = NextContext(
+            StuckWhy.NOT_REPRODUCED,
+            "x",
+            options,
+            "case",
+            (1..10).map { "kernel.v$it" } + "env.HOME",
+            emptyList(),
+        )
+        val text = SolveNext.steps(c).single { it.kind == "unmirrored" }.text
+        assertTrue("kernel.v1" in text && "and 2 more" in text, text)
+        assertTrue("env.HOME" !in text, text)
     }
 
     @Test
@@ -375,7 +667,7 @@ class SolveTest {
         }
         val r = solve(executor = FakeExecutor(capsules = stale, behave = failsWhen(culprit)))
         assertNotEquals(VerdictKind.CONFIRMED, r.verdict.kind, r.verdict.statement)
-        assertEquals(VerdictKind.STUCK, r.verdict.kind, r.verdict.statement)
+        assertEquals(VerdictKind.NEEDS, r.verdict.kind, r.verdict.statement)
         assertEquals(StuckWhy.EXECUTOR, r.verdict.why)
         assertTrue("is void" in r.verdict.statement, r.verdict.statement)
         assertEquals("void", r.runs.last().diff!!.source)
@@ -462,7 +754,7 @@ class SolveTest {
             trial(if (arm.label.startsWith(reverseLabel)) !second else second)
         }
         val r = solve(executor = FakeExecutor(behave = drift))
-        assertEquals(VerdictKind.STUCK, r.verdict.kind, r.verdict.statement)
+        assertEquals(VerdictKind.NEEDS, r.verdict.kind, r.verdict.statement)
         assertEquals(StuckWhy.NOT_REPRODUCED, r.verdict.why)
         assertTrue("fails as often" in r.verdict.statement, r.verdict.statement)
     }

@@ -30,11 +30,14 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ReproduceTest {
+    private val sum = "3e34e52bb51b5b63087200744a69c631497c49ea948659c7225bcb8e5fef19ac"
+
     private fun capsule(vararg pairs: Pair<String, String>) =
         Capsule("t", pairs.map { Attribute(it.first, it.second, "test") })
 
@@ -364,14 +367,45 @@ class ReproduceTest {
         ),
         Base(
             "a toolchain in a script is not named by sh and the first usable row wins",
-            debian12 + listOf("tool.python.version" to "3.12.4", "env.R_BASE_VERSION" to "4.6.1"),
+            debian12 + listOf("tool.python.version" to "3.12.4", "tool.ruby.version" to "3.4.11"),
             "sh prog.sh",
             "python:3.12.4-slim-bookworm",
             "the first of 2 toolchains in table order",
         ),
+        Base(
+            "a capsule taken in the r image has python from the distribution",
+            debian12 + listOf("tool.python.version" to "3.12.4", "env.R_BASE_VERSION" to "4.6.1"),
+            "sh prog.sh",
+            "r-base:4.6.1",
+            "the capsule's env.R_BASE_VERSION comes from the r image",
+        ),
+        Base(
+            "a capsule taken in the gcc image has python from the distribution",
+            listOf(
+                "tool.cc.family" to "gcc",
+                "tool.cc.version" to "13.2.0",
+                "tool.python.version" to "3.11.2",
+                "env.GCC_VERSION" to "13.2.0",
+            ),
+            "BENCH_FLAKE=1 sh prog.sh",
+            "gcc:13.2",
+            "the capsule's env.GCC_VERSION comes from the cc image",
+        ),
+        Base(
+            "the command still wins over the image the capsule was taken in",
+            listOf(
+                "tool.cc.family" to "gcc",
+                "tool.cc.version" to "13.2.0",
+                "tool.python.version" to "3.12.4",
+                "env.GCC_VERSION" to "13.2.0",
+            ),
+            "python3 prog.py",
+            "python:3.12.4-slim-bookworm",
+            "the command names a python tool",
+        ),
         Base("only a distribution: ubuntu", ubuntu2204, "make", "ubuntu:22.04", "distribution"),
         Base("only a distribution: debian", debian12, "make", "debian:12-slim", "distribution"),
-        Base("only a distribution: alpine", alpine320, "make", "alpine:3.20", "distribution"),
+        Base("only a distribution: alpine", alpine320, "make", "alpine:3.20.3", "distribution"),
         Base("nothing at all", listOf("env.A" to "b"), "make", "debian:12-slim", "generic base"),
     )
 
@@ -383,6 +417,49 @@ class ReproduceTest {
             assertTrue(b.basis in r.basis, "${b.name}: ${r.basis}")
             assertTrue(r.dockerfile.contains("FROM ${b.image}\n"), b.name)
         }
+    }
+
+    @Test
+    fun anAlpinePointReleaseThePublishedTagsHoldPinsTheExactTag() {
+        val exact = build(capsule(*alpine320.toTypedArray()), "make")
+        assertEquals("alpine:3.20.3", exact.imageTag)
+        assertEquals(Status.MIRRORED, exact.status("os.release.VERSION_ID"))
+        assertEquals("the image is alpine 3.20.3", exact.entry("os.release.VERSION_ID").detail)
+        val unpublished = build(
+            capsule("os.release.ID" to "alpine", "os.release.VERSION_ID" to "3.20.99"),
+            "make",
+        )
+        assertEquals("alpine:3.20", unpublished.imageTag)
+        assertEquals(Status.PARTIAL, unpublished.status("os.release.VERSION_ID"))
+        assertTrue("point release" in unpublished.entry("os.release.VERSION_ID").detail)
+        val minor = build(
+            capsule("os.release.ID" to "alpine", "os.release.VERSION_ID" to "3.20"),
+            "make",
+        )
+        assertEquals("alpine:3.20", minor.imageTag)
+        assertEquals(Status.MIRRORED, minor.status("os.release.VERSION_ID"))
+    }
+
+    @Test
+    fun anEnvironmentVariableForXdgBaseDirsAndAContainerPathIsMirroredWhenNamed() {
+        val c = Capsule(
+            "t",
+            listOf(
+                Attribute("env.XDG_CACHE_HOME", "~/xdg", "env"),
+                Attribute("env.XDG_CONFIG_HOME", "/tmp/conf", "env"),
+                Attribute("env.XDG_SEAT", "seat0", "env"),
+                Attribute("env.SCRATCH", "/Users/me/scratch", "env"),
+                Attribute("env.CACHE", "/opt/cache", "env"),
+            ),
+        )
+        val r = build(c, envNames = setOf("XDG_CACHE_HOME", "XDG_CONFIG_HOME", "XDG_SEAT"))
+        assertEquals(Status.MIRRORED, r.status("env.XDG_CACHE_HOME"))
+        assertEquals(Status.MIRRORED, r.status("env.XDG_CONFIG_HOME"))
+        assertTrue("--env 'XDG_CACHE_HOME=~/xdg' \\\n" in r.runScript)
+        assertTrue("host identity" in r.entry("env.XDG_SEAT").detail)
+        val host = build(c, envNames = setOf("SCRATCH", "CACHE"))
+        assertTrue("path on the capsule's host" in host.entry("env.CACHE").detail)
+        assertNotEquals(Status.MIRRORED, host.status("env.SCRATCH"))
     }
 
     @Test
@@ -512,6 +589,107 @@ class ReproduceTest {
         assertEquals(Status.NOT_MIRRORED, r.status("tool.coreutils.flavor"))
         assertEquals(Status.PARTIAL, r.status("os.release.VERSION_ID"))
         assertTrue("musl" in r.bundleOthers && "busybox ash as /bin/sh" in r.bundleOthers)
+    }
+
+    @Test
+    fun projectPinsAreWrittenIntoACopyOfTheWorkspace() {
+        val r = build(
+            capsule(
+                "tool.node.version" to "20.11.1",
+                "project.pins.node" to "18",
+                "project.python.schemakit" to "3.0.0",
+                "project.python.widgetkit" to "1.4.2",
+                "project.checksums.vendor/a.txt" to sum,
+            ),
+            "sh prog.sh",
+        )
+        assertEquals(Status.MIRRORED, r.status("project.checksums.vendor/a.txt"))
+        assertTrue("'$sum  vendor/a.txt' >> /pins/SHA256SUMS" in r.dockerfile, r.dockerfile)
+        assertEquals(Status.MIRRORED, r.status("project.pins.node"))
+        assertEquals(Status.MIRRORED, r.status("project.python.schemakit"))
+        assertTrue(r.pinned)
+        assertTrue("printf '%s\\n' '18' >> /pins/.nvmrc" in r.dockerfile, r.dockerfile)
+        assertTrue("'schemakit==3.0.0' >> /pins/requirements.txt" in r.dockerfile)
+        assertTrue("'widgetkit==1.4.2' >> /pins/requirements.txt" in r.dockerfile)
+        assertTrue(
+            "--volume \"\$PWD:/src:ro\"" in r.flags && "--tmpfs /work:exec,mode=1777" in r.flags,
+        )
+        assertTrue("--volume \"\$PWD:/work\"" !in r.flags)
+        assertTrue(
+            "sh -c 'cp -R /src/. /work/ && cp -R /pins/. /work/ && sh prog.sh'" in r.runScript,
+        )
+        assertTrue(r.runLine(shellCommand = "id").contains("cp -R /pins/. /work/ && id"))
+        val plain = build(capsule("tool.node.version" to "20.11.1"), "sh prog.sh")
+        assertFalse(plain.pinned)
+        assertTrue("/pins" !in plain.dockerfile)
+        assertTrue("--volume \"\$PWD:/work\"" in plain.flags)
+        val odd = build(capsule("project.pins.node" to "lts/*"), "sh prog.sh")
+        assertEquals(Status.NOT_MIRRORED, odd.status("project.pins.node"))
+        assertFalse(odd.pinned)
+    }
+
+    @Test
+    fun theShellBehindBinShIsMirroredByTheImageOrALink() {
+        val debian = arrayOf("os.release.ID" to "debian", "os.release.VERSION_ID" to "12")
+        val bash = build(capsule(*debian, "tool.sh.flavor" to "bash"), "sh a.sh")
+        assertEquals(Status.MIRRORED, bash.status("tool.sh.flavor"))
+        assertTrue("RUN ln -sf bash /bin/sh\n" in bash.dockerfile, bash.dockerfile)
+        val dash = build(capsule(*debian, "tool.sh.flavor" to "dash"), "sh a.sh")
+        assertEquals(Status.MIRRORED, dash.status("tool.sh.flavor"))
+        assertFalse("ln -sf" in dash.dockerfile)
+        val busybox = build(
+            capsule(
+                "os.release.ID" to "alpine",
+                "os.release.VERSION_ID" to "3.20.3",
+                "tool.sh.flavor" to "busybox",
+            ),
+            "sh a.sh",
+        )
+        assertEquals(Status.MIRRORED, busybox.status("tool.sh.flavor"))
+        val zsh = build(capsule(*debian, "tool.sh.flavor" to "zsh"), "sh a.sh")
+        assertEquals(Status.NOT_MIRRORED, zsh.status("tool.sh.flavor"))
+        val alpineBash = build(
+            capsule(
+                "os.release.ID" to "alpine",
+                "os.release.VERSION_ID" to "3.20.3",
+                "tool.sh.flavor" to "bash",
+            ),
+            "sh a.sh",
+        )
+        assertEquals(Status.NOT_MIRRORED, alpineBash.status("tool.sh.flavor"))
+    }
+
+    @Test
+    fun aGnuUserlandOnAnAlpineImageInstallsTheGnuTools() {
+        val attrs = arrayOf(
+            "tool.node.version" to "22.12.0",
+            "os.release.ID" to "alpine",
+            "os.release.VERSION_ID" to "3.20.3",
+        )
+        val edited = Attribute("tool.coreutils.flavor", "gnu", "intervention")
+        val gnu = build(
+            Capsule("edited", capsule(*attrs).attributes + edited),
+            "node a.js",
+        )
+        val recorded = build(capsule(*attrs, "tool.coreutils.flavor" to "gnu"), "node a.js")
+        assertEquals(Status.NOT_MIRRORED, recorded.status("tool.coreutils.flavor"))
+        assertTrue(recorded.packages.none { it.name == "findutils" })
+        assertEquals(
+            "apk add coreutils diffutils findutils grep sed",
+            gnu.entry(
+                "tool.coreutils.flavor",
+            ).detail,
+        )
+        for (name in listOf("coreutils", "diffutils", "findutils", "grep", "sed")) {
+            assertTrue(gnu.packages.any { it.name == name && it.manager == "apk" }, name)
+        }
+        val busybox = build(capsule(*attrs, "tool.coreutils.flavor" to "busybox"), "node a.js")
+        assertTrue(busybox.packages.none { it.name == "findutils" })
+        val debian = build(
+            capsule("tool.node.version" to "22.12.0", "tool.coreutils.flavor" to "busybox"),
+            "node a.js",
+        )
+        assertEquals(Status.NOT_MIRRORED, debian.status("tool.coreutils.flavor"))
     }
 
     @Test
@@ -909,6 +1087,7 @@ class ReproduceTest {
             Triple("nofile", "1:2:3", null),
             Triple("nofile", "many", null),
             Triple("bogus", "1", null),
+            Triple("as", "unlimited:unlimited", null),
         )
         for ((name, value, flag) in cases) {
             val r = build(capsule("limits.$name" to value))
@@ -916,6 +1095,37 @@ class ReproduceTest {
             val status = if (flag == null) Status.NOT_MIRRORED else Status.MIRRORED
             assertEquals(status, r.status("limits.$name"), "$name=$value")
         }
+    }
+
+    @Test
+    fun everyCapturedLimitBecomesOneFlagExceptTheAddressSpace() {
+        val r = build(
+            capsule(
+                "limits.as" to "unlimited:unlimited",
+                "limits.core" to "0:0",
+                "limits.cpu" to "unlimited:unlimited",
+                "limits.data" to "unlimited:unlimited",
+                "limits.fsize" to "100000:100000",
+                "limits.memlock" to "8388608:8388608",
+                "limits.nofile" to "1024:2048",
+                "limits.nproc" to "63000:63000",
+                "limits.stack" to "8388608:unlimited",
+            ),
+        )
+        assertEquals(
+            listOf(
+                "--ulimit core=0:0",
+                "--ulimit cpu=-1:-1",
+                "--ulimit data=-1:-1",
+                "--ulimit fsize=100000:100000",
+                "--ulimit memlock=8388608:8388608",
+                "--ulimit nofile=1024:2048",
+                "--ulimit nproc=63000:63000",
+                "--ulimit stack=8388608:-1",
+            ),
+            r.flags.filter { it.startsWith("--ulimit") },
+        )
+        assertEquals(Status.NOT_MIRRORED, r.status("limits.as"))
     }
 
     @Test
@@ -958,6 +1168,87 @@ class ReproduceTest {
         for (name in listOf("LANG=en_US.UTF-8", "LC_ALL=C.UTF-8", "TZ=Asia/Tokyo")) {
             assertTrue("--env '$name' \\\n" in r.runScript, name)
         }
+    }
+
+    @Test
+    fun aLocaleTheCapsuleDoesNotListIsNotGeneratedInTheArm() {
+        val r = build(
+            capsule(
+                "tool.node.version" to "22.12.0",
+                "env.LANG" to "en_US.UTF-8",
+                "env.LC_TIME" to "de_DE.utf8",
+                "locale.installed" to "C.utf8,en_US.utf8",
+            ),
+            "node a.js",
+        )
+        assertTrue("echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen" in r.dockerfile)
+        assertFalse("de_DE" in r.dockerfile)
+        assertEquals(Status.MIRRORED, r.status("env.LC_TIME"))
+        assertTrue("--env 'LC_TIME=de_DE.utf8' \\\n" in r.runScript)
+    }
+
+    @Test
+    fun aRestrictedCpuAffinityBecomesACpuset() {
+        val limited = build(capsule("cpu.count" to "24", "cpu.affinity" to "2"))
+        assertEquals("--cpuset-cpus 0-1", limited.flags.single { it.startsWith("--cpuset") })
+        assertEquals(Status.MIRRORED, limited.status("cpu.affinity"))
+        val single = build(capsule("cpu.count" to "24", "cpu.affinity" to "1"))
+        assertEquals("--cpuset-cpus 0", single.flags.single { it.startsWith("--cpuset") })
+        val all = build(capsule("cpu.count" to "24", "cpu.affinity" to "24"))
+        assertTrue(all.flags.none { it.startsWith("--cpuset") })
+        assertEquals(Status.MIRRORED, all.status("cpu.affinity"))
+        val bad = build(capsule("cpu.affinity" to "many"))
+        assertEquals(Status.NOT_MIRRORED, bad.status("cpu.affinity"))
+    }
+
+    @Test
+    fun aLoopbackOnlyInterfaceListBecomesNetworkNone() {
+        val none = build(capsule("network.interfaces" to "lo"))
+        assertTrue("--network none" in none.flags)
+        assertEquals(Status.MIRRORED, none.status("network.interfaces"))
+        val bridge = build(capsule("network.interfaces" to "eth0,lo"))
+        assertTrue(bridge.flags.none { it.startsWith("--network") })
+        assertEquals(Status.MIRRORED, bridge.status("network.interfaces"))
+        val other = build(capsule("network.interfaces" to "lo,wlan0"))
+        assertEquals(Status.PARTIAL, other.status("network.interfaces"))
+    }
+
+    @Test
+    fun hostsEntriesWithALoopbackAddressBecomeAddHostFlags() {
+        val r = build(capsule("network.hosts.names" to "db.internal@127.0.0.1,cache@127.0.0.2"))
+        assertEquals(
+            listOf("--add-host cache:127.0.0.2", "--add-host db.internal:127.0.0.1"),
+            r.flags.filter { it.startsWith("--add-host") },
+        )
+        assertEquals(Status.MIRRORED, r.status("network.hosts.names"))
+        val mixed = build(capsule("network.hosts.names" to "db.internal@127.0.0.1,vault"))
+        assertEquals(Status.PARTIAL, mixed.status("network.hosts.names"))
+        assertEquals(1, mixed.flags.count { it.startsWith("--add-host") })
+        val bare = build(capsule("network.hosts.names" to "host"))
+        assertEquals(Status.NOT_MIRRORED, bare.status("network.hosts.names"))
+        assertTrue(bare.flags.none { it.startsWith("--add-host") })
+    }
+
+    @Test
+    fun theNsswitchHostsLineIsSetInTheImageAndOnlyForSafeValues() {
+        val r = build(capsule("network.nsswitch.hosts" to "files [NOTFOUND=return] dns"))
+        assertTrue(
+            "&& echo 'hosts: files [NOTFOUND=return] dns' >> /etc/nsswitch.conf" in r.dockerfile,
+        )
+        assertTrue("sed -i '/^hosts:/d' /etc/nsswitch.conf" in r.dockerfile)
+        assertEquals(Status.MIRRORED, r.status("network.nsswitch.hosts"))
+        val unsafe = build(capsule("network.nsswitch.hosts" to "dns'; rm -rf /"))
+        assertFalse("nsswitch" in unsafe.dockerfile)
+        assertEquals(Status.NOT_MIRRORED, unsafe.status("network.nsswitch.hosts"))
+        val alpine = build(
+            capsule(
+                "os.release.ID" to "alpine",
+                "os.release.VERSION_ID" to "3.20.3",
+                "network.nsswitch.hosts" to "dns",
+            ),
+        )
+        assertFalse("nsswitch" in alpine.dockerfile)
+        assertEquals(Status.PARTIAL, alpine.status("network.nsswitch.hosts"))
     }
 
     @Test

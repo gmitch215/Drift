@@ -82,9 +82,9 @@ data class MeasuredDiff(
 
 /**
  * One executed experiment. [ExperimentRun.kind] is pilot, forward, minimal (a subset tried by the
- * minimal-set search), reverse, replicate or split. A reverse run is evaluated the other way round:
- * its outcome is SUPPORTED when the unchanged failing arm (the `control` role) fails more than the
- * reverted one.
+ * minimal-set search), reverse, removal (one bundle member reverted on the failing side),
+ * replicate or split. A reverse or removal run is evaluated the other way round: its outcome is
+ * SUPPORTED when the unchanged failing arm (the `control` role) fails more than the reverted one.
  */
 class ExperimentRun(
     val seq: Int,
@@ -99,7 +99,7 @@ class ExperimentRun(
     val diff: MeasuredDiff?,
     val schedule: TrialSchedule? = null,
 ) {
-    val reverse: Boolean get() = kind == "reverse"
+    val reverse: Boolean get() = kind == "reverse" || kind == "removal"
     val void: Boolean get() = diff?.source == MeasuredDiff.VOID
 
     fun toJson(): JsonObject {
@@ -149,6 +149,7 @@ enum class VerdictKind(val id: String, val label: String) {
     BUNDLE("confirmed-bundle", "CONFIRMED EFFECT (bundle)"),
     EFFECT("confirmed-effect", "CONFIRMED EFFECT (isolation not measured)"),
     NARROWED("narrowed", "NARROWED"),
+    NEEDS("needs", "NEEDS"),
     STUCK("stuck", "STUCK"),
 }
 
@@ -163,8 +164,11 @@ enum class StuckWhy(val id: String) {
 /**
  * The outcome of a solve. [SolveVerdict.set] is the minimal causal set (hypothesis ids),
  * [SolveVerdict.members] the attributes the arms differ in, [SolveVerdict.notIsolated] the members
- * of a bundle that no arm has pulled apart; [SolveVerdict.candidates] and [SolveVerdict.next] are
- * for NARROWED.
+ * of a bundle that no arm has pulled apart; [SolveVerdict.steps] what would settle a NEEDS
+ * verdict; [SolveVerdict.necessary] and [SolveVerdict.sufficient] the
+ * members of a bundle that a removal or a single-member experiment showed the failure needs or
+ * follows; [SolveVerdict.candidates] and [SolveVerdict.next]
+ * are for NARROWED.
  */
 data class SolveVerdict(
     val kind: VerdictKind,
@@ -176,6 +180,9 @@ data class SolveVerdict(
     val mechanism: String? = null,
     val candidates: List<String> = emptyList(),
     val next: String? = null,
+    val necessary: List<String> = emptyList(),
+    val sufficient: List<String> = emptyList(),
+    val steps: List<NextStep> = emptyList(),
 ) {
     fun toJson(): JsonObject = obj(
         "kind" to JsonString(kind.id),
@@ -188,6 +195,34 @@ data class SolveVerdict(
         "mechanism" to (mechanism?.let { JsonString(it) } ?: JsonString("unexplained")),
         "candidates" to JsonArray(candidates.map(::JsonString)),
         "next" to (next?.let { JsonString(it) } ?: JsonNull),
+    ).let {
+        val more = buildMap {
+            if (necessary.isNotEmpty()) put("necessary", JsonArray(necessary.map(::JsonString)))
+            if (sufficient.isNotEmpty()) put("sufficient", JsonArray(sufficient.map(::JsonString)))
+            if (steps.isNotEmpty()) put("steps", JsonArray(steps.map { s -> s.toJson() }))
+        }
+        if (more.isEmpty()) it else JsonObject(it.fields + more)
+    }
+}
+
+/**
+ * What the single-member experiments say about one member of a bundle. [Removal.status] is
+ * `sufficient` (setting only this member on the passing side reproduced the failure), `necessary`
+ * (reverting only it on the failing side removed the failure), `not-shown` (the arm ran and the
+ * failure did not follow) or `untested` (no arm sets it alone, or the arm changed more than the
+ * member); [Removal.experiment] is the run id when an arm ran, [Removal.detail] says why or what.
+ */
+data class Removal(
+    val member: String,
+    val status: String,
+    val experiment: String?,
+    val detail: String,
+) {
+    fun toJson(): JsonObject = obj(
+        "member" to JsonString(member),
+        "status" to JsonString(status),
+        "experiment" to (experiment?.let { JsonString(it) } ?: JsonNull),
+        "detail" to JsonString(detail),
     )
 }
 

@@ -75,7 +75,8 @@ class DockerExecutor(
         )
         val line = repro.runLine(
             extra,
-            "/opt/drift capture --label ${quote(arm.label)} --tools --probes",
+            "/opt/drift capture --label ${quote(arm.label)} --tools --probes" +
+                if (repro.pinned) " --project" else "",
         )
         val result = host.run(listOf("sh", "-c", "cd ${quote(workspace)} && $line 2>/dev/null"))
         if (result == null || result.exitCode != 0) return null

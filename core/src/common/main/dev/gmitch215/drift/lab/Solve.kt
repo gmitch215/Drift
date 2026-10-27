@@ -42,6 +42,8 @@ data class SolveOptions(
     val pilot: Int = 8,
     val maxRounds: Int = 12,
     val digests: Map<String, String> = emptyMap(),
+    val passing: String = "passing.json",
+    val failing: String = "failing.json",
 ) {
     init {
         require(pilot in 3..MAX_PILOT) { "--pilot must be within 3..$MAX_PILOT" }
@@ -96,6 +98,7 @@ class Solver(
         val replicate: ExperimentRun?,
         val diff: MeasuredDiff,
         val verdict: SolveVerdict,
+        val removals: List<Removal> = emptyList(),
     )
 
     class SearchRecord(val tested: Int, val unresolved: Int, val order: List<List<String>>)
@@ -156,6 +159,23 @@ class Solver(
         } catch (h: Halt) {
             verdict = finish(h)
         }
+        val why = verdict.why
+        if (verdict.kind == VerdictKind.STUCK && why != null) {
+            val unmirrored = if (::baseline.isInitialized) {
+                baseline.entries.filter { it.status == Status.NOT_MIRRORED }.map { it.path }
+            } else {
+                emptyList()
+            }
+            val context = NextContext(
+                why,
+                verdict.statement,
+                options,
+                dir,
+                unmirrored,
+                verdict.candidates,
+            )
+            verdict = SolveNext.resolve(verdict, context)
+        }
         val initial = first ?: Planner.from(ranking, frame, Options(options.trialMinutes, 1, 1))
         return SolveCertificate.build(
             name = options.name ?: "${green.label} to ${red.label}",
@@ -178,6 +198,7 @@ class Solver(
                     it.reverse,
                     it.replicate,
                     it.diff,
+                    it.removals,
                 )
             },
             verdict = verdict,
@@ -200,17 +221,13 @@ class Solver(
     // #region pilot
 
     private fun runPilot(green: Capsule, red: Capsule): ExperimentRun {
-        val names = CapsuleDiff.attributes(green, red).map { it.path }
-            .filter { it.startsWith("env.") }.map { it.removePrefix("env.") }.toSet()
         fun config(c: Capsule, label: String): RunConfig {
-            val present = c.attributes.map { it.path.removePrefix("env.") }.toSet()
             val base = ArmBase(
                 c,
                 options.command,
                 Environment.LOCAL,
                 options.digests,
-                names.filter { it in present }
-                    .toSet(),
+                diffEnv(c),
             )
             return when (val r = Arms.config(base, emptyList(), label)) {
                 is ConfigResult.Built -> r.config
@@ -224,6 +241,14 @@ class Solver(
         baseline = left.reproduction!!
         val cap = PilotRule.max(options.pilot, options.budget.maxTrials)
         return execute("p0", "pilot", emptyList(), null, left, right, options.pilot, null, cap)
+    }
+
+    /** The names of the environment variables that differ between the capsules and [c] holds. */
+    private fun diffEnv(c: Capsule): Set<String> {
+        val names = CapsuleDiff.attributes(green, red).map { it.path }
+            .filter { it.startsWith("env.") }.map { it.removePrefix("env.") }.toSet()
+        val present = c.attributes.map { it.path.removePrefix("env.") }.toSet()
+        return names.filter { it in present }.toSet()
     }
 
     // #endregion
@@ -406,8 +431,10 @@ class Solver(
         var halted: Halt? = null
         var minimal = forward.flips
         var unresolved = 0
-        if (forward.flips.size >= 2) {
-            val found = Ddmin.run(forward.flips) { subset ->
+        val atoms = atoms(forward.flips)
+        if (atoms.size >= 2) {
+            val found = Ddmin.run(atoms) { chosen ->
+                val subset = chosen.flatten()
                 order += subset
                 val cached = tests[subset.toSet()]
                 val run = cached ?: if (halted != null) {
@@ -427,7 +454,7 @@ class Solver(
                     else -> Verdict.UNRESOLVED
                 }
             }
-            minimal = found.minimal
+            minimal = found.minimal.flatten()
             unresolved = found.unresolved
         }
         val names = minimal.joinToString(", ")
@@ -486,6 +513,7 @@ class Solver(
             "(exact one-sided p ${p(minimalRun)})"
         val base = "${minimalRun.control.failures} of ${minimalRun.control.trials.size}"
         val set = minimal.joinToString(", ")
+        var removals = emptyList<Removal>()
         val v = if (!SolveCertificate.measured(diff, reverse ?: replicate)) {
             SolveVerdict(
                 VerdictKind.EFFECT,
@@ -518,6 +546,7 @@ class Solver(
         } else {
             val primaries = arms?.primaries.orEmpty()
             val splits = splitBundle(arms, minimalRun)
+            removals = testMembers(forward, diff, primaries)
             SolveVerdict(
                 VerdictKind.BUNDLE,
                 null,
@@ -525,16 +554,194 @@ class Solver(
                     "bundle's and not one member's: ${diff.changed.joinToString(", ")}. " +
                     "Setting $set moved " +
                     "the failure count from $base to $counts and " +
-                    confirmedBy(reverse, replicate) + ". $splits",
+                    confirmedBy(reverse, replicate) + ". $splits" + removalText(removals),
                 set = minimal,
                 members = diff.changed,
                 notIsolated = diff.changed.filter { it !in primaries || primaries.size > 1 },
                 mechanism = mech,
+                necessary = removals.filter { it.status == NECESSARY }.map { it.member },
+                sufficient = removals.filter { it.status == SUFFICIENT }.map { it.member },
             )
         }
-        confirmation = Confirmation(forward, minimal, search, reverse, replicate, diff, v)
+        confirmation =
+            Confirmation(forward, minimal, search, reverse, replicate, diff, v, removals)
         return v
     }
+
+    /**
+     * Forward flips that one intervention sets together are one atom: no arm tests one without the
+     * others, so the minimal-set search keeps or drops them as a group.
+     */
+    private fun atoms(flips: List<String>): List<List<String>> {
+        val groups = linkedMapOf<String, MutableList<String>>()
+        for (f in flips) {
+            val key = try {
+                build(experimentOf("a", listOf(f), green.label, red.label), green, red)
+                    ?.takeIf { it.executable }?.right?.interventions?.map { it.id }?.sorted()
+                    ?.joinToString("|")
+            } catch (h: Halt) {
+                null
+            }
+            groups.getOrPut(key?.takeIf { it.isNotEmpty() } ?: "own:$f") { mutableListOf() } += f
+        }
+        return groups.values.toList()
+    }
+
+    /**
+     * Tests each member of a bundle that its own intervention can set, one at a time. Setting the
+     * member alone on the passing side to its failing value that reproduces the failure makes it
+     * sufficient; otherwise reverting it alone on the failing side that removes the failure makes
+     * it necessary. A member counts only when the arm's capture shows that member changed and
+     * nothing else. Members no arm sets alone are reported as untested, with the reason.
+     */
+    private fun testMembers(
+        forward: ExperimentRun,
+        diff: MeasuredDiff,
+        primaries: List<String>,
+    ): List<Removal> {
+        val out = mutableListOf<Removal>()
+        var stopped: String? = null
+        var ran = 0
+        val members = diff.changed.filter { it !in primaries }
+            .sortedBy { it.startsWith("env.") }
+        for (m in members) {
+            fun untested(why: String) {
+                out += Removal(m, UNTESTED, null, why)
+            }
+
+            fun attempt(
+                from: Capsule,
+                to: Capsule,
+                fromSeen: Capsule?,
+                toSeen: Capsule?,
+                kind: String,
+            ): Pair<ExperimentRun?, String?> {
+                val toward = Interventions.toward(m, seen(from, fromSeen, m), seen(to, toSeen, m))
+                if (toward is Interventions.Toward.Cannot) return null to toward.reason
+                if (ran >= MAX_MEMBER_RUNS) {
+                    return null to "at most $MAX_MEMBER_RUNS member arms are run per solve"
+                }
+                val i = (toward as Interventions.Toward.Sets).intervention
+                val id = "${forward.id}.r${++ran}"
+                val e = experimentOf(id, listOf(m), from.label, to.label)
+                val labels = e.arms.first().label to e.arms.last().label
+                val base = ArmBase(
+                    from,
+                    options.command,
+                    Environment.LOCAL,
+                    options.digests,
+                    diffEnv(from),
+                )
+                return when (val built = Arms.pair(base, emptyList(), listOf(i), labels)) {
+                    is ArmSetResult.Refused -> null to built.problem.message()
+
+                    is ArmSetResult.Built -> if (built.arms.diff.changed != listOf(m)) {
+                        val also = built.arms.diff.changed.filter { it != m }
+                        null to "the arm also changes ${also.joinToString(", ")}"
+                    } else {
+                        try {
+                            val run = runExperiment(
+                                e,
+                                built.arms,
+                                kind,
+                                listOf(m),
+                                id,
+                                from.label,
+                                to.label,
+                            )
+                            run to null
+                        } catch (h: Halt) {
+                            if (h.why == StuckWhy.BUDGET) stopped = h.detail
+                            null to h.detail
+                        }
+                    }
+                }
+            }
+            val halted = stopped
+            if (halted != null) {
+                untested(halted)
+                continue
+            }
+            val passingSeen = forward.control.capsule
+            val failingSeen = forward.treatment.capsule
+            val set = attempt(green, red, passingSeen, failingSeen, "member")
+            val setRun = set.first
+            if (setRun != null) {
+                val r = judgeMember(m, setRun, SUFFICIENT)
+                if (r.status == SUFFICIENT || r.status == UNTESTED) {
+                    out += r
+                    continue
+                }
+            }
+            val revert = attempt(red, green, failingSeen, passingSeen, "removal")
+            val run = revert.first
+            when {
+                run != null -> out += judgeMember(m, run, NECESSARY)
+
+                setRun != null -> out += judgeMember(m, setRun, SUFFICIENT)
+
+                else -> untested(
+                    listOfNotNull(set.second, revert.second).distinct().joinToString("; "),
+                )
+            }
+        }
+        return out
+    }
+
+    private fun judgeMember(m: String, run: ExperimentRun, status: String): Removal {
+        val d = run.diff
+        val more = if (status == SUFFICIENT) run.treatment else run.control
+        val less = if (status == SUFFICIENT) run.control else run.treatment
+        val how = if (status == SUFFICIENT) {
+            "set alone on the passing side"
+        } else {
+            "reverted alone on the failing side"
+        }
+        val counts = "$how: ${more.failures} of ${more.trials.size} against " +
+            "${less.failures} of ${less.trials.size}"
+        return when {
+            run.outcome != Outcome.SUPPORTED ->
+                Removal(m, NOT_SHOWN, run.id, "the failure did not follow ($counts)")
+
+            d == null || d.source != MeasuredDiff.MEASURED || d.changed != listOf(m) ->
+                Removal(
+                    m,
+                    UNTESTED,
+                    run.id,
+                    "the capture of the arm shows ${d?.changed.orEmpty().joinToString(", ")} " +
+                        "changed, not this member alone",
+                )
+
+            else -> Removal(m, status, run.id, "($counts, p ${p(run)})")
+        }
+    }
+
+    private fun removalText(removals: List<Removal>): String {
+        if (removals.isEmpty()) return ""
+        val parts = mutableListOf<String>()
+        for (r in removals.filter { it.status == SUFFICIENT }) {
+            parts += "${r.member} alone reproduces the failure ${r.detail}"
+        }
+        for (r in removals.filter { it.status == NECESSARY }) {
+            parts += "${r.member} alone is needed for the failure ${r.detail}"
+        }
+        for (r in removals.filter { it.status == NOT_SHOWN }) {
+            parts += "${r.member} alone does not decide it (${r.detail})"
+        }
+        val rest = removals.filter { it.status == UNTESTED }
+        if (rest.isNotEmpty()) {
+            parts += "Not tested alone: " +
+                rest.joinToString("; ") { "${it.member} (${it.detail})" }
+        }
+        return " Member tests: " + parts.joinToString(". ") + "."
+    }
+
+    /** The value in [c], or in the capsule captured inside an arm when [c] does not record it. */
+    private fun seen(c: Capsule, captured: Capsule?, path: String): String? =
+        value(c, path) ?: captured?.let { value(it, path) }
+
+    private fun value(c: Capsule, path: String): String? =
+        c.attributes.firstOrNull { it.path == path }?.value
 
     private fun splitBundle(arms: ArmSet?, forward: ExperimentRun): String {
         if (arms == null) return "No bundle-splitting arm was possible: the arms cannot run."
@@ -736,7 +943,7 @@ class Solver(
         }
         val control = ArmRun("control", left.label, records[0], seconds[0], capsules[0])
         val treatment = ArmRun("treatment", right.label, records[1], seconds[1], capsules[1])
-        val reverse = kind == "reverse"
+        val reverse = kind == "reverse" || kind == "removal"
         val more = if (reverse) control.counts else treatment.counts
         val less = if (reverse) treatment.counts else control.counts
         val rule = spec?.rule
@@ -800,10 +1007,12 @@ class Solver(
         if (c != null && t != null) {
             val d = CapsuleDiff.diff(c, t)
             val unreached = unreached(t, requested)
+            val derived = derived(requested)
+            val (consequence, changed) = d.changes.map { it.path }.partition { it in derived }
             return MeasuredDiff(
                 if (unreached.isEmpty()) MeasuredDiff.MEASURED else MeasuredDiff.VOID,
-                d.changes.map { it.path }.sorted(),
-                d.ignored.map { it.path }.sorted(),
+                changed.sorted(),
+                (d.ignored.map { it.path } + consequence).sorted(),
                 d.probes.filter { it.status == ProbeChangeStatus.DIFFERENT }.map { it.id }.sorted(),
                 (c.attributes.map { it.path } + t.attributes.map { it.path }).toSet().size,
                 unreached,
@@ -812,6 +1021,16 @@ class Solver(
         return predicted?.let {
             MeasuredDiff(MeasuredDiff.PREDICTED, it.changed, it.ignored, emptyList())
         }
+    }
+
+    /** Attributes the arm changes by carrying out the edit; they are not a second cause. */
+    private fun derived(requested: RunConfig): Set<String> {
+        val edited = requested.edited.values.flatten()
+        val locale = edited.any { it == "env.LANG" || it.startsWith("env.LC_") }
+        val derived = mutableSetOf<String>()
+        if (locale) derived += "locale.installed"
+        if ("tool.coreutils.flavor" in edited) derived += "tool.coreutils.version"
+        return derived
     }
 
     private fun unreached(captured: Capsule, requested: RunConfig): List<String> {
@@ -825,6 +1044,11 @@ class Solver(
     companion object {
         const val TAIL = 120
         const val MAX_SPLITS = 3
+        const val MAX_MEMBER_RUNS = 6
+        const val SUFFICIENT = "sufficient"
+        const val NECESSARY = "necessary"
+        const val NOT_SHOWN = "not-shown"
+        const val UNTESTED = "untested"
     }
 }
 

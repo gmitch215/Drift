@@ -59,6 +59,9 @@ class Controls(private val rows: List<ControlRow>) {
                 ControlRow("ci.", emptySet(), "the runner provider owns the image and provisioner"),
                 ControlRow("step:", ci, "a workflow variant can add, drop or move a step"),
                 ControlRow("deps.", both, "a lockfile pin sets a dependency version"),
+                ControlRow("project.pins.", local, "a version file in the workspace pins it"),
+                ControlRow("project.checksums.", local, "a checksum file of the workspace sets it"),
+                ControlRow("project.python.", local, "a requirements pin of the workspace sets it"),
                 ControlRow("tool.", both, "an image tag or a setup action pins a toolchain"),
                 ControlRow("tool.libc.", local, "libc ships in the base image; hosted ones fix it"),
                 ControlRow("runtime.", both, "a runtime flag or version pin is in the command"),
@@ -71,6 +74,7 @@ class Controls(private val rows: List<ControlRow>) {
                 ControlRow("os.release.", local, "the userland comes with the base image"),
                 ControlRow("os.", emptySet(), "the host operating system is the host's"),
                 ControlRow("kernel.", emptySet(), "the kernel belongs to the host"),
+                ControlRow("cpu.affinity", local, "a cpuset is a container flag"),
                 ControlRow("cpu.", emptySet(), "the processor belongs to the host"),
             ),
         )

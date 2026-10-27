@@ -214,7 +214,71 @@ sealed class Intervention {
         override fun edit(d: Draft): InterventionProblem? {
             if (!LIMIT_NAME.matches(name)) return invalid("not a limit name")
             if (value.isBlank()) return invalid("empty value")
-            d.set("limits.$name", value)
+            d.set("limits.$name", value.trim().let { if (':' in it) it else "$it:$it" })
+            return null
+        }
+    }
+
+    /** Restricts the CPUs the container may run on, the count in `cpu.affinity`. */
+    data class SetCpuAffinity(val count: String) : Intervention() {
+        override val type get() = "set-cpu-affinity"
+        override val params get() = listOf("count" to count)
+
+        override fun describe() = "restrict the container to $count CPUs (cpuset)"
+
+        override fun edit(d: Draft): InterventionProblem? {
+            if (!POSITIVE.matches(count)) return invalid("not a positive CPU count")
+            d.set("cpu.affinity", count)
+            return null
+        }
+    }
+
+    /** Sets the network interfaces the container has, the sorted list in `network.interfaces`. */
+    data class SetNetwork(val interfaces: String) : Intervention() {
+        override val type get() = "set-network"
+        override val params get() = listOf("interfaces" to interfaces)
+
+        override fun describe() = "set the network interfaces to $interfaces"
+
+        override fun edit(d: Draft): InterventionProblem? {
+            if (!INTERFACES.matches(interfaces)) return invalid("not a list of interface names")
+            d.set("network.interfaces", interfaces)
+            return null
+        }
+    }
+
+    /** Sets the custom hosts entries (`name@127.0.0.1`, comma separated); blank removes them. */
+    data class SetHosts(val entries: String) : Intervention() {
+        override val type get() = "set-hosts"
+        override val params get() = listOf("entries" to entries)
+
+        override fun describe() = if (entries.isBlank()) {
+            "remove the custom hosts entries"
+        } else {
+            "set the hosts entries to $entries"
+        }
+
+        override fun edit(d: Draft): InterventionProblem? {
+            if (entries.isBlank()) {
+                d.unset("network.hosts.names")
+                return null
+            }
+            if (!HOST_ENTRIES.matches(entries)) return invalid("not a list of hosts entries")
+            d.set("network.hosts.names", entries)
+            return null
+        }
+    }
+
+    /** Sets the sources of the `hosts` database in `/etc/nsswitch.conf`, such as `files dns`. */
+    data class SetNsswitch(val hosts: String) : Intervention() {
+        override val type get() = "set-nsswitch"
+        override val params get() = listOf("hosts" to hosts)
+
+        override fun describe() = "set the name service switch hosts sources to $hosts"
+
+        override fun edit(d: Draft): InterventionProblem? {
+            if (!NSSWITCH.matches(hosts.trim())) return invalid("not a list of sources")
+            d.set("network.nsswitch.hosts", hosts.trim())
             return null
         }
     }
@@ -230,6 +294,49 @@ sealed class Intervention {
             if (!TOOL_NAME.matches(tool)) return invalid("not a tool name")
             if (version.isBlank()) return invalid("empty version")
             d.set("tool.$tool.version", version)
+            return null
+        }
+    }
+
+    /** Sets the userland flavor, `gnu` or `busybox`; on Alpine `gnu` installs the GNU tools. */
+    data class SetUserland(val flavor: String) : Intervention() {
+        override val type get() = "set-userland"
+        override val params get() = listOf("flavor" to flavor)
+
+        override fun describe() = "set the userland (coreutils, findutils, grep) to $flavor"
+
+        override fun edit(d: Draft): InterventionProblem? {
+            if (flavor != "gnu" && flavor != "busybox") return invalid("not gnu or busybox")
+            d.set("tool.coreutils.flavor", flavor)
+            return null
+        }
+    }
+
+    /** Sets a project pin that the arm carries as a workspace file (see [WorkspacePins]). */
+    data class SetPin(val path: String, val value: String) : Intervention() {
+        override val type get() = "set-pin"
+        override val params get() = listOf("path" to path, "value" to value)
+
+        override fun describe() = "set $path to $value in the workspace's pin file"
+
+        override fun edit(d: Draft): InterventionProblem? {
+            if (!WorkspacePins.handles(path)) return invalid("not an attribute a pin file carries")
+            if (!WorkspacePins.valid(path, value)) return invalid("not a plain version or digest")
+            d.set(path, value)
+            return null
+        }
+    }
+
+    /** Links `/bin/sh` to another shell; the flavor is the name of the link target. */
+    data class SetShell(val flavor: String) : Intervention() {
+        override val type get() = "set-shell"
+        override val params get() = listOf("flavor" to flavor)
+
+        override fun describe() = "link /bin/sh to $flavor"
+
+        override fun edit(d: Draft): InterventionProblem? {
+            if (!SHELL.matches(flavor)) return invalid("not a shell name")
+            d.set("tool.sh.flavor", flavor)
             return null
         }
     }
@@ -365,8 +472,14 @@ sealed class Intervention {
     companion object {
         private val ENV_NAME = Regex("^[A-Za-z_][A-Za-z0-9_]*$")
         private val TOOL_NAME = Regex("^[a-z][a-z0-9-]*$")
+        private val SHELL = Regex("^[a-z][a-z0-9]*$")
         private val LIMIT_NAME = Regex("^[a-z]+$")
         private val DIGITS = Regex("^[0-9]+$")
+        private val POSITIVE = Regex("^[1-9][0-9]*$")
+        private val INTERFACES = Regex("^[A-Za-z0-9_.@-]+(,[A-Za-z0-9_.@-]+)*$")
+        private val HOST_ENTRY = "[A-Za-z0-9_.-]+(?:@[0-9a-f.:]+)?"
+        private val HOST_ENTRIES = Regex("^$HOST_ENTRY(?:,$HOST_ENTRY)*$")
+        private val NSSWITCH = Regex("^[A-Za-z0-9_\\[\\]=!]+( [A-Za-z0-9_\\[\\]=!]+)*$")
         private val CPU_VALUE = Regex("^(max|[0-9]+)( [0-9]+)?$")
         private val PLATFORM = Regex("^[A-Za-z][A-Za-z0-9_.-]*$")
         private val FLAG = Regex("^--?[A-Za-z0-9][A-Za-z0-9._=:/-]*$")
@@ -391,8 +504,15 @@ object Interventions {
         path.startsWith("env.") -> "set-env"
         path == "cgroup.cpu.max" -> "set-cpu-limit"
         path == "cgroup.memory.max" -> "set-memory-limit"
+        path == "cpu.affinity" -> "set-cpu-affinity"
+        path == "network.interfaces" -> "set-network"
+        path == "network.hosts.names" -> "set-hosts"
+        path == "network.nsswitch.hosts" -> "set-nsswitch"
         path.startsWith("limits.") -> "set-ulimit"
         toolVersion.matches(path) -> "set-runtime"
+        path == "tool.coreutils.flavor" -> "set-userland"
+        path == "tool.sh.flavor" -> "set-shell"
+        WorkspacePins.handles(path) -> "set-pin"
         path.startsWith("os.release.") || path == "os.version" -> "set-os"
         path == "runtime.platform" -> "set-platform"
         depVersion.matches(path) -> "pin-dependency"
@@ -414,6 +534,7 @@ object Interventions {
         if (via == "toggle-step") {
             return sets(Intervention.ToggleStep(path.removePrefix("step:"), true))
         }
+        if (via == "set-hosts") return sets(Intervention.SetHosts(to.orEmpty()))
         if (to == null) {
             return if (path.startsWith("env.")) {
                 sets(Intervention.UnsetEnv(path.removePrefix("env.")))
@@ -434,7 +555,19 @@ object Interventions {
 
             "set-ulimit" -> sets(Intervention.SetUlimit(path.removePrefix("limits."), to))
 
+            "set-cpu-affinity" -> sets(Intervention.SetCpuAffinity(to))
+
+            "set-network" -> sets(Intervention.SetNetwork(to))
+
+            "set-nsswitch" -> sets(Intervention.SetNsswitch(to))
+
             "set-platform" -> sets(Intervention.SetPlatform(to))
+
+            "set-userland" -> sets(Intervention.SetUserland(to))
+
+            "set-shell" -> sets(Intervention.SetShell(to))
+
+            "set-pin" -> sets(Intervention.SetPin(path, to))
 
             "set-runtime" ->
                 sets(Intervention.SetRuntime(toolVersion.matchEntire(path)!!.groupValues[1], to))

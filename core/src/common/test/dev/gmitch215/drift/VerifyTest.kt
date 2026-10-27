@@ -53,8 +53,8 @@ class VerifyTest {
         "confirmed" to "CONFIRMED:",
         "bundle" to "CONFIRMED EFFECT (bundle)",
         "narrowed" to "NARROWED",
-        "stuck at the pilot" to "STUCK",
-        "stuck with refuted candidates" to "STUCK",
+        "stuck at the pilot" to "NEEDS",
+        "stuck with refuted candidates" to "NEEDS",
     )
 
     private fun archive(case: CaseFile): Map<String, String> =
@@ -559,7 +559,7 @@ class VerifyTest {
     fun theFlagshipKotlinCaseIsPinnedAndVerifies() {
         val bytes = FlagshipBFixtures.bytes("resume-offset.driftcase")
         assertEquals(
-            "d8cadbf2ef68af71205d43bc5d23369272d97bf2b2f10b65aa6b19b510ca28a3",
+            "d7f50515d676f0bd32125dbb8dc7952cbdac04fdf5a9045aac5a02b21c2e3b81",
             Sha256.hex(bytes),
         )
         val report = Verify.open(bytes)
@@ -577,7 +577,7 @@ class VerifyTest {
     fun theFlagshipBlindCaseIsPinnedAndFailsTheMeasuredIsolationRule() {
         val bytes = FlagshipCFixtures.bytes("INC-13.driftcase")
         assertEquals(
-            "b4b20bdcb4d3c5e44687564c570fc0be77de505e84607a936720ec18def65aeb",
+            "60bd8ea19526c496a17cbd7e0c3665b5e93e284eb095ef05efa2f35f4f6a890b",
             Sha256.hex(bytes),
         )
         val report = Verify.open(bytes)

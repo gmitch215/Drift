@@ -66,6 +66,17 @@ class ImageTagListTest {
     }
 
     @Test
+    fun theAlpineTagsKeptAreTheExactPointReleases() {
+        assertEquals(
+            mapOf("" to listOf("3.9.6", "3.20.3", "3.22.6")),
+            ImageTagList.group(
+                "alpine",
+                listOf("3.22.6", "3.20.3", "3.9.6", "3.22", "3", "latest", "edge", "20250108"),
+            ),
+        )
+    }
+
+    @Test
     fun versionsSortNumericallyAndAShortOneComesFirst() {
         assertTrue(ImageTagList.compareVersions("9.0.0", "10.0.0") < 0)
         assertTrue(ImageTagList.compareVersions("13.2", "13.2.0") < 0)

@@ -142,20 +142,21 @@ class SolveCommandTest {
             },
         )
         assertEquals(0, result.statusCode)
-        assertTrue(result.stdout.startsWith("STUCK:"), result.stdout)
+        assertTrue(result.stdout.startsWith("NEEDS:"), result.stdout)
         assertTrue("docker is not installed" in flat(result.stdout))
     }
 
     @Test
     fun exitStatusIsOptInAndMapsTheVerdict() {
         assertEquals(
-            listOf(0, 10, 10, 11, 12),
+            listOf(0, 10, 10, 11, 12, 13),
             listOf(
                 VerdictKind.CONFIRMED,
                 VerdictKind.BUNDLE,
                 VerdictKind.EFFECT,
                 VerdictKind.NARROWED,
                 VerdictKind.STUCK,
+                VerdictKind.NEEDS,
             ).map(::verdictExitCode),
         )
         assertEquals(0, solve("--exit-status").statusCode)
@@ -164,8 +165,8 @@ class SolveCommandTest {
         }
         assertEquals(0, solve("--case c8", stuck).statusCode)
         val gated = solve("--exit-status --case c9", stuck)
-        assertEquals(12, gated.statusCode)
-        assertTrue(gated.stdout.startsWith("STUCK:"), gated.stdout)
+        assertEquals(13, gated.statusCode)
+        assertTrue(gated.stdout.startsWith("NEEDS:"), gated.stdout)
     }
 
     @Test
