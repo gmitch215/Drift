@@ -1,0 +1,9 @@
+[PHP Modules]
+Core
+curl
+date
+json
+mbstring
+zip
+
+[Zend Modules]

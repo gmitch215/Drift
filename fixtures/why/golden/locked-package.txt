@@ -1,0 +1,11 @@
+drift why: this machine against the container web
+
+Assuming it works here and fails there: it most likely fails there because tinyfmt is locked to
+  1.1.0 there and 2.0.0 here; it is the only difference I found.
+
+What I found:
+  Locked package tinyfmt: 2.0.0 here, 1.1.0 there
+
+What to try next:
+  Install tinyfmt 2.0.0 there and commit the lockfile so both places install the same version.
+  To be sure, change only that and run it again there.

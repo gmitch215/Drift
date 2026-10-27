@@ -1,0 +1,14 @@
+drift why: this machine against the container web
+
+Assuming it works here and fails there: it most likely fails there because the open-file limit is 64
+  there and 1024 here; it is the only difference I found.
+
+What I found:
+  Open-file limit: 1024 here, 64 there
+
+What to try next:
+  Raise it there to at least 1024: run ulimit -n 1024 before the command, or start the container
+    with --ulimit nofile=1024:1024 (in CI, set it on the runner or service). If ulimit -n 1024 says
+    'Operation not permitted', the hard limit is the cap (64 there): raise it in the service unit
+    (LimitNOFILE), /etc/security/limits.conf or the container's --ulimit.
+  To be sure, change only that and run it again there.

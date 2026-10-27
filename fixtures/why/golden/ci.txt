@@ -1,0 +1,15 @@
+drift why: this machine against the latest failed CI run of gmitch215/Drift, branch master
+
+Nothing on this machine differs from the failing CI run in what its log prints, so I compared the
+  two CI runs. 4 differences change together, so the data cannot separate them (CI runner
+  provisioner build-date, CI runner provisioner version, CI runner image version and 1 more).
+
+What I found:
+  CI runner provisioner build-date: 2026-10-02T22:28:27Z when CI passed, 2026-10-12T17:48:21Z in CI
+  CI runner provisioner version: 20261002.596 when CI passed, 20261012.601 in CI
+  CI runner image version: 20261004.327.1 when CI passed, 20261012.334.1 in CI
+
+What to try next:
+  To tell them apart, change only CI runner provisioner build-date in CI so it matches when CI
+    passed, and run it again. If it passes, that was the cause.
+  The full experiment plan is saved: drift next .drift/why/case

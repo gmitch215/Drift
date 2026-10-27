@@ -1,0 +1,12 @@
+drift why: running sh t.sh here
+
+It most likely fails now because Node is 20.11.1 now and 22.4.0 when it last passed; the error text
+  points at it.
+
+What I found:
+  Node version: 22.4.0 when it last passed, 20.11.1 now
+
+What to try next:
+  Use Node 22.4.0 now. Pin the version so the two stay equal, for example in .tool-versions or your
+    CI image. If there is no version manager now, change the image or package that provides Node.
+  To be sure, change only that and run it again now.

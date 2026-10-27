@@ -1,0 +1,15 @@
+drift why: this machine against the container web
+
+Assuming it works here and fails there: 4 differences change together, so the data cannot separate
+  them (Shell behind /bin/sh, Kernel setting vm.max_map_count, DNS resolver and 1 more).
+
+What I found:
+  Shell behind /bin/sh: bash here, dash there
+  Kernel setting vm.max_map_count: 262144 here, 65530 there
+  DNS resolver: remote servers here, a local stub there
+
+What to try next:
+  To tell them apart, change only Shell behind /bin/sh and DNS search domains there so it matches
+    here, and run it again. If it passes, that was the cause.
+  The full experiment plan is saved: drift next .drift/why/case
+  Add the failing command so its error text can narrow this: drift why --there docker:web -- COMMAND

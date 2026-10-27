@@ -41,6 +41,12 @@ val embedSet = tasks.register<EmbedFixtures>("embedSet") {
     outputDir = layout.buildDirectory.dir("generated/set")
 }
 
+val embedWhy = tasks.register<EmbedFixtures>("embedWhy") {
+    fixtures = rootProject.layout.projectDirectory.dir("fixtures/why")
+    objectName = "WhyFixtures"
+    outputDir = layout.buildDirectory.dir("generated/why")
+}
+
 tasks.register<Sync>("stageStudio") {
     dependsOn(":studio:wasmJsBrowserDistribution")
     from(rootProject.layout.projectDirectory.dir("studio/build/dist/wasmJs/productionExecutable")) {
@@ -85,6 +91,7 @@ kotlin {
             kotlin.srcDir(embedCi)
             kotlin.srcDir(embedHandsoff)
             kotlin.srcDir(embedSet)
+            kotlin.srcDir(embedWhy)
         }
         macosMain { kotlin.srcDir("src/posix/main") }
         linuxMain { kotlin.srcDir("src/posix/main") }

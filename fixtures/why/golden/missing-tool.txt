@@ -1,0 +1,11 @@
+drift why: this machine against the container web
+
+Assuming it works here and fails there: it most likely fails there because Git is not installed
+  there (2.39.5 here); it is the only difference I found.
+
+What I found:
+  Git version: 2.39.5 here, not installed there
+
+What to try next:
+  Install Git there, or put it on the PATH there.
+  To be sure, change only that and run it again there.

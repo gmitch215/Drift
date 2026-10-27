@@ -1,0 +1,13 @@
+drift why: this machine against the container web, running node test.js in both
+
+It most likely fails there because Node is 20.11.1 there and 22.4.0 here; the error text points at
+  it.
+
+What I found:
+  Node version: 22.4.0 here, 20.11.1 there
+
+What to try next:
+  Use Node 22.4.0 there. Pin the version so the two stay equal, for example in .tool-versions or
+    your CI image. If there is no version manager there, change the image or package that provides
+    Node.
+  To be sure, change only that and run it again there.

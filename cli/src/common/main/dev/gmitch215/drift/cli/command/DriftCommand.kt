@@ -16,6 +16,7 @@ import dev.gmitch215.drift.cli.install.InstallSystem
 import dev.gmitch215.drift.cli.install.systemInstall
 import dev.gmitch215.drift.cli.serve.ServeSystem
 import dev.gmitch215.drift.cli.serve.systemServe
+import dev.gmitch215.drift.cli.why.WhyCommand
 import dev.gmitch215.drift.host.Host
 import dev.gmitch215.drift.host.systemHost
 
@@ -34,6 +35,7 @@ class DriftCommand(
         }
         versionOption("$DRIFT_VERSION (${host.platform})")
         subcommands(
+            WhyCommand(host, files),
             CaptureCommand(host),
             RunCommand(host, files),
             ImportCommand(host, files),
@@ -77,11 +79,12 @@ class DriftCommand(
 private const val INTRO = "Drift compares a run that passed with a run that failed, ranks what " +
     "differs and, with Docker, tests which difference causes the failure.\n\n" +
     "Start with one of these:$LINE" +
+    "drift why: say why it works in one place and fails in another$LINE" +
     "drift ci: check this repository's CI$LINE" +
     "drift doctor: check that this machine can run Drift$LINE" +
     "drift diagnose: compare the capsules of a passing and a failing run\n\n" +
     "Commands by task:$LINE" +
-    "Investigate: ci, handsoff, diagnose, bisect, contract, upgrade-check, triage$LINE" +
+    "Explain: why, ci, handsoff, diagnose, bisect, contract, upgrade-check, triage$LINE" +
     "Capture: capture, run, compare, import$LINE" +
     "Lab: solve, reproduce, ingest, next, case, pack, verify, report, open$LINE" +
     "Atlas: atlas, probe$LINE" +

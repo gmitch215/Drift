@@ -1,0 +1,6 @@
+drift why: running sh t.sh here
+
+It passed. I saved this machine as the baseline in .drift/why/baseline.
+
+What to try next:
+  When it fails, run the same command again: drift why -- sh t.sh

@@ -1,0 +1,13 @@
+drift why: this machine against the saved capture in there.json
+
+Assuming it works here and fails there: it most likely fails there because Git is not installed
+  there (2.39.5 here); the error text points at it.
+
+What I found:
+  Git version: 2.39.5 here, not installed there (your error text names it: git)
+  12 other differences exist, but the error text does not point at them: Git version is the only one
+    it names.
+
+What to try next:
+  Install Git there, or put it on the PATH there.
+  To be sure, change only that and run it again there.

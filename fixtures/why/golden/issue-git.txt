@@ -1,0 +1,13 @@
+drift why: reading the report in issue.md
+
+The report points at git branch --show-current needs Git 2.22: Git 2.22.0 added the --show-current
+  subcommand to "git branch", so an older Git rejects it as an unknown option.
+
+What I found:
+  Git version: not stated where it works, 2.20.1 where it fails
+
+What to try next:
+  Ask the reporter to check Git version (2.20.1) on the machine where it fails, and to send what is
+    on the machine where it works.
+  To compare the two machines, ask them to run drift why --save there.json on the machine where it
+    fails and drift why --there there.json on the machine where it works.

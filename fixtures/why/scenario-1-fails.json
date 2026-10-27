@@ -1,0 +1,1 @@
+{"attributes":[{"path":"drift.platform","source":"drift","stability":"static","value":"linux"},{"path":"env.TZ","source":"env","stability":"static","value":"America/New_York"},{"path":"tool.node.version","source":"node --version","stability":"static","value":"20.11.1"}],"label":"there","probes":[],"schema":1}

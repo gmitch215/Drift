@@ -1,0 +1,10 @@
+drift why: running sh t.sh here
+
+It failed (exit 1), and I have no saved run of it passing to compare with, so I cannot say what
+  changed.
+
+What to try next:
+  Run the same command where it passes: drift why -- sh t.sh. A pass saves a baseline in
+    .drift/why/baseline; copy that folder here.
+  Or compare with a machine or container where it works: drift why --there user@host or drift why
+    --there docker:NAME -- sh t.sh

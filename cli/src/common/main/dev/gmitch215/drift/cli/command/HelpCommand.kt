@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.core.CliktError
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.optional
+import dev.gmitch215.drift.cli.why.WhyManual
 import dev.gmitch215.drift.help.Glossary
 
 class HelpCommand : CliktCommand(name = "help") {
@@ -20,6 +21,10 @@ class HelpCommand : CliktCommand(name = "help") {
         val name = term
         if (name == null) {
             Glossary.terms.forEach { echo("${it.name}: ${it.meaning}") }
+            return
+        }
+        if (name.lowercase() == "why") {
+            echo(WhyManual.text, trailingNewline = false)
             return
         }
         val found = Glossary.find(name)
@@ -46,6 +51,14 @@ internal object Examples {
         "--worker tools/cloudflare/wasm/build/worker"
 
     val byCommand: Map<String, List<String>> = mapOf(
+        "why" to listOf(
+            "why",
+            "why --there docker:web",
+            "why -- npm test",
+            "why issue.md",
+            "why --save there.json",
+            "why --there there.json --error @error.txt",
+        ),
         "capture" to listOf("capture --label demo", "capture --label demo --project"),
         "run" to listOf(
             "run --out green-run --label green -- make test",

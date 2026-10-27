@@ -1,0 +1,17 @@
+drift why: this machine against the container web
+
+Nothing I can read differs between here and there, so the cause is not in what Drift compares.
+
+What I found:
+  Compared 4 facts. I looked at tool versions, environment variables, resource limits, memory and
+    CPU limits, kernel settings and the clock source, time zone and locale with the installed
+    locales, the file system type of /tmp, the shell behind /bin/sh, host names, network interface
+    names, IPv6, the DNS resolver file (counts only), CPU affinity, and the lockfiles of the
+    project; none differ.
+  I did not look at your source code and data files, network traffic and DNS lookups, the speed of
+    your disk, or what your code does at run time.
+
+What to try next:
+  That points at your code or data, or at something Drift does not read yet (files, network,
+    timing).
+  If it fails only sometimes, repeat it: drift run --repeat 10 -- COMMAND
