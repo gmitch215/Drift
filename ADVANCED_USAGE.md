@@ -4,12 +4,13 @@ This guide covers every `drift` command and flag for people who have already run
 
 Every example below was run with the macOS release executable (`drift version 1.0.0 (macos)`) from a directory that holds `fixtures/` and `bench/`, against the files in [`fixtures/`](./fixtures/) and [`bench/data/`](./bench/data/). Output is copied from those runs; a line that holds only `...` marks output cut for length. Where a command prints to standard error, the example says so. The offline run in [Offline](#offline) used the Linux arm64 executable inside a Docker container. The `install`, `uninstall` and `serve` examples ran with a scratch home directory and a scratch prefix, never the real profile, registry or trust store. Their output shows the scratch home as `/home/you`, the scratch work directory as `/work` and the scratch release directory as `/release`. The Windows and Linux builds and the `.ps1` script were not run for this guide, and the sections say where a statement comes from a recorded run of someone else's.
 
-The executable is `cli/build/bin/macosArm64/releaseExecutable/drift.kexe`; the README explains how to build it and how to download one. The examples call it `drift`; put it on `PATH` (see [Install and Uninstall](#install-and-uninstall)) or alias it.
+The executable is `cli/build/bin/macosArm64/releaseExecutable/drift.kexe`; the [install guide](./docs/install.md) explains how to build it and how to download one. The examples call it `drift`; put it on `PATH` (see [Install and Uninstall](#install-and-uninstall)) or alias it.
 
 ## Command Index
 
 | Command | Reads | Writes | Needs Docker |
 | --- | --- | --- | --- |
+| [`why`](#why) | this machine and a container, a machine over ssh, a saved capture, the latest failed CI run, a command or an issue text | text or JSON; `.drift/why` | no (`docker:` places use `docker exec`) |
 | [`capture`](#capture) | this machine | a capsule on standard output | no |
 | [`diagnose`](#diagnose) | two capsules | JSON or text, optionally a case directory | no |
 | [`diagnose --against`](#against-a-baseline) | a baseline and a capsule, or this machine | JSON or text, optionally a case directory | no |
@@ -102,6 +103,52 @@ Defaults that matter:
 
 `diagnose --case`, `solve --case` and `ingest` refuse to write into a directory that already holds a `case.json` (`ingest` rewrites the case it is given).
 
+## Why
+
+`drift why [--there PLACE] [--fails-here] [--detail | --json] [-- COMMAND ...]` and `drift why FILE` answer "why does this work here and fail there" without a capture file, a case directory or a flag. The [guide](./docs/why.md) walks through the four flows; this section lists what each one calls and writes. `drift why --reply [--session FILE]` continues a session that `drift why` wrote when it asked for a fact: it reads standard input as the answer to the first open ask, parses it with the scanner that runs the same command, and prints an answer or the next single ask. `drift why --error TEXT` alone, outside a git checkout, reads the text as a report.
+
+| Arguments | Flow | Built from |
+| --- | --- | --- |
+| none, in a git checkout | the latest failed CI run against this machine, with the last passing run as extra evidence | the `ci` run selection and importers, `capture --tools --project`, `diagnose` |
+| `--there docker:NAME[:DIR]` | this machine against a running container | `capture --tools --project` over `docker exec` |
+| `--there user@host` | this machine against another machine | `capture --ssh` (read-only, opt-in, as described in [Remote Capture over SSH](#remote-capture-over-ssh)) |
+| `--there PATH` | this machine against a saved capture | `capture --out`, read back as `diagnose` reads a capsule |
+| `-- COMMAND` | this machine now against this machine when `COMMAND` last passed | `capture --tools --project` and the ranking and plan of `diagnose --against` |
+| `FILE` or `-` | an issue or an error report | `triage` |
+
+The first line of output names the flow. The answer has the verdict, up to three lines of evidence and what to try next. `--detail` appends the ranking and plan that `diagnose --detail` prints. `--json` prints the output of `diagnose` with a `plain` object (`flow`, `direction`, `certainty`, `verdict`, `evidence`, `findings`, `next`). The same inputs give the same bytes, and the exit status is 0 whenever Drift gave an answer, including "cannot tell".
+
+Choices the flows make for you:
+
+- **Scanners on.** `why` captures with the toolchain scanners (`--tools`) and the project scan (`--project`), so a missing tool, a tool version or a locked package shows up in a first answer. Probes (`--probes`) stay off: they run many programs on each side and need transcripts from both. Over ssh the scanners are not available, and the answer says so.
+- **Noise removed.** Host name, account, terminal and `PATH` variables, capture bookkeeping and, in the CI flow, the runner's own labels are dropped before ranking. `NODE_VERSION` and its kin are dropped when `tool.node.version` is present.
+- **Direction.** The default assumption is that it works on the first side (here) and fails on the second (there); `--fails-here` swaps them. With `-- COMMAND` after `--there docker:NAME`, the exit codes of the two runs decide, and the failing side's output conditions the ranking: phrases such as "is not a function", "No module named", "not found", "Too many open files", "Connection refused" and "Permission denied" point at the kind of attribute they fit.
+- **The container.** `docker:NAME` runs `docker inspect` and then one `docker exec NAME ...` per fact. It never starts, stops or changes a container, copies nothing into it and needs only `cat` and `env` in the image. A command that the image lacks reads as absent.
+- **A saved capture.** A fact family that the saved capture does not hold (for example `tool.` in a capture made without `--tools`) is left out of the comparison on both sides, and the answer says which.
+
+Files it writes: `.drift/why/baseline` (a capsule directory, after a passing `-- COMMAND`) and `.drift/why/case` (a case directory, when the answer lists several differences, so `drift next .drift/why/case` works). It never edits a tracked file.
+
+```sh
+drift why -- sh check.sh
+TZ=Asia/Tokyo drift why -- sh check.sh
+```
+
+```
+drift why: running sh check.sh here
+
+It most likely fails now because the time zone differs: TZ is Asia/Tokyo now and not set when it
+  last passed; the error text points at it.
+
+What I found:
+  Time zone (TZ): not set when it last passed, Asia/Tokyo now
+
+What to try next:
+  Unset TZ now, or make the code name its time zone.
+  To be sure, change only that and run it again now.
+```
+
+Problems end in one sentence and exit code 1: a container that is not running (`docker start NAME` is yours to run), a name that is not a container, no Docker, an ssh host that cannot be reached (the ssh messages of [When ssh Fails](#when-ssh-fails)), a saved capture that cannot be read, no git checkout or remote for the CI flow, `gh` or `glab` missing or not logged in, and a bare command without `--`.
+
 ## Capture
 
 `drift capture` prints this machine's capsule as canonical JSON: sorted keys, no whitespace, one line. The output is the exact bytes that the capsule hash covers, so `jq`, `python3 -m json.tool` and `shasum` all work on it as written.
@@ -142,7 +189,7 @@ jq '.probes | length' cap.json cap-full.json
 71
 ```
 
-The counts are from one Mac and vary with the tools installed. `--probes` adds 71 probe records; each holds `id`, `status`, a `hash` and the `transcript`.
+The counts are from one Mac and vary with the tools installed. `--probes` adds 72 probe records; each holds `id`, `status`, a `hash` and the `transcript`.
 
 **Anonymization.** By default the capsule rewrites the home path to `~`, masks the account and host names, and marks the affected attributes `source: "env (anonymized)"`. Values whose names look like secrets (for example `CLOUDFLARE_API_TOKEN`) are stored as `<redacted>`.
 
@@ -177,6 +224,8 @@ Exit codes: 0 on success; 1 for a usage error such as an unknown flag (`Error: n
 | Gradle | `gradle/libs.versions.toml`, `settings.gradle(.kts)`, `build.gradle(.kts)` of the root and of each included module (50 at most), `gradle.properties`, `gradle/wrapper/gradle-wrapper.properties`, `gradle/gradle-daemon-jvm.properties` | `project.gradle.<group>:<artifact>`, `project.gradle.plugin.<id>`, `project.gradle.wrapper`, `project.gradle.jdk.version`, `project.gradle.properties.<key>`, `project.gradle.kotlin.version`, `project.gradle.agp.version`, `project.gradle.kotlin.target.<name>`, `project.gradle.android.compile-sdk`, `.min-sdk` and `.target-sdk` (a number, `release(36)` forms and a `libs.versions` reference are read; `flutter.compileSdkVersion` and other expressions are not), `project.gradle.kotlin.jvm-target`, `.toolchain`, `.language-version`, `.annotation-default-target`, `project.gradle.kmp-android-module`, `project.gradle.dsl` (`kotlin` or `groovy`, from the first build file), `project.gradle.calls.<name>` (see below) |
 | Maven | `pom.xml` | `project.maven.<group>:<artifact>` for the parent and the direct dependencies, `project.maven.property.<name>` for `java.version` and the `maven.compiler.*` properties |
 | Python | `pyproject.toml`, then `uv.lock` or `poetry.lock`, then `requirements.txt` | `project.python.<name>` (lowercase, runs of `-`, `_` and `.` as one `-`), `project.python.requires-python` |
+| Version files | the first line of `.nvmrc` or `.node-version`, and of `.python-version` | `project.pins.node`, `project.pins.python` (a leading `v` is dropped) |
+| Checksum file | `SHA256SUMS`, lines of `<64 hex digits>  <path>` | `project.checksums.<path>` (the digest) |
 | Go | `go.mod` | `project.go.version` (the `go` line), `project.go.toolchain`, `project.go.<module path>` |
 | R | `renv.lock` | `project.r.r-version` (`R.Version`), `project.r.<package>` (every entry under `Packages`; renv records only packages the project code uses) |
 | Dart | `pubspec.lock` | `project.dart.<package>` (not `sdk` packages), `project.dart.sdks.dart` and `.sdks.flutter` (the constraint as written), `project.dart.sdk-min` (the lower bound of `sdks.dart`); direct dependencies come first |
@@ -240,12 +289,60 @@ The caps are fixed: 500 files per ecosystem (the first 500 by sorted path; `proj
 
 `tool.openssl.version` orders by the OpenSSL scheme: `1.1.1 < 1.1.1a < 1.1.1w < 3.0.0`, so a `ver` range on it can mix letter releases and numbered ones.
 
+`--tools` also versions the tools that the working directory names. It takes command names from the package scripts, Makefile recipes, Dockerfile `RUN` lines, workflow `run:` steps and shebangs, and keeps only the names in a built-in list: `make`, `cmake`, `docker`, `podman`, `skopeo`, `pwsh`, `native-image`, `gradle`, `mvn`, `ant`, `bazel`, `cargo`, `dotnet`, `bundle`, `javac`, `kotlinc`, `swift`, `deno`, `bun`, `pnpm`, `yarn`, `pip`, `poetry`, `uv` and `clang`. A name outside that list is never run. A listed tool runs only when `PATH` resolves it to a file outside the working directory, and then it runs by that absolute path, with no shell, a 5 second timeout and a 64 KiB output cap. Output over the cap, or a timeout, records nothing. The lookup uses two fixed calls, `which NAME` and `pwd -P`. These tools are versioned with the same parsers as the table above. Over ssh no tool runs.
+
 A normal capture also reads these facts, without `--tools`:
 
 - `cgroup.version` is `v2` when every line of `/proc/self/cgroup` starts with `0::` and `v1` when any line names a v1 controller (a hybrid host counts as `v1`).
 - `tz.system-zone` is the target of the `/etc/localtime` link below `zoneinfo/`, then the content of `/etc/timezone`. `Etc/UTC`, `Etc/UCT`, `Etc/Universal`, `Etc/Zulu`, `UCT`, `Universal` and `Zulu` are written as `UTC`; `Etc/GMT` stays as it is. It is absent on Windows and where neither source exists. `env.TZ` is separate.
 - `runtime.jvm.options` joins `JAVA_TOOL_OPTIONS` and `JDK_JAVA_OPTIONS`, in that order, and is absent when both are empty. Flags on a `java` command line are not visible to a capture.
 - `java.net.preferIPv6Addresses` is the last `-Djava.net.preferIPv6Addresses=` value in those options, and absent when they do not set it.
+- `limits.<name>` is the soft and hard resource limit from `/proc/self/limits`, written `soft:hard` with each side a number or `unlimited`. The names are `cpu` (seconds), `fsize`, `data`, `stack`, `core`, `memlock` and `as` (bytes), `nproc` and `nofile`. The attributes are absent where the file does not exist, such as macOS and Windows, and a line that does not parse is skipped. The JVM and Node raise the soft open files limit to the hard one when they start, so the JVM and Wasm builds leave `limits.nofile` out; the Linux executables and `drift capture --ssh` record it.
+- `fs.tmp.type` is the filesystem type (`tmpfs`, `ext4`, `overlay` and so on) of the mount that holds `/tmp`, and `fs.cwd.type` the same for the working directory. Both come from `/proc/self/mountinfo`: the longest mount point that holds the path wins, so a `--tmpfs /tmp` mount shows as `tmpfs` while the container root shows as `overlay`. The working directory is read with `readlink /proc/self/cwd`. Absent where mountinfo does not exist, such as macOS and Windows.
+- `locale.installed` is the sorted, comma-separated list of locale names the system has, read from the names in `/usr/lib/locale/locale-archive` and the entries of `/usr/lib/locale`. A name the archive does not list is not added, so `C` and `POSIX` appear only where the system records them. Absent when neither source exists. `reproduce` generates a `LANG` or `LC_*` locale in its arm only when this list names it, so an arm does not hide a missing locale.
+- `network.hosts.names` is the sorted list of the custom `/etc/hosts` names, one token per name: `name@address` when the address is a loopback one (`db.internal@127.0.0.1`) and the bare name for any other address, which is not recorded. The stock aliases (`localhost`, `ip6-*`, `broadcasthost`), the `127.0.1.1` machine entry and the machine's own `HOSTNAME` are left out, and the attribute is absent when nothing custom remains. `network.nsswitch.hosts` is the source list of the `hosts:` line in `/etc/nsswitch.conf`, such as `files dns`. `network.interfaces` is the sorted list of names in `/sys/class/net`, with `lo` included when the host has it.
+- `cpu.affinity` is the number of CPUs in `Cpus_allowed_list` of `/proc/self/status`, which is the set the process may run on. `cpu.count` is still the number of CPUs online.
+- `tool.sh.flavor` is the base name of the target of `readlink -f /bin/sh`, such as `dash`, `bash` or `busybox`. It is absent where `/bin/sh` is not a link (macOS, where it is a file) and on Windows.
+- `sysctl.<name>` is the value of one of seven kernel settings read from `/proc/sys`: `vm.max_map_count`, `fs.inotify.max_user_watches`, `fs.inotify.max_user_instances`, `fs.file-max`, `kernel.pid_max`, `net.core.somaxconn` and `kernel.threads-max`. A value that is not a single word is left out. Nothing else under `/proc/sys` is read, apart from the AppArmor setting above.
+- `clock.source` is the current clock source, such as `tsc` or `kvm-clock`, from `/sys/devices/system/clocksource/clocksource0/current_clocksource`. Linux only.
+- `network.ipv6` is `true` when `/proc/net/if_inet6` lists an address other than `::1`, and `false` when it lists none. It is absent when the file does not exist. `network.ipv6.disabled` is `true` or `false` from `/proc/sys/net/ipv6/conf/all/disable_ipv6`, so `true` means the switch is off.
+- `network.dns.nameservers` is the number of `nameserver` lines in `/etc/resolv.conf`. `network.dns.loopback` is `true` when every nameserver is a loopback address, such as a local stub resolver; it is absent when there are none. `network.dns.search` is the number of search domains on the last `search` or `domain` line, and `network.dns.options` is the sorted option names, such as `edns0,ndots`. No address or domain name is recorded, and the file is read only: no lookup or network call is made.
+- `reproduce` and `drift solve` mirror these facts in the arm: a `cpu.affinity` below `cpu.count` becomes `--cpuset-cpus`, `network.interfaces` of `lo` alone becomes `--network none`, loopback `network.hosts.names` tokens become `--add-host`, and `network.nsswitch.hosts` rewrites the `hosts:` line of the image's `/etc/nsswitch.conf` (an Alpine image reads none, so the entry is partial). A hosts name with no recorded address is not mirrored.
+- `drift capture --probes` also runs `resources.fs-tmp-fsync`. It writes a 4 KiB file in `/tmp`, syncs it with `fsync` 25 times, removes the file and records the median in one of `<1ms`, `1-10ms`, `10-100ms`, `100ms-1s` or `>1s` as `fs.tmp.fsync = <bucket>`. It is unavailable where the host has no write capability (Wasm) or `/tmp` cannot be written, and `--ssh` never runs it because a capture over ssh only reads.
+
+The same capture in `drift-cisim:3` with `--tmpfs /tmp` (the filesystem facts, one line each):
+
+```text
+fs.tmp.type tmpfs
+fs.cwd.type overlay
+fs.tmp.fsync = <1ms
+locale.installed C.utf8
+network.interfaces eth0,lo
+cpu.affinity 24
+```
+
+Without `--tmpfs`, `fs.tmp.type` is `overlay`. The fsync bucket on this host is `<1ms` for both mounts.
+
+```sh
+docker run --rm --ulimit nofile=1024:2048 --ulimit core=0 \
+  --volume "$PWD/drift:/usr/local/bin/drift:ro" debian:trixie-slim \
+  drift capture --label limits |
+  jq -r '.attributes[] | select(.path | startswith("limits.")) | "\(.path) \(.value)"'
+```
+
+```
+limits.as unlimited:unlimited
+limits.core 0:0
+limits.cpu unlimited:unlimited
+limits.data unlimited:unlimited
+limits.fsize unlimited:unlimited
+limits.memlock 8388608:8388608
+limits.nofile 1024:2048
+limits.nproc unlimited:unlimited
+limits.stack 8388608:unlimited
+```
+
+`reproduce` turns each of these into `--ulimit name=soft:hard` (`unlimited` becomes `-1`), and a Lab experiment that sets `limits.nofile` changes that flag. Docker has no `as` limit, so `limits.as` is listed as not mirrored. The `set-ulimit` intervention records a single number such as `2048` as `2048:2048`, because that is what a capture inside the container reports.
 
 Keys that a capture of this machine cannot supply: `runtime.database.server.*`, `network.tls-version-offered` and `net.dns.aaaa.present` need a connection or a name lookup against a named target, and `browser.name` needs a browser. Rules that read them stay `pending-scanner`.
 
@@ -256,7 +353,7 @@ A rule's `applies` list and the ranking use one of 14 dimensions. The dimension 
 | Dimension | Prefixes |
 | --- | --- |
 | `os` | `os.name`, `os.version`, `os.release.`, `tool.libc.`, `libc.`, `windows.`, `fs.`, `crypto.`, `file.` |
-| `kernel` | `kernel.`, `cgroup.` (except the two below), `sysctl.` |
+| `kernel` | `kernel.`, `cgroup.` (except the two below), `sysctl.`, `clock.` |
 | `cpu` | `os.arch`, `cpu.` |
 | `cpu-limit` | `cgroup.cpu.` |
 | `memory` | `cgroup.memory.`, `memory.` |
@@ -296,7 +393,7 @@ shasum -a 256 diag.json
 tool.node.version
 false
 9
-e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08  diag.json
+83c35a87e4f48696684ac6817e31b04e5b9b1bf3c37452d6cbc8c12a030c187c  diag.json
 ```
 
 The top-level keys are `bundles`, `changed`, `competing`, `facts`, `relevant`, `unattached` and `weights`. `weights.calibrated: false` means the ranking uses hand-set weights, so the order of candidates is not a probability of being the cause.
@@ -312,7 +409,7 @@ drift diagnose --detail summary $G $R
 so the data does not name one cause.
 ```
 
-`--detail detail` adds the ranked candidates, the bundle and the next experiment (64 lines for this pair). `--detail full` adds every changed attribute (285 lines). The text is plain ASCII, wrapped at 100 columns.
+`--detail detail` adds the ranked candidates, the bundle and the next experiment (67 lines for this pair). `--detail full` adds every changed attribute and, for a ranking whose candidates all rest on attribute changes, each candidate's probability: its share against the other candidates, read through an isotonic map fit on the dev scenarios and not held out (350 lines for this pair, where all nine candidates read 0.104478). The text is plain ASCII, wrapped at 100 columns.
 
 ```sh
 drift diagnose --detail detail $G $R | sed -n 4,10p
@@ -1045,11 +1142,13 @@ The remote side runs only the commands below, each with every argument in single
 | --- | --- |
 | `uname -sm` | the remote `os.name` and `os.arch`; also the first check that the connection works |
 | `uname -r`, `getconf _NPROCESSORS_ONLN`, `sw_vers -productVersion` | `kernel.release`, `cpu.count`, and `os.version` on macOS |
-| `readlink /etc/localtime` | `tz.system-zone` |
+| `readlink /etc/localtime`, `readlink /proc/self/cwd` | `tz.system-zone` and the mount of the working directory |
+| `readlink -f /bin/sh` | `tool.sh.flavor`, the shell behind `/bin/sh` |
+| `ls -1 /sys/class/net`, `ls -1 /usr/lib/locale` | `network.interfaces` and `locale.installed` |
 | `env` | the `env.*` attributes |
-| `cat` of one of: `/etc/os-release`, `/etc/timezone`, `/etc/crypto-policies/config`, `/proc/self/cgroup`, `/proc/cmdline`, `/proc/sys/kernel/apparmor_restrict_unprivileged_userns`, `/sys/fs/cgroup/cpu.max`, `/sys/fs/cgroup/memory.max`, `/sys/fs/cgroup/memory/memory.limit_in_bytes`, `/usr/share/zoneinfo/tzdata.zi`, `/usr/share/zoneinfo/+VERSION` | the OS release, cgroup, kernel command line, crypto policy and time zone database facts |
+| `cat` of one of: `/etc/hosts`, `/etc/nsswitch.conf`, `/etc/os-release`, `/etc/timezone`, `/etc/resolv.conf`, `/etc/crypto-policies/config`, `/proc/cmdline`, `/proc/net/if_inet6`, `/proc/self/cgroup`, `/proc/self/limits`, `/proc/self/mountinfo`, `/proc/self/status`, `/proc/sys/fs/file-max`, `/proc/sys/fs/inotify/max_user_instances`, `/proc/sys/fs/inotify/max_user_watches`, `/proc/sys/kernel/apparmor_restrict_unprivileged_userns`, `/proc/sys/kernel/pid_max`, `/proc/sys/kernel/threads-max`, `/proc/sys/net/core/somaxconn`, `/proc/sys/net/ipv6/conf/all/disable_ipv6`, `/proc/sys/vm/max_map_count`, `/sys/devices/system/clocksource/clocksource0/current_clocksource`, `/sys/fs/cgroup/cpu.max`, `/sys/fs/cgroup/memory.max`, `/sys/fs/cgroup/memory/memory.limit_in_bytes`, `/usr/lib/locale/locale-archive`, `/usr/share/zoneinfo/tzdata.zi`, `/usr/share/zoneinfo/+VERSION` | the OS release, cgroup, resource limit, mount, CPU affinity, locale, hosts, name service switch, resolver, kernel command line, crypto policy, time zone database, `sysctl.*`, clock source and IPv6 facts |
 
-A Linux capture makes 17 ssh calls that run 15 distinct commands (`env` runs twice and `cat /sys/fs/cgroup/memory.max` twice); a 16th command, `cat /etc/timezone`, runs only when `/etc/localtime` is not a link. The facts never run `df`, `mount`, `find` or `ls`, and never read a path outside the list.
+On a host whose `tzdata.zi` has a version line and whose `/etc/localtime` links into `zoneinfo/`, a Linux capture makes 37 remote commands, 35 of them distinct (`env` and `cat /sys/fs/cgroup/memory.max` each run twice). Two fallbacks each add one call and one distinct command: `cat /usr/share/zoneinfo/+VERSION` when `tzdata.zi` has no version line, and `cat /etc/timezone` when `/etc/localtime` does not link into `zoneinfo/`. The most a Linux capture runs is 39 calls and 37 distinct commands, which is every entry in the list above except `sw_vers`. The facts never run `df`, `mount` or `find`, run `ls` only on the two directories above, and never read a path outside the list.
 
 ### Safety Rules
 
@@ -1240,7 +1339,7 @@ exec docker run --rm \
 
 Arguments after `run.sh` land before the image name, so they override the flags above them.
 
-**Naming the toolchain.** The base image comes from the toolchain the capsule records. `--run` decides which one when the capsule records several: the first word of the command that names a toolchain wins (a path prefix is ignored, so `./gradlew` counts as `gradlew`; `node`, `npm` and `python3` are other examples). With no match, the first toolchain in table order is used.
+**Naming the toolchain.** The base image comes from the toolchain the capsule records. `--run` decides which one when the capsule records several: the first word of the command that names a toolchain wins (a path prefix is ignored, so `./gradlew` counts as `gradlew`; `node`, `npm` and `python3` are other examples). With no match, a toolchain whose official image sets its version variable in the capsule (`PYTHON_VERSION`, `GCC_VERSION`, `R_BASE_VERSION` and the like) wins, because the capsule was taken inside that image; otherwise the first toolchain in table order is used. A distribution that records an alpine point release the registry publishes, such as 3.22.6, gets that exact `alpine` tag.
 
 ```sh
 for r in "npm test" "sh test.sh" "python3 -m pytest"; do
@@ -1359,7 +1458,7 @@ The digest in this example is zeros and does not exist; use a digest from your r
 | `--max-memory`, `--max-cpus` | `docker --memory` and `--cpus` for arms whose capsule sets no limit |
 | `--gate permille=N,salt=S,env=NAME` | set `NAME` to 1 on `N` of every 1000 trials and to 0 on the rest, in every arm, so a command that fails only when it reads 1 fails intermittently; `salt` defaults to 0 and `env` to `DRIFT_GATE` |
 | `--name TEXT` | case name |
-| `--exit-status` | exit 0 `CONFIRMED`, 10 `CONFIRMED EFFECT (bundle)`, 11 `NARROWED`, 12 `STUCK` (default: 0 for every verdict) |
+| `--exit-status` | exit 0 `CONFIRMED`, 10 `CONFIRMED EFFECT (bundle)`, 11 `NARROWED`, 12 `STUCK`, 13 `NEEDS` (default: 0 for every verdict) |
 | `--detail summary\|detail\|full` | how much to print |
 
 **Naming the toolchain in `--run`.** `--run` also picks the base image of every arm (see [Reproduce](#reproduce)), so start the command with the tool that runs the test: `node test.js`, `python3 -m pytest`, `./gradlew test`. The command runs with the workspace at `/work` as the working directory.
@@ -1395,19 +1494,26 @@ The capsule says `os.arch=x86_64`, so the arms ran as `linux/amd64` containers o
 
 `wrote 41 files to solved` goes to standard error. The case has the files of a `diagnose` case plus `experiments/`, `arms/<id>-control` and `-treatment` (each with `Dockerfile`, `run.sh`, `manifest.json`, `capsule.json`), `results/NNNN.json` and `certificate.json`. The exit code is 0 for every verdict unless you pass `--exit-status`, which maps the verdict to an exit code (see [Exit Codes](#exit-codes)).
 
-**Budgets.** `--budget` caps trials over all arms and container minutes together. If no trials-per-arm count up to 30 reaches power 0.8 inside the remaining budget, the run ends `STUCK` with reason `budget` and names the shortfall. A bad item fails before any container starts: `bad --budget item: bogus`, or `--budget takes trials=N and minutes=M, not hours=2`.
+**Budgets.** `--budget` caps trials over all arms and container minutes together. If no trials-per-arm count up to 30 reaches power 0.8 inside the remaining budget, the run ends `NEEDS` with reason `budget`, names the shortfall and gives the command that would settle it. A bad item fails before any container starts: `bad --budget item: bogus`, or `--budget takes trials=N and minutes=M, not hours=2`.
 
-**The four verdicts.**
+**The verdicts.**
 
 | Verdict | Meaning |
 | --- | --- |
 | `CONFIRMED` | a minimal set of attributes, all set directly, reproduces the failure forward and removes it in reverse |
-| `CONFIRMED EFFECT (bundle)` | the same, but the arms also differ in attributes nobody set; each member is named |
+| `CONFIRMED EFFECT (bundle)` | the same, but the arms also differ in attributes nobody set; each member is named. Members that an intervention can set alone get their own experiment (see below) |
 | `CONFIRMED EFFECT (isolation not measured)` | the effect and its reverse or replicate agree, but an arm was not captured inside its container, so what differed between the arms is predicted and not measured |
 | `NARROWED` | an experiment was supported or stayed inconclusive, but the conditions above are not met |
-| `STUCK` | no experiment was supported; the reason is `not-reproduced`, `uncontrollable`, `no-candidates`, `budget` or `executor` |
+| `NEEDS` | no experiment was supported, and the certificate lists what would settle the cause; the reason is `not-reproduced`, `uncontrollable`, `no-candidates`, `budget` or `executor` |
+| `STUCK` | the same, but no step exists; the statement says why (for example a pilot already at its 30 trials per arm that cannot reach the target power) |
 
-A `STUCK` run, with a failure pattern that the program never prints:
+**Member experiments.** When the verdict is a bundle, `solve` tries each member that its own intervention can set, one at a time, up to six arms per solve. Setting only that member on the passing side and reproducing the failure makes it `sufficient`. Otherwise reverting only that member on the failing side and removing the failure makes it `necessary`. A member counts only when the capture inside the arm shows that member changed and nothing else. Members that no arm sets alone (for example `tool.libc.version`, which comes with the base image) are listed as not tested alone, each with the reason. The verdict carries the two lists as `sufficient` and `necessary`, the certificate holds the arms under `conditions.removal`, and `verify` checks that each listed member has a supported experiment. Attributes that one intervention sets together, such as `os.release.ID`, `os.release.PRETTY_NAME` and `os.release.VERSION_ID`, stay together in the minimal set because no arm can tell them apart. On an Alpine base `set-userland gnu` installs the GNU coreutils, findutils, grep, sed and diffutils.
+
+**Interventions the arms carry.** `set-shell` links `/bin/sh` to another shell (`tool.sh.flavor`; on a Debian base `bash` becomes `RUN ln -sf bash /bin/sh`, `dash` is the image's own). `set-pin` sets a project pin that the arm writes as a workspace file: `project.pins.node` as `.nvmrc`, `project.pins.python` as `.python-version`, `project.python.<name>` as a line of `requirements.txt` and `project.checksums.<path>` as a line of `SHA256SUMS`. An arm that carries pins mounts the workspace read-only at `/src`, a tmpfs at `/work`, and copies the workspace and the pin files into `/work` before the command, so the caller's workspace is not changed; the capture inside such an arm adds `--project`.
+
+**Next steps.** A `NEEDS` verdict carries `steps`, each with `kind`, `text`, `command` and `reply`. `capture` is the capture ask that `drift why` prints, with the same `command` (`drift why --save there.json`) and the same piped form in `reply` (`drift why --save there.json && drift why --reply < there.json`); a step that is an ask also carries the ask's `family` and `piped`, `manual-experiment` points at `drift next CASE`, `longer-pilot` and `raise-budget` print the `drift solve` command with `--pilot 30` or a doubled `--budget`, `rerun` repeats the solve after the failing step is fixed, and `unmirrored` names what a container does not mirror.
+
+A `NEEDS` run, with a failure pattern that the program never prints:
 
 ```sh
 drift solve --run 'sh prog.sh' --fail-when 'no such text' --pilot 3 --budget trials=20,minutes=5 \
@@ -1417,10 +1523,23 @@ drift solve --run 'sh prog.sh' --fail-when 'no such text' --pilot 3 --budget tri
 
 ```
 wrote 19 files to stuck
-STUCK: the failure does not reproduce in the container built from the failing capsule: 0 of 3 trials
-  failed
-1 candidate changes, 0 experiments run in containers (6 trials, 6 seconds), not on the original
+NEEDS: the failure does not reproduce in the container built from the failing capsule: 0 of 5 trials
+  failed, so the failure rate is below 60% at 95%
+1 candidate changes, 0 experiments run in containers (10 trials, 10 seconds), not on the original
   host.
+  Next (capture): The container built from the capsule does not show the cause. Capture the failing
+    machine with its tools and project files, which the capsule may lack, and compare it with the
+    passing one.
+    run: drift why --save there.json
+    reply: drift why --save there.json && drift why --reply < there.json
+  Next (unmirrored): A container does not mirror cpu.count, kernel.release, tool.coreutils.version,
+    tool.libc.version. If one of them differs on the failing machine, change it there to the passing
+    value and run the failing command again.
+  Next (longer-pilot): The pilot of 3 trials per arm may be too short to see or size a failure that
+    does not happen every time; run it at the most it allows, 30.
+    run: drift solve bench/data/capsules/locale-tz-date-2.green.json
+      bench/data/capsules/locale-tz-date-2.red.json --run 'sh prog.sh' --fail-when 'no such text'
+      --pilot 30 --case stuck-next
 ```
 
 The loop assumes one cause: the first supported experiment ends it. The fixtures in `fixtures/lab/cases` hold one real certificate per verdict class (see [Verify](#pack-report-and-verify)).
@@ -1519,7 +1638,7 @@ tar -tvf fixtures/lab/cases/locale-tz-date-2.driftcase | head -4
 ```
 
 ```
-wrote packed.driftcase: 19 files, 50176 bytes, sha256 8d4aaf9f238896a823a4aa065b3022df1581b42e4c3e0f8c93986bfb1c889cba
+wrote packed.driftcase: 19 files, 50176 bytes, sha256 50fb8ab1675f74b767e4dcae42cffe96d35979906c0a6d351f125152152d6bc2
 identical
 -rw-r--r--  0 0      0         212 Dec 31  1969 case.json
 -rw-r--r--  0 0      0        5895 Dec 31  1969 certificate.json
@@ -1902,7 +2021,7 @@ upgrade-check: drupal-10-site
   drupal   project.composer.drupal/core          10.3.6 -> 11
   symfony  project.composer.symfony/http-kernel  v6.4.12 -> 7.1
   php      tool.php.version                      8.1.34 -> 8.3
-83 of 426 rules read a target key
+84 of 429 rules read a target key
 
 Will break (0)
   none
@@ -1947,7 +2066,7 @@ The groups come from the three-valued verdict of the rule engine, not from a sco
 | Outside the tested range | the rule matches and every symptom of the rule has the basis `range`: a compatibility table or release note lists the supported versions and states no failure outside them (the Kotlin Multiplatform compatibility table, the AGP maximum API level and minimum Gradle version, the Gradle JVM range); the group is printed only when it has findings |
 | Unknown | the capsule has no current value for a target key, or the target is not a version the rule can compare, so the boundary cannot be judged |
 
-Only rules that read a target key on side `b` and give a different verdict for the targets than for the capsule alone are listed. The line `83 of 426 rules read a target key` counts the rules that read one before that filter. Probe results and run facts describe today's environment, so side `b` has none, and a rule that reads one is unknown.
+Only rules that read a target key on side `b` and give a different verdict for the targets than for the capsule alone are listed. The line `84 of 429 rules read a target key` counts the rules that read one before that filter. Probe results and run facts describe today's environment, so side `b` has none, and a rule that reads one is unknown.
 
 Locked packages are checked apart from the rules. When a target is `php`, `node` or `python`, `upgrade-check` reads the runtime constraint each locked package records and lists a package whose constraint allows today's runtime and excludes the target under "Will break: locked packages", with the package, its version, the lockfile and the constraint. `drift capture --project` records the constraint as `project.<ecosystem>.<package>.requires.<runtime>` for the formats that carry one, and no rule names the package:
 
@@ -1968,7 +2087,7 @@ drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=8.3,d
 ```
 
 ```
-{"rules":426,"touched":83,"willBreak":[],"versionBoundary":[{"rule":"php-8-2-dynamic-properties-deprecated","crossings":[{"key":"tool.php.version","from":"8.1.34","to":"8.3"}]},{"rule":"drupal-10-to-11-symfony-6-2-to-7-1","crossings":[{"key":"project.composer.drupal/core","from":"10.3.6","to":"11"},{"key":"project.composer.symfony/http-kernel","from":"v6.4.12","to":"7.1"}]}]}
+{"rules":429,"touched":84,"willBreak":[],"versionBoundary":[{"rule":"php-8-2-dynamic-properties-deprecated","crossings":[{"key":"tool.php.version","from":"8.1.34","to":"8.3"}]},{"rule":"drupal-10-to-11-symfony-6-2-to-7-1","crossings":[{"key":"project.composer.drupal/core","from":"10.3.6","to":"11"},{"key":"project.composer.symfony/http-kernel","from":"v6.4.12","to":"7.1"}]}]}
 ```
 
 The targets can sit in a file instead. This file gives the same result:
@@ -1996,7 +2115,7 @@ drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=7.4
 ```
 upgrade-check: drupal-10-site
   php  tool.php.version  8.1.34 -> 7.4
-56 of 426 rules read a target key
+57 of 429 rules read a target key
 
 Will break (2)
   1. [high, inferred] Drupal 10 cannot run on PHP 8.0 or earlier; PHP 8.0 sites must move to 8.1 before upgrading core
@@ -2055,7 +2174,7 @@ drift upgrade-check bench/data/capsules/migration-php-json-validate-1.red.json -
 ```
 upgrade-check: red
   drupal  project.composer.drupal/core  unknown -> 11
-21 of 426 rules read a target key
+21 of 429 rules read a target key
 
 Will break (0)
   none
@@ -2091,7 +2210,7 @@ A bad target stops the command with exit code 1 and no output on standard output
 
 The Atlas asks, per probe, whether a Kotlin program prints the same thing on every target. It holds 38 probes. `atlas record` runs them on this target, `atlas build` aggregates transcripts into a dataset, `atlas compare` places this device against it, `atlas show` prints the matrix, the oracle or a draft for one probe and `atlas diff` lists what changed between two Kotlin versions.
 
-**Columns.** `fixtures/atlas/` holds 15 recorded columns on Kotlin 2.4.20, and `fixtures/atlas/2.5.0-beta1/` holds 5 on 2.5.0-Beta1 (`jvm`, `macos`, `wasm`, `android`, `ios`). [`atlas/columns.yml`](./atlas/columns.yml) says how each was measured.
+**Columns.** `fixtures/atlas/` holds 16 recorded columns on Kotlin 2.4.20, and `fixtures/atlas/2.5.0-beta1/` holds 5 on 2.5.0-Beta1 (`jvm`, `macos`, `wasm`, `android`, `ios`). [`atlas/columns.yml`](./atlas/columns.yml) says how each was measured.
 
 | Column | Where it was recorded |
 | --- | --- |
@@ -2403,7 +2522,7 @@ curl -s -o /dev/null -w '%{http_code} %{content_type}\n' http://localhost:PORT/p
 200 text/html; charset=utf-8
 ```
 
-`./gradlew docsSite` runs `dokkaGenerate` and `atlasSite` first, then assembles `build/site` (3,089 files): `README.md` as `index.html`, `ADVANCED_USAGE.md` as `advanced-usage.html` and `TECHNICAL_REPORT.md` as `technical-report.html`, each rendered into `assets/site-template.html`, the Atlas site under `atlas/`, the Dokka site under `engine/`, the icons from `assets/`, `CNAME` and `.nojekyll`. A relative link in the three Markdown files to a repository path that does not exist fails the render, and a link to one that does exist becomes a GitHub URL on `master`. `checkSiteLinks` runs after it and fails on a relative `href` or `src` that does not resolve inside `build/site`. It scanned 73,286 links and found none unresolved outside `engine/`, where Dokka leaves 14 unresolved; those are counted and printed and do not fail it.
+`./gradlew docsSite` runs `dokkaGenerate` and `atlasSite` first, then assembles `build/site`: `README.md` as `index.html`, `ADVANCED_USAGE.md` as `advanced-usage.html`, `TECHNICAL_REPORT.md` as `technical-report.html`, `MANUAL.md`, and the guides in `docs/`, each rendered into `assets/site-template.html`, the Atlas site under `atlas/`, the Dokka site under `engine/`, the icons from `assets/`, `CNAME` and `.nojekyll`. A relative link in these Markdown files to a repository path that does not exist fails the render, and a link to one that does exist becomes a GitHub URL on `master`. `checkSiteLinks` runs after it and fails on a relative `href` or `src` that does not resolve inside `build/site`. It finds no unresolved link outside `engine/`; Dokka's unresolved links there are counted and printed and do not fail it.
 
 The `docs.yml` workflow runs `./gradlew dokkaGenerate atlasSite docsSite` and pushes `build/site` to the `gh-pages` branch. It builds on pushes to `master`, `ver/*`, `feat/*` and `renovate/*` and deploys only from `master`, with a `CNAME` file for `drift.gmitch215.dev`, where the site is live.
 
@@ -2544,7 +2663,26 @@ Three adjustments follow, in this order:
 
 The side comes from the words around the value. The nearest verdict word before it in the clause decides: `works on Node 18` is `passing`, `fails on Node 20` is `failing`. A verdict word right after it wins (`Node 18 works`). `upgraded from Node 18 to Node 20` reads 18 as `passing`. With no verdict word, a value is `failing`.
 
-The keys are the ones the rules read: `os.name`, `os.version`, `os.arch`, `os.release.ID`, `os.release.VERSION_ID`, `tool.<name>.version` for Java, Kotlin, Gradle, Node, npm, Python, PHP, Go, Rust, Git, .NET, workerd, pip, `tool.cc.*` and `tool.libc.*`, `project.gradle.kotlin.version`, `project.gradle.agp.version`, `project.<ecosystem>.<package>` for dependencies pasted from a build file or an install command, `browser.name`, `browser.version`, `ci.provider`, `ci.runner.label`, `runtime.platform`, `runtime.container.image`, `runtime.jvm.options`, `env.LANG`, `env.TZ`, and `run:signature` for the first error line, normalized the way a failing step is.
+The keys are the ones the rules read: `os.name`, `os.version`, `os.arch`, `os.release.ID`, `os.release.VERSION_ID`, `tool.<name>.version` for Java, Kotlin, Gradle, Node, npm, Python, PHP, Go, Rust, Git, .NET, Docker, Composer, OpenSSL, Ruby, Podman, curl, Xcode, CocoaPods, Dart, workerd, pip, `tool.cc.*` and `tool.libc.*`, `project.gradle.kotlin.version`, `project.gradle.agp.version`, `project.<ecosystem>.<package>` for dependencies pasted from a build file, an install command or pip output, `browser.name`, `browser.version`, `ci.provider`, `ci.runner.label`, `runtime.platform`, `runtime.container.image`, `runtime.jvm.options`, `env.LANG`, `env.TZ`, and `run:signature` for the first error line, normalized the way a failing step is. The next section lists the keys that come from logs and configuration.
+
+### Facts From Logs and Configuration
+
+Some text carries a fact in a shape that only that kind of output has. Each reader below needs that shape; a bare word never produces a fact.
+
+| Key | Read from |
+| --- | --- |
+| `tool.<name>.version` for any `<name>` | a name the text itself shows as a tool: the first word of a prompt line (`$ skopeo --version`), a package in an `apt`, `apk`, `dnf`, `yum`, `brew`, `choco`, `winget`, `scoop` or `snap` install line, or a bare `name --version` line. A mention of that name then needs a dotted version or the word `version` before it, and four numbers joined by dots read as an address |
+| `tool.<name>.required` | a requirement on a line that names the tool: `requires PHP >= 8.1.0`, `Expected version ">=18"`, `3.8.10 not in '>=3.9'`, `Minimum supported Gradle version is 8.5`. The operator stays in the value, because a minimum is not the version of any environment |
+| `tool.<name>.version` (failing) | the version found on that same line: `You are running 7.4.33`, `Got "16.20.0"`, `Current version is 8.2` |
+| `project.python.<package>` | `Successfully installed name-1.2.3`, a wheel or sdist file name, `Requirement already satisfied`, `pip install name==1.2.3` and a requirements line |
+| `project.python.pyqt`, `pyside`, `tool.qt.version`, `tool.gtk.version` | a binding name with one digit, such as `PyQt6`; the digit is the value |
+| `runtime.container.image` | a registry path (`ghcr.io/acme/tool:1.4`), `docker://name:tag` or the image after `docker pull`, `run` or `create`; a digest is dropped |
+| `env.<NAME>` | an `environment:` block, `-e NAME=value`, `ENV`, `export` and `set`; a name with `key`, `token`, `secret`, `pass`, `auth`, `cred`, `private`, `salt`, `hash` or `sign` in it is never read |
+| `runtime.platform`, `tool.<platform>.version` | a server platform (Paper, Spigot, Purpur, Velocity, Waterfall and the like) in a `Server Version` style field, a `running <name> version` log line, `<name> version <v>` or a jar name such as `spigot-api-1.19-R0.1-SNAPSHOT.jar` |
+| `tool.docker.version`, `kernel.release` | the `Client:` and `Server:` blocks of `docker version` and the `Server Version:` and `Kernel Version:` lines of `docker info` |
+| `limits.disk-quota`, `limits.nofile` | `Disk quota exceeded` and `Too many open files`; the value is `exceeded` |
+
+A phrase such as `does not have this problem` after a value puts it on the passing side.
 
 `tool-output`, `key-value` and `pattern` were set from a seeded half of the triage corpus (see Corpus below). `section` keeps 0.950: the corpus takes its truth from form sections, so that path cannot be scored against it. On the other half of the corpus the facts on form-labelled keys score a precision of 0.783 and a Brier score of 0.1486 over 1,376 facts. `key-value` is the weakest path: 9 held-out facts, precision 0.444.
 
@@ -2605,7 +2743,7 @@ A claim fires on a sentence outside code blocks that has a phrase from each of i
 
 ### Draft Rules
 
-A draft needs a symptom signature, one version key stated on both sides with the passing version below the failing one, and no rule that already holds on that key. Its detect tree is the version range each side stated plus the signature:
+A draft needs a symptom signature, one key stated on both sides, and no rule that already holds on that key. For a version key (`tool.<name>.version` or any `project.*` key) the passing version must be below the failing one. For `runtime.container.image`, `ci.runner.label` and `runtime.platform` the two values must differ, and the rule compares them for equality. Its detect tree is what each side stated plus the signature:
 
 ```sh
 drift triage fixtures/triage/f11-node-typeerror.md --publish-threshold 0.5 --date 2026-10-13
@@ -2666,21 +2804,37 @@ drift upgrade-check capsule.json --to node=20 --learned .drift/learned
 
 Secrets are masked before anything is stored or printed, with the same redactor as `capture`. Other users' home directories become `.../user`. An `@login` mention becomes `@` and a hash, `u` followed by ten hex digits of the SHA-256 of the lowercase login; `--author` is hashed the same way. A mention inside a code block stays, since it is usually an annotation. The result keeps the SHA-256 of the redacted text and the line and column of each value, never the text.
 
+### CI Logs and Version Banners
+
+`Triage.clean` turns a GitHub Actions log into one fenced block: when at least three lines and at least half of the non-blank lines carry a `job<TAB>step<TAB>timestamp` or `timestamp` prefix, the prefixes and colour codes are removed and the lines are wrapped in a code fence (spans refer to that text; any other text is untouched). The extractors then read the lines as output: a runtime banner is the `tool.X.version` fact (a Ruby `p107` patch level is skipped, so `ruby 3.0.2p107` is 3.0.2), a setup input such as `python-version: 3.9` is a stated version at the confidence of any stated version (700), a banner printed by the log (990) beats it, and the last error line becomes `run:signature`. `Asks.runtimes` also reads a `SyntaxError` under a Python `File "...", line N` frame as Python. In the plain answer the tool versions come before settings and the system, and a report that states a tool version no rule explains gets that version as the failing-side answer of its version check: the session starts with that check answered and the next step is the works-side step. No fact key and no rule was added for this.
+
+### Not Environment
+
+When the text has a program-side signal and no environment fact on the failing side, the result adds a `notEnvironment` object: `signal` (`frame`, `mismatch`, `regression`, `crash`, `logic`, `null-deref`, `bounds`, `memory`, `not-shown`, `located` or `clean-run`), `line` (1-based), `frame` (the project's `file:line` for a frame, otherwise `null`) and `text` (the line, clipped to 160 characters). `drift triage` prints it as a line such as `Not environment (frame) at line 3: at test.js:3:8`. The object is absent when a rule matches or a failing-side fact is stated, so output for other reports does not change. `frame`, `mismatch` and `regression` follow the stated-fact rule. `crash` is an exception: a line with the word crash, in a text that also shows an exception, a traceback, a segmentation fault, an access violation or a stack trace, counts when the only facts stated on the failing side are `os.*` ones, since every bug template asks for the system. It ranks below the other three. The six program statements (`logic`, `null-deref`, `bounds`, `memory`, `not-shown`, `located`) are the other exception. They are phrase lists in `core/.../triage/ProgramFault.kt` and apply when the text tells no story of change (no passing-side fact, no `.required` fact, no limit that was hit, no "works on", "worked before", "since upgrading" or similar phrase) and no rule or draft rule matches. They may stand beside tool versions and the system. A Markdown heading or a bold label does not count as a mismatch. Frames in `node_modules`, `site-packages`, the JDK and `/usr` do not count. `clean-run` comes only from `drift why --reply`: a clean run printed the same failure as the report, `line` is the report line that holds it and `text` is that line. The rule is in [docs/why.md](./docs/why.md#when-it-is-not-the-environment).
+
+`drift why` also withholds the reading when an error phrase names a runtime, module, tool, limit or locale. `drift triage` has no such phrase table, so a report that names a missing runtime feature and gives no version can carry the reading there.
+
+### Ask
+
+When no rule matches, no draft follows and no program-side reading applies, `drift triage` adds an `ask` list (`--json`) and an `Ask (n)` section (text). Each item has `family` (the attribute family the check reads: `tool.node`, `limits.nofile`, `os.release`, `os.version`, `kernel.release`, `env.TZ`, `env.LANG`, `capture` or `clean-run`), `command` and `piped`, which is the command with its output fed to `drift why --reply`. There are at most three, most useful first: a limit the text says was hit, the tool the text names most (a name inside a path, a URL or a package name does not count, and `go` counts only as a Go command), the whole-machine capture when the text says it works elsewhere, other tools, the system, then time zone and locale. A family the text already states on the failing side is never asked for. A runtime the text names only through its error vocabulary is asked for like a named tool (`tool.python`, `tool.node`, `tool.php`, `tool.java`, `tool.go`, `tool.rust`, `tool.ruby`, `tool.dotnet`; the phrases are in `Asks.runtimes`: a Python exception name or traceback header, a Node `Cannot find module`, `ERR_` code or `is not a function` with an `at` frame or `node:`, a PHP `Fatal error: Uncaught` or `Call to undefined function`, a JVM `java.lang.` name, `Exception in thread` or `UnsupportedClassVersionError`, a Go `panic:` with `goroutine` or `cannot find package`, a rustc `error[E` or `thread 'main' panicked`, a Ruby `NoMethodError` or `LoadError`, a .NET `Unhandled exception. System.`). A path or a generic word never counts, and nothing is asked for a tool whose version the text states. `bash: git: command not found`, `command not found: git` and `No such file or directory: 'git'` ask `command -v git` (family `tool.git`, reply fact `tool.git.installed` = `yes` or `no`; an empty answer is `no`); a name with a dot or a slash is a file and is not asked for. `TriageOptions(worksElsewhere = true)`, which `drift why --error TEXT` sets when it falls back to reading the error text, makes no program-side reading from the text alone and adds the capture ask; the session file then carries `"elsewhere": true` so the replies read the report the same way. The `clean-run` ask comes beside those three, never instead of one: it is first when the text states no failing-side fact and last otherwise. It needs a failure signature in the text (an error line that `SymptomExtractor` reads, or the `run:signature` fact), a command and a toolchain with an official image in `ImageTable`. A command is a `$`, `>` or `%` line in a code block (`>` and `%` only when the program is known), the one command of a code block that precedes the block with the error, or an inline code span after a run verb (run, ran, running, executing, typing, `command:`) whose program is one the ask table or `ToolRegistry` knows. A report with a command and no signature gets the `error-text` ask instead (`COMMAND 2>&1 | drift why --reply`); the reply is added to the report. The printed command mounts the working directory read-only at `/src`, copies it into a tmpfs `/w`, drops all capabilities and new privileges, runs as the user, limits processes (256) and memory (1 GB) and adds `--network none` unless the report shows network use or the command is a package or build manager; the command is the only text from the report and is printed inside single quotes, and no ask is printed for a command that is empty, over 400 characters, holds a control or non-ASCII character, a backtick, `$(` or a masked secret, or ends in a backslash. The image tag is a published tag from `ImageTags`: the version the text states for that toolchain (the newest published tag with that prefix, or the nearest one of the same major), or the newest published tag when it states none. Drift never runs the command. The reply is compared with the failure in the report: the same failure (after paths, numbers and times are normalised) ends in the not-environment reading, no error in the output means the command works on a clean machine and the next ask is the capture, and another error keeps the ask open with one sentence on what differed. The session file keeps only the fact `run:clean` with `same` or `works`. Every command comes from a table in `core/.../triage/Asks.kt`; the tool commands are the ones `drift capture --tools` runs, and a test in `scan` keeps the two in step. The key is absent when there is nothing to ask, so other output does not change.
+
+`drift triage` takes no replies. `drift why` writes the session and reads them: see [What To Run Next](./docs/why.md#what-to-run-next). The session file `.drift/why/session.json` is canonical JSON with `schema` 1, `report` (the redacted text) and `asks`, each with `family`, `argv`, `command`, `why`, `reply` (`null` while open, else `{facts: [{key, value}]}`, the facts of the machine where it fails) and, once `drift why --reply --works` has run, `works` (the same shape, from the machine where it works; absent otherwise, so a session without it reads as before). `drift why --reply --works` takes standard input as the answer of a check from the machine where the program works. With both sides it builds two capsules from the facts and runs the comparison `--there` uses (same ranking, same error-text pointers and wording, "where it works" and "where it fails" as the sides), so a differing fact is named; an equal fact is reported as not differing and the next check follows. After a first reply that no rule answers, the next step is the works-side step, before the other checks and the capture. The session lives in the folder where the first `drift why` ran, so the step has two forms: run the check where it works, copy the output and paste it where the session is (`drift why --reply --works`, then Ctrl-D, or Ctrl-Z and Enter on Windows), or pipe it over ssh (`ssh USER@HOST CHECK | drift why --reply --works`); in `plain.ask` each check that can run on both machines carries `piped` (the failing-side pipe), `pipedWorks` (the works-side pipe) and `pasteWorks` (the paste sentence). `--reply` or `--works` in a folder with no session is not a dead end: it reads the answer (it must parse as the output of one of the checks in the ask table, else exit 1 and a plain sentence), redacts it, exits 0 and prints "There is no session here, so I cannot compare yet. The session is in the folder where you ran drift why --error. Run this there:" and one command, `printf '%s\n' 'LINE' ... | drift why --reply [--works]`, with the redacted reply as single-quoted arguments (control characters dropped, non-ASCII replaced by `?`, `--session FILE` only when it was given; over 2 KiB it says to copy the output into a file and use `< FILE`). Run on the machine that holds the session, that command gives the comparison. The `printenv TZ` reply now has to look like a zone name (`Europe/Paris`, `UTC`, `EST5EDT`) so that an arbitrary line is not taken for it. Drift does not detect a terminal, so it prints no prompt before it reads. When the comparison names a difference and other differences exist that the error text does not point at, an evidence line gives their number and names the ones the text points at.
+
 ### Fixtures and Scores
 
-[`fixtures/triage/`](./fixtures/triage/) holds 70 issue bodies, each with an expectation file. The first 52 are strict forms (10), forms with blank issues (8), free text (12), sparse or wrong beginner reports (10) and mixed phrasing (12); the other 18 cover false positives of the key-value path and claim wording. The bodies are invented for this repository; none is copied from an issue. The expectation lists every fact the text states, the rules and claims it should trigger and whether a draft follows. `TriageTest` scores the extractor on them and prints the result:
+[`fixtures/triage/`](./fixtures/triage/) holds 78 issue bodies, each with an expectation file. The first 52 are strict forms (10), forms with blank issues (8), free text (12), sparse or wrong beginner reports (10) and mixed phrasing (12); 18 cover false positives of the key-value path and claim wording, and 8 cover the readers in Facts From Logs and Configuration, one of them with only lookalikes. The bodies are invented for this repository; none is copied from an issue. The expectation lists every fact the text states, the rules and claims it should trigger and whether a draft follows. `TriageTest` scores the extractor on them and prints the result:
 
 | | |
 | --- | --- |
-| facts extracted | 189 |
-| precision, recall | 0.989, 0.979 (187 true positives, 2 false positives, 4 false negatives) |
-| Brier score | 0.0851 |
+| facts extracted | 207 |
+| precision, recall | 0.990, 0.980 (205 true positives, 2 false positives, 4 false negatives) |
+| Brier score | 0.0848 |
 
 The misses are the intended hard cases: a form field that still holds the old version (`b07-form-wrong-version`), a fix reported as `upgraded to node 20 ... went away` (`h05-form-then-fix`), `Go 1.22 tutorials` read as an environment (`h11-lookalike-prose`) and `on my mac` not read as macOS (`b01-form-no-response`). The test fails when precision drops below 0.95, recall below 0.93 or the Brier score above 0.12, and when any path's mean confidence exceeds its accuracy by more than 0.05. The scores are an upper bound for real issues.
 
 ### Limits
 
-A version with no name next to it is not read (`since upgrading to 3.13.0`). One value is kept per key and side. A form field that holds the wrong value is read as written, with 0.950. The text of a pasted log is read only for its first error line. Claims cover nine statements. The draft rule generalizes from one report and is a starting point for a person, not a finding. `-` was not run on Windows.
+A version with no name next to it is not read (`since upgrading to 3.13.0`), except the version found on a line that states a requirement for one tool. One value is kept per key and side. A form field that holds the wrong value is read as written, with 0.950. The text of a pasted log is read only for its first error line. Claims cover nine statements. The draft rule generalizes from one report and is a starting point for a person, not a finding. `-` was not run on Windows.
 
 ### Corpus
 
@@ -3470,7 +3624,7 @@ ci.provisioner.build-date
 ci.provisioner.version
 ```
 
-**Determinism and hashing.** These outputs are functions of their inputs, so a hash identifies them. Over the same two capsules `diagnose` printed the same bytes on every run here (`e47bd4ac...cc08`), `reproduce` wrote identical files, `pack` identical archives and `atlas build` an identical dataset.
+**Determinism and hashing.** These outputs are functions of their inputs, so a hash identifies them. Over the same two capsules `diagnose` printed the same bytes on every run here (`83c35a87...187c`), `reproduce` wrote identical files, `pack` identical archives and `atlas build` an identical dataset.
 
 ```sh
 drift diagnose $G $R | shasum -a 256
@@ -3478,8 +3632,8 @@ drift diagnose $G $R | shasum -a 256
 ```
 
 ```
-e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08  -
-e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08  -
+83c35a87e4f48696684ac6817e31b04e5b9b1bf3c37452d6cbc8c12a030c187c  -
+83c35a87e4f48696684ac6817e31b04e5b9b1bf3c37452d6cbc8c12a030c187c  -
 ```
 
 The test suite pins these outputs for fixtures on the JVM, macOS Native and Wasm targets (see [TECHNICAL_REPORT.md](./TECHNICAL_REPORT.md), "Reproducing the Numbers"). A capsule from `capture` is the exception: it describes the machine, so two machines give two hashes.
@@ -3496,12 +3650,13 @@ Set `DRIFT_RUNNER_LABEL` in the job to record the runner. Do not use `--keep-ide
 
 | Code | When |
 | --- | --- |
-| 0 | the command ran, including `diagnose` with no cause found, `solve` or `ingest` with any verdict (`STUCK` included) unless `--exit-status` is given, `drift` or `drift case` alone (they print help), `install` and `uninstall` (also with `--dry-run`), `uninstall` with no receipt, and `serve` after Ctrl+C or SIGTERM on a native build |
+| 0 | the command ran, including `diagnose` with no cause found, `solve` or `ingest` with any verdict (`NEEDS` and `STUCK` included) unless `--exit-status` is given, `drift` or `drift case` alone (they print help), `install` and `uninstall` (also with `--dry-run`), `uninstall` with no receipt, and `serve` after Ctrl+C or SIGTERM on a native build |
 | 3 | `contract create` found no assertion set that separates a red capsule from the greens |
 | the command's own | `run`: the exit code of the command it ran (0 included); a command the shell cannot find gives 127 |
 | 10 | `solve --exit-status` or `ingest --exit-status` ended `CONFIRMED EFFECT (bundle)` or `CONFIRMED EFFECT (isolation not measured)` |
 | 11 | the same, ended `NARROWED` |
 | 12 | the same, ended `STUCK` |
+| 13 | `solve --exit-status` ended `NEEDS` |
 | 1 | usage error from the parser: unknown command or flag, missing argument or option, bad `--detail` value, `--json` with `--detail` |
 | 1 | unreadable or malformed input: missing file, malformed capsule JSON, unsupported capsule schema, missing case, missing archive, a corrupt install receipt |
 | 1 | `case show` or `next` on a case that fails its integrity check |
@@ -3570,15 +3725,15 @@ Set `DRIFT_RUNNER_LABEL` in the job to record the runner. Do not use `--keep-ide
 | `drift-install: error: set DRIFT_VERSION when DRIFT_INSTALL_BASE_URL is set` | a custom base needs an explicit version |
 | `the Linux executable is built for glibc and this system uses musl; no asset is available` | `install.sh` on Alpine and other musl systems (from the installer's Alpine run) |
 
-When a `solve` trial cannot start, the certificate records an infrastructure problem (a failed `docker build`, a `docker run` error, a timeout) and the loop retries once before it ends `STUCK` with reason `executor`. Check `docker info` first, and run `./repro/run.sh` from a `reproduce` of the same capsule to see the failure by hand.
+When a `solve` trial cannot start, the certificate records an infrastructure problem (a failed `docker build`, a `docker run` error, a timeout) and the loop retries once before it ends `NEEDS` with reason `executor`. Check `docker info` first, and run `./repro/run.sh` from a `reproduce` of the same capsule to see the failure by hand.
 
 ## Limits
 
 - A container mirrors a part of a machine. Never mirrored: the kernel (`kernel.*`), the CPU (`cpu.*`, `hw.*`), the CI provider's image and provisioner (`ci.*`), dependencies installed by the test command (`deps.*`) and the properties of the capturing binary. `reproduce` lists every unmirrored attribute and its reason, and the certificate carries the list. A `solve` verdict is about containers built from the capsules, not about the original host.
-- The ranking uses hand-set weights (`hand-set-1`, `weights.calibrated: false` in `diagnose` output). A score orders candidates; it is not a probability. On the dev benchmark the `plausible` tier (a probe differs in the candidate's dimension) was unreliable: 10 of its 19 candidates were wrong, and probes helped no scenario. The numbers and their intervals are in [TECHNICAL_REPORT.md](./TECHNICAL_REPORT.md) under "Evaluation and Limits".
+- The ranking uses hand-set weights (`hand-set-1`, `weights.calibrated: false` in `diagnose` output). A score orders candidates; it is not a probability. A ranking whose candidates all rest on attribute changes also prints a probability, read through an isotonic map fitted on the dev split (`probability.calibrated: true`). On the dev benchmark the `plausible` tier (a probe differs in the candidate's dimension) was unreliable: 10 of its 19 candidates were wrong, and probes helped no scenario. The numbers and their intervals are in [TECHNICAL_REPORT.md](./TECHNICAL_REPORT.md) under "Evaluation and Limits".
 - `run` merges standard error into standard output and keeps only the tail of the output. `import` reads what a log prints, which is less than a capture: no kernel, CPU or probe data. `bisect` does not run tests and treats the empty and full sets as known.
 - `ingest` can narrow a case or rule a hypothesis out. It never confirms a cause.
-- `solve` runs on local Docker only. It does not use a remote host, a CI service or a cluster, and a failure that needs a different kernel, CPU model or CI-owned image cannot be varied by it (the run ends `STUCK` with reason `uncontrollable`).
+- `solve` runs on local Docker only. It does not use a remote host, a CI service or a cluster, and a failure that needs a different kernel, CPU model or CI-owned image cannot be varied by it (the run ends `NEEDS` with reason `uncontrollable` and the manual experiment as its step).
 - `solve` assumes a single cause: the first supported experiment ends the loop.
 - `verify` checks that an archive agrees with itself. It does not re-run experiments, so it cannot tell a faithful archive from a forged one that was rewritten consistently.
 - `next` after `ingest` skips the experiments that have results but does not re-plan; the order of the rest comes from the plan made before the results (see [Ingest](#ingest)).

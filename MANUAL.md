@@ -23,7 +23,7 @@ There are three ways in. They show the same screens.
   drift serve --dir cli/build/serve/studio
   ```
 
-  Open the address it prints, for example `http://localhost:8080/`. The [README](./README.md#studio-on-the-web)
+  Open the address it prints, for example `http://localhost:8080/`. The [install guide](./docs/install.md#studio-on-the-web)
   and the [usage guide](./ADVANCED_USAGE.md#serve) list the flags.
 - **As a desktop app.** From a clone of the repository, `./gradlew :studio:run` starts Studio in a
   window. `drift open FILE.driftcase` opens a saved case in it.
@@ -185,7 +185,7 @@ What to do:
 The result says how many documented changes may break the environment and how many apply to the
 versions you chose. The screen warns that a quiet result does not show a move is safe: many rules
 describe a move in one direction only, and Drift has no rule for features that a newer version only
-adds. A line such as "73 of 426 rules read a setting you moved" tells you how much of the rule set
+adds. A line such as "74 of 429 rules read a setting you moved" tells you how much of the rule set
 looked at your change.
 
 ## Contract
@@ -273,7 +273,7 @@ Each sentence below states something this manual says that a later change to Stu
 - File Check on that case reads "This file is intact: every check passed".
 - The sample set for Node.js and npm versions has 4 capsules and one separating setting, the node version 22.4.0.
 - Upgrade accepts `name=version` pairs and has a Common moves row with PHP 8.3 and PHP 8.3 and Drupal 11.
-- With the sample drupal-10-site and `php=8.3,drupal=11`, the upgrade result reads "73 of 426 rules read a setting you moved".
+- With the sample drupal-10-site and `php=8.3,drupal=11`, the upgrade result reads "74 of 429 rules read a setting you moved".
 - With the sample contract and Failing Run 36995781138, Contract reports 1 requirement and 1 break.
 - With the two sample runs named above, Bisect reports 9 settings that differ and a first test that changes 4.
 - The web build is served at <https://drift.gmitch215.dev/atlas/> and by `drift serve --dir cli/build/serve/studio` after `./gradlew :cli:stageStudio`.
