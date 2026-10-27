@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Documentation - Drift</title>
+        <meta name="description" content="The guides, the manual and the reference documents." />
+        <link rel="icon" href="drift.ico" sizes="any" />
+        <link rel="icon" href="drift_128.png" type="image/png" sizes="128x128" />
+        <link rel="apple-touch-icon" href="drift.png" />
+        <meta property="og:title" content="Documentation - Drift" />
+        <meta property="og:description" content="The guides, the manual and the reference documents." />
+        <meta property="og:image" content="https://drift.gmitch215.dev/drift.png" />
+        <style>
+            :root {
+                color-scheme: light dark;
+                --canvas: #fcfbfe;
+                --surface: #ffffff;
+                --line: #e4def0;
+                                --fg: #1d1a26;
+                --muted: #5b556b;
+                --accent: #8a63f0;
+                --accent-text: #6b3fd4;
+                --tint: #efe8fb;
+                --radius: 6px;
+                --u: 4px;
+            }
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --canvas: #110e17;
+                    --surface: #191521;
+                    --line: #2b2438;
+                    --fg: #ece9f3;
+                    --muted: #a69fb8;
+                    --accent: #9d7bf5;
+                    --accent-text: #b99cff;
+                    --tint: #2a2140;
+                }
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                padding: 0 calc(var(--u) * 4) calc(var(--u) * 20);
+                background: var(--canvas);
+                color: var(--fg);
+                font:
+                    16px/1.65 ui-sans-serif,
+                    system-ui,
+                    -apple-system,
+                    'Segoe UI',
+                    Roboto,
+                    sans-serif;
+                overflow-wrap: break-word;
+            }
+            main,
+            nav .bar,
+            footer {
+                max-width: 52rem;
+                margin: 0 auto;
+            }
+            a:focus-visible {
+                outline: 2px solid var(--accent-text);
+                outline-offset: 2px;
+                border-radius: var(--radius);
+            }
+            nav {
+                margin: 0 calc(var(--u) * -4) calc(var(--u) * 8);
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border-bottom: 1px solid var(--line);
+                background: var(--surface);
+            }
+            nav .bar {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: var(--u) calc(var(--u) * 4);
+            }
+            nav a {
+                color: var(--muted);
+                font-size: 14px;
+                text-decoration: none;
+            }
+            nav a:hover,
+            nav a[aria-current] {
+                color: var(--accent-text);
+            }
+            nav a[aria-current] {
+                text-decoration: underline;
+                text-decoration-color: var(--accent);
+                text-decoration-thickness: 2px;
+                text-underline-offset: 0.5em;
+            }
+            nav a.brand {
+                display: flex;
+                align-items: center;
+                gap: calc(var(--u) * 2);
+                margin-right: auto;
+                color: var(--fg);
+                font-size: 16px;
+                font-weight: 600;
+            }
+            nav a.brand[aria-current] {
+                color: var(--fg);
+                text-decoration: none;
+            }
+            nav a.brand img {
+                width: 28px;
+                height: 28px;
+            }
+            h1 {
+                margin: 0 0 calc(var(--u) * 4);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .hero {
+                margin: 0 0 calc(var(--u) * 8);
+            }
+            .hero img {
+                display: block;
+                margin: 0 0 calc(var(--u) * 4);
+            }
+            .hero h1 {
+                margin: 0 0 var(--u);
+                font-size: 32px;
+                line-height: 40px;
+            }
+            .hero .lead {
+                margin: 0;
+                color: var(--muted);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .steps,
+            .links {
+                display: grid;
+                gap: calc(var(--u) * 3);
+                grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+                margin: 0 0 calc(var(--u) * 4);
+                padding: 0;
+                list-style: none;
+            }
+            .steps {
+                counter-reset: step;
+            }
+            .links {
+                margin-bottom: calc(var(--u) * 12);
+            }
+            .steps li {
+                display: flex;
+                counter-increment: step;
+            }
+            a.card {
+                display: block;
+                flex: 1;
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: var(--surface);
+                color: inherit;
+                text-decoration: none;
+            }
+            a.card:hover {
+                border-color: var(--accent);
+            }
+            a.card strong {
+                display: block;
+                color: var(--accent-text);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .steps a.card strong::before {
+                content: counter(step) '. ';
+            }
+            a.card span {
+                color: var(--muted);
+                font-size: 14px;
+                line-height: 22px;
+            }
+
+            .readme h2 {
+                margin: calc(var(--u) * 12) 0 calc(var(--u) * 3);
+                padding-bottom: calc(var(--u) * 2);
+                border-bottom: 1px solid var(--line);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .readme h3 {
+                margin: calc(var(--u) * 8) 0 calc(var(--u) * 2);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .readme h4 {
+                margin: calc(var(--u) * 6) 0 calc(var(--u) * 2);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .readme a {
+                color: var(--accent-text);
+                text-underline-offset: 0.2em;
+            }
+            .readme hr {
+                margin: calc(var(--u) * 12) 0;
+                border: 0;
+                border-top: 1px solid var(--line);
+            }
+            .readme blockquote {
+                margin: calc(var(--u) * 6) 0;
+                padding: var(--u) 0 var(--u) calc(var(--u) * 4);
+                border-left: 3px solid var(--accent);
+                color: var(--muted);
+            }
+            .readme ul,
+            .readme ol {
+                padding-left: calc(var(--u) * 6);
+            }
+            .readme li {
+                margin: calc(var(--u) * 1.5) 0;
+            }
+            .readme code {
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            }
+            .readme :not(pre) > code {
+                padding: 0.15em 0.4em;
+                border-radius: var(--radius);
+                background: var(--tint);
+                color: var(--accent-text);
+                font-size: 13px;
+                overflow-wrap: anywhere;
+            }
+            .readme pre {
+                margin: calc(var(--u) * 5) 0;
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                overflow-x: auto;
+                background: var(--surface);
+                font-size: 13px;
+                line-height: 20px;
+            }
+            .readme pre code {
+                display: block;
+            }
+            .readme .table {
+                overflow-x: auto;
+                margin: calc(var(--u) * 5) 0;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+            }
+            .readme table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 14px;
+                line-height: 22px;
+            }
+            .readme th,
+            .readme td {
+                padding: calc(var(--u) * 2) calc(var(--u) * 3);
+                border-bottom: 1px solid var(--line);
+                text-align: left;
+                vertical-align: top;
+            }
+            .readme th {
+                background: var(--tint);
+                font-weight: 600;
+            }
+            .readme tbody tr:last-child td {
+                border-bottom: 0;
+            }
+            .readme img {
+                max-width: 100%;
+            }
+
+            .guides {
+                display: flex;
+                flex-wrap: wrap;
+                gap: var(--u) calc(var(--u) * 4);
+                margin: 0 0 calc(var(--u) * 6);
+                padding-bottom: calc(var(--u) * 3);
+                border-bottom: 1px solid var(--line);
+            }
+            .guides a {
+                color: var(--muted);
+                font-size: 14px;
+                text-decoration: none;
+            }
+            .guides a:hover,
+            .guides a[aria-current] {
+                color: var(--accent-text);
+            }
+            .guides a[aria-current] {
+                text-decoration: underline;
+                text-decoration-color: var(--accent);
+                text-decoration-thickness: 2px;
+                text-underline-offset: 0.5em;
+            }
+            .docs-render {
+                margin: calc(var(--u) * 5) 0;
+                overflow-x: auto;
+                text-align: center;
+            }
+            .docs-render svg {
+                max-width: 100%;
+                height: auto;
+            }
+
+            .pager {
+                display: flex;
+                flex-wrap: wrap;
+                gap: calc(var(--u) * 3);
+                margin: calc(var(--u) * 12) 0 0;
+            }
+            .pager a.card {
+                min-width: 13rem;
+            }
+            .pager a.next {
+                margin-left: auto;
+                text-align: right;
+            }
+            .pager a.card span {
+                display: block;
+                font-size: 12px;
+                line-height: 18px;
+            }
+            .pager a.card strong {
+                font-size: 16px;
+            }
+
+            footer {
+                margin-top: calc(var(--u) * 16);
+                padding-top: calc(var(--u) * 6);
+                border-top: 1px solid var(--line);
+                color: var(--muted);
+                font-size: 14px;
+            }
+            footer a {
+                color: inherit;
+            }
+        </style>
+    </head>
+    <body>
+        <nav>
+            <div class="bar"><a class="brand" href="index.html"><img src="drift_128.png" alt="" width="28" height="28">Drift</a>
+<a href="docs.html" aria-current="page">Guides</a>
+<a href="manual.html">Manual</a>
+<a href="advanced-usage.html">Usage</a>
+<a href="technical-report.html">Report</a>
+<a href="atlas/#atlas">Atlas</a>
+<a href="engine/">Engine</a>
+<a href="https://github.com/gmitch215/Drift">GitHub</a></div>
+        </nav>
+        <main>
+            <div class="guides">
+<a href="docs.html" aria-current="page">Documentation</a>
+<a href="why.html">Why</a>
+<a href="install.html">Install</a>
+<a href="try-it.html">Try It</a>
+<a href="portability-atlas.html">Kotlin Portability Atlas</a>
+<a href="architecture.html">Architecture</a>
+<a href="shared-code.html">Shared Code</a>
+<a href="limits.html">Limits</a>
+</div>
+            
+            <div class="readme"><h1 id="documentation">Documentation</h1>
+<h2 id="guides">Guides</h2>
+<ul>
+<li><a href="install.html">Install</a>: downloads, package managers, the install script and building from source.</li>
+<li><a href="why.html">Why</a>: <code>drift why</code>, the one command that compares a working place with a failing one and explains the difference.</li>
+<li><a href="try-it.html">Try It</a>: commands to run against the recorded fixtures, with their output.</li>
+<li><a href="portability-atlas.html">Kotlin Portability Atlas</a>: the probes, the columns and how to read them.</li>
+<li><a href="architecture.html">Architecture</a>: the modules, their dependencies and the investigation chain.</li>
+<li><a href="shared-code.html">Shared Code</a>: how much of the code every target shares.</li>
+<li><a href="limits.html">Limits</a>: what Drift cannot do, by platform.</li>
+</ul>
+<h2 id="reference">Reference</h2>
+<ul>
+<li><a href="manual.html">MANUAL.md</a> walks through each Studio screen, with screenshots.</li>
+<li><a href="advanced-usage.html">ADVANCED_USAGE.md</a> covers every command and flag, with output from real runs.</li>
+<li><a href="technical-report.html">TECHNICAL_REPORT.md</a> describes the design, the evidence and the numbers.</li>
+<li>Engine documentation for the modules is generated with Dokka by <code>./gradlew :dokkaGenerate</code> into
+<code>build/dokka/html</code>, and <code>docsSite</code> copies it to <code>engine/</code>. Drift ships as an application, and the
+modules are not a public API or a published library.</li>
+</ul></div>
+            <div class="pager">
+<a class="card" href="index.html" rel="prev"><span>Prev</span><strong>Drift</strong></a>
+<a class="card next" href="why.html" rel="next"><span>Next</span><strong>Why</strong></a>
+</div>
+        </main>
+        <footer>
+            <a href="https://github.com/gmitch215/Drift">github.com/gmitch215/Drift</a> &middot;
+            <a href="https://github.com/gmitch215/Drift/blob/master/LICENSE">MIT License</a>
+        </footer>
+        <script type="module" src="docs-render.js"></script>
+    </body>
+</html>

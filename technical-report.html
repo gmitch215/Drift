@@ -272,6 +272,39 @@
                 max-width: 100%;
             }
 
+            .guides {
+                display: flex;
+                flex-wrap: wrap;
+                gap: var(--u) calc(var(--u) * 4);
+                margin: 0 0 calc(var(--u) * 6);
+                padding-bottom: calc(var(--u) * 3);
+                border-bottom: 1px solid var(--line);
+            }
+            .guides a {
+                color: var(--muted);
+                font-size: 14px;
+                text-decoration: none;
+            }
+            .guides a:hover,
+            .guides a[aria-current] {
+                color: var(--accent-text);
+            }
+            .guides a[aria-current] {
+                text-decoration: underline;
+                text-decoration-color: var(--accent);
+                text-decoration-thickness: 2px;
+                text-underline-offset: 0.5em;
+            }
+            .docs-render {
+                margin: calc(var(--u) * 5) 0;
+                overflow-x: auto;
+                text-align: center;
+            }
+            .docs-render svg {
+                max-width: 100%;
+                height: auto;
+            }
+
             .pager {
                 display: flex;
                 flex-wrap: wrap;
@@ -309,6 +342,7 @@
     <body>
         <nav>
             <div class="bar"><a class="brand" href="index.html"><img src="drift_128.png" alt="" width="28" height="28">Drift</a>
+<a href="docs.html">Guides</a>
 <a href="manual.html">Manual</a>
 <a href="advanced-usage.html">Usage</a>
 <a href="technical-report.html" aria-current="page">Report</a>
@@ -318,9 +352,10 @@
         </nav>
         <main>
             
+            
             <div class="readme"><h1 id="technical-report-drift">Technical Report: Drift</h1>
 <p>Drift is a Kotlin Multiplatform command line tool and desktop, web and mobile app, version 1.0.0. It records an environment as a capsule, compares two capsules, ranks what changed between a passing run and a failing one, proposes the experiments that would separate the candidates, and writes a container description that mirrors a capsule. Its Lab runs those experiments in containers under a rule fixed before the first trial, reports a verdict, and packs the evidence into an archive that a second command re-checks. It also works from one capsule or one issue text without a second environment: <code>drift upgrade-check</code> lists what a move to other versions breaks, <code>drift triage</code> reads an issue body offline, and <code>drift contract</code> writes what a program needs from an environment. It ships two measured data sets: the Kotlin Portability Atlas, a table of Kotlin behavior across targets and compiler versions, with a static site and a viewer in the app, and DriftBench, a seeded benchmark of container pairs with an injected cause. The release pipeline builds a CLI archive per platform, consumer installers for the app, a Homebrew formula and cask, and two Chocolatey packages.</p>
-<p>This document is the engineering reference for what the working tree does today, what it costs, and what was measured. Each table names its instrument. The section Reproducing the Numbers lists the command or file behind every figure. Test counts, line counts, coverage, rule counts, Atlas hashes and command output describe the tree on 2026-10-13 and were read again from a clean build on that day on a Mac; they move with the tree. Figures from other machines or earlier days (the Docker and paisley-park runs, Wine, the installers, the browsers and the performance sweep) name where and when they were taken and were not repeated. Nothing described here has run on GitHub: every workflow is checked with <code>actionlint</code> and its steps were exercised by hand on a Mac and on a Linux host, and no Windows machine was available.</p>
+<p>This document is the engineering reference for what the working tree does today, what it costs, and what was measured. Each table names its instrument. The section Reproducing the Numbers lists the command or file behind every figure. Test counts, line counts, coverage, rule counts, Atlas hashes and command output describe the tree on 2026-10-13 and were read again from a clean build on that day on a Mac; they move with the tree. Figures from other machines or earlier days (the Docker and paisley-park runs, Wine, the installers, the browsers and the performance sweep) name where and when they were taken and were not repeated. Build Project, Record Atlas, Deploy Documentation and Mirror to GitLab have run on GitHub, and Bench Host Arms ran once; Release Project has not run (GitHub run status read on 2026-10-26). Every workflow is checked with <code>actionlint</code> and its steps were exercised by hand on a Mac and on a Linux host, and no Windows machine was available.</p>
 <hr />
 <h2 id="summary">Summary</h2>
 <div class="table"><table>
@@ -364,7 +399,7 @@
 </tr>
 <tr>
 <td>macOS arm64 CLI, release executable</td>
-<td>9,866,776 bytes; 21 subcommands</td>
+<td>9,866,776 bytes (executable built 2026-10-15, before <code>drift why</code>; 28 subcommands then, 29 in the current tree; the Linux x64 executable of the current tree is 15,616,968 bytes)</td>
 <td><code>ls -l</code>, <code>drift --help</code></td>
 </tr>
 <tr>
@@ -379,7 +414,7 @@
 </tr>
 <tr>
 <td>Rules</td>
-<td>426 in 51 folders: 375 active and 51 <code>pending-scanner</code>; 1481 fixtures (465 positive, 1016 negative); 494 cited sources (313 distinct)</td>
+<td>429 in 51 folders: 376 active and 53 <code>pending-scanner</code>; 1493 fixtures (469 positive, 1024 negative); 497 cited sources (315 distinct)</td>
 <td><code>rules/**/*.yml</code></td>
 </tr>
 <tr>
@@ -409,7 +444,7 @@
 </tr>
 <tr>
 <td>DriftBench</td>
-<td>80 scenarios from 43 templates; 49 dev scenarios validated in containers, 31 sealed</td>
+<td>272 scenarios from 135 template ids; 122 dev, 150 sealed test (<code>split.json</code>)</td>
 <td><code>bench/data</code></td>
 </tr>
 <tr>
@@ -458,8 +493,8 @@
 <td><code>fixtures/cases/d</code></td>
 </tr>
 <tr>
-<td>Triage on 70 fixture bodies</td>
-<td>precision 0.989, recall 0.979, Brier 0.0851; claim check: 0 of 67 labelled threads flagged</td>
+<td>Triage on 78 fixture bodies</td>
+<td>precision 0.990, recall 0.980, Brier 0.0848; claim check: 0 of 67 labelled threads flagged</td>
 <td><code>TriageTest</code>, <code>triage/claim-labels.yml</code></td>
 </tr>
 <tr>
@@ -469,7 +504,7 @@
 </tr>
 </tbody>
 </table></div>
-<p>Six results shape how to read the rest. The fit of ranking weights on the 49 dev scenarios did not beat the hand-set weights out of fold, so the weights are hand-set and every ranking says so. On the benchmark the ranked order beats a random order at the top: 21 of 45 at top-1 against 16.3 expected (P = 0.018) and 29 of 45 at top-3 against 25.9 (P = 0.009). An earlier measurement on 41 scenarios could not tell the top-3 order from chance (P = 0.37); the regenerated data refutes that. The <code>plausible</code> tier, which a differing probe that reads the candidate's attribute or a matched rule earns, is not reliable on this benchmark: 14 of its 25 candidates are wrong, because the probe agrees with decoys that really changed, and probes move the order of two scenarios, both for the worse. The probability the tool prints is mostly a count of rivals, &quot;one of n&quot;, and it exists only for rankings that rest on attribute changes alone. In the migration case, Drift's predictions lost: the frozen <code>upgrade-check</code> output named 12 breaks and none happened (0 true positives, 12 false positives), because every rule fired on the version crossing alone and the real obstacles, a locked package with a PHP upper bound and a tentative return type, have no rule. And the claim check in <code>triage</code> is weak: it flags none of the 67 labelled threads and no clear true positive among its 6 hits in 222,707 corpus bodies.</p>
+<p>Six results shape how to read the rest. No fitted ranking weight beat the hand-set weights out of fold, so the weights are hand-set and every ranking says so. On the benchmark the ranked order beats a random order at the top: 21 of 45 at top-1 against 16.3 expected (P = 0.018) and 29 of 45 at top-3 against 25.9 (P = 0.009). An earlier measurement on 41 scenarios could not tell the top-3 order from chance (P = 0.37); the regenerated data refutes that. The <code>plausible</code> tier, which a differing probe that reads the candidate's attribute or a matched rule earns, is not reliable on this benchmark: 14 of its 25 candidates are wrong, because the probe agrees with decoys that really changed, and probes move the order of two scenarios, both for the worse. The probability the tool prints exists only for rankings that rest on attribute changes alone. It is the share of the posterior read through an isotonic map fit on the 115 probed dev scenarios and not held out. Out of fold it scores Brier 0.170 against 0.173 for &quot;one of n&quot;, a gap far smaller than the spread between folds (0.139 to 0.245). In the migration case, Drift's predictions lost: the frozen <code>upgrade-check</code> output named 12 breaks and none happened (0 true positives, 12 false positives), because every rule fired on the version crossing alone and the real obstacles, a locked package with a PHP upper bound and a tentative return type, have no rule. And the claim check in <code>triage</code> is weak: it flags none of the 67 labelled threads and no clear true positive among its 6 hits in 222,707 corpus bodies.</p>
 <p>What does hold up under test is the machinery around the ranking. Output is byte-identical on three targets and pinned by hashes, including the recorded certificates of the flagship cases. A bundle of changes the data cannot separate is reported as a bundle. A missing probe is missing evidence and never a pass. The planner prices each experiment in expected bits before anything is run, and says which experiments no one can run on a hosted runner. The Lab fixes its decision rule before the first trial and gave no false CONFIRMED verdict in 180 runs of the 45 dev scenarios (synthetic scenarios, one container configuration, and a bound that holds per run, not per kind of failure). <code>verify</code> re-derives every count, p-value, posterior and verdict from an archive alone. It does not re-run an experiment.</p>
 <p>Platform findings sit beside those. A Kotlin probe can print different bytes on x86-64 and arm64 hardware, on different JDKs, and on a Native executable linked on a different build host, so an Atlas column describes a machine as much as a target. The deployed Cloudflare Workers matched the local workerd runs except for the sign bit of NaN results. Safari was not measured, Windows was not run, and no workflow has run on GitHub.</p>
 <hr />
@@ -521,10 +556,10 @@
 </tr>
 </tbody>
 </table></div>
-<p><strong>Byte-identical output.</strong> Golden tests assert exact bytes and a SHA-256 in common test code, so the same assertion runs on the JVM, macOS arm64 Native and Wasm on Node. The <code>.driftcase</code> archive follows the same rule (see The Lab). <code>GoldenTest</code> pins the canonical bytes of a capsule with non-ASCII text, a control character and a surrogate pair (hash <code>9a69c086...edf1</code>), the hash of 1,000 <code>a</code> characters (<code>41edece4...7ea3</code>, checked here against Python's <code>hashlib</code>), and a canonical rule. Ranking, plan, case and rendering goldens follow the same pattern. The macOS release CLI printing <code>drift diagnose</code> for a real pair produced the same hash, <code>4b0dd023...ff8a</code>, as the golden that <code>DriftCommandTest</code> asserts on all three targets.</p>
+<p><strong>Byte-identical output.</strong> Golden tests assert exact bytes and a SHA-256 in common test code, so the same assertion runs on the JVM, macOS arm64 Native and Wasm on Node. The <code>.driftcase</code> archive follows the same rule (see The Lab). <code>GoldenTest</code> pins the canonical bytes of a capsule with non-ASCII text, a control character and a surrogate pair (hash <code>9a69c086...edf1</code>), the hash of 1,000 <code>a</code> characters (<code>41edece4...7ea3</code>, checked here against Python's <code>hashlib</code>), and a canonical rule. Ranking, plan, case and rendering goldens follow the same pattern. The macOS release CLI printing <code>drift diagnose</code> for a real pair produced the same hash, <code>99f637b2...38f7</code>, as the golden that <code>DriftCommandTest</code> asserts on all three targets.</p>
 <p><strong>Canonical JSON.</strong> The encoder sorts object keys at every depth, writes no whitespace, accepts integers only, escapes strings with a fixed table and rejects a lone surrogate. A capsule's hash is the SHA-256 of that encoding. For <code>fixtures/lab/node-alpine.json</code> the hash printed in the <code>reproduce</code> header, <code>540e5c22...0531</code>, equals <code>sha256</code> of the file without its trailing newline.</p>
 <p><strong>Unknown beats incorrect.</strong> An absent tool writes no attribute. A probe that needs a capability the host lacks reports <code>unavailable</code>, and a diff treats that as missing evidence. A rule whose attributes are absent returns <code>UNKNOWN</code> and never matches. <code>ci.runner.label</code> and <code>runtime.platform</code> values such as <code>workerd-local</code> appear only when the workflow declares them in <code>DRIFT_RUNNER_LABEL</code> or <code>DRIFT_RUNTIME_PLATFORM</code>. A ranking whose candidates carry probe, rule or spectrum evidence prints no probability: no dev scenario carries rule or history evidence, and on the 13 that carry a probe the hand-set probe weight read worse than &quot;one of n&quot; (see Evaluation and Limits).</p>
-<p><strong>Labelled weights.</strong> Every ranking and plan carries its weight set (<code>hand-set-1</code>, <code>plan-hand-set-1</code>) and <code>&quot;calibrated&quot;: false</code>. The renderer calls scores hand-set and says they order candidates and are not probabilities.</p>
+<p><strong>Labelled weights.</strong> Every ranking and plan carries its weight set (<code>hand-set-1</code>, <code>plan-hand-set-1</code>) and <code>&quot;calibrated&quot;: false</code>. The renderer calls scores hand-set and says they order candidates and are not probabilities. A ranking that prints a probability adds a <code>probability</code> block with <code>calibrated: true</code>, read through the fitted map (see Probability).</p>
 <p><strong>Test seams.</strong> Tests run against a fake host, recorded tool transcripts under <code>fixtures/transcripts</code>, a fake HTTP fetcher for the rule-source verifier, a fake <code>docker</code> script for the benchmark runner, a fake <code>Executor</code> that the <code>solve</code> loop runs against, a fake <code>InstallSystem</code> for <code>install</code> and a fake <code>ServeSystem</code> for <code>serve</code>. One scan test runs real commands on the host and compares the result with the same parse of recorded output. A few tests touch the real file system or a loopback socket inside a scratch directory: <code>NativeInstallTest</code>, <code>MacosInstallTest</code>, <code>JvmServeTest</code> and <code>PosixServeTest</code>.</p>
 <p><strong>Gates.</strong> The build fails on a spotless (ktlint) violation, a Kotlin line over 100 columns, a warning (all warnings are errors), a shared-code ratio under 80%, a <code>core</code> that contains platform code, a <code>host</code> over its platform-line budget, or JVM line coverage under 95%.</p>
 <hr />
@@ -551,7 +586,7 @@
 </tr>
 <tr>
 <td><code>cli</code></td>
-<td>The <code>drift</code> command on Clikt 5.1.0, with 21 subcommands: <code>capture</code>, <code>run</code>, <code>import</code>, <code>bisect</code>, <code>diagnose</code>, <code>next</code>, <code>case</code>, <code>reproduce</code>, <code>atlas</code>, <code>probe</code>, <code>solve</code>, <code>ingest</code>, <code>pack</code>, <code>verify</code>, <code>report</code>, <code>open</code>, <code>install</code>, <code>uninstall</code>, <code>serve</code>, <code>contract</code>, <code>triage</code> and <code>upgrade-check</code>. Writes files and exact stdout bytes through a small <code>expect fun</code> per target, holds the Docker executor behind <code>solve</code>, the installer, and the web server behind <code>serve</code>.</td>
+<td>The <code>drift</code> command on Clikt 5.1.0, with 29 subcommands: <code>why</code>, <code>capture</code>, <code>run</code>, <code>import</code>, <code>ci</code>, <code>handsoff</code>, <code>bisect</code>, <code>diagnose</code>, <code>compare</code>, <code>next</code>, <code>case</code>, <code>reproduce</code>, <code>atlas</code>, <code>probe</code>, <code>solve</code>, <code>ingest</code>, <code>pack</code>, <code>verify</code>, <code>report</code>, <code>open</code>, <code>install</code>, <code>uninstall</code>, <code>serve</code>, <code>contract</code>, <code>triage</code>, <code>upgrade-check</code>, <code>doctor</code>, <code>help</code> and <code>completion</code>. Nested subcommands such as <code>atlas show</code> are not counted. Writes files and exact stdout bytes through a small <code>expect fun</code> per target, holds the Docker executor behind <code>solve</code>, the installer, and the web server behind <code>serve</code>.</td>
 </tr>
 <tr>
 <td><code>studio</code></td>
@@ -579,7 +614,7 @@
 </tr>
 </tbody>
 </table></div>
-<p>The remaining directories are data and delivery, not modules: <code>rules</code> (426 YAML rule files in 51 folders), <code>triage</code> (the corpus manifest and the claim-check labels), <code>notices</code> (third-party notices that ship in every artifact), <code>atlas</code> (the hand-maintained classification of every Atlas probe), <code>fixtures</code> (recorded capsules, Atlas transcripts, solved cases, project trees, issue bodies and upgrade-check captures), <code>packaging</code> (templates for the Homebrew and Chocolatey packages), <code>assets</code> (the icon), and <code>install.sh</code> and <code>install.ps1</code> at the root. <code>.github/release</code> holds the scripts the release workflow runs. The version is <code>version=1.0.0</code> in <code>gradle.properties</code>; <code>core</code> embeds it for <code>--version</code>, the Studio and Android packages read it, and the Xcode project carries its own copy of the marketing version.</p>
+<p>The remaining directories are data and delivery, not modules: <code>rules</code> (429 YAML rule files in 51 folders), <code>triage</code> (the corpus manifest and the claim-check labels), <code>notices</code> (third-party notices that ship in every artifact), <code>atlas</code> (the hand-maintained classification of every Atlas probe), <code>fixtures</code> (recorded capsules, Atlas transcripts, solved cases, project trees, issue bodies and upgrade-check captures), <code>packaging</code> (templates for the Homebrew and Chocolatey packages), <code>assets</code> (the icon), and <code>install.sh</code> and <code>install.ps1</code> at the root. <code>.github/release</code> holds the scripts the release workflow runs. The version is <code>version=1.0.0</code> in <code>gradle.properties</code>; <code>core</code> embeds it for <code>--version</code>, the Studio and Android packages read it, and the Xcode project carries its own copy of the marketing version.</p>
 <p><strong>Toolchain.</strong> Drift builds with Kotlin 2.4.20, Gradle 9.8.0 and, for <code>androidApp</code>, AGP 9.4.1, on JDK 21 in every workflow. The <a href="https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html">Kotlin Multiplatform compatibility guide</a> lists Kotlin 2.4.20 and 2.4.21 with Gradle 7.6.3 to 9.7.0 and AGP 8.5.2 to 9.3.1 (read 2026-10-13). Drift's Gradle and AGP are newer than that range, so the combination is outside what the guide lists; <code>build.yml</code>, <code>atlas.yml</code> and <code>docs.yml</code> build and test on it without a failure, on Linux, macOS and Windows runners. Nothing more than that is claimed for it.</p>
 <p>Sources sit at <code>src/&lt;set&gt;/main</code> and <code>src/&lt;set&gt;/test</code>. The shared-code ratio counts non-comment lines under <code>src/common/main</code> against every other source set's <code>main</code>.</p>
 <div class="table"><table>
@@ -764,7 +799,7 @@
 <pre><code>{&quot;attributes&quot;:[{&quot;path&quot;:&quot;ci.provisioner.build-date&quot;,&quot;source&quot;:&quot;log&quot;,&quot;stability&quot;:&quot;static&quot;,&quot;value&quot;:&quot;2026-09-01T19:56:44Z&quot;},{&quot;path&quot;:&quot;ci.provisioner.name&quot;,&quot;source&quot;:&quot;log&quot;,&quot;stability&quot;:&quot;static&quot;,&quot;value&quot;:&quot;Hosted Compute Agent&quot;},{&quot;path&quot;:&quot;ci.provisioner.version&quot;,&quot;source&quot;:&quot;log&quot;,&quot;stability&quot;:&quot;static&quot;,&quot;value&quot;:&quot;20260901.588&quot;},{&quot;path&quot;:&quot;ci.runner.i
 </code></pre>
 <p>A probe result is an id, a status (<code>ok</code> or <code>unavailable</code>), the transcript the probe printed, and the SHA-256 of that transcript. Two capsules differ on a probe when the transcript hashes differ.</p>
-<p><code>Capture.run</code> records, without options: <code>drift.platform</code>, <code>os.name</code>, <code>os.arch</code>, <code>kotlin.version</code> (the Kotlin version the build was compiled with), <code>kotlin.target</code>, <code>runtime.platform</code>, every environment variable as <code>env.&lt;name&gt;</code> (<code>PWD</code>, <code>OLDPWD</code>, <code>SHLVL</code>, <code>_</code>, <code>RANDOM</code>, <code>SECONDS</code> and <code>LINENO</code> are volatile), <code>kernel.release</code> and <code>cpu.count</code> from <code>uname</code> and <code>getconf</code> (or <code>ver</code> and <code>NUMBER_OF_PROCESSORS</code> on Windows), <code>os.release.ID</code>, <code>VERSION_ID</code> and <code>PRETTY_NAME</code> from <code>/etc/os-release</code>, and the cgroup CPU and memory limits when the files exist. <code>--tools</code> adds the scanner attributes, <code>--probes</code> runs the catalog and <code>--project</code> reads the project files of the working directory (see Project and Source Facts). Four system facts are always captured when the host can read them: <code>cgroup.version</code>, <code>tz.system-zone</code>, <code>runtime.jvm.options</code> (the <code>JAVA_TOOL_OPTIONS</code> and <code>JDK_JAVA_OPTIONS</code> values) and <code>java.net.preferIPv6Addresses</code>. A capsule records <code>drift.platform</code> and no Drift version, so no recorded capsule, hash or fixture changes when the version does. On Windows the environment is read from the process's Win32 environment block with <code>GetEnvironmentStringsW</code> (<code>host/src/mingw/main/.../SystemHost.mingw.kt</code>, parsed by <code>EnvBlock.kt</code>), not from a <code>cmd /c set</code> child process, so it does not depend on a shell being found (see Platform and CPU Findings).</p>
+<p><code>Capture.run</code> records, without options: <code>drift.platform</code>, <code>os.name</code>, <code>os.arch</code>, <code>kotlin.version</code> (the Kotlin version the build was compiled with), <code>kotlin.target</code>, <code>runtime.platform</code>, every environment variable as <code>env.&lt;name&gt;</code> (<code>PWD</code>, <code>OLDPWD</code>, <code>SHLVL</code>, <code>_</code>, <code>RANDOM</code>, <code>SECONDS</code> and <code>LINENO</code> are volatile), <code>kernel.release</code> and <code>cpu.count</code> from <code>uname</code> and <code>getconf</code> (or <code>ver</code> and <code>NUMBER_OF_PROCESSORS</code> on Windows), <code>os.release.ID</code>, <code>VERSION_ID</code> and <code>PRETTY_NAME</code> from <code>/etc/os-release</code>, and the cgroup CPU and memory limits when the files exist. <code>--tools</code> adds the scanner attributes, <code>--probes</code> runs the catalog and <code>--project</code> reads the project files of the working directory (see Project and Source Facts). Four system facts are always captured when the host can read them: <code>cgroup.version</code>, <code>tz.system-zone</code>, <code>runtime.jvm.options</code> (the <code>JAVA_TOOL_OPTIONS</code> and <code>JDK_JAVA_OPTIONS</code> values) and <code>java.net.preferIPv6Addresses</code>. On Linux a capture also records the soft and hard resource limits from <code>/proc/self/limits</code> as <code>limits.&lt;name&gt;</code>, written <code>soft:hard</code> (Dev Solves Scored describes why). A capsule records <code>drift.platform</code> and no Drift version, so no recorded capsule, hash or fixture changes when the version does. On Windows the environment is read from the process's Win32 environment block with <code>GetEnvironmentStringsW</code> (<code>host/src/mingw/main/.../SystemHost.mingw.kt</code>, parsed by <code>EnvBlock.kt</code>), not from a <code>cmd /c set</code> child process, so it does not depend on a shell being found (see Platform and CPU Findings).</p>
 <p>On the macOS development machine used for this report:</p>
 <div class="table"><table>
 <thead>
@@ -947,7 +982,7 @@
 <p>Each changed path maps to one of 14 dimensions by longest matching prefix: <code>os</code>, <code>kernel</code>, <code>cpu</code>, <code>cpu-limit</code>, <code>memory</code>, <code>runtime</code>, <code>compiler</code>, <code>build</code>, <code>userland</code>, <code>env</code>, <code>locale</code>, <code>limits</code>, <code>network</code> and <code>browser</code>. For example <code>tool.node.</code> is <code>runtime</code>, <code>tool.npm.</code> and <code>deps.</code> and <code>ci.</code> are <code>build</code>, <code>env.TZ</code> is <code>locale</code>, and <code>env.HTTPS_PROXY</code> is <code>network</code>. A path no prefix claims has no dimension; it is listed under <code>changes</code> and never ranked. <a href="advanced-usage.html#attribute-prefixes">ADVANCED_USAGE.md</a> holds the full prefix table. Probe ids map the same way, so a probe that differs in a dimension can support a candidate in that dimension.</p>
 <hr />
 <h2 id="rules-and-provenance">Rules and Provenance</h2>
-<p>A rule records a documented difference between two environments that can break software. The catalog has 426 rules in <code>rules/**/*.yml</code>, one folder per subject (51 folders), each with a mechanism, one or more symptoms, a matcher, fixtures and cited sources. 375 are <code>active</code>. The other 51 are <code>pending-scanner</code>: they read an attribute that no scanner emits yet (a database server version, the TLS versions a peer offers, a browser name, a source-level key), they are compiled and checked like the rest, and they never match a capture that lacks the attribute. <code>RuleCatalogTest</code> prints the keys they are waiting for.</p>
+<p>A rule records a documented difference between two environments that can break software. The catalog has 429 rules in <code>rules/**/*.yml</code>, one folder per subject (51 folders), each with a mechanism, one or more symptoms, a matcher, fixtures and cited sources. 376 are <code>active</code>. The other 53 are <code>pending-scanner</code>: they read an attribute that no scanner emits yet (a database server version, the TLS versions a peer offers, a browser name, a source-level key), they are compiled and checked like the rest, and they never match a capture that lacks the attribute. <code>RuleCatalogTest</code> prints the keys they are waiting for.</p>
 <p>A rule file has <code>schema: 1</code>, an <code>id</code> equal to the file name, a <code>title</code>, <code>applies</code> (dimension ids), <code>difference</code>, <code>symptoms</code>, <code>mechanism</code> (one sentence), <code>detect</code>, <code>severity</code> (<code>low</code>, <code>medium</code>, <code>high</code>), <code>provenance</code>, <code>fixtures</code> and <code>status</code> (<code>active</code> or <code>pending-scanner</code>). A symptom has a <code>basis</code>: <code>verified</code> when the cited source states the symptom, <code>inferred</code> when it only states the mechanism, <code>range</code> when it lists a compatible or tested range and states no failure. The matcher is a small language over a passing side <code>a</code> and a failing side <code>b</code>: <code>eq</code>, <code>ne</code>, <code>in</code>, <code>has</code>, <code>starts</code>, <code>ver</code> (version ranges), <code>present</code>, <code>changed</code> (with a trailing <code>*</code>), and <code>all</code>, <code>any</code>, <code>not</code>, to a depth of 8. This is a rule from the catalog:</p>
 <pre><code class="language-yaml">id: node-localhost-ipv6-first
 applies:
@@ -964,7 +999,7 @@ detect:
 severity: medium
 </code></pre>
 <p>Rule files are YAML because people maintain them by hand. snakeyaml-engine 3.2 parses them at build time under the failsafe schema, so every scalar is a string (<code>1.20</code>, <code>no</code>, <code>0o17</code> and <code>~</code> stay strings), and <code>embedRules</code> writes the JSON that <code>core</code> reads. Common code never parses YAML. A stray <code>rules/**/*.json</code> fails the build, and the embedded JSON was byte-identical to what the earlier JSON catalog produced when the format changed (32 of 32 rules at that time).</p>
-<p>The checker, <code>Constraints.check</code>, runs in the <code>core</code> test suite, so on every build. It validates each rule (id shape, non-empty fields, one-sentence mechanism, dimension ids, provenance, fixtures), requires unique ids, requires every positive fixture to match and every negative fixture not to match, and lists every <code>pending-scanner</code> rule (51 today). A scan-side test (<code>RuleCatalogTest</code>) checks that every attribute path an active rule reads is one that capture or a scanner emits, and that a pending rule reads at least one that none emits.</p>
+<p>The checker, <code>Constraints.check</code>, runs in the <code>core</code> test suite, so on every build. It validates each rule (id shape, non-empty fields, one-sentence mechanism, dimension ids, provenance, fixtures), requires unique ids, requires every positive fixture to match and every negative fixture not to match, and lists every <code>pending-scanner</code> rule (53 today). A scan-side test (<code>RuleCatalogTest</code>) checks that every attribute path an active rule reads is one that capture or a scanner emits, and that a pending rule reads at least one that none emits.</p>
 <div class="table"><table>
 <thead>
 <tr>
@@ -975,36 +1010,36 @@ severity: medium
 <tbody>
 <tr>
 <td>rules, active / pending-scanner</td>
-<td>426: 375 / 51</td>
+<td>429: 376 / 53</td>
 </tr>
 <tr>
 <td>severity high / medium / low</td>
-<td>132 / 239 / 55</td>
+<td>134 / 240 / 55</td>
 </tr>
 <tr>
 <td>fixtures, positive / negative</td>
-<td>465 / 1016</td>
+<td>469 / 1024</td>
 </tr>
 <tr>
 <td>cited sources</td>
-<td>494 entries, 313 distinct locations</td>
+<td>497 entries, 315 distinct locations</td>
 </tr>
 <tr>
 <td>source kinds: measurement / vendor-doc / release-note / spec / report</td>
-<td>19 / 205 / 197 / 72 / 1</td>
+<td>19 / 207 / 198 / 72 / 1</td>
 </tr>
 <tr>
 <td>symptoms, <code>verified</code> / <code>inferred</code> / <code>range</code></td>
-<td>133 / 265 / 52</td>
+<td>133 / 268 / 52</td>
 </tr>
 <tr>
 <td>rules with at least one <code>inferred</code> symptom</td>
-<td>262</td>
+<td>265</td>
 </tr>
 </tbody>
 </table></div>
 <p>A matched rule gives a candidate the <code>known</code> tier and a weight by severity, with its mechanism text attached. A rule whose matcher touches no changed attribute is listed as unattached and never dropped.</p>
-<p>The rule sources are cited and not reproduced. The fixtures are synthetic pairs written to exercise the matcher. They show that the rule fires on the stated versions and stays quiet on others; they do not show that the failure occurs. The 494 provenance entries name 313 distinct locations: 309 web URLs and 4 <code>fixture:</code> references, which the verifier skips. <code>tools</code> includes a verifier that fetches each distinct web URL and records the HTTP status. Its unit tests use a fake fetcher. A run against the network covered 3 URLs when it was written (all 3 returned HTTP 200). A run over all 309 web URLs is not recorded. An HTTP 200 shows the page exists, not that the quoted section still does. Most symptoms are <code>inferred</code> (265 of 450): the cited page states the mechanism, and the symptom is what that mechanism implies.</p>
+<p>The rule sources are cited and not reproduced. The fixtures are synthetic pairs written to exercise the matcher. They show that the rule fires on the stated versions and stays quiet on others; they do not show that the failure occurs. The 497 provenance entries name 315 distinct locations: 311 web URLs and 4 <code>fixture:</code> references, which the verifier skips. <code>tools</code> includes a verifier that fetches each distinct web URL and records the HTTP status. Its unit tests use a fake fetcher. A run against the network covered 3 URLs when it was written (all 3 returned HTTP 200). A run over all 311 web URLs is not recorded. An HTTP 200 shows the page exists, not that the quoted section still does. Most symptoms are <code>inferred</code> (268 of 453): the cited page states the mechanism, and the symptom is what that mechanism implies.</p>
 <p><strong>Catalog by subject.</strong></p>
 <div class="table"><table>
 <thead>
@@ -1062,9 +1097,9 @@ severity: medium
 </tr>
 <tr>
 <td><code>composer</code></td>
+<td>4</td>
 <td>3</td>
-<td>3</td>
-<td>0</td>
+<td>1</td>
 <td><code>numpy</code></td>
 <td>6</td>
 <td>6</td>
@@ -1136,9 +1171,9 @@ severity: medium
 <td>1</td>
 <td>0</td>
 <td><code>python</code></td>
-<td>29</td>
+<td>30</td>
 <td>28</td>
-<td>1</td>
+<td>2</td>
 </tr>
 <tr>
 <td><code>expo-react-native</code></td>
@@ -1202,8 +1237,8 @@ severity: medium
 </tr>
 <tr>
 <td><code>git</code></td>
-<td>1</td>
-<td>1</td>
+<td>2</td>
+<td>2</td>
 <td>0</td>
 <td><code>teavm</code></td>
 <td>2</td>
@@ -1282,9 +1317,9 @@ severity: medium
 </tr>
 <tr>
 <td>total</td>
-<td>426</td>
-<td>375</td>
-<td>51</td>
+<td>429</td>
+<td>376</td>
+<td>53</td>
 <td></td>
 <td></td>
 <td></td>
@@ -1292,7 +1327,7 @@ severity: medium
 </tr>
 </tbody>
 </table></div>
-<p>Three shapes of rule exist. Version-boundary rules read only version keys (<code>ver</code> on <code>tool.php.version</code> and the like) and say that a documented change lies between two versions. Fact rules also read a project or system fact, such as <code>project.composer.require.&lt;name&gt;</code>, <code>runtime.openssl.legacy-provider</code> or <code>tool.sudo.flavor</code>, and match only when the fact is present. Added-API rules (36 of them: PHP 12, Python 12, JDK 8, Node 4) read a call site or import under <code>project.&lt;eco&gt;.calls.*</code> on the failing side and an older runtime there; they describe code that a newer runtime accepts and an older one rejects, so they fire for a CI runner older than the developer machine and not for an upgrade (see Upgrade Check). The 15 older rules with a single negative fixture were left as written; the compiler allows one.</p>
+<p>Three shapes of rule exist. Version-boundary rules read only version keys (<code>ver</code> on <code>tool.php.version</code> and the like) and say that a documented change lies between two versions. Fact rules also read a project or system fact, such as <code>project.composer.require.&lt;name&gt;</code>, <code>runtime.openssl.legacy-provider</code> or <code>tool.sudo.flavor</code>, and match only when the fact is present. Call-site rules (52 of them, the rules that read <code>project.&lt;eco&gt;.calls.*</code>: gradle 5, java 11, js 6, php 12, python 18, counted with <code>grep -rlE 'project\.[a-z0-9_-]+\.calls\.' rules | wc -l</code>) read a call site or import on the failing side. 35 of them are added-API rules (jdk 8, node 4, php 12, python 11): the passing side runs the newer version and the failing side an older one, so they describe code that a newer runtime accepts and an older one rejects, and they fire for a CI runner older than the developer machine and not for an upgrade (see Upgrade Check). The other 17 describe removed or changed behavior and fire in the upgrade direction. The 15 older rules with a single negative fixture were left as written; the compiler allows one.</p>
 <hr />
 <h2 id="history-and-vacuous-green">History and Vacuous Green</h2>
 <p>A diff of two capsules compares two points. A run history adds which runs passed. <code>History</code> orders the runs of one workflow and job (as given, or by numeric run id) and classifies it over its decisive runs, those that passed or failed; cancelled and unknown runs are skipped without breaking adjacency.</p>
@@ -1401,7 +1436,7 @@ severity: medium
 <p>There is no stronger tier. A candidate with no probe or rule evidence never exceeds <code>correlated</code>; a property test over 60 random histories checks it. The policy is written once, in the KDoc of <code>Ranker</code>.</p>
 <p><strong>Probe links.</strong> <code>ProbeLinks</code> maps each of the 33 general probes to the attribute path prefixes its output depends on: the numeric, text, collection and duration probes run inside the Drift process and read <code>runtime.platform</code> and <code>tool.java.</code>; the shell probes read <code>tool.coreutils.</code>, <code>os.name</code> and <code>os.release.</code>; <code>process.timezone</code> reads <code>env.TZ</code>; <code>resources.locale-env</code> reads <code>env.LANG</code>, <code>env.LC_</code> and <code>env.TZ</code>; the two cgroup probes read <code>cgroup.cpu.</code> and <code>cgroup.memory.</code>; two probes read nothing. The prefix lists are a reading of the probe sources, not a measurement, and <code>tool.java.</code> for the in-process probes assumes the <code>java</code> on <code>PATH</code> is the JVM that runs Drift. A probe in the candidate's dimension that does not read its attribute no longer counts for the candidate, which removes a rule that supported every changed attribute of a dimension whether or not the probe could have seen it. On the 45 dev scenarios and 32 rules of that time the change moved nothing: every ranking, tier and rate was identical before and after (see Calibration on the Dev Split, which says that this was not repeated on the current catalog). The benefit is by construction, tested with a property test over random capsule pairs, and is not measured.</p>
 <p><strong>Bundles.</strong> Candidates with the same tier, the same probe and rule evidence and the same Ochiai counts cannot be told apart by the data. They share a bundle id, and no member of a bundle is reported as the cause on its own. Order inside a bundle comes from the dimension prior alone and means nothing.</p>
-<p><strong>Probability.</strong> The ranking carries a probability only when every candidate rests on attribute evidence alone. It is the candidate's share of the softmax over all scores plus a fitted weight for &quot;none of the listed candidates is the cause&quot; (0.25). The shares of a ranking add up to less than one. Where any candidate has probe, rule or spectrum evidence, every probability is null.</p>
+<p><strong>Probability.</strong> The ranking carries a probability only when every candidate rests on attribute evidence alone. It is the candidate's share of the softmax over all scores plus a weight for &quot;none of the listed candidates is the cause&quot; (1.0, not fit), read through the eight-step isotonic map in <code>Weights.map</code>, which gives the rate at which candidates with that share were the cause. The map is fit on all 115 probed dev scenarios and is not held out. The probabilities of a ranking need not add up to one. Where any candidate has probe, rule or spectrum evidence, every probability is null.</p>
 <p>Pair mode, the real drangler failure, a passing run against a failing one:</p>
 <pre><code class="language-sh">drift diagnose fixtures/drangler/capsules/36702683742.json fixtures/drangler/capsules/36995781138.json --detail summary --case case
 </code></pre>
@@ -1409,7 +1444,7 @@ severity: medium
 9 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
 so the data does not name one cause.
 </code></pre>
-<p>At <code>--detail full</code> the nine candidates are all tier <code>difference</code>: <code>tool.node.version</code> scores 1.098612 (runtime, 3x) with probability 0.129032, and the other eight score 0.916291 (build or userland, 2.5x) with probability 0.107527 each. <code>tool.yarn.version</code> is the ninth: it has no scanner dimension of its own and reaches <code>userland</code> through the general <code>tool.</code> prefix, so it was unranked before that mapping existed. The nine probabilities sum to 0.989, which is the fitted &quot;none&quot; weight showing; the real case is outside the distribution that weight was fitted on (see Evaluation and Limits).</p>
+<p>At <code>--detail full</code> the nine candidates are all tier <code>difference</code>: <code>tool.node.version</code> scores 1.098612 (runtime, 3x) and the other eight score 0.916291 (build or userland, 2.5x). All nine read probability 0.104478, because their shares (0.125 and 0.104) fall in one step of the map, so the readout does not separate the first candidate from the rest. <code>tool.yarn.version</code> is the ninth: it has no scanner dimension of its own and reaches <code>userland</code> through the general <code>tool.</code> prefix, so it was unranked before that mapping existed. The nine probabilities sum to 0.940, a claim of 94% that one of nine changes is the cause. Of the 33 dev rankings that print a probability, 32 hold five or fewer candidates and one holds 15, so the real case is outside the data the map was fit on (see Evaluation and Limits).</p>
 <p>History mode over the same case, from <code>RankHistoryTest.theDranglerTransitionIsOneBundleNoCandidateIsTheCause</code> (5 passing runs, 3 failing runs, job <code>Docker E2E</code>): the transition is a <code>BUNDLE</code> with three added steps (<code>Set up Node</code>, <code>Post Set up Node</code>, <code>Dump Host State on Failure</code>); all 9 candidates are tier <code>correlated</code>, basis <code>inferred</code>, in one bundle <code>bundle-1</code>; every candidate has spectrum counts <code>ef 3, nf 0, ep 0</code>, score 1.000000 and coverage 0.862068 (25 of 29 attributes present in each passing run). The data separates nothing: every changed value is present in all three failing runs and in none of the five passing ones. The catalog fires no rule on this pair. The ranking's order within the bundle is the dimension prior.</p>
 <hr />
 <h2 id="the-experiment-planner">The Experiment Planner</h2>
@@ -1629,7 +1664,7 @@ FAIL fisher: experiment p0 exact one-sided p; expected 8/11440 (699), recorded 1
 verify: failed at manifest: results/0001.json was changed; expected 5f6997c647d89b96cd77b038f0ce6679a32ae6f68a
 </code></pre>
 <p>The command exits 1, with identical standard output from the JVM and the macOS executable. A second edit, made with a script that is not in the repository, flipped one trial in <code>results/0002.json</code> and also resealed the results chain, the certificate's chain head and the manifest. It still failed at <code>counts</code> and <code>fisher</code> (and at <code>verdict</code> and <code>report</code>), because the tally of the recorded trials no longer equals the recorded count; again the JVM and native outputs were byte-identical.</p>
-<p>The four archives in <code>fixtures/lab/cases</code> are real certificates from the dev evaluation below, one per verdict class (CONFIRMED, CONFIRMED EFFECT (bundle), NARROWED and STUCK). For each, the archive that <code>pack</code> writes from the extracted directory is byte-identical to the committed file, <code>report</code> writes the same <code>report.html</code>, and <code>verify</code> prints the same output with exit 0, on the JVM and on the macOS release executable.</p>
+<p>The four archives in <code>fixtures/lab/cases</code> are real certificates from the dev evaluation below, one per verdict class (CONFIRMED, CONFIRMED EFFECT (bundle), NARROWED and STUCK). For each, the archive that <code>pack</code> writes from the extracted directory is byte-identical to the committed file, <code>report</code> writes the same <code>report.html</code>, and <code>verify</code> prints the same output with exit 0, on the JVM and on the macOS release executable. After the probability readout changed, the four archives were repacked with a ranking re-derived by the current ranker (only <code>hypotheses/ranking.json</code> and the manifest differ); the repacked files were verified on the JVM and the Linux lane, and the macOS executable has not been rerun on them.</p>
 <div class="table"><table>
 <thead>
 <tr>
@@ -1645,28 +1680,28 @@ verify: failed at manifest: results/0001.json was changed; expected 5f6997c647d8
 <td><code>locale-tz-date-2</code></td>
 <td>CONFIRMED</td>
 <td>50,176</td>
-<td><code>8d4aaf9f238896a8</code></td>
+<td><code>50fb8ab1675f74b7</code></td>
 <td><code>29dfc13b8f4884e3</code></td>
 </tr>
 <tr>
 <td><code>runtime-node-api-1</code></td>
 <td>CONFIRMED EFFECT (bundle)</td>
-<td>58,368</td>
-<td><code>467bc38c27507118</code></td>
+<td>58,880</td>
+<td><code>d1a07e0b8418c629</code></td>
 <td><code>12ed7c1a194b82fa</code></td>
 </tr>
 <tr>
 <td><code>env-retries-flaky-plain-1</code></td>
 <td>NARROWED</td>
 <td>43,008</td>
-<td><code>b32e0ccfb7a677f3</code></td>
+<td><code>46d99976364e8eda</code></td>
 <td><code>16668d3caa233db3</code></td>
 </tr>
 <tr>
 <td><code>limits-nofile-1</code></td>
 <td>STUCK</td>
-<td>31,744</td>
-<td><code>6563ac778d368520</code></td>
+<td>32,256</td>
+<td><code>a6464b019102d135</code></td>
 <td><code>56eb1a79bd35ab2b</code></td>
 </tr>
 </tbody>
@@ -1683,10 +1718,10 @@ verify: failed at manifest: results/0001.json was changed; expected 5f6997c647d8
 <h2 id="upgrade-check">Upgrade Check</h2>
 <p><code>drift upgrade-check [CAPSULE] --to php=8.3,drupal=11</code> asks what a move to other versions breaks, from one capsule and no second environment. It copies the capsule, sets the target keys on the copy, and evaluates every rule against that synthetic pair with the same engine that <code>diagnose</code> uses. A target name is one of 19 aliases for an attribute path (<code>agp</code>, <code>composer</code>, <code>docker</code>, <code>drupal</code>, <code>git</code>, <code>go</code>, <code>gradle</code>, <code>java</code>, <code>jdk</code>, <code>kotlin</code>, <code>node</code>, <code>npm</code>, <code>openssl</code>, <code>php</code>, <code>python</code>, <code>ruby</code>, <code>symfony</code>, <code>twig</code>, <code>tzdata</code>), or a dotted path. Without a capsule the command captures this machine with <code>--tools --project</code>.</p>
 <p>The result has five groups (four, plus the group below that is printed only when it has findings), taken from the three-valued verdicts of the matcher and not from a new score. <strong>Will break</strong> is a rule that matches on a fact beyond the target version keys, such as a package in the lockfile or a call in the source; the finding prints that fact on an <code>evidence:</code> line. <strong>Version boundary crossed</strong> is a rule that matches on the target versions alone: a documented change lies between the two versions, and nothing in the capsule shows that the project meets it. <strong>May break</strong> is a rule whose verdict is unknown because another key it reads is missing from the capsule or is one no scanner emits yet, and the output names the key (and says when the rule is <code>pending-scanner</code>). <strong>Outside the tested range</strong> is a rule that matches and whose symptoms all have the basis <code>range</code>: a compatibility table lists the supported versions (Kotlin Multiplatform against Gradle and AGP, AGP against Gradle and the maximum API level) and says nothing about a failure outside them, so the move is untested and not known to break. <strong>Unknown</strong> is a target whose current value the capsule lacks. A rule is listed only when its verdict for the target differs from its verdict for the capsule alone. The order inside a group is severity, verified symptoms before inferred ones, then rule id, and the JSON form is canonical, schema 2.</p>
-<p>On the real capture <code>fixtures/upgrade-check/drupal-10-php-8-1.json</code> (the Composer fixture inside <code>php:8.1-cli-bookworm</code>: PHP 8.1.34, Drupal 10.3.6, Symfony 6.4.12), <code>--to php=8.3,drupal=11,symfony=7.1</code> gives 0 will break, 3 may break, 2 version boundary and 0 unknown, and 83 of the 426 rules read a target key. The output is byte-identical on the JVM and macOS builds, and <code>UpgradeCheckTest</code> (19 tests) and <code>UpgradeCheckCommandTest</code> (9) run on all three Gradle targets.</p>
+<p>On the real capture <code>fixtures/upgrade-check/drupal-10-php-8-1.json</code> (the Composer fixture inside <code>php:8.1-cli-bookworm</code>: PHP 8.1.34, Drupal 10.3.6, Symfony 6.4.12), <code>--to php=8.3,drupal=11,symfony=7.1</code> gives 0 will break, 3 may break, 2 version boundary and 0 unknown, and 84 of the 429 rules read a target key. The output is byte-identical on the JVM and macOS builds, and <code>UpgradeCheckTest</code> (19 tests) and <code>UpgradeCheckCommandTest</code> (9) run on all three Gradle targets.</p>
 <p><strong>What it got wrong.</strong> The first version put every version-only match under Will break. Case D (below) ran it before a PHP 7.4 to 8.3 move: 11 will-break findings and 1 may-break, and none of them was a failure in the project's own test suite (0 true positives, 12 false positives). The suite passed on PHP 8.3. What did break the move was not predicted: a locked package with a PHP upper bound stopped the install, and a locked package that lacks a PHP 8.1 tentative return type died with a fatal error. No rule covers either. The group split and the evidence requirement are the response, and the same capture now gives 0 will break, 1 may break, 11 version boundary and 0 unknown. That is a change of wording, not a better prediction: the 11 are still not failures, and the frozen prediction in <code>fixtures/cases/d</code> is unchanged.</p>
-<p><strong>A second check.</strong> On the four migration scenarios of DriftBench, moving the green arm to the red arm's version put a will-break finding on the injected version key in 3 of 4 scenarios, and in 2 of 4 in the natural direction (the red arm to the new version). Both counts are weak: any finding on the version key counts, and at that time none named the injected API (0 of 4). Added-API rules (36, one per call such as <code>json_validate</code>, <code>Array.fromAsync</code> or <code>List.getFirst</code>) then raised the API-level hits to 4 of 4, but only in the direction where side b has the older runtime, which is the CI-older-than-local shape; an upgrade runs the other way, and those rules do not fire for it.</p>
-<p><strong>Limits.</strong> A quiet result does not show that a move is safe: the catalog holds documented changes, 51 of its 426 rules wait for a key no scanner emits, and a project that uses a removed API without a rule for it is invisible. The direction of a rule is the direction of its text (<code>a</code> is the passing side), and a rule written for a downgrade can match an upgrade only by accident. <code>--learned DIR</code> adds the rules published by <code>drift triage</code> (see Triage and the Corpus).</p>
+<p><strong>A second check.</strong> On the four migration scenarios of DriftBench, moving the green arm to the red arm's version put a will-break finding on the injected version key in 3 of 4 scenarios, and in 2 of 4 in the natural direction (the red arm to the new version). Both counts are weak: any finding on the version key counts, and at that time none named the injected API (0 of 4). Added-API rules (36 when this check ran, one per call such as <code>json_validate</code>, <code>Array.fromAsync</code> or <code>List.getFirst</code>) then raised the API-level hits to 4 of 4, but only in the direction where side b has the older runtime, which is the CI-older-than-local shape; an upgrade runs the other way, and those rules do not fire for it.</p>
+<p><strong>Limits.</strong> A quiet result does not show that a move is safe: the catalog holds documented changes, 53 of its 429 rules wait for a key no scanner emits, and a project that uses a removed API without a rule for it is invisible. The direction of a rule is the direction of its text (<code>a</code> is the passing side), and a rule written for a downgrade can match an upgrade only by accident. <code>--learned DIR</code> adds the rules published by <code>drift triage</code> (see Triage and the Corpus).</p>
 <hr />
 <h2 id="triage-and-the-corpus">Triage and the Corpus</h2>
 <p><code>drift triage ISSUE_FILE</code> reads the text of an issue offline, with no model, and says what it can about the reporter's environment: facts as Drift attribute keys, each with a confidence, the rules that apply, statements that contradict what Drift knows, and a draft rule when the report suggests one. The same text gives the same bytes on the JVM, Native and Wasm builds, since the arithmetic is integer and the scanning has no regular expressions. A fact has a side (<code>passing</code> or <code>failing</code>) taken from the verdict word nearest the value, a path that says how it was found, and a confidence. The paths start at <code>section</code> 0.950 (the first line under an issue-form heading), <code>tool-output</code> 0.900, <code>pattern</code> 0.700 (0.800 under an environment heading) and <code>key-value</code> 0.490, and the agreement of two spans raises a value while a conflict or a hedge lowers it. Rules that match are listed with the facts they read. A draft rule needs a symptom signature, one version key stated on both sides with the passing version below the failing one, and no rule that already holds on that key. It is published, not only drafted, when <code>--publish-threshold</code> is set, its confidence reaches it, <code>--date</code> names the day the report was read, and the rule passes the rule compiler and its own fixtures. Published drafts go into a learned-rule store (<code>--learned DIR</code>, validated by the rule compiler on every read, never a shipped id) that <code>diagnose</code>, <code>upgrade-check</code> and <code>triage</code> read. Secrets are masked first with the capture redactor, and an <code>@login</code> mention becomes a hash.</p>
@@ -1770,7 +1805,64 @@ verify: failed at manifest: results/0001.json was changed; expected 5f6997c647d8
 </table></div>
 <p>Recall is low by construction (15%): it counts form values found again outside their own sections. Reliability on the held-out half, in bins of confidence: 0.4 holds 165 facts at accuracy 0.412, 0.5 holds 177 at 0.661, 0.6 holds 47 at 0.936, 0.7 holds 528 at 0.799, 0.8 holds 51 at 0.941 and 0.9 holds 404 at 0.933, so the 0.5 and 0.6 bins are underconfident and the 0.9 bin slightly overconfident. A fact was found in 75% of the issues of large form-only repositories, 63% of large form repositories with blank issues allowed, 60% and 40% of large Markdown-template repositories (strict, blank), 36% and 49% of small form repositories and 21% of small repositories with no template. Small repositories are worse on every measure that has a number, and 9 scored small facts support no precision figure. The scored sample is large trackers, mostly PHP, Node, .NET and Python.</p>
 <p>Earlier in the work the <code>key-value</code> path read <code>PHP Fatal error: ... on line 23</code> as PHP version 23 (123 of its 142 held-out misses) and the claim check fired on any sentence that mentioned a library without a negation. The first is fixed: a version must sit next to the tool name or its label. Before that fix the held-out precision was 0.731 and the Brier score 0.1645 over 1,500 facts; after it, the table above. The fix changed the fact set, so the two figures are not a paired comparison.</p>
-<p><strong>Fixtures.</strong> <code>fixtures/triage</code> holds 70 invented issue bodies with expectation files (strict forms, forms with blank issues, free text, sparse or wrong beginner reports, mixed phrasing, 18 for false positives and claim wording). <code>TriageTest</code> scores the extractor on them: 189 facts, 187 true positives, 2 false positives, 4 false negatives, precision 0.989, recall 0.979, Brier 0.0851, and the test fails below 0.95, 0.93 or above 0.12. These bodies were written to exercise the extractor, so the scores are an upper bound for real issues. <code>drift triage calibrate --corpus FILE --out TABLE</code> repeats the dev-half recalibration on a corpus of the user's own issues (it reads the whole file into memory, and a <code>.json.zst</code> through the user's <code>zstd</code>), and <code>--confidence TABLE</code> applies it. On the real corpus (222,707 issues, 595 MB of JSON) the macOS executable took 7.5 minutes at a peak resident size of 6.09 GB; keeping only the form bodies instead of every parsed issue brought it to 6.0 minutes and 3.20 GB with an identical table (<code>pattern</code> 700 to 760, held-out Brier 0.1450 to 0.1408 over 1,434 facts). The remaining memory is the decompressed text itself.</p>
+<p><strong>Fixtures.</strong> <code>fixtures/triage</code> holds 78 invented issue bodies with expectation files (strict forms, forms with blank issues, free text, sparse or wrong beginner reports, mixed phrasing, 18 for false positives and claim wording, 8 for the readers of logs and configuration). <code>TriageTest</code> scores the extractor on them: 207 facts, 205 true positives, 2 false positives, 4 false negatives, precision 0.990, recall 0.980, Brier 0.0848, and the test fails below 0.95, 0.93 or above 0.12. These bodies were written to exercise the extractor, so the scores are an upper bound for real issues. <code>drift triage calibrate --corpus FILE --out TABLE</code> repeats the dev-half recalibration on a corpus of the user's own issues (it reads the whole file into memory, and a <code>.json.zst</code> through the user's <code>zstd</code>), and <code>--confidence TABLE</code> applies it. On the real corpus (222,707 issues, 595 MB of JSON) the macOS executable took 7.5 minutes at a peak resident size of 6.09 GB; keeping only the form bodies instead of every parsed issue brought it to 6.0 minutes and 3.20 GB with an identical table (<code>pattern</code> 700 to 760, held-out Brier 0.1450 to 0.1408 over 1,434 facts). The remaining memory is the decompressed text itself.</p>
+<p><strong>Readers added against real issues.</strong> The first corpus-id run on the 164 labelled dev threads named the labelled cause on 2 of the 21 environment-cause items that carry a named attribute. The extractor and the rule catalog were then changed against 127 of those threads, a tune part drawn by SHA-256 of the thread id (first byte under 192), and checked on the other 37. The validate part holds three named environment-cause items, so it shows regressions and false claims and cannot show a gain. Each reader needs a shape that only one kind of text has (see Facts From Logs and Configuration in <code>ADVANCED_USAGE.md</code>): a requirement against the version found, tool names the text runs, pip output, container images, environment blocks, binding names such as <code>PyQt6</code>, server platforms in logs and jar names, <code>docker version</code> blocks and errno lines. Each has hand-written positive and negative cases in <code>TriageTest</code>, and eight fixture bodies. On the dev half the Linux executable (sha256 <code>86b2a0f122df185dfc78233a7eec27296add289d8e01820ba10c986683aff492</code>; the JVM output equals it on all 164 bodies) prints a fact for the labelled family on 10 of the 21 items (3 before), names the attribute exactly on 9 (3), a rule or draft names it on 4 (2), and a stated value agrees on 7 (2). Precision of the cause on items with a non-empty cause set is 4 of 12 (2 of 9 before). The null baseline did not move: 5 of the 143 items without a named attribute carry a rule or a draft before and after (3.5%), while 84 of them carry any fact against 78. On the 6,253 Tier A bodies a rule or draft is printed for 108 (1.7%) against 103 (1.6%). Of the two new hits one comes from the Composer rule and one from a draft for a changed container image, which describes one report that nobody has reproduced; the PyQt rule matches its item but reads a different key than the label, so it does not count. Five of the 18 named tune items name a tool or a version that is not in the issue text (a Tasmota firmware version, PowerShell, Electron, OpenSSL, a Skopeo version), and no reader can find those. These are dev-half numbers; the held-out half was not read.</p>
+<p><strong>Rules written and held back.</strong> Two rules came from documentation read in full: <code>composer-2-platform-check-php-requirement</code> (the Composer <code>platform-check</code> setting) and <code>pyqt-6-removes-pyqt5-api</code> (the PyQt6 differences page). Both read keys only triage emits, so they are <code>pending-scanner</code> and leave the benchmark data as it was. Three more PHP 8.0 rules (float to string casting independent of the locale, the removed Standard functions, <code>curl_init()</code> returning an object) are sourced from the migration page but read <code>tool.php.version</code>, and with them in the catalog the dev calibration fit, <code>evaluation.json</code>, <code>upgrade.json</code> and <code>Weights.map</code> all change (the isotonic map goes from eight steps to ten), so they sit in <code>.claude/batch/results/p7-t2-held-rules/</code> until the benchmark data is regenerated on purpose.</p>
+<p><strong>The ask and the not-environment reading.</strong> When a report leaves a fact out, triage and <code>drift why</code> ask for it instead of saying nothing: a fixed table maps a tool the text names (a version command that matches <code>Scanners.all</code> and <code>ToolRegistry</code>), a hit open-file limit or full disk, a TLS library, PHP extensions, a named environment variable, a Bukkit-family server, a system without a release, a kernel, a time zone, a locale and a &quot;works elsewhere&quot; statement to one command, at most three per report and only when no rule, draft or program-side reading answers. <code>drift why</code> writes the session to <code>.drift/why/session.json</code> and <code>drift why --reply</code> reads the output of the asked command from standard input, parses it with the scanner that runs the same command and answers again; see <code>docs/why.md</code>. The corpus scorer counts an ask as correct on environment-cause and unclear items, and a not-environment call as correct only on code-defect and user-error items. On the 164 dev threads, with no held-out data read: four-class accuracy is 89 of 164 (0.543; Wilson 0.466 to 0.617), equal to the 89 of 164 that the amendment's ceiling gives a tool that always asks (it can be right on at most the environment-cause and unclear items). The unclear items are right on 60 of 61 and the environment-cause items on 10 of 28. The not-environment reading fires on 19 of the 75 code-defect or user-error items and on none of the 28 environment-cause items. That is 17 of 56 on the tune part, where the mechanisms were chosen, and 2 of 19 on the validate part, which each mechanism was run on once after it was fixed; the validate recall of 0.11 is the out-of-sample figure. The Wilson lower bound of 19 of 19 is 0.83, above the 0.80 bar, but 2 of 2 on validate is 0.34 and the held-out half has about 39 such items, so the bar needs at least 16 calls and a recall of 0.41 there, which these mechanisms do not reach. The six mechanisms added here are statements that the program's own logic or text is wrong (false positives or &quot;incorrectly&quot;, a null dereference, an index out of range, a memory leak, an output that does not appear, a typo or <code>line N of FILE</code> in the report), found by reading the 56 tune code-defect and user-error bodies as a set and counting each candidate against the tune unclear and environment-cause items; they need a report with no story of change (no passing side, required version, limit hit or &quot;works on&quot; phrase) and they may stand beside tool versions. Candidates dropped on tune for firing on unclear items or environment-cause items: hangs and infinite loops (2 correct, 3 unclear), internal assertions (1 and 1), native crashes (1 and 1 unclear, 1 environment), a reproduction with a code block and no tool word, expected and actual values under the relaxed gate (1 environment), and project stack frames under it (5 unclear). The ceiling is set by the labels: by my reading at least ten of the 47 tune unclear items are program bugs by their text (a Safari regex that breaks table rendering, an autolink that drops part of a URL, a parser assertion, a compiler crash, a hang) that the thread simply never explained, and no text mechanism can tell them from a code defect that a maintainer named. A second loop measure, not a bar, answers each ask through the real <code>drift why --reply</code> with a made-up reply from a template per family: stage 1 (a text fact for the labelled family or an ask whose family equals it) holds for 13 of the 21 named environment-cause items (12 of 18 tune, 1 of 3 validate), and stage 2 (the session then states that family) for the same 13. It measures ask coverage and the parse round trip, not diagnosis. Eight of the 21 named attributes (the Tasmota firmware, PowerShell and Electron versions that the text never names, an eslint glob, <code>SLSKD_UMASK</code>, a CI runner label stated in a later comment, a disk quota whose text I did not read, and one item whose ask a matched rule suppresses) are out of reach of any command the text implies, so the exact-attribute and facts bars (above 0.65 and 0.70) top out at 13 or 14 of 21 (0.62 or 0.67), and 14 only if an ask were allowed beside a wrong rule match.</p>
+<p><strong>The clean-run check.</strong> &quot;Not environment&quot; is the highest bar and the text alone reaches about 0.1 recall out of sample, so Drift can also ask for a check: the report's own command run in a clean, contained container of the official image for its toolchain (<code>docker run --rm --user &quot;$(id -u):$(id -g)&quot; --cap-drop ALL --security-opt no-new-privileges --pids-limit 256 --memory 1g [--network none] -v &quot;$PWD&quot;:/src:ro --tmpfs /w:exec,mode=1777 -w /w IMAGE sh -c 'cp -R /src/. /w/ &amp;&amp; COMMAND' 2&gt;&amp;1 | drift why --reply</code>). Drift prints it and never runs it, and only COMMAND comes from the report: it is quoted by one function that refuses a control or non-ASCII character, a backtick, <code>$(</code>, a masked secret, a trailing backslash and more than 400 characters. The network stays on only when the report shows network use or the command is a package or build manager. The ask (family <code>clean-run</code>, fields <code>family</code>, <code>command</code>, <code>piped</code> as for every ask) needs a failure signature in the text (an error line read by <code>SymptomExtractor</code>, or the <code>run:signature</code> fact), a command (a <code>$</code>, <code>&gt;</code> or <code>%</code> line in a code block, the one command of a block before the error block, or an inline code span after a run verb with a known program) and a toolchain with an official image. The image tag comes from the pinned tag list behind <code>ImageTable</code>; a test keeps the default flavor equal to what the <code>ImageTable</code> rows choose. A report with a command and no signature gets the <code>error-text</code> ask, whose reply is appended to the report. The clean-run reply is compared with the failure in the report after the normaliser of <code>Signature</code> has replaced numbers, times and temporary paths and a token with a slash reads as a path. The same failure ends in the not-environment reading (signal <code>clean-run</code>), an output with no error line is a pass and leads to the capture ask, and any other error keeps the ask open. Docker's own errors and binary output are refused. The session keeps only <code>run:clean</code> = <code>same</code> or <code>works</code>. The reading is deterministic and the same on the JVM, linuxX64 and wasmJsNode.</p>
+<p>On the 164 dev threads the widened forms still reach nothing in the classes the bar is about: 0 of 75 code-defect and user-error items (Wilson 0 to 0.049) and 0 of 28 environment-cause items (0 to 0.121), on tune and on validate. Of the 75, 37 carry neither a failure signature nor a command-looking line, 23 are answered by a rule, a draft or a program-side reading before the ask applies, 7 show a command-looking line and no signature, 5 a signature and no command-looking line and 3 both (two <code>deno</code> reports and one <code>dotnet</code> report, whose toolchains have no image). Of the 28, 14 carry neither, 8 are answered earlier, 4 a signature only and 2 a command-looking line only. The ask fires on 1 of the 61 unclear items (a <code>npm install</code> report) and the error-text ask on 2 more (both Rust reports that run <code>rustc --version</code>). The command-looking count is a regex over the body (a prompt line, or a run verb and a code span) and overstates: of the 9 items with one and no signature, none is a command Drift can run (a Gradle task line, quoted logs and SQL, <code>docker</code> and <code>skopeo</code> sessions whose toolchains have no image, a prose sentence with a code span). Issue reports mostly describe the command in prose without a runnable span. The round trip through the real binary with the synthetic replies (<code>replay.py prepare-clean</code>, <code>clean-reply</code>, <code>replay-lane.sh b same</code> and <code>works</code>, table &quot;Clean Run Loop&quot; in <code>score.py</code>) therefore has one corpus item, the unclear one: its same-failure reply, built from the <code>run:signature</code> fact, ends in the not-environment reading and its works reply in the capture ask, never in the not-environment reading. Three hand-written reports through the lane binary behave the same, the environment-cause one included: a same-failure reply on an environment-cause report is the correct reading when a clean machine reproduces the failure, so it is counted, not hidden, and a works reply never ends in the not-environment reading (a unit test on a report with a passing side checks both). The four-class accuracy, the not-environment precision and the other ratified numbers are unchanged by this item (89 of 164 and 19 of 19 on dev). The stage measures ask coverage and the parse round trip, not diagnosis: nobody ran the command on a clean machine.</p>
+<p><strong>Runtime from error vocabulary.</strong> A reporter with one machine often pastes only an error line (<code>ModuleNotFoundError: No module named 'distutils'</code>) that names no tool, so the ask table's name matching found nothing to ask. <code>Asks.runtimes</code> now maps each runtime's own error vocabulary to the same family ask as if the text had named it (Python, Node, PHP, JVM, Go, Rust, Ruby, .NET), and a shell or runtime &quot;not found&quot; error asks <code>command -v NAME</code>; a path, a generic word, a name with a dot or a slash and a tool whose version is stated never ask. <code>drift why --error</code> alone assumes the program works elsewhere (<code>TriageOptions.worksElsewhere</code>): no program-side reading from the text alone and the capture as the second ask. Through the real code on the six cold-start briefs 9 to 14 (<code>drift why --error LINE</code>): 9 asks <code>php -v</code>, 10 <code>python3 --version</code>, 12 <code>command -v git</code>, 13 <code>ulimit -n</code>; 11 (<code>AssertionError: expected 4 lines, got 1</code>) and 14 (<code>AssertionError: importer cannot write: album mode is 755</code>) name no runtime or tool, so they get the capture ask only, which is the one way their time zone and umask differences can surface; an earlier build called both &quot;not an environment difference&quot; from the expected-and-actual lines. On the 164 dev threads no ratified number moved (four-class 89 of 164, not environment 19 of 19, null baseline 138 of 143, <code>cause</code> precision 4 of 12) and the clean-run reach is unchanged (0 of 75, 0 of 28; 1 of 61 unclear). Two items changed: a Deno report now asks for Node (the report has <code>is not a function</code> with <code>at</code> frames) in place of the system version, an inference a Deno report makes wrong, and a PHP locale report matches a rule that the lane's rule directory holds and the earlier outputs did not.</p>
+<p><strong>Comparing one fact.</strong> The ask and reply loop settled one machine at a time: a reader with PHP 7.4.33 on the failing machine got a verdict that no recorded rule explained it (the sentence now says &quot;I have no recorded rule that explains this failure from PHP version 7.4.33 alone, so I cannot say whether it matters yet&quot;) and had to bring their own knowledge. <code>drift why --reply --works</code> closes the loop: the session keeps the parsed facts of each ask on two sides (<code>reply</code> for the failing machine, additive <code>works</code>), and when an ask has both, <code>compareFlow</code> builds a works and a failing capsule from them and calls the same <code>Explain.run</code> that <code>--there</code> uses, so ranking, error-text pointers and verdict wording are shared (<code>PHP version: 8.3.12 where it works, 7.4.33 where it fails</code>, &quot;most likely&quot;). Equal facts say they do not differ and the next check follows. The works step is placed before the other checks and the capture, and either side may be given first. Replay on the dev half (21 named environment-cause items; 3 get an ask with a template): all 3 works-side replies, built from the label's <code>before</code> value or a placeholder, end with the fact named as the difference (2 of 2 tune, 1 of 1 validate); the stage measures the comparison path and the parse round trip, not diagnosis, and no triage output changed, so no ratified number moved. A saved capture of this very machine now says &quot;Nothing I can read differs between this machine and the saved capture of itself; run this on the machine where it works&quot; instead of the generic no-difference text.</p>
+<p><strong>Held-out result, corpus-id, Drift final6.</strong> The held-out half holds 141 labelled threads (13 environment cause, 6 of them with a named attribute; 32 code defect; 7 user error; 89 unclear). It was scored once, with the Linux x64 executable of sha256 <code>ddeb143b...</code> and the ratified bars of 2026-10-27, and nothing was tuned on it. The full record is <code>experiments/results/corpus-id/heldout-final6.md</code>.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>bar</th>
+<th>held-out</th>
+<th>ratified</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>exact attribute named</td>
+<td>2 of 6</td>
+<td>above 0.65</td>
+<td>miss</td>
+</tr>
+<tr>
+<td>facts for the labelled family</td>
+<td>2 of 6</td>
+<td>above 0.70</td>
+<td>miss</td>
+</tr>
+<tr>
+<td>null baseline, no rule or draft on non-named items</td>
+<td>131 of 135</td>
+<td>at least 0.50</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>not environment, precision on its calls</td>
+<td>8 of 24 (Wilson lower 0.18), 2 environment-cause items called</td>
+<td>point at least 0.95, lower above 0.80, no environment-cause call</td>
+<td>miss</td>
+</tr>
+<tr>
+<td><code>cause</code> precision</td>
+<td>0 of 1</td>
+<td>0.85, lower 0.65</td>
+<td>miss</td>
+</tr>
+<tr>
+<td>four-class accuracy</td>
+<td>84 of 141 (0.596; Wilson 0.513 to 0.673)</td>
+<td>0.80, lower 0.72</td>
+<td>miss</td>
+</tr>
+</tbody>
+</table></div>
+<p>Five of six bars are missed. On the dev half the not-environment reading was 19 of 19; on held-out it is 8 of 24, with 14 of its 24 calls on threads labelled unclear and two on environment-cause threads (<code>fabiospampinato/vscode-todo-plus#276</code> and <code>nodejs/node#8545</code>). The signals were chosen on the dev tune items, and 17 of their 19 dev hits were those items, so the dev figure measured memorization of the tune set more than a mechanism. The per-signal table is in the record: <code>located</code> fired 10 times with 4 correct, <code>crash</code> 5 times with 2 correct. A tool that always asks would score 0.723 on the four-class measure (102 of 141); Drift scores 0.596, because it says not environment on unclear threads, which the ratified table counts as wrong. The loop tables (ask and reply, clean run) were not run on this half.</p>
 <p><strong>The claim check is weak.</strong> It flags a sentence that contradicts something Drift knows: nine statements, each tied to a rule or to two Atlas columns that print different results (for example, that the Nashorn engine is available in JDK 21, which the rules say JEP 372 removed). It needs the facts and a sentence that affirms the claim inside one clause; questions and &quot;removed in&quot; sentences are rejected. A labelled set of 67 maintainer-correction threads from 13 repositories (<code>triage/claim-labels.yml</code>: 6 corrections, 55 not corrections, 6 unclear) was built to measure it, and the search heuristic that found the candidates has a precision of 6 of 61 (0.098; Wilson 0.05 to 0.20). The engine flags none of the 6 corrections. The 67 threads were split by <code>sha256(&quot;&lt;repo&gt;#&lt;issue&gt;&quot;)</code> (first four bytes, odd is held-out) before the second fix: 30 held-out (3 corrections, 23 not corrections, 4 unclear) and 37 dev. The engine flags 0 of the 30 held-out threads, so its precision there is undefined and its recall is 0 of 3 (Wilson 0 to 0.56). On the whole corpus the fix pass (assertion shape in the first pass; hedge, deprecation and imperative cues in the second) took it from 12 hits to 6 to 1 in 222,707 bodies; the one left is <code>distutils</code> in a parenthetical in a CPython issue and is not a claim. By the rule fixed for this check (held-out precision below 0.5 removes the feature from the headline claims), the claim check is documented as experimental in <code>README.md</code> and <code>ADVANCED_USAGE.md</code>. The claim list covers nine Kotlin, JDK and Python statements, none of which the 13 repositories of the labelled set discuss, so a larger set would need claims written for it. The claim-check set also holds too few corrections (6) for a recall figure.</p>
 <hr />
 <h2 id="studio-screens">Studio Screens</h2>
@@ -2066,7 +2158,7 @@ controls: 8 lines are the same on every target
 </ul>
 <p><strong>Studio.</strong> The Atlas is the first tab of Drift Studio. It shows the matrix of 16 columns at 2.4.20 and 5 at 2.5.0-Beta1 with a version selector, the columns grouped by family (JVM, Native, Wasm, JS, Cloudflare, Mobile, Device) under one horizontal scroll, a divergent-only filter, three detail levels, a column for the device the app runs on, and a predict-then-reveal mode that shows the question and the source, asks which output a target gives, and keeps the score in memory. A tap on a row shows the source, each target's full output, the basis and quoted references, the issues with the state read, what was searched, and the notes. A probe with no explanation reads &quot;unclassified: no explanation found&quot;, and the footer states the limits of the data. The app has an Investigation tab that runs <code>StudioState.of</code> over the drangler capsules (funnel, candidates, drill-in, three detail levels). Studio builds for JVM Desktop and for the browser as Wasm; the Android and iOS builds replay the embedded transcripts and add the live probes of the device. The JVM tests (114) and the browser tests (69, in Chrome through <code>wasmJsBrowserTest</code>) pass; the Studio screens beyond the Atlas are described in Studio Screens above.</p>
 <p><strong>The site.</strong> <code>./gradlew atlasSite</code> writes a static site to <code>build/atlas-site</code>: the Studio web build at the root, <code>data/dataset.json</code> (688,560 bytes), <code>data/classification.json</code>, <code>data/ladder.json</code> (1,990,747 bytes), the 17 transcript files, <code>404.html</code>, <code>versions.html</code> and one page per probe under <code>probe/</code> (38 pages and an index). It has 79 files and 18,548 KiB, of which the two Wasm files are about 12 MB. The probe pages are static HTML with no script and no external resource, and the text is escaped. A unit test builds the site twice from two temporary directories and compares the bytes; a second full build and a hash of every file was done on 2026-10-07 (78 files then) and not repeated. Every page under <code>probe/</code> links to <code>../../</code> and the 404 page to <code>./../</code>, the directory above the site root, which is the front page of the documentation site. <code>docsSite</code> places this site under <code>atlas/</code> of the documentation site and the Dokka site under <code>engine/</code>. The deploy steps ran against a local bare repository before <code>docsSite</code> existed (one commit of 2,907 files, then &quot;No changes to deploy&quot;); the steps now copy <code>build/site</code>, and that run was not repeated. No GitHub run exists, and the sticky name column and horizontal scroll of the matrix were not looked at in a browser.</p>
-<p><strong>The documentation site.</strong> <code>./gradlew docsSite</code> renders <code>README.md</code>, <code>ADVANCED_USAGE.md</code> and <code>TECHNICAL_REPORT.md</code> into <code>assets/site-template.html</code> with commonmark-java (tables, heading ids and autolinks) and writes them with the Atlas site and the Dokka site to <code>build/site</code>: 3,969 files, 68,944 KiB (the same build gave identical hashes on a second run on 2026-10-07, not repeated). The render fails on a relative link to a path that is not in the repository and on a link to a heading that does not exist; the three documents pass with every anchor resolving. <code>checkSiteLinks</code> scanned 95,013 relative <code>href</code> and <code>src</code> values outside <code>engine/</code> and found none unresolved, and 132 unresolved inside <code>engine/</code>, the Dokka links to pages it does not write. The front page and the report page were loaded at 390 by 844 with Chrome device emulation: one column, <code>scrollWidth</code> equal to <code>innerWidth</code>, and no table wider than the viewport outside a scroll container. Chromium through Playwright loaded the front page, both documents, <code>atlas/</code>, a probe page and <code>engine/</code> from a local server with no console error, no failed request and no HTTP error status, started Studio under <code>atlas/</code>, and followed every nav item and back. GitHub Pages was not involved, and no other browser loaded the site.</p>
+<p><strong>The documentation site.</strong> <code>./gradlew docsSite</code> renders <code>README.md</code>, <code>MANUAL.md</code>, <code>ADVANCED_USAGE.md</code>, <code>TECHNICAL_REPORT.md</code> and the seven guides in <code>docs/*.md</code> into <code>assets/site-template.html</code> with commonmark-java (tables, heading ids and autolinks) and writes them with the Atlas site and the Dokka site to <code>build/site</code>: 3,969 files and 68,944 KiB on 2026-10-07, before the guides under <code>docs/</code> were added (not rebuilt since). The render fails on a relative link to a path that is not in the repository and on a link to a heading that does not exist; the current pages pass the render (lane a4, 2026-10-26). <code>checkSiteLinks</code> found no unresolved relative <code>href</code> or <code>src</code> outside <code>engine/</code> (lane a4, 2026-10-26); the unresolved links inside <code>engine/</code> are Dokka links to pages it does not write. The front page and the report page were loaded at 390 by 844 with Chrome device emulation: one column, <code>scrollWidth</code> equal to <code>innerWidth</code>, and no table wider than the viewport outside a scroll container. Chromium through Playwright loaded the front page, both documents, <code>atlas/</code>, a probe page and <code>engine/</code> from a local server with no console error, no failed request and no HTTP error status, started Studio under <code>atlas/</code>, and followed every nav item and back. GitHub Pages was not involved, and no other browser loaded the site.</p>
 <p><strong>What the Atlas does not cover.</strong> There is no Safari column. The <code>mingw-wine</code> transcript in <code>fixtures/atlas-extra</code> comes from Wine and is not a Windows column, and no Windows JVM column exists. Android is an emulator on API 37 and iOS is a simulator; no device ran. There is no macOS x64 column, and the <code>js-ir</code> column comes from the standalone compiler on Node and not from a Gradle build. <code>.github/workflows/atlas.yml</code> defines the jobs that would record Linux x64, Linux arm64, macOS, Windows, three JDKs, and the browsers; it has not been run. Every cell is a single run, and the hardware and build host change some cells (see Platform and CPU Findings and The build host).</p>
 <hr />
 <h2 id="platform-and-cpu-findings">Platform and CPU Findings</h2>
@@ -2338,11 +2430,11 @@ controls: 8 lines are the same on every target
 <hr />
 <h2 id="driftbench">DriftBench</h2>
 <p>DriftBench scores a diagnosis against a known cause. A scenario is a pair of containers, green and red, running one small program. The red arm fails at a declared rate and the green arm passes. The injected cause is ground truth by construction, because the scenario was built around it, so the benchmark measures how well a ranking recovers a cause that was put there. It is synthetic and every scenario and result file says so (<code>&quot;synthetic&quot;: true</code>).</p>
-<p><strong>Scenarios.</strong> 43 templates in 16 YAML files (<code>bench/scenarios/*.yml</code>, one per dimension and <code>migration.yml</code> with four templates for runtime upgrades) produce 80 scenarios. A template names a dimension, a program in <code>sh</code>, <code>python3</code>, <code>node</code> or <code>java</code>, the failure signature, the run configuration of each arm (image, environment, memory, CPUs, cpuset, ulimits, network, files), and the cause with optional bundle members and decoys. A seeded SplitMix64 generator (seed 20261006) picks variants and draws values. The class of a scenario is derived: <code>control</code> (no cause), <code>intermittent</code> (red rate under 1,000 permille), <code>bundle</code>, <code>decoy</code>, else <code>single</code>. The 80 split into single 29, bundle 18, intermittent 13, decoy 12 and control 8.</p>
+<p><strong>Scenarios.</strong> 135 template ids in 16 YAML files (<code>bench/scenarios/*.yml</code>, one per dimension and <code>migration.yml</code> with four templates for runtime upgrades) produce 272 scenarios. The first set had 80 scenarios from 43 templates; the dev measurements labelled 45 or 49 scenarios come from that set and its earlier versions. A template names a dimension, a program in <code>sh</code>, <code>python3</code>, <code>node</code> or <code>java</code>, the failure signature, the run configuration of each arm (image, environment, memory, CPUs, cpuset, ulimits, network, files), and the cause with optional bundle members and decoys. A seeded SplitMix64 generator (seed 20261006) picks variants and draws values. The class of a scenario is derived: <code>control</code> (no cause), <code>intermittent</code> (red rate under 1,000 permille), <code>bundle</code>, <code>decoy</code>, else <code>single</code>. The 272 split into single 111, bundle 92, decoy 28, intermittent 21 and control 20.</p>
 <p><strong>Intermittency.</strong> The harness arms the fault on trial <code>i</code> when a fixed integer hash of <code>i</code> and the scenario salt is under the gate, and the program fails only when the fault is armed and the injected cause is present. The failing trials are therefore known before Docker runs, and a flaky scenario is a deterministic pattern with a declared rate. No scenario contains a real race.</p>
 <p><strong>Causes a container cannot vary.</strong> Kernel release, clocksource, CPU model and browser engine run one configuration in both arms; the cause values exist as <code>capsule-overrides</code> written into the saved capsules, marked <code>bench-synthetic</code>. 10 scenarios are of this kind (<code>controllable: false</code>). Separately, 15 scenarios mark the cause <code>visible: false</code>, because the capsule has no attribute for it yet (open file descriptor limit, file size limit, cpu count under a cpuset, hosts file, lockfile pins, shell flavor, npm version). Those scenarios measure whether a diagnoser abstains.</p>
 <p><strong>Validation.</strong> A scenario is valid when both arms finish, the green arm passes, every red failure carries the declared signature (text or exit code), the failing trials equal the prediction from the hash gate, each arm's failure count passes an exact two-sided binomial test against the declared rate (each tail at least 0.0005, <code>BigInteger</code>), and the cause path appears in the capsule diff exactly when <code>visible</code> says so. A scenario that fails is listed in <code>data/dropped.json</code> and left out; its program is fixed, and no tolerance is loosened.</p>
-<p>Dev scenarios ran in Docker on a Linux host, capsules captured with the Linux release executable (<code>capture --tools</code>) inside each arm:</p>
+<p>The 49 dev scenarios then in use ran in Docker on a Linux host, capsules captured with the Linux release executable (<code>capture --tools</code>) inside each arm:</p>
 <div class="table"><table>
 <thead>
 <tr>
@@ -2382,16 +2474,16 @@ controls: 8 lines are the same on every target
 </tbody>
 </table></div>
 <p>The four migration dev scenarios (PHP 7.4 and 8.3, Node 18 and 22, JDK 17 and 21, Python 3.11 and 3.13) ran on a Mac under Docker Desktop (linux/arm64) with the Linux arm64 executable inside each arm; the others ran on a Linux host. The first run had one drop, <code>build-npm-sbom-plain-1</code>, whose program sent npm's error message to <code>/dev/null</code>, so the red arm failed without the declared signature (green 0 of 20, red 20 of 20). The program was fixed and the batch rerun; the final run has no drops.</p>
-<p><strong>Sealed test split.</strong> A scenario is in dev when the first four bytes of <code>sha256(id)</code>, read as an unsigned integer, mod 100 are under 60. That gives 49 dev and 31 test scenarios. The test list is sealed: the SHA-256 of the sorted test ids, each followed by a newline, is <code>457097f88491381de17a43a67a7f09ab3843d008c838f02db2e81b0c6d5b4068</code>, committed in <code>data/split.json</code> and pinned in <code>CommittedDataTest</code>. <code>prepare</code> refuses a test id, the calibration harness refuses it (<code>SealedException</code>), and a test asserts no result or capsule file exists for a test id. The test scenarios were never executed, run through the ranker or scored. They are validated only through the dev sibling instances of the same templates. The hash and the split rule were recomputed independently from <code>bench/data/scenarios.json</code> for this report (see Reproducing the Numbers).</p>
-<p>Template ids were renamed (suffixes such as <code>-basic</code>) until every template had at least one dev instance and the dev share was near 60%; it was 59.2% (45 of 76) before the four migration scenarios, which all fall in dev by the hash rule, and is 61.3% (49 of 80) now. The sealed list and its hash did not change. Only the hash rule was used, and no measurement.</p>
-<p><strong>Sealed-run protocol.</strong> The test set is run once. <code>bench freeze</code> records the engine commit, the SHA-256 of the embedded rule catalog, <code>fit.json</code>, <code>evaluation.json</code>, <code>scenarios.json</code> and <code>split.json</code>, and the held-out template list in <code>bench/data/freeze.json</code>. <code>bench unseal</code> runs only when each recorded value matches the working tree and the ranker still reproduces both calibration files; otherwise it exits 1 and names the fields that differ. A successful unseal appends one line (timestamp, commit, operator) to <code>bench/data/unseal.log</code>, after which <code>freeze</code> and a second <code>unseal</code> refuse; <code>prepare --test</code> and a <code>Lab</code> opened with the unsealed ids re-check the freeze. The check does not hash engine source, so an engine change that leaves the dev ranking and the calibration files byte-identical passes, and the logged commit is the record of what ran. Templates added after the first 43 are held out when <code>sha256(template id)</code> falls in the test bucket and then have test instances only, which gives three strata: dev, test-sibling (a test scenario whose template has dev instances) and test-novel (a held-out template that never ran). A template has at most three instances and the analysis clusters by template. Template authors do not read <code>rules/</code> and rule authors do not read <code>bench/scenarios/</code>; that separation is an instruction to the writers, not something the build checks. The result is the single run at the frozen commit, reported as it comes out; a null result is the result, and later fixes are reported beside it. <code>UnsealTest</code> and <code>FreezeTest</code> exercise the protocol on a scratch copy of <code>bench/data</code>.</p>
+<p><strong>Sealed test split.</strong> The split in <code>bench/data/split.json</code> has 122 dev and 150 test scenarios, 272 in all. A scenario is dev when the first four bytes of <code>sha256(id)</code>, read as an unsigned integer, mod 100 are under 60; a template outside <code>LEGACY_TEMPLATES</code> whose own id fails that test is held out with test instances only (the <code>rule</code> field). The test list is sealed: the SHA-256 of the sorted test ids, each followed by a newline, is <code>aea538143b9ca524864692d92e64c0ae95e0c5c42415cf4864be0236469f8b13</code>, committed in <code>data/split.json</code> and pinned in <code>CommittedDataTest</code>. The earlier 31-scenario list had the hash <code>457097f8...</code>; the split was regenerated on 2026-10-15 (commit 9bb18240). <code>prepare</code> refuses a test id, the calibration harness refuses it (<code>SealedException</code>), and a test asserts no result or capsule file exists for a test id. The test scenarios were never executed, run through the ranker or scored. They are validated only through the dev sibling instances of the same templates. The test-list hash was recomputed from <code>bench/data/scenarios.json</code> for this report and matches; the per-id rule alone does not reproduce the split (see Reproducing the Numbers).</p>
+<p>Template ids were renamed (suffixes such as <code>-basic</code>) until every template had at least one dev instance and the dev share was near 60%; it was 59.2% (45 of 76) before the four migration scenarios, which all fall in dev by the hash rule, and was 61.3% (49 of 80) on the 80-scenario set and is 44.9% (122 of 272) in the current split. The sealed list changed when the split was regenerated (see Sealed test split). Only the hash rule was used, and no measurement.</p>
+<p><strong>Sealed-run protocol.</strong> The test set is run once. <code>bench freeze</code> records the engine commit, the SHA-256 of the embedded rule catalog, <code>fit.json</code>, <code>evaluation.json</code>, <code>scenarios.json</code> and <code>split.json</code>, and the held-out template list in <code>bench/data/freeze.json</code>. <code>bench unseal</code> runs only when each recorded value matches the working tree and the ranker still reproduces both calibration files; otherwise it exits 1 and names the fields that differ. A successful unseal appends one line (timestamp, commit, operator) to <code>bench/data/unseal.log</code>, after which <code>freeze</code> and a second <code>unseal</code> refuse; <code>prepare --test</code> and a <code>Lab</code> opened with the unsealed ids re-check the freeze. The check does not hash engine source, so an engine change that leaves the dev ranking and the calibration files byte-identical passes, and the logged commit is the record of what ran. Templates added after the first 43 are held out when <code>sha256(template id)</code> falls in the test bucket and then have test instances only, which gives three strata: dev, test-sibling (a test scenario whose template has dev instances) and test-novel (a held-out template that never ran). A template has at most three instances and the analysis clusters by template. Template authors do not read <code>rules/</code> and rule authors do not read <code>bench/scenarios/</code>; that separation is an instruction to the writers, not something the build checks. The result is the single run at the frozen commit, reported as it comes out; a null result is the result, and later fixes are reported beside it. <code>UnsealTest</code> and <code>FreezeTest</code> exercise the protocol on a scratch copy of <code>bench/data</code>. No freeze has run on the current split: <code>bench/data/freeze.json</code> and <code>bench/data/unseal.log</code> are absent from the tree.</p>
 <hr />
 <h2 id="evaluation-and-limits">Evaluation and Limits</h2>
 <h3 id="calibration-on-the-dev-split">Calibration on the Dev Split</h3>
-<p>The <code>bench</code> harness (<code>Observe.kt</code>, <code>Evaluate.kt</code>) runs the real <code>Ranker</code> on the capsule pair of each of the 49 dev scenarios and compares the result with the injected cause. The input that matters is the probed pair: the passing and the failing baseline that <code>solve</code> captured inside its containers with <code>capture --probes</code> (71 probes each, stored in <code>bench/data/probed/</code>). 45 scenarios have a cause (4 are controls). On the probed pairs the ranker produced 99 candidates, 29 of them the cause. In 14 of the 49 scenarios a probe differs between the two sides, which links 20 candidates to a probe that reads their attribute. Only four probes ever differ in these pairs (<code>resources.locale-env</code> in 7 scenarios, <code>resources.cgroup-memory</code> in 6, <code>process.timezone</code> in 5, <code>resources.cgroup-cpu</code> in 4), and each reads exactly the attribute that changed (<code>env.LANG</code>, <code>cgroup.memory.max</code>, <code>env.TZ</code>, <code>cgroup.cpu.max</code>). Seven scenarios now match a catalog rule (<code>runtime-java-virtual-basic-1</code>, <code>compiler-c2x-plain-2</code>, <code>os-distro-family-basic-1</code>, <code>os-glibc-floor-1</code> and three of the four migration scenarios). None matched one when the catalog held 32 rules, so an earlier version of this report said that no dev scenario matches a rule; that sentence is false for the current catalog of 296. Two comparison inputs share the harness: the same pairs with the probes removed, which gives a paired measurement of what probes do, and the original capsules the scenarios were validated with (no probes, 106 candidates, 33 of them the cause). The probed pairs come from the <code>reproduce</code> containers, so the five scenarios whose cause a container cannot set (kernel, CPU model, browser engine) have no candidates in them; the original capsules keep those.</p>
-<p>Folds are the first four bytes of <code>sha256(&quot;fold:&quot; + id)</code> mod 5. A model replaces the shipped one only if its out-of-fold Brier score is at least 2% lower and its out-of-fold MRR is not lower, and the Brier score is taken over the rankings that print a probability (those whose candidates all rest on attribute changes, 30 candidates).</p>
-<p>The calibration files were regenerated on 2026-10-13 after the dev split grew from 45 to 49 scenarios (four migration scenarios, see DriftBench) and the catalog from 32 to 296 rules. The weights table did not change, and <code>selection.chosen</code> is still <code>hand-set+softmax-none</code>. <code>evaluation.json</code> is <code>4effe497...e374</code> and <code>fit.json</code> is <code>fbbb6f45...4a31</code>; <code>CalibrationTest</code> regenerates both and compares bytes.</p>
-<p><strong>Complete dev set.</strong> The committed calibration files now cover 115 of the 122 dev scenarios, the ones that have probed captures; 105 of the 115 have a cause and 10 are controls. The other seven (<code>build-checksum-pin-1</code> and <code>-2</code>, <code>build-version-pin-1</code> and <code>-2</code>, <code>network-hosts-stale-1</code> and <code>-2</code>, <code>network-nsswitch-order-1</code>) read a file the harness mounts, which a container built from a capsule does not have, so <code>solve</code> cannot capture them. <code>Lab.UNPROBED</code> lists them and the probed lab leaves them out of every section, including <code>original</code>. <code>evaluation.json</code> is <code>030fdf04...31a5</code> and <code>fit.json</code> is <code>25eb0d75...d524</code>, and two regenerations gave identical bytes. The paragraphs from here to the end of this section describe the earlier run on 49 scenarios, so their figures differ from the ones below.</p>
+<p>The <code>bench</code> harness (<code>Observe.kt</code>, <code>Evaluate.kt</code>) runs the real <code>Ranker</code> on the capsule pair of each dev scenario and compares the result with the injected cause. The figures in this paragraph are from the 49 dev scenarios then in use; the current split has 122 (see Complete dev set). The input that matters is the probed pair: the passing and the failing baseline that <code>solve</code> captured inside its containers with <code>capture --probes</code> (71 probes each, stored in <code>bench/data/probed/</code>). 45 scenarios have a cause (4 are controls). On the probed pairs the ranker produced 99 candidates, 29 of them the cause. In 14 of the 49 scenarios a probe differs between the two sides, which links 20 candidates to a probe that reads their attribute. Only four probes ever differ in these pairs (<code>resources.locale-env</code> in 7 scenarios, <code>resources.cgroup-memory</code> in 6, <code>process.timezone</code> in 5, <code>resources.cgroup-cpu</code> in 4), and each reads exactly the attribute that changed (<code>env.LANG</code>, <code>cgroup.memory.max</code>, <code>env.TZ</code>, <code>cgroup.cpu.max</code>). Seven scenarios now match a catalog rule (<code>runtime-java-virtual-basic-1</code>, <code>compiler-c2x-plain-2</code>, <code>os-distro-family-basic-1</code>, <code>os-glibc-floor-1</code> and three of the four migration scenarios). None matched one when the catalog held 32 rules, so an earlier version of this report said that no dev scenario matches a rule; that sentence is false for the current catalog of 296. Two comparison inputs share the harness: the same pairs with the probes removed, which gives a paired measurement of what probes do, and the original capsules the scenarios were validated with (no probes, 106 candidates, 33 of them the cause). The probed pairs come from the <code>reproduce</code> containers, so the five scenarios whose cause a container cannot set (kernel, CPU model, browser engine) have no candidates in them; the original capsules keep those.</p>
+<p>Folds are the first four bytes of <code>sha256(&quot;fold:&quot; + id)</code> mod 5. A model replaces the shipped one only if its out-of-fold Brier score is at least 2% lower and its out-of-fold MRR is not lower, and the Brier score is taken over the rankings that print a probability (those whose candidates all rest on attribute changes, 79 candidates in 33 rankings).</p>
+<p>The calibration files were regenerated on 2026-10-13 after the dev split grew from 45 to 49 scenarios, and again on 2026-10-15 (commit 9bb18240) when the split became 122 dev and 150 test (four migration scenarios, see DriftBench) and the catalog from 32 to 296 rules. The weights table did not change, and <code>selection.chosen</code> is still <code>hand-set+softmax-none</code>. <code>evaluation.json</code> is <code>4effe497...e374</code> and <code>fit.json</code> is <code>fbbb6f45...4a31</code>; <code>CalibrationTest</code> regenerates both and compares bytes.</p>
+<p><strong>Complete dev set.</strong> The committed calibration files now cover 115 of the 122 dev scenarios, the ones that have probed captures; 105 of the 115 have a cause and 10 are controls. The other seven (<code>build-checksum-pin-1</code> and <code>-2</code>, <code>build-version-pin-1</code> and <code>-2</code>, <code>network-hosts-stale-1</code> and <code>-2</code>, <code>network-nsswitch-order-1</code>) read a file the harness mounts, which a container built from a capsule does not have, so <code>solve</code> cannot capture them. <code>Lab.UNPROBED</code> lists them and the probed lab leaves them out of every section, including <code>original</code>. <code>evaluation.json</code> is <code>dfdddafb...283b</code> and <code>fit.json</code> is <code>a050d59c...97a6</code>, and two regenerations gave identical bytes. The paragraphs from here to the end of this section describe the earlier run on 49 scenarios, so their figures differ from the ones below.</p>
 <div class="table"><table>
 <thead>
 <tr>
@@ -2447,16 +2539,16 @@ controls: 8 lines are the same on every target
 </tr>
 <tr>
 <td>hand-set, original capsules</td>
-<td>58 of 105</td>
-<td>81 of 105</td>
-<td>0.661</td>
-<td>0.00015 / 0.00003</td>
+<td>72 of 105</td>
+<td>97 of 105</td>
+<td>0.801</td>
+<td>0.00039 / 0.00003</td>
 </tr>
 </tbody>
 </table></div>
 <p>The shipped order does not beat the dimension prior. In the template-clustered bootstrap (10,000 resamples, seed 20261006, 77 templates), shipped minus dimension prior is -0.038 at top-1 (-0.101 to 0.019), 0.000 at top-3 (-0.028 to 0.029) and -0.021 in MRR (-0.060 to 0.014). Against alphabetical order the top-1 gain is 0.029 (-0.110 to 0.165), so its interval includes zero, and the top-3 gain is 0.086 (0.000 to 0.180). Probes still help no scenario: the same two scenarios move down (<code>env-pool-size-decoy-2</code>, <code>migration-python-copy-1</code>), and top-1 is 48 without probes and 46 with them.</p>
 <p>Tiers of the shipped ranker: <code>difference</code> holds 271 candidates and 39 are the cause (0.14; 0.11 to 0.19), <code>plausible</code> 62 and 22 (0.35; 0.25 to 0.48), <code>known</code> 13 and 10 (0.77; 0.50 to 0.92). A <code>plausible</code> or <code>known</code> top candidate is wrong in 25 of 115 scenarios (0.15 to 0.30), 43 of 75 confident candidates are wrong (0.46 to 0.68), and 4 of the 10 controls get a confident candidate. Of 27 bundle scenarios with a ranked cause, 15 put it inside a bundle (0.37 to 0.72).</p>
-<p>The selection rule now picks <code>hand-set+softmax+isotonic</code>. Out of fold, on the 79 candidates of rankings that print a probability, it scores Brier 0.170 against 0.184 for the shipped <code>hand-set+softmax-none</code> readout and 0.173 for a uniform guess. The gain over the shipped readout is 7.9% with equal MRR, which passes the 2% rule. The shipped readout reads worse than a uniform guess on these rankings, where on 49 scenarios it read better (0.166 against 0.179). <code>core</code> still ships <code>Weights.NONE</code> (0.25, fit on 49 scenarios) and applies no isotonic map; the fit of the none weight on the 115 is 0.5. This regeneration changes neither.</p>
+<p>The selection rule now picks <code>hand-set+softmax+isotonic</code>. Out of fold, on the 79 candidates of rankings that print a probability, it scores Brier 0.170 against 0.184 for the previous <code>hand-set+softmax-none</code> readout and 0.173 for a uniform guess. The gain over the previous readout is 7.9% with equal MRR, which passes the 2% rule. The previous readout reads worse than a uniform guess on these rankings, where on 49 scenarios it read better (0.166 against 0.179). <code>core</code> now ships the chosen readout: <code>Weights.NONE</code> is 1.0, because the model fits no none weight (the previous readout would fit 0.5 on the 115), and <code>Weights.map</code> holds the eight steps of <code>fit.json</code> <code>calibration</code>. The order is untouched, and top-1, top-3 and MRR are the same for every model that keeps the hand-set order.</p>
 <p>Evidence classes on the complete set (<code>evidence</code> section of <code>evaluation.json</code>, labelled <code>complete</code>, which counts the 115 scenarios with captures): the evidence ranker gets top-1 48 of 105 (0.457), top-3 67 and MRR 0.542, against 50, 67 and 0.553 for the dimension prior, so it does not beat the prior. Shipped minus evidence ranker at top-1 is -0.019 (-0.061 to 0.000). <code>plausible</code> is right for 11 of 12 candidates (0.92; 0.65 to 0.99), <code>known</code> is empty, and <code>correlated</code> holds 63 candidates of which 21 are the cause (0.33). One scenario of 115 has a confident wrong top candidate (shipped: 25), and none of the 10 controls has a confident candidate. The top-1 gains are <code>memory-oom-decoy-1</code> and <code>-2</code>, with no losses. Trials to a verdict stay pending, because the repository holds no dev solve certificates.</p>
 <p>Order of the hand-set ranker on the 45 scenarios with a cause (Wilson 95% intervals; &quot;P&quot; is the exact chance that a random order does at least as well, one-sided, not corrected for the three inputs):</p>
 <div class="table"><table>
@@ -2587,9 +2679,9 @@ controls: 8 lines are the same on every target
 <li>Rule weights and spectrum weights stay hand-set. Seven scenarios now carry a rule match, which is too few to fit a weight, and no dev scenario has a history.</li>
 <li>Fitted per-dimension priors lose again against the hand-set priors in the out-of-fold comparison that <code>fit.json</code> records.</li>
 </ul>
-<p>The weights stay hand-set. This refutes one mechanism, that a fitted weight improves the order or the printed probability on this benchmark. It does not close the objective of weighing probe evidence. A probe linked through the symptom it relates to is measured under Evidence Classes. The data above says only that probes linked through the attribute they read carry nothing beyond the attribute change.</p>
+<p>The weights stay hand-set. This refutes one mechanism, that a fitted weight improves the order or the printed probability on this benchmark: the one probability gain, an isotonic map, sits on the hand-set weights. It does not close the objective of weighing probe evidence. A probe linked through the symptom it relates to is measured under Evidence Classes. The data above says only that probes linked through the attribute they read carry nothing beyond the attribute change.</p>
 <p><strong>Evidence classes.</strong> <code>Ranker.rank</code> takes an optional observed failure (the symptoms read from a log). With one, a probe or a rule match is mechanism-level only when its symptom matches it: a probe through the phrase table in <code>ProbeSymptoms</code>, a rule when a distinctive token of one of its symptoms appears in the failure. Anything else is observational, carries ratio 1 and lifts a candidate to <code>correlated</code> at most. Without a failure the output is unchanged, and no command passes one yet. On the 49 dev scenarios that have probed captures (<code>partial</code>: 73 of the 122 dev ids have none yet), with the red arm's last failure line as the failure, top-1 moves from 21 to 23 of 45 (paired gain 0.044, percentile interval 0 to 0.133) and top-3 stays at 29, against 23 and 28 for the dimension prior alone. That is a tie with the prior at top-1 and one scenario at top-3, so the result does not beat the prior. <code>plausible</code> is right for 9 of 10 candidates (shipped: 11 of 25) and 1 of 49 scenarios has a confident wrong top candidate (shipped: 10). The three <code>known</code> candidates fall to <code>correlated</code>: their rules describe a date-time parse failure and a loose string comparison, which are not the failures observed, so those three hits were a version crossing and not a mechanism. Both top-1 gains (<code>memory-oom-decoy-1</code> and <code>-2</code>) come from exit code 137 reading as the memory probe's symptom, and the phrase table was written after the dev signatures had been seen, so the numbers are not blind. Prose-only rule symptoms never match, and no dev scenario has a matching rule symptom, so rule matching is untested. Trials to a verdict from <code>solve</code> are pending: the repository holds no dev solve certificates, and <code>Solve</code> ranks with the unconditioned ranker.</p>
-<p><strong>Probability readout.</strong> Models on the rankings that print a probability (30 candidates), Brier score out of fold unless stated:</p>
+<p><strong>Probability readout.</strong> Models on the rankings that print a probability (79 candidates in 33 rankings), Brier score out of fold unless stated:</p>
 <div class="table"><table>
 <thead>
 <tr>
@@ -2600,37 +2692,45 @@ controls: 8 lines are the same on every target
 <tbody>
 <tr>
 <td>uniform 1/n</td>
-<td>0.179</td>
+<td>0.173</td>
 </tr>
 <tr>
 <td>hand-set, p = logistic(score)</td>
-<td>0.311</td>
+<td>0.341</td>
 </tr>
 <tr>
 <td>constant base rate</td>
-<td>0.254</td>
+<td>0.245</td>
 </tr>
 <tr>
 <td>softmax of the scores, none weight 1</td>
-<td>0.166</td>
+<td>0.185</td>
 </tr>
 <tr>
-<td>softmax and a fitted none weight (shipped; fit 0.25), in sample</td>
-<td>0.155</td>
+<td>softmax and a fitted none weight (previous readout; fit 0.5), in sample</td>
+<td>0.181</td>
 </tr>
 <tr>
-<td>softmax and a fitted none weight (shipped; fit 0.25)</td>
-<td>0.166</td>
+<td>softmax and a fitted none weight (previous readout)</td>
+<td>0.184</td>
 </tr>
 <tr>
-<td>isotonic and fitted-prior variants</td>
-<td>0.206 to 0.270</td>
+<td>softmax and an isotonic map (shipped), in sample</td>
+<td>0.159</td>
+</tr>
+<tr>
+<td>softmax and an isotonic map (shipped)</td>
+<td>0.170</td>
+</tr>
+<tr>
+<td>other isotonic and fitted-prior variants</td>
+<td>0.173 to 0.264</td>
 </tr>
 </tbody>
 </table></div>
-<p>The shipped readout is 7% below a uniform guess on those rankings and is mostly a count of rivals. It beats the logistic reading, the base rate and every isotonic map. On all rankings it reads 0.146 out of fold against 0.160 for uniform. The covered set shrank from 51 candidates in the earlier report to 30, because rule-matched and probe-linked candidates left the attribute-only class, so these figures do not compare one to one with the earlier 0.149. Reliability, out of fold, in five bins of width 0.2 (candidates, mean predicted, observed): 4, 0.188, 0; 12, 0.246, 2; 7, 0.461, 3; 5, 0.720, 5; 2, 0.923, 1. The none weight was fit on this benchmark's mix, where 20 of 49 scenarios have no cause (4) or one the ranking cannot list (16). It says nothing about how often real failures have no listed cause. On the drangler pair the nine probabilities add to 0.989, a claim of 98.9% that one of nine changes is the cause, which the case data does not support. The probability stays attribute-only.</p>
+<p>The shipped readout is 2% below a uniform guess on those rankings (0.170 against 0.173) and 8% below the previous readout (0.184). The Brier score of the chosen model runs from 0.139 to 0.245 across the five folds, so the gap to &quot;one of n&quot; is much smaller than the spread between folds, and this benchmark does not show that the readout beats saying one in n. The logistic reading, the base rate, the isotonic maps over raw log-odds and the softmax with a fitted none weight all lost to it. On all rankings it reads 0.113 out of fold against 0.124 for uniform, where the map is also applied to rankings that print nothing. Reliability, out of fold, in five bins of width 0.2 (candidates, mean predicted, observed causes): 30, 0.135, 2; 35, 0.338, 14; none; 14, 0.681, 11; none. The map has eight steps, so three bins are occupied. Candidates in the lowest bin were the cause less often than predicted (2 of 30 against 0.135) and in the highest occupied bin more often (11 of 14 against 0.681). The map is fit on all 115 dev scenarios, 44 of which have no listed cause (10 controls and 34 whose cause the ranking cannot list), so it says nothing about how often real failures have no listed cause. Of the 33 rankings that print a probability, 32 hold five or fewer candidates and one holds 15. On the drangler pair all nine probabilities read 0.104478 and add up to 0.940, a claim of 94% that one of nine changes is the cause, which the case data does not support. The probability stays attribute-only.</p>
 <p>Other facts of the shipped model on the probed pairs, out of fold. Top-1 by class: single 5 of 15, bundle 8 of 12, decoy 3 of 9, intermittent 5 of 9. The cause ranks above every decoy in 3 of 7 decoy scenarios (4 of 7 without probes). In the 11 bundle-class scenarios with a ranked cause, 6 put it inside a bundle (0.28 to 0.79, down from 8 of 8 on the earlier data); in the other classes the cause shares a bundle in 4 of 18. The 5 manual scenarios have no candidates at all in the probed pairs. Reversing green and red on the probed pairs gives 11 candidate rule matches in 5 scenarios, 7 printed <code>known</code> and 24 <code>plausible</code>; no inferred-basis rule printed <code>known</code>, and the reversed pairs have no ground truth, so the accuracy of those tiers is unmeasured.</p>
-<p>Fold assignment is by id hash, so sibling instances of one template can land in different folds, which makes the out-of-fold figures optimistic. The family of probability maps was chosen after seeing that per-candidate maps lost, so cross-validation protects the fit but not the choice of family. The probed run is a second measurement on the same 49 scenarios, not independent data.</p>
+<p>Fold assignment is by id hash, so sibling instances of one template can land in different folds, which makes the out-of-fold figures optimistic. The shipped map was chosen among ten readouts on the same scenarios and is then fit on all of them, so cross-validation protects each fit but not the choice of readout, and no data was held out for the shipped values. The probed run is a second measurement on the same 49 scenarios, not independent data.</p>
 <h3 id="the-lab-on-the-dev-split">The Lab on the Dev Split</h3>
 <p>All 45 dev scenarios ran through <code>drift solve</code> on a Linux host with Docker (this first run is described here; three repeats follow), using the Linux release executable inside each arm to capture its capsule. The sealed test split was never run. Per scenario, <code>--run</code> names the scenario's toolchain in its first word and <code>--fail-when</code> is the scenario's signature (or <code>exit</code>). The 45 runs used 1,460 trials in total, from 16 trials for a scenario that stopped at the pilot to 76 for the largest bundle. Truth comes from <code>bench/data/scenarios.json</code>. A CONFIRMED verdict counts as correct when its minimal set is exactly the injected cause. A bundle verdict counts as containing the cause when the true path, or one of the scenario's declared bundle members, is among its members.</p>
 <div class="table"><table>
@@ -2706,6 +2806,7 @@ controls: 8 lines are the same on every target
 <li><code>os-glibc-floor-1</code>: CONFIRMED EFFECT (bundle) of 4 attributes (OS release name and version, coreutils, libc); the settable member is the OS release name, and the verdict says the effect is the bundle's.</li>
 </ul>
 <p>The limit of the first run is easy to read past: each scenario ran once, with one seed. Its 0 false CONFIRMED is a measurement on 45 synthetic scenarios, with 14 CONFIRMED and 4 controls, which gives no power to see a false rate near 1%. The scenarios are synthetic and the arms are <code>reproduce</code> containers. The repeats below add power, with their own limits. The sealed test split was never run.</p>
+<p><strong>Dev set solved once.</strong> On the current 122-scenario dev split, <code>drift solve</code> ran once on each of 115 scenarios; the other seven are file-mount scenarios that the Lab cannot solve (<code>build-checksum-pin-1/2</code>, <code>build-version-pin-1/2</code>, <code>network-hosts-stale-1/2</code>, <code>network-nsswitch-order-1</code>). Verdicts: 28 CONFIRMED, 21 CONFIRMED EFFECT (bundle), 1 NARROWED, 65 STUCK. All 10 controls end STUCK. The solver's first line gives four reasons for the STUCK verdicts: 25 where the passing side fails as often as the failing side; 25 where the failure does not reproduce in the container built from the failing capsule; 10 where the experiment is void because the treatment capsule does not show the requested <code>os.release.VERSION_ID</code>; and 2 where no trial count up to 30 reaches the target power. Those reasons add to 62, and the record gives none for the other three. One arm image build failed (<code>runtime-r-newer-base-2</code>). Each scenario ran once. Dev Solves Scored below checks the verdicts against the injected causes.</p>
 <p><strong>Repeated runs.</strong> The same 45 scenarios ran three more times on a Linux host with the Linux x64 release executable, which with the first run makes 180. The scenario harness draws its fault from the trial index with a fixed salt per scenario, so a literal repeat would reproduce the same trial sequence and measure only Docker noise. The three repeats therefore add 1,000,003 times the repeat number to each scenario's salt, which gives independent draws at the same failure rate and changes nothing else. A repeat with the original salts was not run.</p>
 <div class="table"><table>
 <thead>
@@ -2758,8 +2859,310 @@ controls: 8 lines are the same on every target
 <p>43 of the 45 scenarios had the same verdict class, and the same minimal set where there is one, in all four runs: the 14 CONFIRMED, the 9 bundle verdicts and 21 STUCK stayed where they were. Two intermittent scenarios changed class: <code>cpu-limit-quota-basic-2</code> (STUCK budget, CONFIRMED <code>cgroup.cpu.max</code>, STUCK budget, CONFIRMED <code>cgroup.cpu.max</code>) and <code>env-retries-flaky-plain-1</code> (NARROWED, NARROWED, CONFIRMED <code>env.MAX_RETRIES</code>, STUCK budget). In their certificates the 8 failing-baseline trials of the pilot give a different failure-rate estimate in each run, and that estimate sizes the arms: at some estimates no arm of up to 30 trials reaches the target power (STUCK budget), and at others the experiment is SUPPORTED or stays inconclusive at 13 to 21 trials per arm. That the pilot size drives it is inferred from the records, not from reading the code. No control produced a CONFIRMED or a bundle verdict (0 of 16 control runs), no decoy scenario confirmed the decoy (0 of 36 runs), and no bundle verdict lacked the true path or a declared bundle member.</p>
 <p>With 0 false CONFIRMED in 180 runs, the exact one-sided 95% upper bound on the per-run rate is 1 - 0.05^(1/180) = 1.65%. For the 16 control runs alone it is 17.1% and for the 36 decoy runs 8.0%. Read the bound per run and not per kind of failure: the 180 runs are 45 scenarios with four draws each, three of the four draws are reseeded and the first is not, the scenarios are synthetic, the arms are <code>reproduce</code> containers, and <code>solve</code> assumes one cause. The 180 certificates are not in the repository; the four archives in <code>fixtures/lab/cases</code> are four of the first 45.</p>
 <p><strong>Migration scenarios.</strong> The four migration dev scenarios were solved later, on the Mac, with the default budget: the Python and JDK scenarios ended CONFIRMED EFFECT (bundle), the first with four members (<code>env.LANG</code>, <code>env.PYTHON_SHA256</code>, <code>env.PYTHON_VERSION</code>, <code>tool.python.version</code>) and the second with two (<code>env.JAVA_VERSION</code>, <code>tool.java.version</code>), both moving failures from 0 of 5 to 5 of 5. The PHP scenario ended NARROWED because one experiment image could not be built (<code>php:8.3.35-cli-bullseye</code> does not exist), and the Node scenario ended STUCK because the experiment image build failed (<code>npm@10.9.0</code> needs Node 18.17 or newer, and the image has 18.16.0). Both build failures are in <code>solve</code>'s image tables and npm pin, not in the benchmark, and were not fixed. The Python template has an intermittent gate that <code>solve</code> does not reproduce (it has no per-trial gate), so its red arm fails every time. The probed captures of these runs feed the calibration above; their verdicts do not.</p>
+<h3 id="dev-solves-scored">Dev Solves Scored</h3>
+<p><code>bench solves</code> reads the certificate of each of the 115 solved dev cases and compares its verdict with the scenario's injected cause in <code>bench/data/scenarios.json</code>. The output is <code>bench/data/solves/dev.json</code>. The cases are the final solve of each id: 66 from the re-solve with the fixed binaries and 49 from the older scenarios; no id is in both. The seven file-mount scenarios have no case. The numbers below are dev data that the team tuned the engine against, not held out, and each scenario ran once. The certificates are not in the repository, so the score is regenerated from the archived case directories (<code>experiments/dev-solves</code>).</p>
+<p>A CONFIRMED verdict is correct when its minimal set is exactly the injected cause. A bundle verdict holds the cause when the cause is among its members, and names it when the minimal set is the cause. On a control, STUCK is correct and any other verdict is a false confirmation.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>class</th>
+<th>n</th>
+<th>CONFIRMED correct</th>
+<th>CONFIRMED wrong</th>
+<th>bundle holds (minimal set names the cause)</th>
+<th>NARROWED</th>
+<th>STUCK</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>single</td>
+<td>42</td>
+<td>15</td>
+<td>0</td>
+<td>5 (5)</td>
+<td>0</td>
+<td>22</td>
+</tr>
+<tr>
+<td>bundle</td>
+<td>33</td>
+<td>0</td>
+<td>0</td>
+<td>15 (9)</td>
+<td>1, misses the cause</td>
+<td>17</td>
+</tr>
+<tr>
+<td>decoy</td>
+<td>19</td>
+<td>11</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>8</td>
+</tr>
+<tr>
+<td>intermittent</td>
+<td>11</td>
+<td>2</td>
+<td>0</td>
+<td>1 (1)</td>
+<td>0</td>
+<td>8</td>
+</tr>
+<tr>
+<td>control</td>
+<td>10</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>10, all correct</td>
+</tr>
+<tr>
+<td>all</td>
+<td>115</td>
+<td>28</td>
+<td>0</td>
+<td>21 (15)</td>
+<td>1</td>
+<td>65</td>
+</tr>
+</tbody>
+</table></div>
+<p>All 28 CONFIRMED verdicts name the injected cause: 28 of 28, Wilson 95% interval 87.9% to 100%. No decoy was confirmed, and none of the 10 controls drew a verdict (10 of 10 STUCK, Wilson 72.2% to 100%). With no wrong CONFIRMED there is no case to list. All 21 bundle verdicts hold the cause among their members. In six of them the minimal set names the settable member that travels with the cause: <code>build-npm-sbom-plain-1</code> (node version for the npm version), <code>os-glibc-floor-1</code>, <code>os-version-gate-2</code>, <code>userland-coreutils-new-flag-1</code> and <code>-3</code> (OS release name for libc or coreutils), and <code>userland-cp-update-2</code> (OS release ID for coreutils). The one NARROWED verdict, <code>build-npm-subcommand-2</code>, names <code>tool.node.version</code> where the cause is <code>tool.npm.version</code>.</p>
+<p>The solver resolves 43 of the 105 scenarios that have a cause (41.0%, Wilson 32.0% to 50.5%), counting a CONFIRMED correct or a bundle whose minimal set names the cause. In 49 of 105 (46.7%, 37.4% to 56.2%) some verdict holds the cause. The 10 controls are outside both denominators. On the same 105 scenarios the shipped ranker puts the cause first in 46 (43.8%, 34.7% to 53.4%) and in the top three in 67 (63.8%, 54.3% to 72.4%); ordering the changed attributes by dimension prior alone gives 50 (47.6%, 38.3% to 57.1%) and 67. The ranker and prior numbers are in-sample on the same dev split. Of the 43 resolved scenarios the ranker had the cause first in 30; of the 62 unresolved ones it had it first in 16. As a guesser the solver is no better than the order it follows. Its value is the precision when it speaks, and it speaks for 28 of 105.</p>
+<p>The 65 STUCK verdicts are 55 scenarios with a cause and the 10 controls. By the first clause of the certificate's statement, the 55 split into 25 where the failure does not reproduce in the container built from the failing capsule, 15 where the passing configuration fails as often as the failing one, 10 where the experiment is void because the treatment capsule does not show the requested <code>os.release.VERSION_ID</code> (all bundle scenarios), 3 where no trial count up to 30 reaches the target power, and 2 executor failures (one image build, and <code>env-pip-cache-dir-1</code>, whose archived certificate predates its re-solve; the re-solve ended STUCK with 0 of 30 trials failing). By the certificate's own reason field, STUCK counts 44 not-reproduced, 12 executor, 6 uncontrollable and 3 budget across all 65. The injected causes of the 55 are spread over 30 paths. The most common are <code>tool.coreutils.flavor</code> (7), <code>limits.nofile</code> (5), <code>tool.shell.flavor</code> (4), and <code>env.HTTP_PROXY</code>, <code>os.release.ID</code> and <code>tool.cc.version</code> (3 each); most are attributes a container cannot set or mirror.</p>
+<p>Trials per case are the sum over the experiment arms in the certificate. CONFIRMED took a median of 44 (range 44 to 112), bundle verdicts 58 (44 to 128), the NARROWED case 86, and STUCK 30 (0 to 60; the 0 is the failed image build).</p>
+<p>Two readings follow, with their limits. The 28 of 28 agrees with the earlier repeated runs (59 CONFIRMED, 0 false in 180 runs), and the interval still allows a wrong rate of up to 12% per CONFIRMED verdict. Coverage is the open problem: 62 of 105 scenarios with a cause ended without a verdict that names it. The mechanisms recorded in the certificates are container limits (causes a container cannot set), the void rule on floating image tags, and a gate that fails both arms equally. Closing those is the objective; this run refutes none of them. The scenarios are synthetic, one cause each, and the sealed test split is not scored here.</p>
+<p><strong>Coverage after the Lab fixes.</strong> Each of the 55 stuck scenarios was read from its certificate, arm Dockerfiles, run scripts and trial output. Seventeen were Drift defects fixed in this round, four were fixed earlier in the tree (the ruby, r and elixir image rows landed after the scored run), three are one open decision, 18 are scenario defects, and 13 are inherent limits.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>class</th>
+<th>scenarios</th>
+<th>cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Drift defect, fixed here</td>
+<td>10 alpine</td>
+<td>the void rule fired because the arm used <code>alpine:3.22</code> (3.22.7 now) for a capsule that records 3.22.6; the Lab now builds the exact tag when the registry publishes it and keeps the experiment void when it does not</td>
+</tr>
+<tr>
+<td>Drift defect, fixed here</td>
+<td>5 gcc and make</td>
+<td>the capsule was taken in the gcc image and has python from the distribution, but the base came from the first row in table order, so the arms were python images with no <code>gcc</code> or <code>make</code>; a row whose official image variable is in the capsule (<code>GCC_VERSION</code>) now wins over table order</td>
+</tr>
+<tr>
+<td>Drift defect, fixed here</td>
+<td>2 <code>env.XDG_CACHE_HOME</code></td>
+<td>the <code>XDG_</code> prefix counted as host identity and the value <code>~/xdg</code> counted as a host path, so the hypothesis was uncontrollable; the four XDG base directories and values under <code>~</code>, <code>/tmp</code> and <code>/var/tmp</code> are mirrored now</td>
+</tr>
+<tr>
+<td>Drift defect, fixed before</td>
+<td>4 ruby, r and elixir</td>
+<td>the scored arms were python or gcc images</td>
+</tr>
+<tr>
+<td>Drift defect, open decision</td>
+<td>3 <code>env.HTTP_PROXY</code></td>
+<td><code>Redactor</code> masks every IPv4 address in an env value, loopback included, so <code>http://127.0.0.1:1</code> is unusable; masking loopback is a privacy change and is not made</td>
+</tr>
+<tr>
+<td>scenario defect</td>
+<td>18</td>
+<td>the cause is not an attribute of the committed capsules: <code>limits.*</code> (8), the interpreter on the command line (4), <code>network.hosts</code> and <code>network.mode</code> (2), <code>cpu.count</code> (1), a lockfile in the harness image (1), a locale that is not installed (1), and a proxy host already masked in the capsule (1)</td>
+</tr>
+<tr>
+<td>inherent limit</td>
+<td>13</td>
+<td>browsers (4), the host kernel and CPU (6), and three intermittent scenarios that need more than 30 trials per arm</td>
+</tr>
+</tbody>
+</table></div>
+<p>The 21 scenarios of the first four rows ran again on paisley-park with binaries built from the changed tree. Two now end CONFIRMED, both naming <code>env.XDG_CACHE_HOME</code>; 18 end CONFIRMED EFFECT (bundle) and one NARROWED. The solver resolves 54 of the 105 scenarios with a cause (51.4%, Wilson 42.0% to 60.8%), up from 43 (41.0%); some verdict holds the cause in 68 (64.8%, 55.3% to 73.2%), up from 49; and a verdict of any kind exists for 71 (67.6%, 58.2% to 75.8%), up from 50. CONFIRMED verdicts number 30, all correct (Wilson 88.6% to 100%), so no false confirmation appeared. The 10 controls were not solved again. Two of the new bundle verdicts, <code>build-make-feature-1</code> and <code>-2</code>, name <code>tool.cc.version</code> and do not hold the injected <code>tool.make.version</code>, which the capsule does not record. The seven alpine userland scenarios hold their cause, <code>tool.coreutils.flavor</code>, among nine members and name <code>os.release.ID</code>, the member that sets it. The score is in <code>bench/data/solves/dev-after.json</code> and the experiment in <code>experiments/dev-solves</code>. The same caveats apply as before: the scenarios are synthetic, tuned against, and each ran once, and the fixes were chosen after reading these 55 certificates, so the after numbers are in-sample.</p>
+<p><strong>Resource limit capture.</strong> The eight <code>limits-*</code> scenarios in the scenario-defect row above were stuck because no capsule carried a <code>limits.*</code> attribute: capture recorded none, so no arm received a <code>--ulimit</code> flag and both arms behaved alike (0 of 30 trials failed on either side). Capture was added after those dev failures were read, so the eight results are in-sample, like the Lab fixes. <code>Capture</code> now reads <code>/proc/self/limits</code> and records <code>limits.&lt;name&gt;</code> as <code>soft:hard</code> for <code>cpu</code>, <code>fsize</code>, <code>data</code>, <code>stack</code>, <code>core</code>, <code>nproc</code>, <code>nofile</code>, <code>memlock</code> and <code>as</code>, with <code>unlimited</code> kept as a value; the attributes are absent on macOS and Windows. The JVM and Node raise the soft open files limit to the hard one when they start (in <code>drift-cisim:3</code> the shell reads 1024:2048 and both runtimes read 2048:2048), so those builds leave <code>limits.nofile</code> out instead of recording a soft value the process did not inherit. The <code>limits</code> dimension, <code>reproduce</code>, the <code>set-ulimit</code> intervention and the arm harness already handled the attribute; the <code>set-ulimit</code> intervention now records a single number as <code>N:N</code>, so the requested value equals what a capture inside the arm reports and the void rule can compare the two.</p>
+<p>The 16 capsules of the eight scenarios were recorded again on paisley-park with the new Linux executable, and all eight scenarios validate with the cause visible, which is why the seven <code>limits-*</code> templates changed from <code>visible: false</code> to <code>true</code> (only the <code>visible</code> and <code>note</code> fields of 14 entries in <code>scenarios.json</code> changed; the ids and <code>split.json</code> did not). The new capsules differ from the old ones by more than <code>limits.*</code>: three scenarios (<code>limits-core-1</code>, <code>-2</code> and <code>limits-nofile-pipe-1</code>) had been recorded on a linux/arm64 Docker host with Debian 12, and the current <code>python:3.12-slim</code> is x86_64 Debian 13, and the newer capture masks <code>HOME</code> and the host name. All eight were solved once on paisley-park. Each ends CONFIRMED with the injected cause as the minimal set (<code>limits.core</code> twice, <code>limits.fsize</code> once, <code>limits.nofile</code> five times): 7 of 7 failures against 0 of 7, and back, in 44 trials for the six scenarios that change one attribute and in 72 trials and four experiments for the two decoy scenarios, which also change a memory limit and a log level. With them the solver resolves 62 of the 105 scenarios with a cause (59.0%, Wilson 49.5% to 68.0%), up from 54, and CONFIRMED verdicts number 38, all correct (90.8% to 100%). The score is in <code>bench/data/solves/dev-limits.json</code> and the certificates in <code>experiments/dev-solves/certificates-limits</code>. The archive <code>fixtures/lab/cases/limits-nofile-1.driftcase</code> is the earlier STUCK run and stays as recorded.</p>
+<p><strong>Hosts, name resolution, CPU affinity and loopback proxies.</strong> The remaining stuck scenarios were read again from their certificates and capsules. The fixes below were chosen after reading the dev certificates, so every number in this paragraph is in-sample. Four capture and Lab changes: <code>network.hosts.names</code> now names every custom <code>/etc/hosts</code> entry, as <code>name@address</code> when the address is loopback and as the bare name otherwise, with the stock aliases and the machine's own name left out (the earlier <code>network.hosts.count</code> is gone, because a count that changes with the names turned every flip into a two-attribute bundle); <code>network.nsswitch.hosts</code> records the <code>hosts:</code> line of <code>/etc/nsswitch.conf</code>; and four interventions set what the arm can carry: <code>--cpuset-cpus</code> from <code>cpu.affinity</code> when it is below <code>cpu.count</code>, <code>--network none</code> from an interface list of <code>lo</code> alone, <code>--add-host</code> from the loopback tokens, and a Dockerfile step that rewrites the <code>hosts:</code> line (an Alpine image reads no such file, so the entry is partial). The three <code>network-proxy</code> scenarios needed no new capsule: their committed red capsules already held <code>http://127.0.0.1:N</code>, and the arm dropped it because the redactor masked loopback; with loopback exempt they solve. Eight committed capsule pairs predated the facts and were recorded again on paisley-park with the new Linux executable: <code>cpu-count-pool-2</code>, <code>locale-setlocale-2</code>, <code>network-hosts-2</code>, <code>network-hosts-stale-1</code>, <code>-2</code>, <code>network-interface-missing-1</code>, <code>network-nsswitch-order-1</code> and <code>network-proxy-lowercase-1</code>, whose sealed capsule held a masked host. Four templates changed their cause path to the new attribute and flipped <code>visible</code> to true (<code>network.hosts</code> to <code>network.hosts.names</code>, <code>network.mode</code> to <code>network.interfaces</code>, <code>network.nsswitch</code> to <code>network.nsswitch.hosts</code>, <code>cpu.count</code> to <code>cpu.affinity</code>); <code>scenarios.json</code> changes in those fields for 12 entries (the <code>cpu-count-node-parallelism</code> template shares the cause), and the ids and <code>split.json</code> are unchanged. The two committed score files <code>dev.json</code> and <code>dev-after.json</code> changed only in the cause label of three cases.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>class</th>
+<th>cause-bearing</th>
+<th>resolved before</th>
+<th>resolved after</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>single</td>
+<td>49</td>
+<td>30 (Wilson 47.2% to 73.6%)</td>
+<td>38 (64.1% to 87.0%)</td>
+</tr>
+<tr>
+<td>bundle</td>
+<td>33</td>
+<td>16 (32.5% to 64.8%)</td>
+<td>16</td>
+</tr>
+<tr>
+<td>decoy</td>
+<td>19</td>
+<td>13 (46.0% to 84.6%)</td>
+<td>15 (56.7% to 91.5%)</td>
+</tr>
+<tr>
+<td>intermittent</td>
+<td>11</td>
+<td>3 (9.7% to 56.6%)</td>
+<td>4 (15.2% to 64.6%)</td>
+</tr>
+<tr>
+<td>all</td>
+<td>112</td>
+<td>62 (46.1% to 64.2%)</td>
+<td>73 (56.0% to 73.4%)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Before is <code>dev.json</code>, <code>dev-after.json</code> and <code>dev-limits.json</code> merged. After adds <code>dev-x1-a.json</code>, the 38 scenarios solved again with the final binaries: the eight scenarios above plus <code>network-proxy-1</code>, <code>-decoy-1</code> and <code>-decoy-2</code>, all 10 controls and all 19 decoys. The 112 are the 105 scenarios the solver ran and the seven file-mount scenarios it could not; four of those seven have no case yet. CONFIRMED verdicts number 49 and all 49 name the injected cause (Wilson 92.7% to 100%); no control ended with a verdict (10 of 10 STUCK) and no decoy path was confirmed. The eleven scenarios that changed state are <code>cpu-count-pool-2</code>, <code>locale-setlocale-2</code>, <code>network-hosts-2</code>, <code>network-interface-missing-1</code>, <code>network-proxy-1</code>, <code>network-proxy-decoy-1</code>, <code>network-proxy-decoy-2</code>, <code>network-proxy-lowercase-1</code> (stuck to CONFIRMED) and <code>network-hosts-stale-1</code>, <code>-2</code> and <code>network-nsswitch-order-1</code> (no case to CONFIRMED). Each scenario ran once.</p>
+<p>The first pass over the controls and decoys with the new capture found a regression, and the second pass fixes it. <code>locale-node-collation-decoy-1</code> and <code>-2</code> ended as a CONFIRMED EFFECT bundle of <code>env.LANG</code> and <code>locale.installed</code>: the treatment arm generates the requested locale, so its capture lists a locale the control arm's does not. <code>Solve</code> now treats <code>locale.installed</code> as a consequence of a locale edit and records it among the ignored attributes of the measured diff; <code>SolveTest.aLocaleTheArmGeneratesIsNotAMemberOfTheBundle</code> failed first with the bundle verdict. After the change both decoys end CONFIRMED on <code>env.LANG</code> again. All 38 new case directories pack and pass <code>drift verify</code>.</p>
+<p><strong>Shell flavor.</strong> <code>userland-bash-only-builtins-2</code>, <code>-3</code> and <code>userland-shell-bashism-1</code>, <code>-2</code> stay stuck, and no capture fact would change that. Both arms run <code>sh /bench/harness.sh &lt;arm&gt;</code> in the same <code>debian:12-slim</code> image and take the capsule with the same executable before the program starts; the interpreter appears only in the plan (<code>CMD='bash prog.sh'</code> against <code>CMD='sh prog.sh'</code>), so the two capsules are identical. <code>drift solve</code> takes one failing command and runs it in every arm. What <code>/bin/sh</code> resolves to (dash on Debian, bash 3.2 on macOS) is a real environment difference and would be a fact worth capturing, but it is the same in these arms, so recording it would not make these four rise. They are scenario defects: the cause is the command line. Resolving them needs a passing command on <code>drift solve</code>, which is a change in <code>cli/</code>.</p>
+<p><strong>File-mount scenarios.</strong> Three of the seven are now solved, because <code>/etc/hosts</code> and <code>/etc/nsswitch.conf</code> are well-known system files with a bounded, privacy-safe reading (loopback addresses and custom names; other addresses are not recorded). The other four read a pin at a path the scenario chose (<code>/etc/app/pins.sha256</code> for <code>build-checksum-pin-1</code>, <code>-2</code> and <code>/etc/app/pin</code> for <code>build-version-pin-1</code>, <code>-2</code>), and <code>build-lockfile-pin-2</code> reads <code>/etc/app/lock.txt</code>. No capture can know such a path, and a project's own pin file sits in the workspace both arms already mount. They stay as classified limits. The three solved scenarios stay out of the probed fit (<code>Lab.UNPROBED</code>): with their probed pairs added, <code>calibrate</code> keeps the chosen model (<code>hand-set+softmax+isotonic</code>) but moves the isotonic step at 600,000 from 666,667 to 729,730 and drops the 847,059 step, and the committed case fixtures pin that map in their ranking hashes (<code>ArchiveTest</code>, <code>CaseTest</code>, <code>RankHistoryTest</code>, <code>VerifyTest</code> and a Studio golden failed). Taking that change means regenerating the fixtures, which is a decision for the maintainer.</p>
+<p><strong>Intermittent and budget.</strong> Of the 11 intermittent scenarios, four now end CONFIRMED, and seven are stuck: <code>browser-engine-flaky-std-1</code> (5 of 8 against 5 of 8 in a container), <code>kernel-clocksource-flaky-basic-2</code> and <code>kernel-overcommit-flaky-1</code> (3 of 8 against 3 of 8; the kernel is the host's), <code>build-lockfile-pin-2</code> (0 of 30 on both arms; the lockfile is in the harness image), and three budget cases. For the three, the pilot of eight trials gave <code>cpu-limit-quota-basic-2</code> 1 of 8 (true red rate 0.4), <code>env-retries-flaky-plain-1</code> 2 of 8 (0.3) and <code>migration-python-copy-1</code> 2 of 8 (0.5), and the planner sized the experiment from that Laplace estimate (0.2, 0.3, 0.3). At alpha 0.004166 with a clean control, the exact test at 30 trials per arm has power 0.956 at rate 0.4 and 0.997 at rate 0.5, and 0.719 at rate 0.3 (0.867 at 35 per arm). So two of the three are not limited by the cap of 30: the pilot estimate refused to run an experiment that would very likely have confirmed. Running anyway would change the power rule, and a sequential rule (the e-process of the plan) would need fixed-point log arithmetic, a new certificate field that <code>verify</code> re-derives, and a flag in <code>cli/</code>; neither was done. The default stays, and the open question is whether the pilot should run longer before it sizes the experiment.</p>
+<p><strong>Member experiments, inseparable groups and NEEDS.</strong> Three changes to <code>drift solve</code>, each chosen after reading dev certificates, so every number here is in-sample, and each scenario ran once.</p>
+<p>First, the minimal-set search keeps together the attributes that one intervention sets. The three <code>os.release.*</code> hypotheses are one <code>set-os</code> change, so a subset with any of them is the same arm and the search returned whichever sorted first (<code>os-version-gate-2</code> reported <code>os.release.PRETTY_NAME</code> where the cause is <code>os.release.VERSION_ID</code>). The minimal set is now the group.</p>
+<p>Second, a bundle verdict tests its members. Each member that its own intervention can set gets an experiment of its own, up to six arms per solve and inside the stated budget. Setting only that member on the passing side and reproducing the failure makes it <code>sufficient</code>. Otherwise reverting only it on the failing side and removing the failure makes it <code>necessary</code>. A member counts only when the capture inside the arm shows that member changed and nothing else, and its value is read from the arms' captures when the capsule does not record it (neither <code>build-npm-sbom-plain-1</code> capsule records <code>tool.npm.version</code>; the containers do). The new <code>set-userland</code> intervention installs the GNU coreutils, findutils, grep, sed and diffutils on an Alpine base, so <code>tool.coreutils.flavor</code> can be reverted alone. Members that no arm sets without the rest of the image (<code>tool.libc.version</code>, <code>tool.coreutils.version</code>, <code>tz.database.version</code>) are listed as not tested alone, each with the reason, and the verdict never names them. The certificate holds the arms under <code>conditions.removal</code>, the verdict holds <code>necessary</code> and <code>sufficient</code>, <code>verify</code> checks that each listed member has a supported experiment, and <code>bench solves</code> counts a bundle as naming the cause when the cause is in its minimal set or in either list. The first real run of this change failed: the Reproduce step that installs the GNU tools keyed on the capsule's <code>tool.coreutils.flavor=gnu</code>, so the forward <code>set-os alpine</code> arm (green capsule, GNU flavor) received GNU tools and passed, and the seven Alpine scenarios ended NEEDS. It now installs them only for an attribute that an intervention set.</p>
+<p>Third, <code>NEEDS</code> replaces <code>STUCK</code> as the outcome of a solve that could not settle the cause. The certificate lists steps, each with <code>kind</code>, <code>text</code>, <code>command</code> and <code>reply</code>: capture the failing machine (the capture ask of <code>drift why</code>: <code>drift why --save there.json</code>, with the piped form <code>drift why --save there.json &amp;&amp; drift why --reply &lt; there.json</code>, which <code>drift why</code> prints too), name what a container does not mirror, run the pilot at its 30 trials per arm, run the manual experiment (<code>drift next CASE</code>) for what no container can set, double the budget, or rerun after the failing executor step. <code>STUCK</code> stays only for a certificate with no step to give, and its statement says why. <code>core/.../lab/SolveNext.kt</code> holds the mapping and <code>drift solve --exit-status</code> exits 13 on NEEDS. The solve script that <code>bench prepare</code> writes for an intermittent scenario now passes <code>--pilot 30</code>.</p>
+<p>49 scenarios were solved again with Linux x64 and arm64 executables built from the changed tree on paisley-park, <code>run-solve.sh --jobs 2</code>: the 15 bundle scenarios that hold the cause without naming it or ended NARROWED, the 11 intermittent and 10 control scenarios, and the other scenarios that ended STUCK. The score is <code>bench/data/solves/dev-p8.json</code>, regenerated byte for byte from <code>experiments/dev-solves/certificates-p8</code>, and the four earlier score files still regenerate byte for byte. The 69 other cases keep their earlier certificates: 49 of them are CONFIRMED, a path these changes do not reach (no CONFIRMED certificate has forward flips that one intervention sets together, and member experiments run only after a bundle verdict).</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>class</th>
+<th>cause-bearing</th>
+<th>resolved before</th>
+<th>resolved after</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>single</td>
+<td>49</td>
+<td>38 (Wilson 64.1% to 87.0%)</td>
+<td>38</td>
+</tr>
+<tr>
+<td>bundle</td>
+<td>33</td>
+<td>16 (32.5% to 64.8%)</td>
+<td>25 (59.0% to 87.2%)</td>
+</tr>
+<tr>
+<td>decoy</td>
+<td>19</td>
+<td>15 (56.7% to 91.5%)</td>
+<td>15</td>
+</tr>
+<tr>
+<td>intermittent</td>
+<td>11</td>
+<td>4 (15.2% to 64.6%)</td>
+<td>5 (21.3% to 72.0%)</td>
+</tr>
+<tr>
+<td>all</td>
+<td>112</td>
+<td>73 (56.0% to 73.4%)</td>
+<td>83 (65.3% to 81.3%)</td>
+</tr>
+</tbody>
+</table></div>
+<p>The ratified bar is 90 of 112. After the Lab changes alone, 83 is 74.1%, seven short; the scenario fixes below closed the gap. Ten scenarios moved. <code>userland-date-relative-3</code>, <code>userland-find-printf-1</code> and <code>-2</code>, <code>userland-gnu-long-options-1</code>, <code>-2</code> and <code>-3</code>, and <code>userland-grep-perl-1</code> name <code>tool.coreutils.flavor</code> as <code>necessary</code> (7 of 7 failures with the BusyBox tools, 0 of 7 with the GNU tools installed, in 58 trials). <code>build-npm-sbom-plain-1</code> names <code>tool.npm.version</code> as <code>sufficient</code> (setting npm alone on the passing side: 7 of 7 against 0 of 7). <code>os-version-gate-2</code> names its group. <code>migration-python-copy-1</code> ends CONFIRMED EFFECT (bundle) naming <code>tool.python.version</code> once the pilot runs 30 trials. <code>os-glibc-floor-1</code>, <code>userland-coreutils-new-flag-1</code>, <code>-3</code> and <code>userland-cp-update-2</code> hold <code>tool.libc.version</code> or <code>tool.coreutils.version</code>, which no arm sets without the image, so they stay at &quot;holds without naming&quot;. <code>build-npm-subcommand-2</code> and <code>runtime-elixir-newer-stdlib-2</code> stay NARROWED, and <code>build-make-feature-1</code> and <code>-2</code> still miss <code>tool.make.version</code>, which no capsule records.</p>
+<p>Over the 118 cases, the verdicts went from 49 CONFIRMED, 39 CONFIRMED EFFECT (bundle), 2 NARROWED and 28 STUCK to 49, 40, 2, 25 NEEDS and 2 STUCK. All 49 CONFIRMED name the injected cause (Wilson 92.7% to 100%), none of the 10 controls drew a verdict that names a cause (10 of 10 NEEDS), and no decoy path was named. The two genuine STUCK verdicts are <code>cpu-limit-quota-basic-2</code> and <code>env-retries-flaky-plain-1</code>: the pilot already runs the 30 trials per arm that the exact test allows, the failure rate it saw (0.3125 and 0.3) leaves the power under 0.8, and no option changes that. The default power stays.</p>
+<p>Twenty-nine scenarios remained at that point: browser (4) and kernel or CPU (6) need an arm that a container cannot give; the four shell scenarios and the five pin scenarios were scenario defects (below); the two power cases above; and the eight bundle scenarios named above.</p>
+<p><strong>Scenario defects fixed, 92 of 112.</strong> Nine dev scenarios could not be solved because the scenario hid its cause from the capture and from the arms, so the solver had nothing to flip. They were changed, their capsules recorded again on paisley-park with the current Linux executable, and solved once. The count of 92 was reached partly by fixing these defects, and the fixes were chosen after reading the dev certificates, so it is in-sample.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>scenarios</th>
+<th>defect</th>
+<th>change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>userland-bash-only-builtins-2</code>, <code>-3</code>, <code>userland-shell-bashism-1</code>, <code>-2</code></td>
+<td>both arms ran the same image and the same capture; only the command line (<code>bash prog.sh</code> against <code>sh prog.sh</code>) differed, which no capsule records</td>
+<td>the arms run <code>sh prog.sh</code> on <code>debian:12-slim</code>; the green image links <code>/bin/sh</code> to bash and the red image keeps dash. The capture already records <code>tool.sh.flavor</code> (the link target). The cause path is <code>tool.sh.flavor</code>. <code>Reproduce</code> mirrors bash with <code>RUN ln -sf bash /bin/sh</code>, and the <code>set-shell</code> intervention sets the flavor.</td>
+</tr>
+<tr>
+<td><code>build-version-pin-1</code>, <code>-2</code></td>
+<td>the pin was a file at <code>/etc/app/pin</code> inside the image, a path no capture reads</td>
+<td>the pin is <code>.nvmrc</code> or <code>.python-version</code> in the workspace. <code>capture --project</code> records it as <code>project.pins.node</code> or <code>project.pins.python</code>.</td>
+</tr>
+<tr>
+<td><code>build-lockfile-pin-2</code></td>
+<td>the lockfile was <code>/etc/app/lock.txt</code> inside the image</td>
+<td>the lockfile is the workspace's <code>requirements.txt</code>, which the project capture already reads as <code>project.python.&lt;name&gt;</code>; the cause path changed from <code>deps.schemakit.version</code> to <code>project.python.schemakit</code>.</td>
+</tr>
+<tr>
+<td><code>build-checksum-pin-1</code>, <code>-2</code></td>
+<td>the pinned checksum was <code>/etc/app/pins.sha256</code>, and the vendored file existed only in the harness image</td>
+<td>the pin is the workspace's <code>SHA256SUMS</code>, which the project capture records as <code>project.checksums.&lt;path&gt;</code>, and the vendored file is a workspace file in both arms.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The arms carry these pins as workspace files. <code>Reproduce</code> bakes the pin files into the image under <code>/pins</code>, mounts the workspace read-only at <code>/src</code> and a tmpfs at <code>/work</code>, and copies both into <code>/work</code> before the command (<code>cp -R /src/. /work/ &amp;&amp; cp -R /pins/. /work/ &amp;&amp; ...</code>), so a pin changes without touching the caller's workspace. The <code>set-pin</code> intervention sets <code>project.pins.*</code>, <code>project.python.&lt;name&gt;</code> and <code>project.checksums.&lt;path&gt;</code>, and <code>drift solve</code> adds <code>--project</code> to the capture inside an arm that carries pins. The scenario template gained two arm keys, <code>shell</code> and <code>workspace</code> (written only when set), and the harness stages the workspace files and records with <code>--project</code> for an arm that has them. All nine solve CONFIRMED on the injected cause alone (44 trials each, 128 for the intermittent lockfile scenario).</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>class</th>
+<th>cause-bearing</th>
+<th>resolved before the p8 work</th>
+<th>resolved after</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>single</td>
+<td>49</td>
+<td>38 (Wilson 64.1% to 87.0%)</td>
+<td>46 (83.5% to 97.9%)</td>
+</tr>
+<tr>
+<td>bundle</td>
+<td>33</td>
+<td>16 (32.5% to 64.8%)</td>
+<td>25 (59.0% to 87.2%)</td>
+</tr>
+<tr>
+<td>decoy</td>
+<td>19</td>
+<td>15 (56.7% to 91.5%)</td>
+<td>15</td>
+</tr>
+<tr>
+<td>intermittent</td>
+<td>11</td>
+<td>4 (15.2% to 64.6%)</td>
+<td>6 (28.0% to 78.7%)</td>
+</tr>
+<tr>
+<td>all</td>
+<td>112</td>
+<td>73 (56.0% to 73.4%)</td>
+<td>92 (74.0% to 88.1%)</td>
+</tr>
+</tbody>
+</table></div>
+<p>92 of 112 is 82.1%, above the 0.80 bar. Over the 122 solved cases the verdicts are 58 CONFIRMED (all name the injected cause, Wilson 93.8% to 100%), 40 CONFIRMED EFFECT (bundle), 2 NARROWED, 20 NEEDS and 2 STUCK; all 10 controls end NEEDS and name no cause, and no decoy was named. <code>build-make-feature-1</code> and <code>-2</code> were not changed: the capture registry already knows <code>make</code>, but <code>tool.make.version</code> comes with the <code>gcc</code> image like <code>tool.coreutils.version</code>, so no arm sets it alone and a recorded value would leave them at &quot;holds without naming&quot;. The re-recording did not move the calibration fit: <code>calibrate</code> gives the same output with the old and the new capsules.</p>
+<p><strong>Where the 39 unresolved scenarios stand.</strong> Browsers (4) and the host kernel or CPU (6) are inherent limits of a container. Budget (3), shell flavor (4), file pins (4) and the lockfile (1) are above. The other 17 are bundle scenarios whose minimal set does not name the cause: 13 hold it among the members, one is NARROWED to a set that holds it, two miss it (<code>build-make-feature-1</code> and <code>-2</code>, whose <code>tool.make.version</code> the capsule does not record) and one is NARROWED to a set that misses it.</p>
 <h3 id="flagship-case-b-kotlin-on-native-and-wasm">Flagship Case B: Kotlin on Native and Wasm</h3>
-<p>Case B asks whether the Lab can isolate a Kotlin divergence that the Atlas found. The shipped archive is <code>fixtures/cases/b/resume-offset.driftcase</code> (395,776 bytes, 43 entries, sha256 <code>d8cadbf2...ca28a3</code>), and the program is in <code>fixtures/cases/b/program</code>.</p>
+<p>Case B asks whether the Lab can isolate a Kotlin divergence that the Atlas found. The shipped archive is <code>fixtures/cases/b/resume-offset.driftcase</code> (395,776 bytes, 43 entries, sha256 <code>d7f50515...2e3b81</code>), and the program is in <code>fixtures/cases/b/program</code>.</p>
 <p><strong>Selection rule.</strong> Written down before any outcome was read: among the probes of <code>atlas/classification.yml</code> that are <code>unclassified</code> and have a repro draft, keep those whose 2.4.20 columns <code>jvm</code>, <code>macos</code> and <code>wasm</code> are not all in one group, and take the smallest draft by byte count, ties by probe id. Three smaller drafts (<code>numbers.type-checks</code>, <code>int.division-modulo</code>, <code>regex.groups-replace</code>) differ only on <code>cloudflare-jvm</code>, so the rule passes over them. It picks <code>kotlin.string.split-replace-lines</code>, whose one differing line is <code>indexOf-empty</code>: <code>&quot;abc&quot;.indexOf(&quot;&quot;, 10)</code> is 3 on the JVM, Native and Android and -1 on Wasm, unchanged at 2.5.0-Beta1. Its classification entry and repro draft already exist; the cited Javadoc covers <code>String.indexOf(String, int)</code> on the JDK and the Kotlin KDoc gives no rule for a start index past the end. That Javadoc block contradicts itself for an empty <code>str</code> past the end: its formula, the smallest <code>k</code> with <code>k &gt;= Math.min(fromIndex, this.length()) &amp;&amp; this.startsWith(str, k)</code>, gives 3, and its API note says the method &quot;returns -1 when fromIndex is larger than the length of the string&quot; (JDK 21 <code>String</code>, read 2026-10-13). The JVM, Native and Android follow the formula; Wasm and <code>cloudflare-jvm</code> follow the note.</p>
 <p><strong>The program.</strong> <code>resume(text, offset, separator)</code> is <code>text.indexOf(separator, offset)</code>, called with a saved offset of 40 into a 17-character text and an empty separator, which stands for &quot;to the end&quot;. The program prints <code>cursor=</code> and a <code>FAIL</code> line when the cursor is outside the text. Built with Kotlin 2.4.20 it prints <code>cursor=17</code> on the JVM and on Native (linuxArm64, in a container) and <code>cursor=-1</code> with the <code>FAIL</code> line on Wasm (Node 24.21.0). The program was written to hit the divergence; nobody met it in the wild.</p>
 <p><strong>Mapping to the Lab.</strong> The environment is a <code>node:24-bookworm-slim</code> container on arm64 Docker Desktop. <code>run.mjs</code>, the test command, runs the Native build or, when <code>DRIFT_RUNTIME_PLATFORM=wasm</code>, the Wasm build. The green capsule and the red capsule were captured inside that container with the Linux arm64 executable, the red one with the variable set, and differ in <code>runtime.platform</code> only (<code>linux</code>, <code>wasm</code>). The failure is a line of output (<code>--fail-when &quot;FAIL cursor&quot;</code>). Each platform is a different compiler backend, standard library and runtime, so the platform is one dimension of the capsule and several things in fact; the capsule has no attribute for the rest.</p>
@@ -2900,7 +3303,7 @@ Mechanism: unexplained (no rule or probe agreed)
 </tbody>
 </table></div>
 <p>Of 14, six were reconstructed and run: three CONFIRMED EFFECT (bundle), three STUCK. Eight were not reconstructible. In all three bundle results the sealed cause key is among the members (ranked 2 of 2, 1 of 2 and 3 of 4 by the diagnosis), and none was CONFIRMED on one attribute. The reasons for the eight, from <code>outcomes.json</code>: two Windows machines (INC-03, INC-09); a thread that announces an image move and names no single failing command (INC-05); a registry push through buildx that a container pair cannot repeat (INC-04); a macOS Android Studio runtime and the Android SDK (INC-06); a Minecraft server that needs the EULA accepted (INC-08); two cases where the hand check found no failing side (INC-10: both pinned AdoptOpenJDK tags throw the same NullPointerException; INC-01: JerryScript built from the parent commit passes all 306 scripts in four zones, and the <code>run-tests.py</code> option sets and test262 were not run).</p>
-<p><strong>The flagship</strong> is INC-13, the first entry in the order: <code>prisma@6.0.1</code> on <code>node:22.12.0-alpine3.20</code> against <code>node:22.12.0-alpine3.21</code>, from <a href="https://github.com/prisma/orm/issues/25817">prisma/orm#25817</a>. The command is <code>node node_modules/prisma/build/index.js -v</code> and the failure is a nonzero exit. By hand, the 3.20 side prints <code>linux-musl-arm64-openssl-3.0.x</code> and exits 0, and the 3.21 side prints the libssl detection warning and cannot load the query engine. <code>solve</code> finished in 73 seconds with <code>CONFIRMED EFFECT (bundle)</code>: the arms differ in 12 attributes (<code>os.release.PRETTY_NAME</code>, <code>os.release.VERSION_ID</code>, <code>tool.libc.version</code> and nine component rows for musl, OpenSSL, BusyBox, certificates, tzdata and the bundled npm and corepack), setting the OS release moved failures from 0 of 5 to 5 of 5 (exact one-sided p 0.003968) and back in reverse, and the mechanism field reads <code>unexplained</code>. Only <code>os.release.VERSION_ID</code> can be set on its own, so no arm splits the bundle. The archive <code>INC-13.driftcase</code> (179,712 bytes, SHA-256 <code>b4b20bdcb4d3c5e44687564c570fc0be77de505e84607a936720ec18def65aeb</code>) was packed by the JVM build and by the macOS executable with identical bytes, and <code>verify</code> and <code>report</code> output is identical on both. <code>VerifyTest</code> pins the hash, verifies the archive and checks that repacking reproduces it, and pins <code>sealed.json</code> and the ordering rule.</p>
+<p><strong>The flagship</strong> is INC-13, the first entry in the order: <code>prisma@6.0.1</code> on <code>node:22.12.0-alpine3.20</code> against <code>node:22.12.0-alpine3.21</code>, from <a href="https://github.com/prisma/orm/issues/25817">prisma/orm#25817</a>. The command is <code>node node_modules/prisma/build/index.js -v</code> and the failure is a nonzero exit. By hand, the 3.20 side prints <code>linux-musl-arm64-openssl-3.0.x</code> and exits 0, and the 3.21 side prints the libssl detection warning and cannot load the query engine. <code>solve</code> finished in 73 seconds with <code>CONFIRMED EFFECT (bundle)</code>: the arms differ in 12 attributes (<code>os.release.PRETTY_NAME</code>, <code>os.release.VERSION_ID</code>, <code>tool.libc.version</code> and nine component rows for musl, OpenSSL, BusyBox, certificates, tzdata and the bundled npm and corepack), setting the OS release moved failures from 0 of 5 to 5 of 5 (exact one-sided p 0.003968) and back in reverse, and the mechanism field reads <code>unexplained</code>. Only <code>os.release.VERSION_ID</code> can be set on its own, so no arm splits the bundle. The archive <code>INC-13.driftcase</code> (180,224 bytes, SHA-256 <code>60bd8ea19526c496a17cbd7e0c3665b5e93e284eb095ef05efa2f35f4f6a890b</code>) was packed by the JVM build and by the macOS executable with identical bytes, and <code>verify</code> and <code>report</code> output is identical on both. <code>VerifyTest</code> pins the hash, verifies the archive and checks that repacking reproduces it, and pins <code>sealed.json</code> and the ordering rule.</p>
 <p>What the flagship does not show. The verdict says an OS release change is enough, not why. The thread proposes that libssl moved from <code>/lib</code> to <code>/usr/lib</code>; no arm tests that. The arms were not captured (the Linux binary is glibc and cannot run on Alpine), so the 12 members come from the list of what the base image changes, not from a measured arm diff. Capture inside the Alpine images needed <code>apk add gcompat</code>, so the two capsules describe the images plus that package. The pin of <code>prisma@6.0.1</code> is the latest release on the issue date and the Node version is held at 22.12.0 on both sides; neither is stated in the thread.</p>
 <p><strong>The isolation check.</strong> <code>drift verify</code> requires a measured diff from both arms for a bundle, as it does for a CONFIRMED verdict. INC-13 fails that check and nothing else: its arms ran on Alpine without the Linux binary, so both diffs are predicted from the base image's change list (<code>expected measured, recorded predicted and predicted</code>). The other 13 checks pass and the sealed archive is unchanged. INC-11 and INC-12 measured their diffs and pass all 14 checks, and INC-02, INC-07 and INC-14 end STUCK and pass.</p>
 <p><strong>The losses.</strong> Three results are failures of reconstruction by <code>solve</code>, not of the diagnosis, and each is a defect in the engine that this protocol did not fix:</p>
@@ -2965,15 +3368,15 @@ Mechanism: unexplained (no rule or probe agreed)
 <ul>
 <li>The benchmark is synthetic. The injected cause is ground truth because the scenario was built around it. Real failures have causes that nobody injected and that may lie outside any capsule.</li>
 <li>Intermittency is a hash gate on the fault, so no scenario contains a real race, and five scenarios carry capsule values that were written in and not measured.</li>
-<li>The 31 sealed scenarios were never run. Their validity is inferred from dev siblings.</li>
+<li>The 150 test scenarios in the current split were never run. Their validity is inferred from dev siblings.</li>
 <li>Weights are hand-set. The ranking weights, the planner's cost weights, its 25% unknown prior and the trial-plan thresholds are guesses with a written reason, and none was calibrated.</li>
-<li>Rule sources are cited and not reproduced. Rule fixtures are synthetic. 262 of 426 rules have a symptom that rests on the mechanism alone (265 of 450 symptoms are <code>inferred</code>), and 51 rules wait for an attribute no scanner emits.</li>
+<li>Rule sources are cited and not reproduced. Rule fixtures are synthetic. 265 of 429 rules have a symptom that rests on the mechanism alone (268 of 453 symptoms are <code>inferred</code>), and 53 rules wait for an attribute no scanner emits.</li>
 <li>Rule matches on real data are few. Seven dev scenarios and one real project (case D, where the 12 matched rules predicted breaks that did not happen) are the only matches, and the Drangler pair matches no rule. Real multi-rule captures were not tested.</li>
 <li>A probe links to a candidate through the attribute path it reads, a table that is a reading of the probe sources and not a measurement, and the link ignores the symptom. A differing probe supports a decoy that really changed as much as the cause.</li>
 <li><code>correlated</code> needs the history to carry step data. Without the run JSON joined to the logs, every green's steps are unknown, all five are excluded as <code>NO_STEP_EVIDENCE</code>, and all eight drangler candidates drop to <code>difference</code> (<code>withoutStepEvidenceInTheGreensTheDranglerFallsBackToDifferences</code>).</li>
 <li>The history ranking assumes the failing runs share one failure signature; the caller must group them.</li>
 <li>Atlas cells are single runs, and the 16 columns come from five machines and two CPU families, so a column describes a machine as much as a target (see Platform and CPU Findings). The Wasm Node column was recorded on Apple Silicon and the browser columns on x86-64, which confounds engine and CPU. Linux Native columns depend on the host that linked the executable. The displayed source of a probe and the code that runs are two hand-written copies; the ladder measured 1 of 38 probes differing between them, by a class name. Probe classification rests on the pages the authors read, with at most the first 8 tracker results of each query; Native's Unicode table version and whether Native and Wasm call libm or the JS engine for math are unverified.</li>
-<li>No workflow has run on GitHub: <code>build.yml</code>, <code>atlas.yml</code>, <code>release.yml</code> and <code>docs.yml</code> are checked with <code>actionlint</code> and their steps ran by hand. The Linux test suites ran in containers and the mingw ones under Wine, which is not Windows; real Windows ran nothing (no test, no installer, no registry edit), and neither did Safari or a signed or notarized build. The Linux arm64 executable was cross-linked, and a Kotlin/Native build on an arm64 Linux host was not run.</li>
+<li>Build Project (<code>build.yml</code>), Record Atlas (<code>atlas.yml</code>), Deploy Documentation (<code>docs.yml</code>) and Mirror to GitLab (<code>gitlab.yml</code>) have run on GitHub. On 2026-10-26, 3 of 65 Build Project runs had succeeded and the latest one failed. Bench Host Arms (<code>bench.yml</code>) ran once and passed; Release Project (<code>release.yml</code>) has not run. The workflow steps are checked with <code>actionlint</code> and ran by hand. The Linux test suites ran in containers and the mingw ones under Wine, which is not Windows; real Windows ran nothing (no test, no installer, no registry edit), and neither did Safari or a signed or notarized build. The Linux arm64 executable was cross-linked, and a Kotlin/Native build on an arm64 Linux host was not run.</li>
 <li>Capture removes the account name, the host name and the home path only where they appear in the capturing host's own <code>env.*</code>. Probe transcripts and labels are not rewritten, and emails and account ids are not recognized. <code>--keep-identifiers</code> keeps everything.</li>
 <li>The Lab ran each of the 45 dev scenarios four times (180 runs, three reseeded). 0 false CONFIRMED bounds the per-run rate at 1.65% with 95% confidence on these synthetic scenarios and says nothing about real failures; an exact repeat of the original draws was not run. The loop needs two <code>SUPPORTED</code> tests to confirm (forward and reverse), which makes a false CONFIRMED on a decoy rare by design (about 0.25% at alpha 0.05 if the two tests are independent), but that figure is arithmetic and was not measured.</li>
 <li>The pilot of 8 trials sizes the arms, and for intermittent scenarios its estimate moved 2 of 45 scenarios between STUCK, NARROWED and CONFIRMED across four runs. A larger or sequential pilot was not tested.</li>
@@ -3060,14 +3463,13 @@ Mechanism: unexplained (no rule or probe agreed)
 ./gradlew atlasSite
 </code></pre>
 <p><code>coverageSummary</code> writes <code>build/coverage/summary.txt</code>, which holds the coverage table and the per-module test counts; <code>sharedRatio</code> prints the shared-code table. The CLI examples above run the linked executable, <code>cli/build/bin/macosArm64/releaseExecutable/drift.kexe</code>. A JVM run is <code>./gradlew :cli:jvmRun --args=&quot;...&quot;</code>. The figures here were read on 2026-10-13 on a Mac from the executables linked by the final <code>./gradlew build</code>.</p>
-<p>The sealed split and the dev rule, recomputed from the scenario list:</p>
-<pre><code class="language-python">import json, hashlib
-ids = [s[&quot;id&quot;] for s in json.load(open(&quot;bench/data/scenarios.json&quot;))]
-dev = {i for i in ids if int.from_bytes(hashlib.sha256(i.encode()).digest()[:4], &quot;big&quot;) % 100 &lt; 60}
-test = sorted(set(ids) - dev)
-print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; for i in test).encode()).hexdigest())
+<p>A scenario is dev when the first four bytes of <code>sha256(id)</code>, read as an unsigned integer, mod 100 are under 60, unless its template is held out: a template outside <code>SplitRule.LEGACY_TEMPLATES</code> (the 43 templates that predate the rule) whose own id fails the same test has only test instances. <code>bench split</code> recomputes the split from <code>bench/data/scenarios.json</code> with that rule and compares it with <code>bench/data/split.json</code>:</p>
+<pre><code>./gradlew :bench:jvmRun --args=&quot;split --root .&quot;
 </code></pre>
-<p>This prints <code>49 31 457097f88491381de17a43a67a7f09ab3843d008c838f02db2e81b0c6d5b4068</code>.</p>
+<p>It prints the dev count, the test count, the held-out template count and the SHA-256 of the sorted test ids, then exits 1 with a message if the result differs from <code>split.json</code>. On the committed data it prints:</p>
+<pre><code>dev 122, test 150, held-out templates 36, test_sha256 aea538143b9ca524864692d92e64c0ae95e0c5c42415cf4864be0236469f8b13
+matches data/split.json
+</code></pre>
 <div class="table"><table>
 <thead>
 <tr>
@@ -3099,7 +3501,7 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
 </tr>
 <tr>
 <td>no <code>Double</code> or <code>Float</code> in common code</td>
-<td>0</td>
+<td>1 (a string literal in <code>triage/Claims.kt</code>)</td>
 <td><code>grep -rn &quot;Double|Float&quot; core/src/common/main bench/src/common/main</code></td>
 </tr>
 <tr>
@@ -3109,7 +3511,7 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
 </tr>
 <tr>
 <td><code>drift diagnose</code> hash</td>
-<td><code>4b0dd023...ff8a</code></td>
+<td><code>99f637b2...38f7</code></td>
 <td><code>drift diagnose fixtures/drangler/capsules/36702683742.json fixtures/drangler/capsules/37114464625.json | shasum -a 256</code>; <code>DriftCommandTest.DIAGNOSE_SHA</code></td>
 </tr>
 <tr>
@@ -3129,7 +3531,7 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
 </tr>
 <tr>
 <td>CLI size and commands</td>
-<td>9,866,776 bytes; 21 subcommands</td>
+<td>9,866,776 bytes (macOS arm64, built 2026-10-15, before <code>drift why</code>; 28 subcommands then, 29 now); Linux x64 of the current tree 15,616,968 bytes</td>
 <td><code>ls -l cli/build/bin/macosArm64/releaseExecutable/drift.kexe</code>, <code>drift --help</code></td>
 </tr>
 <tr>
@@ -3149,12 +3551,12 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
 </tr>
 <tr>
 <td>rules, status, fixtures, sources, severities</td>
-<td>426; 375 active and 51 pending-scanner; 1481 (465/1016); 494 entries, 313 distinct; 132/239/55</td>
+<td>429; 376 active and 53 pending-scanner; 1493 (469/1024); 497 entries, 315 distinct; 134/240/55</td>
 <td><code>find rules -name '*.yml' | wc -l</code>; <code>grep -rh '^status:' rules --include='*.yml' | sort | uniq -c</code>; <code>grep -rh '^severity:' rules --include='*.yml' | sort | uniq -c</code>; <code>- name:</code> under <code>fixtures:</code> and <code>kind:</code> under <code>provenance:</code> per file</td>
 </tr>
 <tr>
 <td>rule symptom basis</td>
-<td>86 verified, 233 inferred; 230 rules</td>
+<td>133 verified, 265 inferred, 52 range (450 symptoms)</td>
 <td><code>grep -rh &quot;basis:&quot; rules --include=&quot;*.yml&quot;</code></td>
 </tr>
 <tr>
@@ -3239,12 +3641,12 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
 </tr>
 <tr>
 <td>Documentation site</td>
-<td>3,969 files, 68,944 KiB; 95,013 relative links, 0 unresolved outside <code>engine/</code>, 132 inside it</td>
+<td>11 rendered pages; no unresolved relative link outside <code>engine/</code> (lane a4, 2026-10-26)</td>
 <td><code>./gradlew docsSite</code>; <code>find build/site -type f | wc -l</code>; <code>du -sk build/site</code>; the <code>checkSiteLinks</code> output</td>
 </tr>
 <tr>
 <td>DriftBench</td>
-<td>80 scenarios, 43 templates, 49 dev, 31 sealed</td>
+<td>272 scenarios, 135 template ids, 122 dev, 150 test</td>
 <td><code>bench/data/scenarios.json</code>, <code>bench/data/split.json</code></td>
 </tr>
 <tr>
@@ -3253,13 +3655,18 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
 <td><code>bench/data/results/*.json</code> (<code>valid</code>, <code>arms.*.trials</code>, <code>arms.*.failures</code>)</td>
 </tr>
 <tr>
+<td>dev solves scored</td>
+<td>58 CONFIRMED, all naming the injected cause, none wrong; 92 of 112 resolved (82.1%, in-sample, nine of them after fixing scenario defects; first measured 43 of 105); 10 of 10 controls name no cause</td>
+<td><code>bench/data/solves/dev.json</code>; <code>./gradlew :bench:jvmRun --args=&quot;solves --root $PWD/bench --solved &lt;case dirs&gt;&quot;</code> (<code>experiments/dev-solves</code>)</td>
+</tr>
+<tr>
 <td>order table, three inputs</td>
-<td>46, 48 and 58 of 105 top-1 for hand-set (probed, probes removed, original)</td>
+<td>46, 48 and 72 of 105 top-1 for hand-set (probed, probes removed, original)</td>
 <td><code>bench/data/calibration/evaluation.json</code> (<code>original</code>, <code>probes_removed</code>, <code>probed</code>: <code>models[id=hand-set].in_sample</code>); Wilson 95% intervals computed from the counts</td>
 </tr>
 <tr>
 <td>exact tests against a random order</td>
-<td>P = 0.0012 (probed), 0.0001, 0.00015 at top-1; 0.00002, 0.00002, 0.00003 at top-3</td>
+<td>P = 0.0012 (probed), 0.0001, 0.00039 at top-1; 0.00002, 0.00002, 0.00003 at top-3</td>
 <td><code>evaluation.json</code> <code>versus_random.top1.p_at_least_micro</code>, <code>.top3</code></td>
 </tr>
 <tr>
@@ -3269,7 +3676,7 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
 </tr>
 <tr>
 <td>calibration files</td>
-<td><code>evaluation.json</code> sha256 <code>030fdf04...31a5</code>; <code>fit.json</code> <code>25eb0d75...d524</code>; regenerated and byte-compared by <code>CalibrationTest</code></td>
+<td><code>evaluation.json</code> sha256 <code>dfdddafb...283b</code>; <code>fit.json</code> <code>a050d59c...97a6</code>; regenerated and byte-compared by <code>CalibrationTest</code></td>
 <td><code>shasum -a 256 bench/data/calibration/*.json</code>; <code>./gradlew :bench:jvmRun --args=&quot;calibrate --root $PWD/bench&quot;</code></td>
 </tr>
 <tr>
@@ -3284,13 +3691,13 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
 </tr>
 <tr>
 <td>readout Brier, covered rankings</td>
-<td>0.184 shipped; 0.173 uniform; 0.123 against 0.124 on all rankings</td>
+<td>0.170 shipped (isotonic map); 0.184 shares with a fitted none weight; 0.173 uniform; 0.113 against 0.124 on all rankings</td>
 <td><code>evaluation.json</code> <code>probed.models[].cross_validated.covered.brier</code></td>
 </tr>
 <tr>
-<td>none weight, fit provenance</td>
-<td>0.25; seed 20261006</td>
-<td><code>fit.json</code> <code>probability.none</code>, <code>provenance</code>; <code>Weights.NONE</code>, <code>Weights.FIT</code></td>
+<td>none weight, map, fit provenance</td>
+<td>none weight 1.0 (not fit); 8-step map; seed 20261006</td>
+<td><code>fit.json</code> <code>calibration</code>, <code>provenance</code>; <code>Weights.NONE</code>, <code>Weights.map</code>, <code>Weights.FIT</code></td>
 </tr>
 <tr>
 <td>dev inputs</td>
@@ -3299,7 +3706,7 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
 </tr>
 <tr>
 <td>drangler pair ranking</td>
-<td>9 candidates, bundle-1, probabilities 0.129032 and 0.107527</td>
+<td>9 candidates, bundle-1, probability 0.104478 for each</td>
 <td><code>drift diagnose ... --detail full</code></td>
 </tr>
 <tr>
@@ -3344,7 +3751,7 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
 </tr>
 <tr>
 <td>Lab fixtures, archive bytes</td>
-<td>4 archives, 50,176 / 58,368 / 43,008 / 31,744 bytes</td>
+<td>4 archives, 50,176 / 58,880 / 43,008 / 32,256 bytes</td>
 <td><code>ls -l fixtures/lab/cases</code>; extract each with <code>tar -xf</code>, <code>drift pack &lt;dir&gt; --out x</code>, <code>cmp x &lt;fixture&gt;</code></td>
 </tr>
 <tr>
@@ -3419,12 +3826,12 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
 </tr>
 <tr>
 <td>triage fixtures</td>
-<td>70 bodies, 189 facts, precision 0.989, recall 0.979, Brier 0.0851</td>
+<td>78 bodies, 207 facts, precision 0.990, recall 0.980, Brier 0.0848</td>
 <td><code>TriageTest</code></td>
 </tr>
 <tr>
 <td>upgrade-check</td>
-<td>0 / 3 / 2 / 0 on the Drupal capture, 83 of 426 rules; case D 1 / 1 / 11 / 0, 56 of 426</td>
+<td>0 / 3 / 2 / 0 on the Drupal capture, 84 of 429 rules; case D 1 / 1 / 11 / 0, 57 of 429</td>
 <td><code>drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=8.3,drupal=11,symfony=7.1</code>; <code>drift upgrade-check fixtures/cases/d/capture-php-7-4.json --to php=8.3</code></td>
 </tr>
 <tr>
@@ -3475,5 +3882,6 @@ print(len(dev), len(test), hashlib.sha256(&quot;&quot;.join(i + &quot;\n&quot; f
             <a href="https://github.com/gmitch215/Drift">github.com/gmitch215/Drift</a> &middot;
             <a href="https://github.com/gmitch215/Drift/blob/master/LICENSE">MIT License</a>
         </footer>
+        <script type="module" src="docs-render.js"></script>
     </body>
 </html>

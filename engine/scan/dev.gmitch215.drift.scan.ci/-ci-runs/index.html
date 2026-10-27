@@ -1,0 +1,295 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>CiRuns</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
+                    Drift Engine Documentation
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">1.0.0
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":scan/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":scan/commonMain" data-filter=":scan/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Drift Engine Documentation
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="scan::dev.gmitch215.drift.scan.ci/CiRuns///PointingToDeclaration//-2087818296">
+  <div class="breadcrumbs"><a href="../../index.html">scan</a><span class="delimiter">/</span><a href="../index.html">dev.gmitch215.drift.scan.ci</a><span class="delimiter">/</span><span class="current">CiRuns</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Ci</span><wbr><span><span>Runs</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scan/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">CiRuns</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>repo<span class="token operator">: </span><a href="../-ci-repo/index.html">CiRepo</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>provider<span class="token operator">: </span><a href="../-ci-provider-kind/index.html">CiProviderKind</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>failing<span class="token operator">: </span><a href="../-ci-run-info/index.html">CiRunInfo</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>passing<span class="token operator">: </span><a href="../-ci-run-info/index.html">CiRunInfo</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>job<span class="token operator">: </span><a href="../-ci-job-info/index.html">CiJobInfo</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>jobs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-ci-job-info/index.html">CiJobInfo</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>red<span class="token operator">: </span><a href="../../../core/dev.gmitch215.drift.model/-run/index.html">Run</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>green<span class="token operator">: </span><a href="../../../core/dev.gmitch215.drift.model/-run/index.html">Run</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>failingLabel<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>passingLabel<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="source-link-wrapper"><span class="source-link" data-element-type="source-link">(<a href="https://github.com/gmitch215/Drift/blob/master/scan/src/common/main/dev/gmitch215/drift/scan/ci/CiCheck.kt#L35">source</a>)</span></span></div><p class="paragraph">What <a href="../-ci-check/fetch.html">CiCheck.fetch</a> read: the failing run, a passing run if any, and their job logs.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="2060851185%2FConstructors%2F-2087818296" anchor-label="CiRuns" id="2060851185%2FConstructors%2F-2087818296" data-filterable-set=":scan/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":scan/commonMain" data-filterable-set=":scan/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-ci-runs.html"><span>Ci</span><wbr><span><span>Runs</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2060851185%2FConstructors%2F-2087818296"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scan/commonMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">repo<span class="token operator">: </span><a href="../-ci-repo/index.html">CiRepo</a><span class="token punctuation">, </span></span><span class="parameter ">provider<span class="token operator">: </span><a href="../-ci-provider-kind/index.html">CiProviderKind</a><span class="token punctuation">, </span></span><span class="parameter ">failing<span class="token operator">: </span><a href="../-ci-run-info/index.html">CiRunInfo</a><span class="token punctuation">, </span></span><span class="parameter ">passing<span class="token operator">: </span><a href="../-ci-run-info/index.html">CiRunInfo</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">job<span class="token operator">: </span><a href="../-ci-job-info/index.html">CiJobInfo</a><span class="token punctuation">, </span></span><span class="parameter ">jobs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-ci-job-info/index.html">CiJobInfo</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">red<span class="token operator">: </span><a href="../../../core/dev.gmitch215.drift.model/-run/index.html">Run</a><span class="token punctuation">, </span></span><span class="parameter ">green<span class="token operator">: </span><a href="../../../core/dev.gmitch215.drift.model/-run/index.html">Run</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">failingLabel<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">passingLabel<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="-1849960330%2FProperties%2F-2087818296" anchor-label="failing" id="-1849960330%2FProperties%2F-2087818296" data-filterable-set=":scan/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":scan/commonMain" data-filterable-set=":scan/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="failing.html"><span><span>failing</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1849960330%2FProperties%2F-2087818296"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scan/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="failing.html">failing</a><span class="token operator">: </span><a href="../-ci-run-info/index.html">CiRunInfo</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-413367728%2FProperties%2F-2087818296" anchor-label="failingLabel" id="-413367728%2FProperties%2F-2087818296" data-filterable-set=":scan/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":scan/commonMain" data-filterable-set=":scan/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="failing-label.html"><span>failing</span><wbr><span><span>Label</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-413367728%2FProperties%2F-2087818296"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scan/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="failing-label.html">failingLabel</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-824179305%2FProperties%2F-2087818296" anchor-label="green" id="-824179305%2FProperties%2F-2087818296" data-filterable-set=":scan/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":scan/commonMain" data-filterable-set=":scan/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="green.html"><span><span>green</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-824179305%2FProperties%2F-2087818296"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scan/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="green.html">green</a><span class="token operator">: </span><a href="../../../core/dev.gmitch215.drift.model/-run/index.html">Run</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="916248925%2FProperties%2F-2087818296" anchor-label="job" id="916248925%2FProperties%2F-2087818296" data-filterable-set=":scan/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":scan/commonMain" data-filterable-set=":scan/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="job.html"><span><span>job</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="916248925%2FProperties%2F-2087818296"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scan/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="job.html">job</a><span class="token operator">: </span><a href="../-ci-job-info/index.html">CiJobInfo</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-94799606%2FProperties%2F-2087818296" anchor-label="jobs" id="-94799606%2FProperties%2F-2087818296" data-filterable-set=":scan/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":scan/commonMain" data-filterable-set=":scan/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="jobs.html"><span><span>jobs</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-94799606%2FProperties%2F-2087818296"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scan/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="jobs.html">jobs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../-ci-job-info/index.html">CiJobInfo</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="193743593%2FProperties%2F-2087818296" anchor-label="passing" id="193743593%2FProperties%2F-2087818296" data-filterable-set=":scan/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":scan/commonMain" data-filterable-set=":scan/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="passing.html"><span><span>passing</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="193743593%2FProperties%2F-2087818296"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scan/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="passing.html">passing</a><span class="token operator">: </span><a href="../-ci-run-info/index.html">CiRunInfo</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1547739069%2FProperties%2F-2087818296" anchor-label="passingLabel" id="1547739069%2FProperties%2F-2087818296" data-filterable-set=":scan/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":scan/commonMain" data-filterable-set=":scan/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="passing-label.html"><span>passing</span><wbr><span><span>Label</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1547739069%2FProperties%2F-2087818296"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scan/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="passing-label.html">passingLabel</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1605789105%2FProperties%2F-2087818296" anchor-label="provider" id="-1605789105%2FProperties%2F-2087818296" data-filterable-set=":scan/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":scan/commonMain" data-filterable-set=":scan/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="provider.html"><span><span>provider</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1605789105%2FProperties%2F-2087818296"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scan/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="provider.html">provider</a><span class="token operator">: </span><a href="../-ci-provider-kind/index.html">CiProviderKind</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2085809399%2FProperties%2F-2087818296" anchor-label="red" id="-2085809399%2FProperties%2F-2087818296" data-filterable-set=":scan/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":scan/commonMain" data-filterable-set=":scan/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="red.html"><span><span>red</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2085809399%2FProperties%2F-2087818296"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scan/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="red.html">red</a><span class="token operator">: </span><a href="../../../core/dev.gmitch215.drift.model/-run/index.html">Run</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-138940050%2FProperties%2F-2087818296" anchor-label="repo" id="-138940050%2FProperties%2F-2087818296" data-filterable-set=":scan/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":scan/commonMain" data-filterable-set=":scan/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="repo.html"><span><span>repo</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-138940050%2FProperties%2F-2087818296"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":scan/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="repo.html">repo</a><span class="token operator">: </span><a href="../-ci-repo/index.html">CiRepo</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>Copyright (c) Gregory Mitchell</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

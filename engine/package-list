@@ -9,6 +9,7 @@ dev.gmitch215.drift.cli.cloudflare
 dev.gmitch215.drift.cli.command
 dev.gmitch215.drift.cli.install
 dev.gmitch215.drift.cli.serve
+dev.gmitch215.drift.cli.why
 module:core
 dev.gmitch215.drift.case
 dev.gmitch215.drift.ci

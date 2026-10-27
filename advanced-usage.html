@@ -272,6 +272,39 @@
                 max-width: 100%;
             }
 
+            .guides {
+                display: flex;
+                flex-wrap: wrap;
+                gap: var(--u) calc(var(--u) * 4);
+                margin: 0 0 calc(var(--u) * 6);
+                padding-bottom: calc(var(--u) * 3);
+                border-bottom: 1px solid var(--line);
+            }
+            .guides a {
+                color: var(--muted);
+                font-size: 14px;
+                text-decoration: none;
+            }
+            .guides a:hover,
+            .guides a[aria-current] {
+                color: var(--accent-text);
+            }
+            .guides a[aria-current] {
+                text-decoration: underline;
+                text-decoration-color: var(--accent);
+                text-decoration-thickness: 2px;
+                text-underline-offset: 0.5em;
+            }
+            .docs-render {
+                margin: calc(var(--u) * 5) 0;
+                overflow-x: auto;
+                text-align: center;
+            }
+            .docs-render svg {
+                max-width: 100%;
+                height: auto;
+            }
+
             .pager {
                 display: flex;
                 flex-wrap: wrap;
@@ -309,6 +342,7 @@
     <body>
         <nav>
             <div class="bar"><a class="brand" href="index.html"><img src="drift_128.png" alt="" width="28" height="28">Drift</a>
+<a href="docs.html">Guides</a>
 <a href="manual.html">Manual</a>
 <a href="advanced-usage.html" aria-current="page">Usage</a>
 <a href="technical-report.html">Report</a>
@@ -318,10 +352,11 @@
         </nav>
         <main>
             
+            
             <div class="readme"><h1 id="advanced-usage-the-full-cli">Advanced Usage: The Full CLI</h1>
 <p>This guide covers every <code>drift</code> command and flag for people who have already run <code>drift capture</code>. It shows scripting patterns, the JSON and text output levels, cases, reproduction, the Lab (<code>solve</code>, <code>ingest</code>, <code>pack</code>, <code>report</code>, <code>verify</code>), hands-off planning (<code>handsoff plan</code>), CI commands (<code>run</code>, <code>import</code>, <code>diagnose --against</code>, <code>bisect plan</code>, <code>bisect apply</code>), portability contracts (<code>contract create</code>, <code>contract verify</code>), issue triage (<code>triage</code>), upgrade preflight (<code>upgrade-check</code>), the Atlas, and the commands that install and serve Drift (<code>install</code>, <code>uninstall</code>, <code>serve</code>, <code>install.sh</code>, <code>install.ps1</code>). For the design and the measurements behind the commands, see <a href="technical-report.html">TECHNICAL_REPORT.md</a>.</p>
 <p>Every example below was run with the macOS release executable (<code>drift version 1.0.0 (macos)</code>) from a directory that holds <code>fixtures/</code> and <code>bench/</code>, against the files in <a href="https://github.com/gmitch215/Drift/tree/master/fixtures"><code>fixtures/</code></a> and <a href="https://github.com/gmitch215/Drift/tree/master/bench/data"><code>bench/data/</code></a>. Output is copied from those runs; a line that holds only <code>...</code> marks output cut for length. Where a command prints to standard error, the example says so. The offline run in <a href="#offline">Offline</a> used the Linux arm64 executable inside a Docker container. The <code>install</code>, <code>uninstall</code> and <code>serve</code> examples ran with a scratch home directory and a scratch prefix, never the real profile, registry or trust store. Their output shows the scratch home as <code>/home/you</code>, the scratch work directory as <code>/work</code> and the scratch release directory as <code>/release</code>. The Windows and Linux builds and the <code>.ps1</code> script were not run for this guide, and the sections say where a statement comes from a recorded run of someone else's.</p>
-<p>The executable is <code>cli/build/bin/macosArm64/releaseExecutable/drift.kexe</code>; the README explains how to build it and how to download one. The examples call it <code>drift</code>; put it on <code>PATH</code> (see <a href="#install-and-uninstall">Install and Uninstall</a>) or alias it.</p>
+<p>The executable is <code>cli/build/bin/macosArm64/releaseExecutable/drift.kexe</code>; the <a href="install.html">install guide</a> explains how to build it and how to download one. The examples call it <code>drift</code>; put it on <code>PATH</code> (see <a href="#install-and-uninstall">Install and Uninstall</a>) or alias it.</p>
 <h2 id="command-index">Command Index</h2>
 <div class="table"><table>
 <thead>
@@ -333,6 +368,12 @@
 </tr>
 </thead>
 <tbody>
+<tr>
+<td><a href="#why"><code>why</code></a></td>
+<td>this machine and a container, a machine over ssh, a saved capture, the latest failed CI run, a command or an issue text</td>
+<td>text or JSON; <code>.drift/why</code></td>
+<td>no (<code>docker:</code> places use <code>docker exec</code>)</td>
+</tr>
 <tr>
 <td><a href="#capture"><code>capture</code></a></td>
 <td>this machine</td>
@@ -717,6 +758,75 @@
 </tbody>
 </table></div>
 <p><code>diagnose --case</code>, <code>solve --case</code> and <code>ingest</code> refuse to write into a directory that already holds a <code>case.json</code> (<code>ingest</code> rewrites the case it is given).</p>
+<h2 id="why">Why</h2>
+<p><code>drift why [--there PLACE] [--fails-here] [--detail | --json] [-- COMMAND ...]</code> and <code>drift why FILE</code> answer &quot;why does this work here and fail there&quot; without a capture file, a case directory or a flag. The <a href="why.html">guide</a> walks through the four flows; this section lists what each one calls and writes. <code>drift why --reply [--session FILE]</code> continues a session that <code>drift why</code> wrote when it asked for a fact: it reads standard input as the answer to the first open ask, parses it with the scanner that runs the same command, and prints an answer or the next single ask. <code>drift why --error TEXT</code> alone, outside a git checkout, reads the text as a report.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Arguments</th>
+<th>Flow</th>
+<th>Built from</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>none, in a git checkout</td>
+<td>the latest failed CI run against this machine, with the last passing run as extra evidence</td>
+<td>the <code>ci</code> run selection and importers, <code>capture --tools --project</code>, <code>diagnose</code></td>
+</tr>
+<tr>
+<td><code>--there docker:NAME[:DIR]</code></td>
+<td>this machine against a running container</td>
+<td><code>capture --tools --project</code> over <code>docker exec</code></td>
+</tr>
+<tr>
+<td><code>--there user@host</code></td>
+<td>this machine against another machine</td>
+<td><code>capture --ssh</code> (read-only, opt-in, as described in <a href="#remote-capture-over-ssh">Remote Capture over SSH</a>)</td>
+</tr>
+<tr>
+<td><code>--there PATH</code></td>
+<td>this machine against a saved capture</td>
+<td><code>capture --out</code>, read back as <code>diagnose</code> reads a capsule</td>
+</tr>
+<tr>
+<td><code>-- COMMAND</code></td>
+<td>this machine now against this machine when <code>COMMAND</code> last passed</td>
+<td><code>capture --tools --project</code> and the ranking and plan of <code>diagnose --against</code></td>
+</tr>
+<tr>
+<td><code>FILE</code> or <code>-</code></td>
+<td>an issue or an error report</td>
+<td><code>triage</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The first line of output names the flow. The answer has the verdict, up to three lines of evidence and what to try next. <code>--detail</code> appends the ranking and plan that <code>diagnose --detail</code> prints. <code>--json</code> prints the output of <code>diagnose</code> with a <code>plain</code> object (<code>flow</code>, <code>direction</code>, <code>certainty</code>, <code>verdict</code>, <code>evidence</code>, <code>findings</code>, <code>next</code>). The same inputs give the same bytes, and the exit status is 0 whenever Drift gave an answer, including &quot;cannot tell&quot;.</p>
+<p>Choices the flows make for you:</p>
+<ul>
+<li><strong>Scanners on.</strong> <code>why</code> captures with the toolchain scanners (<code>--tools</code>) and the project scan (<code>--project</code>), so a missing tool, a tool version or a locked package shows up in a first answer. Probes (<code>--probes</code>) stay off: they run many programs on each side and need transcripts from both. Over ssh the scanners are not available, and the answer says so.</li>
+<li><strong>Noise removed.</strong> Host name, account, terminal and <code>PATH</code> variables, capture bookkeeping and, in the CI flow, the runner's own labels are dropped before ranking. <code>NODE_VERSION</code> and its kin are dropped when <code>tool.node.version</code> is present.</li>
+<li><strong>Direction.</strong> The default assumption is that it works on the first side (here) and fails on the second (there); <code>--fails-here</code> swaps them. With <code>-- COMMAND</code> after <code>--there docker:NAME</code>, the exit codes of the two runs decide, and the failing side's output conditions the ranking: phrases such as &quot;is not a function&quot;, &quot;No module named&quot;, &quot;not found&quot;, &quot;Too many open files&quot;, &quot;Connection refused&quot; and &quot;Permission denied&quot; point at the kind of attribute they fit.</li>
+<li><strong>The container.</strong> <code>docker:NAME</code> runs <code>docker inspect</code> and then one <code>docker exec NAME ...</code> per fact. It never starts, stops or changes a container, copies nothing into it and needs only <code>cat</code> and <code>env</code> in the image. A command that the image lacks reads as absent.</li>
+<li><strong>A saved capture.</strong> A fact family that the saved capture does not hold (for example <code>tool.</code> in a capture made without <code>--tools</code>) is left out of the comparison on both sides, and the answer says which.</li>
+</ul>
+<p>Files it writes: <code>.drift/why/baseline</code> (a capsule directory, after a passing <code>-- COMMAND</code>) and <code>.drift/why/case</code> (a case directory, when the answer lists several differences, so <code>drift next .drift/why/case</code> works). It never edits a tracked file.</p>
+<pre><code class="language-sh">drift why -- sh check.sh
+TZ=Asia/Tokyo drift why -- sh check.sh
+</code></pre>
+<pre><code>drift why: running sh check.sh here
+
+It most likely fails now because the time zone differs: TZ is Asia/Tokyo now and not set when it
+  last passed; the error text points at it.
+
+What I found:
+  Time zone (TZ): not set when it last passed, Asia/Tokyo now
+
+What to try next:
+  Unset TZ now, or make the code name its time zone.
+  To be sure, change only that and run it again now.
+</code></pre>
+<p>Problems end in one sentence and exit code 1: a container that is not running (<code>docker start NAME</code> is yours to run), a name that is not a container, no Docker, an ssh host that cannot be reached (the ssh messages of <a href="#when-ssh-fails">When ssh Fails</a>), a saved capture that cannot be read, no git checkout or remote for the CI flow, <code>gh</code> or <code>glab</code> missing or not logged in, and a bare command without <code>--</code>.</p>
 <h2 id="capture">Capture</h2>
 <p><code>drift capture</code> prints this machine's capsule as canonical JSON: sorted keys, no whitespace, one line. The output is the exact bytes that the capsule hash covers, so <code>jq</code>, <code>python3 -m json.tool</code> and <code>shasum</code> all work on it as written.</p>
 <pre><code class="language-sh">drift capture --label demo &gt; cap.json
@@ -768,7 +878,7 @@ jq '.probes | length' cap.json cap-full.json
 0
 71
 </code></pre>
-<p>The counts are from one Mac and vary with the tools installed. <code>--probes</code> adds 71 probe records; each holds <code>id</code>, <code>status</code>, a <code>hash</code> and the <code>transcript</code>.</p>
+<p>The counts are from one Mac and vary with the tools installed. <code>--probes</code> adds 72 probe records; each holds <code>id</code>, <code>status</code>, a <code>hash</code> and the <code>transcript</code>.</p>
 <p><strong>Anonymization.</strong> By default the capsule rewrites the home path to <code>~</code>, masks the account and host names, and marks the affected attributes <code>source: &quot;env (anonymized)&quot;</code>. Values whose names look like secrets (for example <code>CLOUDFLARE_API_TOKEN</code>) are stored as <code>&lt;redacted&gt;</code>.</p>
 <pre><code class="language-sh">drift capture --label demo | jq '[.attributes[] | select(.source | test(&quot;anonymized&quot;))] | length'
 drift capture --label demo | jq '[.attributes[] | select(.value == &quot;&lt;redacted&gt;&quot;)] | length'
@@ -816,6 +926,16 @@ drift capture --label demo | jq '[.attributes[] | select(.value == &quot;&lt;red
 <td>Python</td>
 <td><code>pyproject.toml</code>, then <code>uv.lock</code> or <code>poetry.lock</code>, then <code>requirements.txt</code></td>
 <td><code>project.python.&lt;name&gt;</code> (lowercase, runs of <code>-</code>, <code>_</code> and <code>.</code> as one <code>-</code>), <code>project.python.requires-python</code></td>
+</tr>
+<tr>
+<td>Version files</td>
+<td>the first line of <code>.nvmrc</code> or <code>.node-version</code>, and of <code>.python-version</code></td>
+<td><code>project.pins.node</code>, <code>project.pins.python</code> (a leading <code>v</code> is dropped)</td>
+</tr>
+<tr>
+<td>Checksum file</td>
+<td><code>SHA256SUMS</code>, lines of <code>&lt;64 hex digits&gt;  &lt;path&gt;</code></td>
+<td><code>project.checksums.&lt;path&gt;</code> (the digest)</td>
 </tr>
 <tr>
 <td>Go</td>
@@ -991,13 +1111,51 @@ drift capture --label demo | jq '[.attributes[] | select(.value == &quot;&lt;red
 </tbody>
 </table></div>
 <p><code>tool.openssl.version</code> orders by the OpenSSL scheme: <code>1.1.1 &lt; 1.1.1a &lt; 1.1.1w &lt; 3.0.0</code>, so a <code>ver</code> range on it can mix letter releases and numbered ones.</p>
+<p><code>--tools</code> also versions the tools that the working directory names. It takes command names from the package scripts, Makefile recipes, Dockerfile <code>RUN</code> lines, workflow <code>run:</code> steps and shebangs, and keeps only the names in a built-in list: <code>make</code>, <code>cmake</code>, <code>docker</code>, <code>podman</code>, <code>skopeo</code>, <code>pwsh</code>, <code>native-image</code>, <code>gradle</code>, <code>mvn</code>, <code>ant</code>, <code>bazel</code>, <code>cargo</code>, <code>dotnet</code>, <code>bundle</code>, <code>javac</code>, <code>kotlinc</code>, <code>swift</code>, <code>deno</code>, <code>bun</code>, <code>pnpm</code>, <code>yarn</code>, <code>pip</code>, <code>poetry</code>, <code>uv</code> and <code>clang</code>. A name outside that list is never run. A listed tool runs only when <code>PATH</code> resolves it to a file outside the working directory, and then it runs by that absolute path, with no shell, a 5 second timeout and a 64 KiB output cap. Output over the cap, or a timeout, records nothing. The lookup uses two fixed calls, <code>which NAME</code> and <code>pwd -P</code>. These tools are versioned with the same parsers as the table above. Over ssh no tool runs.</p>
 <p>A normal capture also reads these facts, without <code>--tools</code>:</p>
 <ul>
 <li><code>cgroup.version</code> is <code>v2</code> when every line of <code>/proc/self/cgroup</code> starts with <code>0::</code> and <code>v1</code> when any line names a v1 controller (a hybrid host counts as <code>v1</code>).</li>
 <li><code>tz.system-zone</code> is the target of the <code>/etc/localtime</code> link below <code>zoneinfo/</code>, then the content of <code>/etc/timezone</code>. <code>Etc/UTC</code>, <code>Etc/UCT</code>, <code>Etc/Universal</code>, <code>Etc/Zulu</code>, <code>UCT</code>, <code>Universal</code> and <code>Zulu</code> are written as <code>UTC</code>; <code>Etc/GMT</code> stays as it is. It is absent on Windows and where neither source exists. <code>env.TZ</code> is separate.</li>
 <li><code>runtime.jvm.options</code> joins <code>JAVA_TOOL_OPTIONS</code> and <code>JDK_JAVA_OPTIONS</code>, in that order, and is absent when both are empty. Flags on a <code>java</code> command line are not visible to a capture.</li>
 <li><code>java.net.preferIPv6Addresses</code> is the last <code>-Djava.net.preferIPv6Addresses=</code> value in those options, and absent when they do not set it.</li>
+<li><code>limits.&lt;name&gt;</code> is the soft and hard resource limit from <code>/proc/self/limits</code>, written <code>soft:hard</code> with each side a number or <code>unlimited</code>. The names are <code>cpu</code> (seconds), <code>fsize</code>, <code>data</code>, <code>stack</code>, <code>core</code>, <code>memlock</code> and <code>as</code> (bytes), <code>nproc</code> and <code>nofile</code>. The attributes are absent where the file does not exist, such as macOS and Windows, and a line that does not parse is skipped. The JVM and Node raise the soft open files limit to the hard one when they start, so the JVM and Wasm builds leave <code>limits.nofile</code> out; the Linux executables and <code>drift capture --ssh</code> record it.</li>
+<li><code>fs.tmp.type</code> is the filesystem type (<code>tmpfs</code>, <code>ext4</code>, <code>overlay</code> and so on) of the mount that holds <code>/tmp</code>, and <code>fs.cwd.type</code> the same for the working directory. Both come from <code>/proc/self/mountinfo</code>: the longest mount point that holds the path wins, so a <code>--tmpfs /tmp</code> mount shows as <code>tmpfs</code> while the container root shows as <code>overlay</code>. The working directory is read with <code>readlink /proc/self/cwd</code>. Absent where mountinfo does not exist, such as macOS and Windows.</li>
+<li><code>locale.installed</code> is the sorted, comma-separated list of locale names the system has, read from the names in <code>/usr/lib/locale/locale-archive</code> and the entries of <code>/usr/lib/locale</code>. A name the archive does not list is not added, so <code>C</code> and <code>POSIX</code> appear only where the system records them. Absent when neither source exists. <code>reproduce</code> generates a <code>LANG</code> or <code>LC_*</code> locale in its arm only when this list names it, so an arm does not hide a missing locale.</li>
+<li><code>network.hosts.names</code> is the sorted list of the custom <code>/etc/hosts</code> names, one token per name: <code>name@address</code> when the address is a loopback one (<code>db.internal@127.0.0.1</code>) and the bare name for any other address, which is not recorded. The stock aliases (<code>localhost</code>, <code>ip6-*</code>, <code>broadcasthost</code>), the <code>127.0.1.1</code> machine entry and the machine's own <code>HOSTNAME</code> are left out, and the attribute is absent when nothing custom remains. <code>network.nsswitch.hosts</code> is the source list of the <code>hosts:</code> line in <code>/etc/nsswitch.conf</code>, such as <code>files dns</code>. <code>network.interfaces</code> is the sorted list of names in <code>/sys/class/net</code>, with <code>lo</code> included when the host has it.</li>
+<li><code>cpu.affinity</code> is the number of CPUs in <code>Cpus_allowed_list</code> of <code>/proc/self/status</code>, which is the set the process may run on. <code>cpu.count</code> is still the number of CPUs online.</li>
+<li><code>tool.sh.flavor</code> is the base name of the target of <code>readlink -f /bin/sh</code>, such as <code>dash</code>, <code>bash</code> or <code>busybox</code>. It is absent where <code>/bin/sh</code> is not a link (macOS, where it is a file) and on Windows.</li>
+<li><code>sysctl.&lt;name&gt;</code> is the value of one of seven kernel settings read from <code>/proc/sys</code>: <code>vm.max_map_count</code>, <code>fs.inotify.max_user_watches</code>, <code>fs.inotify.max_user_instances</code>, <code>fs.file-max</code>, <code>kernel.pid_max</code>, <code>net.core.somaxconn</code> and <code>kernel.threads-max</code>. A value that is not a single word is left out. Nothing else under <code>/proc/sys</code> is read, apart from the AppArmor setting above.</li>
+<li><code>clock.source</code> is the current clock source, such as <code>tsc</code> or <code>kvm-clock</code>, from <code>/sys/devices/system/clocksource/clocksource0/current_clocksource</code>. Linux only.</li>
+<li><code>network.ipv6</code> is <code>true</code> when <code>/proc/net/if_inet6</code> lists an address other than <code>::1</code>, and <code>false</code> when it lists none. It is absent when the file does not exist. <code>network.ipv6.disabled</code> is <code>true</code> or <code>false</code> from <code>/proc/sys/net/ipv6/conf/all/disable_ipv6</code>, so <code>true</code> means the switch is off.</li>
+<li><code>network.dns.nameservers</code> is the number of <code>nameserver</code> lines in <code>/etc/resolv.conf</code>. <code>network.dns.loopback</code> is <code>true</code> when every nameserver is a loopback address, such as a local stub resolver; it is absent when there are none. <code>network.dns.search</code> is the number of search domains on the last <code>search</code> or <code>domain</code> line, and <code>network.dns.options</code> is the sorted option names, such as <code>edns0,ndots</code>. No address or domain name is recorded, and the file is read only: no lookup or network call is made.</li>
+<li><code>reproduce</code> and <code>drift solve</code> mirror these facts in the arm: a <code>cpu.affinity</code> below <code>cpu.count</code> becomes <code>--cpuset-cpus</code>, <code>network.interfaces</code> of <code>lo</code> alone becomes <code>--network none</code>, loopback <code>network.hosts.names</code> tokens become <code>--add-host</code>, and <code>network.nsswitch.hosts</code> rewrites the <code>hosts:</code> line of the image's <code>/etc/nsswitch.conf</code> (an Alpine image reads none, so the entry is partial). A hosts name with no recorded address is not mirrored.</li>
+<li><code>drift capture --probes</code> also runs <code>resources.fs-tmp-fsync</code>. It writes a 4 KiB file in <code>/tmp</code>, syncs it with <code>fsync</code> 25 times, removes the file and records the median in one of <code>&lt;1ms</code>, <code>1-10ms</code>, <code>10-100ms</code>, <code>100ms-1s</code> or <code>&gt;1s</code> as <code>fs.tmp.fsync = &lt;bucket&gt;</code>. It is unavailable where the host has no write capability (Wasm) or <code>/tmp</code> cannot be written, and <code>--ssh</code> never runs it because a capture over ssh only reads.</li>
 </ul>
+<p>The same capture in <code>drift-cisim:3</code> with <code>--tmpfs /tmp</code> (the filesystem facts, one line each):</p>
+<pre><code class="language-text">fs.tmp.type tmpfs
+fs.cwd.type overlay
+fs.tmp.fsync = &lt;1ms
+locale.installed C.utf8
+network.interfaces eth0,lo
+cpu.affinity 24
+</code></pre>
+<p>Without <code>--tmpfs</code>, <code>fs.tmp.type</code> is <code>overlay</code>. The fsync bucket on this host is <code>&lt;1ms</code> for both mounts.</p>
+<pre><code class="language-sh">docker run --rm --ulimit nofile=1024:2048 --ulimit core=0 \
+  --volume &quot;$PWD/drift:/usr/local/bin/drift:ro&quot; debian:trixie-slim \
+  drift capture --label limits |
+  jq -r '.attributes[] | select(.path | startswith(&quot;limits.&quot;)) | &quot;\(.path) \(.value)&quot;'
+</code></pre>
+<pre><code>limits.as unlimited:unlimited
+limits.core 0:0
+limits.cpu unlimited:unlimited
+limits.data unlimited:unlimited
+limits.fsize unlimited:unlimited
+limits.memlock 8388608:8388608
+limits.nofile 1024:2048
+limits.nproc unlimited:unlimited
+limits.stack 8388608:unlimited
+</code></pre>
+<p><code>reproduce</code> turns each of these into <code>--ulimit name=soft:hard</code> (<code>unlimited</code> becomes <code>-1</code>), and a Lab experiment that sets <code>limits.nofile</code> changes that flag. Docker has no <code>as</code> limit, so <code>limits.as</code> is listed as not mirrored. The <code>set-ulimit</code> intervention records a single number such as <code>2048</code> as <code>2048:2048</code>, because that is what a capture inside the container reports.</p>
 <p>Keys that a capture of this machine cannot supply: <code>runtime.database.server.*</code>, <code>network.tls-version-offered</code> and <code>net.dns.aaaa.present</code> need a connection or a name lookup against a named target, and <code>browser.name</code> needs a browser. Rules that read them stay <code>pending-scanner</code>.</p>
 <h3 id="attribute-prefixes">Attribute Prefixes</h3>
 <p>A rule's <code>applies</code> list and the ranking use one of 14 dimensions. The dimension of an attribute path comes from the longest matching prefix in this table; a path that no prefix claims, such as <code>drift.platform</code>, has no dimension.</p>
@@ -1015,7 +1173,7 @@ drift capture --label demo | jq '[.attributes[] | select(.value == &quot;&lt;red
 </tr>
 <tr>
 <td><code>kernel</code></td>
-<td><code>kernel.</code>, <code>cgroup.</code> (except the two below), <code>sysctl.</code></td>
+<td><code>kernel.</code>, <code>cgroup.</code> (except the two below), <code>sysctl.</code>, <code>clock.</code></td>
 </tr>
 <tr>
 <td><code>cpu</code></td>
@@ -1083,7 +1241,7 @@ shasum -a 256 diag.json
 <pre><code>tool.node.version
 false
 9
-e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08  diag.json
+83c35a87e4f48696684ac6817e31b04e5b9b1bf3c37452d6cbc8c12a030c187c  diag.json
 </code></pre>
 <p>The top-level keys are <code>bundles</code>, <code>changed</code>, <code>competing</code>, <code>facts</code>, <code>relevant</code>, <code>unattached</code> and <code>weights</code>. <code>weights.calibrated: false</code> means the ranking uses hand-set weights, so the order of candidates is not a probability of being the cause.</p>
 <p><code>--detail</code> prints text instead, at three levels. It cannot be combined with <code>--json</code>.</p>
@@ -1092,7 +1250,7 @@ e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08  diag.json
 <pre><code>9 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
 so the data does not name one cause.
 </code></pre>
-<p><code>--detail detail</code> adds the ranked candidates, the bundle and the next experiment (64 lines for this pair). <code>--detail full</code> adds every changed attribute (285 lines). The text is plain ASCII, wrapped at 100 columns.</p>
+<p><code>--detail detail</code> adds the ranked candidates, the bundle and the next experiment (67 lines for this pair). <code>--detail full</code> adds every changed attribute and, for a ranking whose candidates all rest on attribute changes, each candidate's probability: its share against the other candidates, read through an isotonic map fit on the dev scenarios and not held out (350 lines for this pair, where all nine candidates read 0.104478). The text is plain ASCII, wrapped at 100 columns.</p>
 <pre><code class="language-sh">drift diagnose --detail detail $G $R | sed -n 4,10p
 </code></pre>
 <pre><code>Candidates, best first. Scores come from hand-set weights (hand-set-1, uncalibrated); they order
@@ -2068,20 +2226,28 @@ drift diagnose --ssh ci-green --ssh ci-red --detail summary
 <td><code>kernel.release</code>, <code>cpu.count</code>, and <code>os.version</code> on macOS</td>
 </tr>
 <tr>
-<td><code>readlink /etc/localtime</code></td>
-<td><code>tz.system-zone</code></td>
+<td><code>readlink /etc/localtime</code>, <code>readlink /proc/self/cwd</code></td>
+<td><code>tz.system-zone</code> and the mount of the working directory</td>
+</tr>
+<tr>
+<td><code>readlink -f /bin/sh</code></td>
+<td><code>tool.sh.flavor</code>, the shell behind <code>/bin/sh</code></td>
+</tr>
+<tr>
+<td><code>ls -1 /sys/class/net</code>, <code>ls -1 /usr/lib/locale</code></td>
+<td><code>network.interfaces</code> and <code>locale.installed</code></td>
 </tr>
 <tr>
 <td><code>env</code></td>
 <td>the <code>env.*</code> attributes</td>
 </tr>
 <tr>
-<td><code>cat</code> of one of: <code>/etc/os-release</code>, <code>/etc/timezone</code>, <code>/etc/crypto-policies/config</code>, <code>/proc/self/cgroup</code>, <code>/proc/cmdline</code>, <code>/proc/sys/kernel/apparmor_restrict_unprivileged_userns</code>, <code>/sys/fs/cgroup/cpu.max</code>, <code>/sys/fs/cgroup/memory.max</code>, <code>/sys/fs/cgroup/memory/memory.limit_in_bytes</code>, <code>/usr/share/zoneinfo/tzdata.zi</code>, <code>/usr/share/zoneinfo/+VERSION</code></td>
-<td>the OS release, cgroup, kernel command line, crypto policy and time zone database facts</td>
+<td><code>cat</code> of one of: <code>/etc/hosts</code>, <code>/etc/nsswitch.conf</code>, <code>/etc/os-release</code>, <code>/etc/timezone</code>, <code>/etc/resolv.conf</code>, <code>/etc/crypto-policies/config</code>, <code>/proc/cmdline</code>, <code>/proc/net/if_inet6</code>, <code>/proc/self/cgroup</code>, <code>/proc/self/limits</code>, <code>/proc/self/mountinfo</code>, <code>/proc/self/status</code>, <code>/proc/sys/fs/file-max</code>, <code>/proc/sys/fs/inotify/max_user_instances</code>, <code>/proc/sys/fs/inotify/max_user_watches</code>, <code>/proc/sys/kernel/apparmor_restrict_unprivileged_userns</code>, <code>/proc/sys/kernel/pid_max</code>, <code>/proc/sys/kernel/threads-max</code>, <code>/proc/sys/net/core/somaxconn</code>, <code>/proc/sys/net/ipv6/conf/all/disable_ipv6</code>, <code>/proc/sys/vm/max_map_count</code>, <code>/sys/devices/system/clocksource/clocksource0/current_clocksource</code>, <code>/sys/fs/cgroup/cpu.max</code>, <code>/sys/fs/cgroup/memory.max</code>, <code>/sys/fs/cgroup/memory/memory.limit_in_bytes</code>, <code>/usr/lib/locale/locale-archive</code>, <code>/usr/share/zoneinfo/tzdata.zi</code>, <code>/usr/share/zoneinfo/+VERSION</code></td>
+<td>the OS release, cgroup, resource limit, mount, CPU affinity, locale, hosts, name service switch, resolver, kernel command line, crypto policy, time zone database, <code>sysctl.*</code>, clock source and IPv6 facts</td>
 </tr>
 </tbody>
 </table></div>
-<p>A Linux capture makes 17 ssh calls that run 15 distinct commands (<code>env</code> runs twice and <code>cat /sys/fs/cgroup/memory.max</code> twice); a 16th command, <code>cat /etc/timezone</code>, runs only when <code>/etc/localtime</code> is not a link. The facts never run <code>df</code>, <code>mount</code>, <code>find</code> or <code>ls</code>, and never read a path outside the list.</p>
+<p>On a host whose <code>tzdata.zi</code> has a version line and whose <code>/etc/localtime</code> links into <code>zoneinfo/</code>, a Linux capture makes 37 remote commands, 35 of them distinct (<code>env</code> and <code>cat /sys/fs/cgroup/memory.max</code> each run twice). Two fallbacks each add one call and one distinct command: <code>cat /usr/share/zoneinfo/+VERSION</code> when <code>tzdata.zi</code> has no version line, and <code>cat /etc/timezone</code> when <code>/etc/localtime</code> does not link into <code>zoneinfo/</code>. The most a Linux capture runs is 39 calls and 37 distinct commands, which is every entry in the list above except <code>sw_vers</code>. The facts never run <code>df</code>, <code>mount</code> or <code>find</code>, run <code>ls</code> only on the two directories above, and never read a path outside the list.</p>
 <h3 id="safety-rules">Safety Rules</h3>
 <p>Drift passes <code>-o BatchMode=yes</code>, so ssh never asks for a password, and it never calls <code>sshpass</code> or <code>sudo</code>. It passes <code>-o StrictHostKeyChecking=yes</code>, so a host key that is not already in your <code>known_hosts</code> fails the connection. Drift never runs <code>ssh-keyscan</code>, never edits <code>known_hosts</code>, and never uses <code>accept-new</code>, <code>StrictHostKeyChecking=no</code> or <code>UserKnownHostsFile=/dev/null</code>. Your own <code>~/.ssh/config</code>, agent and keys do the authentication, and Drift stores no credential and no host key. It passes <code>ForwardAgent=no</code>, <code>ForwardX11=no</code> and <code>ClearAllForwardings=yes</code> so your config cannot turn forwarding on.</p>
 <p>The host text must match <code>[user@]name</code>, with letters, digits, <code>.</code>, <code>_</code> and <code>-</code> (or a bracketed IPv6 address after the <code>@</code>), no part may start with <code>-</code>, and Drift passes it after <code>--</code>. Anything else is refused before ssh runs, so a host argument cannot become an ssh option. A host argument in brackets reaches ssh without them.</p>
@@ -2278,7 +2444,7 @@ exec docker run --rm \
 	&quot;$image&quot; sh -c 'npm test'
 </code></pre>
 <p>Arguments after <code>run.sh</code> land before the image name, so they override the flags above them.</p>
-<p><strong>Naming the toolchain.</strong> The base image comes from the toolchain the capsule records. <code>--run</code> decides which one when the capsule records several: the first word of the command that names a toolchain wins (a path prefix is ignored, so <code>./gradlew</code> counts as <code>gradlew</code>; <code>node</code>, <code>npm</code> and <code>python3</code> are other examples). With no match, the first toolchain in table order is used.</p>
+<p><strong>Naming the toolchain.</strong> The base image comes from the toolchain the capsule records. <code>--run</code> decides which one when the capsule records several: the first word of the command that names a toolchain wins (a path prefix is ignored, so <code>./gradlew</code> counts as <code>gradlew</code>; <code>node</code>, <code>npm</code> and <code>python3</code> are other examples). With no match, a toolchain whose official image sets its version variable in the capsule (<code>PYTHON_VERSION</code>, <code>GCC_VERSION</code>, <code>R_BASE_VERSION</code> and the like) wins, because the capsule was taken inside that image; otherwise the first toolchain in table order is used. A distribution that records an alpine point release the registry publishes, such as 3.22.6, gets that exact <code>alpine</code> tag.</p>
 <pre><code class="language-sh">for r in &quot;npm test&quot; &quot;sh test.sh&quot; &quot;python3 -m pytest&quot;; do
   drift reproduce fixtures/lab/node.json --run &quot;$r&quot; --out t1 2&gt;/dev/null | sed -n 2p
   jq -r '.image.basis' t1/manifest.json
@@ -2427,7 +2593,7 @@ FROM node:22.12.0-alpine3.20@sha256:00000000000000000000000000000000000000000000
 </tr>
 <tr>
 <td><code>--exit-status</code></td>
-<td>exit 0 <code>CONFIRMED</code>, 10 <code>CONFIRMED EFFECT (bundle)</code>, 11 <code>NARROWED</code>, 12 <code>STUCK</code> (default: 0 for every verdict)</td>
+<td>exit 0 <code>CONFIRMED</code>, 10 <code>CONFIRMED EFFECT (bundle)</code>, 11 <code>NARROWED</code>, 12 <code>STUCK</code>, 13 <code>NEEDS</code> (default: 0 for every verdict)</td>
 </tr>
 <tr>
 <td><code>--detail summary|detail|full</code></td>
@@ -2460,8 +2626,8 @@ CONFIRMED: this dimension causes the failure: env.TZ. Setting it to the failing 
 </code></pre>
 <p>The capsule says <code>os.arch=x86_64</code>, so the arms ran as <code>linux/amd64</code> containers on an arm64 Mac (emulated), and <code>--drift-binary</code> had to be an x86_64 Linux binary (<code>cli/build/bin/linuxX64/releaseExecutable/drift.kexe</code>). The binary must run inside the arm's image. Without <code>--drift-binary</code> the same command also ended <code>CONFIRMED</code> and wrote 35 files; the 6 missing files are the capsules of the arms.</p>
 <p><code>wrote 41 files to solved</code> goes to standard error. The case has the files of a <code>diagnose</code> case plus <code>experiments/</code>, <code>arms/&lt;id&gt;-control</code> and <code>-treatment</code> (each with <code>Dockerfile</code>, <code>run.sh</code>, <code>manifest.json</code>, <code>capsule.json</code>), <code>results/NNNN.json</code> and <code>certificate.json</code>. The exit code is 0 for every verdict unless you pass <code>--exit-status</code>, which maps the verdict to an exit code (see <a href="#exit-codes">Exit Codes</a>).</p>
-<p><strong>Budgets.</strong> <code>--budget</code> caps trials over all arms and container minutes together. If no trials-per-arm count up to 30 reaches power 0.8 inside the remaining budget, the run ends <code>STUCK</code> with reason <code>budget</code> and names the shortfall. A bad item fails before any container starts: <code>bad --budget item: bogus</code>, or <code>--budget takes trials=N and minutes=M, not hours=2</code>.</p>
-<p><strong>The four verdicts.</strong></p>
+<p><strong>Budgets.</strong> <code>--budget</code> caps trials over all arms and container minutes together. If no trials-per-arm count up to 30 reaches power 0.8 inside the remaining budget, the run ends <code>NEEDS</code> with reason <code>budget</code>, names the shortfall and gives the command that would settle it. A bad item fails before any container starts: <code>bad --budget item: bogus</code>, or <code>--budget takes trials=N and minutes=M, not hours=2</code>.</p>
+<p><strong>The verdicts.</strong></p>
 <div class="table"><table>
 <thead>
 <tr>
@@ -2476,7 +2642,7 @@ CONFIRMED: this dimension causes the failure: env.TZ. Setting it to the failing 
 </tr>
 <tr>
 <td><code>CONFIRMED EFFECT (bundle)</code></td>
-<td>the same, but the arms also differ in attributes nobody set; each member is named</td>
+<td>the same, but the arms also differ in attributes nobody set; each member is named. Members that an intervention can set alone get their own experiment (see below)</td>
 </tr>
 <tr>
 <td><code>CONFIRMED EFFECT (isolation not measured)</code></td>
@@ -2487,21 +2653,41 @@ CONFIRMED: this dimension causes the failure: env.TZ. Setting it to the failing 
 <td>an experiment was supported or stayed inconclusive, but the conditions above are not met</td>
 </tr>
 <tr>
+<td><code>NEEDS</code></td>
+<td>no experiment was supported, and the certificate lists what would settle the cause; the reason is <code>not-reproduced</code>, <code>uncontrollable</code>, <code>no-candidates</code>, <code>budget</code> or <code>executor</code></td>
+</tr>
+<tr>
 <td><code>STUCK</code></td>
-<td>no experiment was supported; the reason is <code>not-reproduced</code>, <code>uncontrollable</code>, <code>no-candidates</code>, <code>budget</code> or <code>executor</code></td>
+<td>the same, but no step exists; the statement says why (for example a pilot already at its 30 trials per arm that cannot reach the target power)</td>
 </tr>
 </tbody>
 </table></div>
-<p>A <code>STUCK</code> run, with a failure pattern that the program never prints:</p>
+<p><strong>Member experiments.</strong> When the verdict is a bundle, <code>solve</code> tries each member that its own intervention can set, one at a time, up to six arms per solve. Setting only that member on the passing side and reproducing the failure makes it <code>sufficient</code>. Otherwise reverting only that member on the failing side and removing the failure makes it <code>necessary</code>. A member counts only when the capture inside the arm shows that member changed and nothing else. Members that no arm sets alone (for example <code>tool.libc.version</code>, which comes with the base image) are listed as not tested alone, each with the reason. The verdict carries the two lists as <code>sufficient</code> and <code>necessary</code>, the certificate holds the arms under <code>conditions.removal</code>, and <code>verify</code> checks that each listed member has a supported experiment. Attributes that one intervention sets together, such as <code>os.release.ID</code>, <code>os.release.PRETTY_NAME</code> and <code>os.release.VERSION_ID</code>, stay together in the minimal set because no arm can tell them apart. On an Alpine base <code>set-userland gnu</code> installs the GNU coreutils, findutils, grep, sed and diffutils.</p>
+<p><strong>Interventions the arms carry.</strong> <code>set-shell</code> links <code>/bin/sh</code> to another shell (<code>tool.sh.flavor</code>; on a Debian base <code>bash</code> becomes <code>RUN ln -sf bash /bin/sh</code>, <code>dash</code> is the image's own). <code>set-pin</code> sets a project pin that the arm writes as a workspace file: <code>project.pins.node</code> as <code>.nvmrc</code>, <code>project.pins.python</code> as <code>.python-version</code>, <code>project.python.&lt;name&gt;</code> as a line of <code>requirements.txt</code> and <code>project.checksums.&lt;path&gt;</code> as a line of <code>SHA256SUMS</code>. An arm that carries pins mounts the workspace read-only at <code>/src</code>, a tmpfs at <code>/work</code>, and copies the workspace and the pin files into <code>/work</code> before the command, so the caller's workspace is not changed; the capture inside such an arm adds <code>--project</code>.</p>
+<p><strong>Next steps.</strong> A <code>NEEDS</code> verdict carries <code>steps</code>, each with <code>kind</code>, <code>text</code>, <code>command</code> and <code>reply</code>. <code>capture</code> is the capture ask that <code>drift why</code> prints, with the same <code>command</code> (<code>drift why --save there.json</code>) and the same piped form in <code>reply</code> (<code>drift why --save there.json &amp;&amp; drift why --reply &lt; there.json</code>); a step that is an ask also carries the ask's <code>family</code> and <code>piped</code>, <code>manual-experiment</code> points at <code>drift next CASE</code>, <code>longer-pilot</code> and <code>raise-budget</code> print the <code>drift solve</code> command with <code>--pilot 30</code> or a doubled <code>--budget</code>, <code>rerun</code> repeats the solve after the failing step is fixed, and <code>unmirrored</code> names what a container does not mirror.</p>
+<p>A <code>NEEDS</code> run, with a failure pattern that the program never prints:</p>
 <pre><code class="language-sh">drift solve --run 'sh prog.sh' --fail-when 'no such text' --pilot 3 --budget trials=20,minutes=5 \
   --workspace ws --case stuck bench/data/capsules/locale-tz-date-2.green.json \
   bench/data/capsules/locale-tz-date-2.red.json
 </code></pre>
 <pre><code>wrote 19 files to stuck
-STUCK: the failure does not reproduce in the container built from the failing capsule: 0 of 3 trials
-  failed
-1 candidate changes, 0 experiments run in containers (6 trials, 6 seconds), not on the original
+NEEDS: the failure does not reproduce in the container built from the failing capsule: 0 of 5 trials
+  failed, so the failure rate is below 60% at 95%
+1 candidate changes, 0 experiments run in containers (10 trials, 10 seconds), not on the original
   host.
+  Next (capture): The container built from the capsule does not show the cause. Capture the failing
+    machine with its tools and project files, which the capsule may lack, and compare it with the
+    passing one.
+    run: drift why --save there.json
+    reply: drift why --save there.json &amp;&amp; drift why --reply &lt; there.json
+  Next (unmirrored): A container does not mirror cpu.count, kernel.release, tool.coreutils.version,
+    tool.libc.version. If one of them differs on the failing machine, change it there to the passing
+    value and run the failing command again.
+  Next (longer-pilot): The pilot of 3 trials per arm may be too short to see or size a failure that
+    does not happen every time; run it at the most it allows, 30.
+    run: drift solve bench/data/capsules/locale-tz-date-2.green.json
+      bench/data/capsules/locale-tz-date-2.red.json --run 'sh prog.sh' --fail-when 'no such text'
+      --pilot 30 --case stuck-next
 </code></pre>
 <p>The loop assumes one cause: the first supported experiment ends it. The fixtures in <code>fixtures/lab/cases</code> hold one real certificate per verdict class (see <a href="#pack-report-and-verify">Verify</a>).</p>
 <p>Errors before any container starts: <code>case directory already holds a case: solved</code>, <code>--fail-when needs exit or a pattern</code> (an empty value), <code>cannot read capsule file: nofile.json</code>. All exit 1.</p>
@@ -2600,7 +2786,7 @@ drift pack ex --out packed.driftcase
 cmp packed.driftcase fixtures/lab/cases/locale-tz-date-2.driftcase &amp;&amp; echo identical
 tar -tvf fixtures/lab/cases/locale-tz-date-2.driftcase | head -4
 </code></pre>
-<pre><code>wrote packed.driftcase: 19 files, 50176 bytes, sha256 8d4aaf9f238896a823a4aa065b3022df1581b42e4c3e0f8c93986bfb1c889cba
+<pre><code>wrote packed.driftcase: 19 files, 50176 bytes, sha256 50fb8ab1675f74b767e4dcae42cffe96d35979906c0a6d351f125152152d6bc2
 identical
 -rw-r--r--  0 0      0         212 Dec 31  1969 case.json
 -rw-r--r--  0 0      0        5895 Dec 31  1969 certificate.json
@@ -3056,7 +3242,7 @@ contract: 0 hold, 0 break, 1 unverifiable
   drupal   project.composer.drupal/core          10.3.6 -&gt; 11
   symfony  project.composer.symfony/http-kernel  v6.4.12 -&gt; 7.1
   php      tool.php.version                      8.1.34 -&gt; 8.3
-83 of 426 rules read a target key
+84 of 429 rules read a target key
 
 Will break (0)
   none
@@ -3120,7 +3306,7 @@ Unknown (0)
 </tr>
 </tbody>
 </table></div>
-<p>Only rules that read a target key on side <code>b</code> and give a different verdict for the targets than for the capsule alone are listed. The line <code>83 of 426 rules read a target key</code> counts the rules that read one before that filter. Probe results and run facts describe today's environment, so side <code>b</code> has none, and a rule that reads one is unknown.</p>
+<p>Only rules that read a target key on side <code>b</code> and give a different verdict for the targets than for the capsule alone are listed. The line <code>84 of 429 rules read a target key</code> counts the rules that read one before that filter. Probe results and run facts describe today's environment, so side <code>b</code> has none, and a rule that reads one is unknown.</p>
 <p>Locked packages are checked apart from the rules. When a target is <code>php</code>, <code>node</code> or <code>python</code>, <code>upgrade-check</code> reads the runtime constraint each locked package records and lists a package whose constraint allows today's runtime and excludes the target under &quot;Will break: locked packages&quot;, with the package, its version, the lockfile and the constraint. <code>drift capture --project</code> records the constraint as <code>project.&lt;ecosystem&gt;.&lt;package&gt;.requires.&lt;runtime&gt;</code> for the formats that carry one, and no rule names the package:</p>
 <div class="table"><table>
 <thead>
@@ -3158,7 +3344,7 @@ Unknown (0)
 <pre><code class="language-sh">drift upgrade-check fixtures/upgrade-check/drupal-10-php-8-1.json --to php=8.3,drupal=11,symfony=7.1 --json \
   | jq -c '{rules, touched, willBreak: [.&quot;will-break&quot;[] | {rule}], versionBoundary: [.&quot;version-boundary&quot;[] | {rule, crossings: [.crossings[] | {key, from, to}]}]}'
 </code></pre>
-<pre><code>{&quot;rules&quot;:426,&quot;touched&quot;:83,&quot;willBreak&quot;:[],&quot;versionBoundary&quot;:[{&quot;rule&quot;:&quot;php-8-2-dynamic-properties-deprecated&quot;,&quot;crossings&quot;:[{&quot;key&quot;:&quot;tool.php.version&quot;,&quot;from&quot;:&quot;8.1.34&quot;,&quot;to&quot;:&quot;8.3&quot;}]},{&quot;rule&quot;:&quot;drupal-10-to-11-symfony-6-2-to-7-1&quot;,&quot;crossings&quot;:[{&quot;key&quot;:&quot;project.composer.drupal/core&quot;,&quot;from&quot;:&quot;10.3.6&quot;,&quot;to&quot;:&quot;11&quot;},{&quot;key&quot;:&quot;project.composer.symfony/http-kernel&quot;,&quot;from&quot;:&quot;v6.4.12&quot;,&quot;to&quot;:&quot;7.1&quot;}]}]}
+<pre><code>{&quot;rules&quot;:429,&quot;touched&quot;:84,&quot;willBreak&quot;:[],&quot;versionBoundary&quot;:[{&quot;rule&quot;:&quot;php-8-2-dynamic-properties-deprecated&quot;,&quot;crossings&quot;:[{&quot;key&quot;:&quot;tool.php.version&quot;,&quot;from&quot;:&quot;8.1.34&quot;,&quot;to&quot;:&quot;8.3&quot;}]},{&quot;rule&quot;:&quot;drupal-10-to-11-symfony-6-2-to-7-1&quot;,&quot;crossings&quot;:[{&quot;key&quot;:&quot;project.composer.drupal/core&quot;,&quot;from&quot;:&quot;10.3.6&quot;,&quot;to&quot;:&quot;11&quot;},{&quot;key&quot;:&quot;project.composer.symfony/http-kernel&quot;,&quot;from&quot;:&quot;v6.4.12&quot;,&quot;to&quot;:&quot;7.1&quot;}]}]}
 </code></pre>
 <p>The targets can sit in a file instead. This file gives the same result:</p>
 <pre><code class="language-yaml">php: 8.3
@@ -3174,7 +3360,7 @@ symfony: '7.1'
 </code></pre>
 <pre><code>upgrade-check: drupal-10-site
   php  tool.php.version  8.1.34 -&gt; 7.4
-56 of 426 rules read a target key
+57 of 429 rules read a target key
 
 Will break (2)
   1. [high, inferred] Drupal 10 cannot run on PHP 8.0 or earlier; PHP 8.0 sites must move to 8.1 before upgrading core
@@ -3228,7 +3414,7 @@ Unknown (0)
 </code></pre>
 <pre><code>upgrade-check: red
   drupal  project.composer.drupal/core  unknown -&gt; 11
-21 of 426 rules read a target key
+21 of 429 rules read a target key
 
 Will break (0)
   none
@@ -3260,7 +3446,7 @@ Unknown (10)
 </ul>
 <h2 id="atlas">Atlas</h2>
 <p>The Atlas asks, per probe, whether a Kotlin program prints the same thing on every target. It holds 38 probes. <code>atlas record</code> runs them on this target, <code>atlas build</code> aggregates transcripts into a dataset, <code>atlas compare</code> places this device against it, <code>atlas show</code> prints the matrix, the oracle or a draft for one probe and <code>atlas diff</code> lists what changed between two Kotlin versions.</p>
-<p><strong>Columns.</strong> <code>fixtures/atlas/</code> holds 15 recorded columns on Kotlin 2.4.20, and <code>fixtures/atlas/2.5.0-beta1/</code> holds 5 on 2.5.0-Beta1 (<code>jvm</code>, <code>macos</code>, <code>wasm</code>, <code>android</code>, <code>ios</code>). <a href="https://github.com/gmitch215/Drift/blob/master/atlas/columns.yml"><code>atlas/columns.yml</code></a> says how each was measured.</p>
+<p><strong>Columns.</strong> <code>fixtures/atlas/</code> holds 16 recorded columns on Kotlin 2.4.20, and <code>fixtures/atlas/2.5.0-beta1/</code> holds 5 on 2.5.0-Beta1 (<code>jvm</code>, <code>macos</code>, <code>wasm</code>, <code>android</code>, <code>ios</code>). <a href="https://github.com/gmitch215/Drift/blob/master/atlas/columns.yml"><code>atlas/columns.yml</code></a> says how each was measured.</p>
 <div class="table"><table>
 <thead>
 <tr>
@@ -3577,7 +3763,7 @@ curl -s -o /dev/null -w '%{http_code} %{content_type}\n' http://localhost:PORT/p
 </code></pre>
 <pre><code>200 text/html; charset=utf-8
 </code></pre>
-<p><code>./gradlew docsSite</code> runs <code>dokkaGenerate</code> and <code>atlasSite</code> first, then assembles <code>build/site</code> (3,089 files): <code>README.md</code> as <code>index.html</code>, <code>ADVANCED_USAGE.md</code> as <code>advanced-usage.html</code> and <code>TECHNICAL_REPORT.md</code> as <code>technical-report.html</code>, each rendered into <code>assets/site-template.html</code>, the Atlas site under <code>atlas/</code>, the Dokka site under <code>engine/</code>, the icons from <code>assets/</code>, <code>CNAME</code> and <code>.nojekyll</code>. A relative link in the three Markdown files to a repository path that does not exist fails the render, and a link to one that does exist becomes a GitHub URL on <code>master</code>. <code>checkSiteLinks</code> runs after it and fails on a relative <code>href</code> or <code>src</code> that does not resolve inside <code>build/site</code>. It scanned 73,286 links and found none unresolved outside <code>engine/</code>, where Dokka leaves 14 unresolved; those are counted and printed and do not fail it.</p>
+<p><code>./gradlew docsSite</code> runs <code>dokkaGenerate</code> and <code>atlasSite</code> first, then assembles <code>build/site</code>: <code>README.md</code> as <code>index.html</code>, <code>ADVANCED_USAGE.md</code> as <code>advanced-usage.html</code>, <code>TECHNICAL_REPORT.md</code> as <code>technical-report.html</code>, <code>MANUAL.md</code>, and the guides in <code>docs/</code>, each rendered into <code>assets/site-template.html</code>, the Atlas site under <code>atlas/</code>, the Dokka site under <code>engine/</code>, the icons from <code>assets/</code>, <code>CNAME</code> and <code>.nojekyll</code>. A relative link in these Markdown files to a repository path that does not exist fails the render, and a link to one that does exist becomes a GitHub URL on <code>master</code>. <code>checkSiteLinks</code> runs after it and fails on a relative <code>href</code> or <code>src</code> that does not resolve inside <code>build/site</code>. It finds no unresolved link outside <code>engine/</code>; Dokka's unresolved links there are counted and printed and do not fail it.</p>
 <p>The <code>docs.yml</code> workflow runs <code>./gradlew dokkaGenerate atlasSite docsSite</code> and pushes <code>build/site</code> to the <code>gh-pages</code> branch. It builds on pushes to <code>master</code>, <code>ver/*</code>, <code>feat/*</code> and <code>renovate/*</code> and deploys only from <code>master</code>, with a <code>CNAME</code> file for <code>drift.gmitch215.dev</code>, where the site is live.</p>
 <h2 id="probe">Probe</h2>
 <p><code>probe cloudflare</code> runs the Kotlin probes in a Cloudflare Worker and writes the transcript in the Atlas format, the same file <code>atlas record</code> writes. The default run is local: <code>wrangler dev --local</code> serves the Worker on workerd at <code>127.0.0.1</code>, so it needs no network and no Cloudflare account. It needs Node and <code>wrangler</code> (on <code>PATH</code>, or through <code>npx wrangler</code>), and a directory that holds a built Worker.</p>
@@ -3780,7 +3966,60 @@ Draft rule: none
 <li>A hedge on the line (<code>maybe</code>, <code>probably</code>, <code>i think</code>, <code>not sure</code>) scales the start by 0.7. A distribution name that implies Linux gives <code>os.name</code> at 0.9 of the distribution's confidence.</li>
 </ol>
 <p>The side comes from the words around the value. The nearest verdict word before it in the clause decides: <code>works on Node 18</code> is <code>passing</code>, <code>fails on Node 20</code> is <code>failing</code>. A verdict word right after it wins (<code>Node 18 works</code>). <code>upgraded from Node 18 to Node 20</code> reads 18 as <code>passing</code>. With no verdict word, a value is <code>failing</code>.</p>
-<p>The keys are the ones the rules read: <code>os.name</code>, <code>os.version</code>, <code>os.arch</code>, <code>os.release.ID</code>, <code>os.release.VERSION_ID</code>, <code>tool.&lt;name&gt;.version</code> for Java, Kotlin, Gradle, Node, npm, Python, PHP, Go, Rust, Git, .NET, workerd, pip, <code>tool.cc.*</code> and <code>tool.libc.*</code>, <code>project.gradle.kotlin.version</code>, <code>project.gradle.agp.version</code>, <code>project.&lt;ecosystem&gt;.&lt;package&gt;</code> for dependencies pasted from a build file or an install command, <code>browser.name</code>, <code>browser.version</code>, <code>ci.provider</code>, <code>ci.runner.label</code>, <code>runtime.platform</code>, <code>runtime.container.image</code>, <code>runtime.jvm.options</code>, <code>env.LANG</code>, <code>env.TZ</code>, and <code>run:signature</code> for the first error line, normalized the way a failing step is.</p>
+<p>The keys are the ones the rules read: <code>os.name</code>, <code>os.version</code>, <code>os.arch</code>, <code>os.release.ID</code>, <code>os.release.VERSION_ID</code>, <code>tool.&lt;name&gt;.version</code> for Java, Kotlin, Gradle, Node, npm, Python, PHP, Go, Rust, Git, .NET, Docker, Composer, OpenSSL, Ruby, Podman, curl, Xcode, CocoaPods, Dart, workerd, pip, <code>tool.cc.*</code> and <code>tool.libc.*</code>, <code>project.gradle.kotlin.version</code>, <code>project.gradle.agp.version</code>, <code>project.&lt;ecosystem&gt;.&lt;package&gt;</code> for dependencies pasted from a build file, an install command or pip output, <code>browser.name</code>, <code>browser.version</code>, <code>ci.provider</code>, <code>ci.runner.label</code>, <code>runtime.platform</code>, <code>runtime.container.image</code>, <code>runtime.jvm.options</code>, <code>env.LANG</code>, <code>env.TZ</code>, and <code>run:signature</code> for the first error line, normalized the way a failing step is. The next section lists the keys that come from logs and configuration.</p>
+<h3 id="facts-from-logs-and-configuration">Facts From Logs and Configuration</h3>
+<p>Some text carries a fact in a shape that only that kind of output has. Each reader below needs that shape; a bare word never produces a fact.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Read from</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tool.&lt;name&gt;.version</code> for any <code>&lt;name&gt;</code></td>
+<td>a name the text itself shows as a tool: the first word of a prompt line (<code>$ skopeo --version</code>), a package in an <code>apt</code>, <code>apk</code>, <code>dnf</code>, <code>yum</code>, <code>brew</code>, <code>choco</code>, <code>winget</code>, <code>scoop</code> or <code>snap</code> install line, or a bare <code>name --version</code> line. A mention of that name then needs a dotted version or the word <code>version</code> before it, and four numbers joined by dots read as an address</td>
+</tr>
+<tr>
+<td><code>tool.&lt;name&gt;.required</code></td>
+<td>a requirement on a line that names the tool: <code>requires PHP &gt;= 8.1.0</code>, <code>Expected version &quot;&gt;=18&quot;</code>, <code>3.8.10 not in '&gt;=3.9'</code>, <code>Minimum supported Gradle version is 8.5</code>. The operator stays in the value, because a minimum is not the version of any environment</td>
+</tr>
+<tr>
+<td><code>tool.&lt;name&gt;.version</code> (failing)</td>
+<td>the version found on that same line: <code>You are running 7.4.33</code>, <code>Got &quot;16.20.0&quot;</code>, <code>Current version is 8.2</code></td>
+</tr>
+<tr>
+<td><code>project.python.&lt;package&gt;</code></td>
+<td><code>Successfully installed name-1.2.3</code>, a wheel or sdist file name, <code>Requirement already satisfied</code>, <code>pip install name==1.2.3</code> and a requirements line</td>
+</tr>
+<tr>
+<td><code>project.python.pyqt</code>, <code>pyside</code>, <code>tool.qt.version</code>, <code>tool.gtk.version</code></td>
+<td>a binding name with one digit, such as <code>PyQt6</code>; the digit is the value</td>
+</tr>
+<tr>
+<td><code>runtime.container.image</code></td>
+<td>a registry path (<code>ghcr.io/acme/tool:1.4</code>), <code>docker://name:tag</code> or the image after <code>docker pull</code>, <code>run</code> or <code>create</code>; a digest is dropped</td>
+</tr>
+<tr>
+<td><code>env.&lt;NAME&gt;</code></td>
+<td>an <code>environment:</code> block, <code>-e NAME=value</code>, <code>ENV</code>, <code>export</code> and <code>set</code>; a name with <code>key</code>, <code>token</code>, <code>secret</code>, <code>pass</code>, <code>auth</code>, <code>cred</code>, <code>private</code>, <code>salt</code>, <code>hash</code> or <code>sign</code> in it is never read</td>
+</tr>
+<tr>
+<td><code>runtime.platform</code>, <code>tool.&lt;platform&gt;.version</code></td>
+<td>a server platform (Paper, Spigot, Purpur, Velocity, Waterfall and the like) in a <code>Server Version</code> style field, a <code>running &lt;name&gt; version</code> log line, <code>&lt;name&gt; version &lt;v&gt;</code> or a jar name such as <code>spigot-api-1.19-R0.1-SNAPSHOT.jar</code></td>
+</tr>
+<tr>
+<td><code>tool.docker.version</code>, <code>kernel.release</code></td>
+<td>the <code>Client:</code> and <code>Server:</code> blocks of <code>docker version</code> and the <code>Server Version:</code> and <code>Kernel Version:</code> lines of <code>docker info</code></td>
+</tr>
+<tr>
+<td><code>limits.disk-quota</code>, <code>limits.nofile</code></td>
+<td><code>Disk quota exceeded</code> and <code>Too many open files</code>; the value is <code>exceeded</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>A phrase such as <code>does not have this problem</code> after a value puts it on the passing side.</p>
 <p><code>tool-output</code>, <code>key-value</code> and <code>pattern</code> were set from a seeded half of the triage corpus (see Corpus below). <code>section</code> keeps 0.950: the corpus takes its truth from form sections, so that path cannot be scored against it. On the other half of the corpus the facts on form-labelled keys score a precision of 0.783 and a Brier score of 0.1486 over 1,376 facts. <code>key-value</code> is the weakest path: 9 held-out facts, precision 0.444.</p>
 <h3 id="rules">Rules</h3>
 <p>A rule applies when its detect tree holds on the stated facts. A tree that reads <code>a</code> and <code>b</code> sides is evaluated with the passing facts as <code>a</code> and the failing facts as <code>b</code>.</p>
@@ -3876,7 +4115,7 @@ Draft rule: none
 </table></div>
 <p>A claim fires on a sentence outside code blocks that has a phrase from each of its word groups and no negation, question mark or sign that the sentence is not an assertion (<code>deprecat</code>, <code>slated</code>, <code>instead</code>, <code>alternativ</code>, <code>would</code>, <code>please</code>, <code>overflow</code>, <code>non-</code>). A claim that depends on the environment stays silent when the fact is missing. The confidence is 0.700, times the weakest fact the claim depends on.</p>
 <h3 id="draft-rules">Draft Rules</h3>
-<p>A draft needs a symptom signature, one version key stated on both sides with the passing version below the failing one, and no rule that already holds on that key. Its detect tree is the version range each side stated plus the signature:</p>
+<p>A draft needs a symptom signature, one key stated on both sides, and no rule that already holds on that key. For a version key (<code>tool.&lt;name&gt;.version</code> or any <code>project.*</code> key) the passing version must be below the failing one. For <code>runtime.container.image</code>, <code>ci.runner.label</code> and <code>runtime.platform</code> the two values must differ, and the rule compares them for equality. Its detect tree is what each side stated plus the signature:</p>
 <pre><code class="language-sh">drift triage fixtures/triage/f11-node-typeerror.md --publish-threshold 0.5 --date 2026-10-13
 </code></pre>
 <pre><code>Triage of issue text 3ba2ef819767
@@ -3923,8 +4162,16 @@ drift upgrade-check capsule.json --to node=20 --learned .drift/learned
 <p><code>diagnose</code>, <code>upgrade-check</code> and <code>triage</code> read the store from <code>--learned</code> and rank or match its rules with the shipped ones. A missing store adds nothing; a store that does not compile is an error. The Action's <code>publish-threshold</code> input only changes the decision shown in the comment, since the Action passes no store.</p>
 <h3 id="redaction">Redaction</h3>
 <p>Secrets are masked before anything is stored or printed, with the same redactor as <code>capture</code>. Other users' home directories become <code>.../user</code>. An <code>@login</code> mention becomes <code>@</code> and a hash, <code>u</code> followed by ten hex digits of the SHA-256 of the lowercase login; <code>--author</code> is hashed the same way. A mention inside a code block stays, since it is usually an annotation. The result keeps the SHA-256 of the redacted text and the line and column of each value, never the text.</p>
+<h3 id="ci-logs-and-version-banners">CI Logs and Version Banners</h3>
+<p><code>Triage.clean</code> turns a GitHub Actions log into one fenced block: when at least three lines and at least half of the non-blank lines carry a <code>job&lt;TAB&gt;step&lt;TAB&gt;timestamp</code> or <code>timestamp</code> prefix, the prefixes and colour codes are removed and the lines are wrapped in a code fence (spans refer to that text; any other text is untouched). The extractors then read the lines as output: a runtime banner is the <code>tool.X.version</code> fact (a Ruby <code>p107</code> patch level is skipped, so <code>ruby 3.0.2p107</code> is 3.0.2), a setup input such as <code>python-version: 3.9</code> is a stated version at the confidence of any stated version (700), a banner printed by the log (990) beats it, and the last error line becomes <code>run:signature</code>. <code>Asks.runtimes</code> also reads a <code>SyntaxError</code> under a Python <code>File &quot;...&quot;, line N</code> frame as Python. In the plain answer the tool versions come before settings and the system, and a report that states a tool version no rule explains gets that version as the failing-side answer of its version check: the session starts with that check answered and the next step is the works-side step. No fact key and no rule was added for this.</p>
+<h3 id="not-environment">Not Environment</h3>
+<p>When the text has a program-side signal and no environment fact on the failing side, the result adds a <code>notEnvironment</code> object: <code>signal</code> (<code>frame</code>, <code>mismatch</code>, <code>regression</code>, <code>crash</code>, <code>logic</code>, <code>null-deref</code>, <code>bounds</code>, <code>memory</code>, <code>not-shown</code>, <code>located</code> or <code>clean-run</code>), <code>line</code> (1-based), <code>frame</code> (the project's <code>file:line</code> for a frame, otherwise <code>null</code>) and <code>text</code> (the line, clipped to 160 characters). <code>drift triage</code> prints it as a line such as <code>Not environment (frame) at line 3: at test.js:3:8</code>. The object is absent when a rule matches or a failing-side fact is stated, so output for other reports does not change. <code>frame</code>, <code>mismatch</code> and <code>regression</code> follow the stated-fact rule. <code>crash</code> is an exception: a line with the word crash, in a text that also shows an exception, a traceback, a segmentation fault, an access violation or a stack trace, counts when the only facts stated on the failing side are <code>os.*</code> ones, since every bug template asks for the system. It ranks below the other three. The six program statements (<code>logic</code>, <code>null-deref</code>, <code>bounds</code>, <code>memory</code>, <code>not-shown</code>, <code>located</code>) are the other exception. They are phrase lists in <code>core/.../triage/ProgramFault.kt</code> and apply when the text tells no story of change (no passing-side fact, no <code>.required</code> fact, no limit that was hit, no &quot;works on&quot;, &quot;worked before&quot;, &quot;since upgrading&quot; or similar phrase) and no rule or draft rule matches. They may stand beside tool versions and the system. A Markdown heading or a bold label does not count as a mismatch. Frames in <code>node_modules</code>, <code>site-packages</code>, the JDK and <code>/usr</code> do not count. <code>clean-run</code> comes only from <code>drift why --reply</code>: a clean run printed the same failure as the report, <code>line</code> is the report line that holds it and <code>text</code> is that line. The rule is in <a href="why.html#when-it-is-not-the-environment">docs/why.md</a>.</p>
+<p><code>drift why</code> also withholds the reading when an error phrase names a runtime, module, tool, limit or locale. <code>drift triage</code> has no such phrase table, so a report that names a missing runtime feature and gives no version can carry the reading there.</p>
+<h3 id="ask">Ask</h3>
+<p>When no rule matches, no draft follows and no program-side reading applies, <code>drift triage</code> adds an <code>ask</code> list (<code>--json</code>) and an <code>Ask (n)</code> section (text). Each item has <code>family</code> (the attribute family the check reads: <code>tool.node</code>, <code>limits.nofile</code>, <code>os.release</code>, <code>os.version</code>, <code>kernel.release</code>, <code>env.TZ</code>, <code>env.LANG</code>, <code>capture</code> or <code>clean-run</code>), <code>command</code> and <code>piped</code>, which is the command with its output fed to <code>drift why --reply</code>. There are at most three, most useful first: a limit the text says was hit, the tool the text names most (a name inside a path, a URL or a package name does not count, and <code>go</code> counts only as a Go command), the whole-machine capture when the text says it works elsewhere, other tools, the system, then time zone and locale. A family the text already states on the failing side is never asked for. A runtime the text names only through its error vocabulary is asked for like a named tool (<code>tool.python</code>, <code>tool.node</code>, <code>tool.php</code>, <code>tool.java</code>, <code>tool.go</code>, <code>tool.rust</code>, <code>tool.ruby</code>, <code>tool.dotnet</code>; the phrases are in <code>Asks.runtimes</code>: a Python exception name or traceback header, a Node <code>Cannot find module</code>, <code>ERR_</code> code or <code>is not a function</code> with an <code>at</code> frame or <code>node:</code>, a PHP <code>Fatal error: Uncaught</code> or <code>Call to undefined function</code>, a JVM <code>java.lang.</code> name, <code>Exception in thread</code> or <code>UnsupportedClassVersionError</code>, a Go <code>panic:</code> with <code>goroutine</code> or <code>cannot find package</code>, a rustc <code>error[E</code> or <code>thread 'main' panicked</code>, a Ruby <code>NoMethodError</code> or <code>LoadError</code>, a .NET <code>Unhandled exception. System.</code>). A path or a generic word never counts, and nothing is asked for a tool whose version the text states. <code>bash: git: command not found</code>, <code>command not found: git</code> and <code>No such file or directory: 'git'</code> ask <code>command -v git</code> (family <code>tool.git</code>, reply fact <code>tool.git.installed</code> = <code>yes</code> or <code>no</code>; an empty answer is <code>no</code>); a name with a dot or a slash is a file and is not asked for. <code>TriageOptions(worksElsewhere = true)</code>, which <code>drift why --error TEXT</code> sets when it falls back to reading the error text, makes no program-side reading from the text alone and adds the capture ask; the session file then carries <code>&quot;elsewhere&quot;: true</code> so the replies read the report the same way. The <code>clean-run</code> ask comes beside those three, never instead of one: it is first when the text states no failing-side fact and last otherwise. It needs a failure signature in the text (an error line that <code>SymptomExtractor</code> reads, or the <code>run:signature</code> fact), a command and a toolchain with an official image in <code>ImageTable</code>. A command is a <code>$</code>, <code>&gt;</code> or <code>%</code> line in a code block (<code>&gt;</code> and <code>%</code> only when the program is known), the one command of a code block that precedes the block with the error, or an inline code span after a run verb (run, ran, running, executing, typing, <code>command:</code>) whose program is one the ask table or <code>ToolRegistry</code> knows. A report with a command and no signature gets the <code>error-text</code> ask instead (<code>COMMAND 2&gt;&amp;1 | drift why --reply</code>); the reply is added to the report. The printed command mounts the working directory read-only at <code>/src</code>, copies it into a tmpfs <code>/w</code>, drops all capabilities and new privileges, runs as the user, limits processes (256) and memory (1 GB) and adds <code>--network none</code> unless the report shows network use or the command is a package or build manager; the command is the only text from the report and is printed inside single quotes, and no ask is printed for a command that is empty, over 400 characters, holds a control or non-ASCII character, a backtick, <code>$(</code> or a masked secret, or ends in a backslash. The image tag is a published tag from <code>ImageTags</code>: the version the text states for that toolchain (the newest published tag with that prefix, or the nearest one of the same major), or the newest published tag when it states none. Drift never runs the command. The reply is compared with the failure in the report: the same failure (after paths, numbers and times are normalised) ends in the not-environment reading, no error in the output means the command works on a clean machine and the next ask is the capture, and another error keeps the ask open with one sentence on what differed. The session file keeps only the fact <code>run:clean</code> with <code>same</code> or <code>works</code>. Every command comes from a table in <code>core/.../triage/Asks.kt</code>; the tool commands are the ones <code>drift capture --tools</code> runs, and a test in <code>scan</code> keeps the two in step. The key is absent when there is nothing to ask, so other output does not change.</p>
+<p><code>drift triage</code> takes no replies. <code>drift why</code> writes the session and reads them: see <a href="why.html#what-to-run-next">What To Run Next</a>. The session file <code>.drift/why/session.json</code> is canonical JSON with <code>schema</code> 1, <code>report</code> (the redacted text) and <code>asks</code>, each with <code>family</code>, <code>argv</code>, <code>command</code>, <code>why</code>, <code>reply</code> (<code>null</code> while open, else <code>{facts: [{key, value}]}</code>, the facts of the machine where it fails) and, once <code>drift why --reply --works</code> has run, <code>works</code> (the same shape, from the machine where it works; absent otherwise, so a session without it reads as before). <code>drift why --reply --works</code> takes standard input as the answer of a check from the machine where the program works. With both sides it builds two capsules from the facts and runs the comparison <code>--there</code> uses (same ranking, same error-text pointers and wording, &quot;where it works&quot; and &quot;where it fails&quot; as the sides), so a differing fact is named; an equal fact is reported as not differing and the next check follows. After a first reply that no rule answers, the next step is the works-side step, before the other checks and the capture. The session lives in the folder where the first <code>drift why</code> ran, so the step has two forms: run the check where it works, copy the output and paste it where the session is (<code>drift why --reply --works</code>, then Ctrl-D, or Ctrl-Z and Enter on Windows), or pipe it over ssh (<code>ssh USER@HOST CHECK | drift why --reply --works</code>); in <code>plain.ask</code> each check that can run on both machines carries <code>piped</code> (the failing-side pipe), <code>pipedWorks</code> (the works-side pipe) and <code>pasteWorks</code> (the paste sentence). <code>--reply</code> or <code>--works</code> in a folder with no session is not a dead end: it reads the answer (it must parse as the output of one of the checks in the ask table, else exit 1 and a plain sentence), redacts it, exits 0 and prints &quot;There is no session here, so I cannot compare yet. The session is in the folder where you ran drift why --error. Run this there:&quot; and one command, <code>printf '%s\n' 'LINE' ... | drift why --reply [--works]</code>, with the redacted reply as single-quoted arguments (control characters dropped, non-ASCII replaced by <code>?</code>, <code>--session FILE</code> only when it was given; over 2 KiB it says to copy the output into a file and use <code>&lt; FILE</code>). Run on the machine that holds the session, that command gives the comparison. The <code>printenv TZ</code> reply now has to look like a zone name (<code>Europe/Paris</code>, <code>UTC</code>, <code>EST5EDT</code>) so that an arbitrary line is not taken for it. Drift does not detect a terminal, so it prints no prompt before it reads. When the comparison names a difference and other differences exist that the error text does not point at, an evidence line gives their number and names the ones the text points at.</p>
 <h3 id="fixtures-and-scores">Fixtures and Scores</h3>
-<p><a href="https://github.com/gmitch215/Drift/tree/master/fixtures/triage"><code>fixtures/triage/</code></a> holds 70 issue bodies, each with an expectation file. The first 52 are strict forms (10), forms with blank issues (8), free text (12), sparse or wrong beginner reports (10) and mixed phrasing (12); the other 18 cover false positives of the key-value path and claim wording. The bodies are invented for this repository; none is copied from an issue. The expectation lists every fact the text states, the rules and claims it should trigger and whether a draft follows. <code>TriageTest</code> scores the extractor on them and prints the result:</p>
+<p><a href="https://github.com/gmitch215/Drift/tree/master/fixtures/triage"><code>fixtures/triage/</code></a> holds 78 issue bodies, each with an expectation file. The first 52 are strict forms (10), forms with blank issues (8), free text (12), sparse or wrong beginner reports (10) and mixed phrasing (12); 18 cover false positives of the key-value path and claim wording, and 8 cover the readers in Facts From Logs and Configuration, one of them with only lookalikes. The bodies are invented for this repository; none is copied from an issue. The expectation lists every fact the text states, the rules and claims it should trigger and whether a draft follows. <code>TriageTest</code> scores the extractor on them and prints the result:</p>
 <div class="table"><table>
 <thead>
 <tr>
@@ -3935,21 +4182,21 @@ drift upgrade-check capsule.json --to node=20 --learned .drift/learned
 <tbody>
 <tr>
 <td>facts extracted</td>
-<td>189</td>
+<td>207</td>
 </tr>
 <tr>
 <td>precision, recall</td>
-<td>0.989, 0.979 (187 true positives, 2 false positives, 4 false negatives)</td>
+<td>0.990, 0.980 (205 true positives, 2 false positives, 4 false negatives)</td>
 </tr>
 <tr>
 <td>Brier score</td>
-<td>0.0851</td>
+<td>0.0848</td>
 </tr>
 </tbody>
 </table></div>
 <p>The misses are the intended hard cases: a form field that still holds the old version (<code>b07-form-wrong-version</code>), a fix reported as <code>upgraded to node 20 ... went away</code> (<code>h05-form-then-fix</code>), <code>Go 1.22 tutorials</code> read as an environment (<code>h11-lookalike-prose</code>) and <code>on my mac</code> not read as macOS (<code>b01-form-no-response</code>). The test fails when precision drops below 0.95, recall below 0.93 or the Brier score above 0.12, and when any path's mean confidence exceeds its accuracy by more than 0.05. The scores are an upper bound for real issues.</p>
 <h3 id="limits">Limits</h3>
-<p>A version with no name next to it is not read (<code>since upgrading to 3.13.0</code>). One value is kept per key and side. A form field that holds the wrong value is read as written, with 0.950. The text of a pasted log is read only for its first error line. Claims cover nine statements. The draft rule generalizes from one report and is a starting point for a person, not a finding. <code>-</code> was not run on Windows.</p>
+<p>A version with no name next to it is not read (<code>since upgrading to 3.13.0</code>), except the version found on a line that states a requirement for one tool. One value is kept per key and side. A form field that holds the wrong value is read as written, with 0.950. The text of a pasted log is read only for its first error line. Claims cover nine statements. The draft rule generalizes from one report and is a starting point for a person, not a finding. <code>-</code> was not run on Windows.</p>
 <h3 id="corpus">Corpus</h3>
 <p><code>triage/corpus.yml</code> lists the trackers the extractor is measured on: 43 repositories on GitHub and GitLab, 15 large and 28 small (50 to 1,000 stars), with their issue template policy. <code>./gradlew :tools:buildCorpus</code> pages every repo newest first with <code>gh</code> or <code>glab</code> (a 100-issue page per call, resumable, at most 25,000 issues per repo, none created after the manifest cutoff), redacts titles and bodies with the log sanitizer, replaces every login with <code>u</code> and twelve hex digits of an HMAC-SHA256 keyed with the manifest salt, sorts by repo and issue number, and writes one JSON file in <code>tools/build/corpus</code> and its <code>zstd -19</code> copy. The same input gives the same bytes. The file is not in the repository: the manifest pins its SHA-256 and size under <code>asset:</code>, and <code>./gradlew :tools:downloadCorpus</code> downloads it from that URL and refuses a file that does not match.</p>
 <p><code>./gradlew :tools:evalTriage</code> runs <code>drift triage</code> over the corpus. It is not part of <code>build</code>. A form body (<code>### Label</code> sections from a repo whose template is a form) states its environment under labelled headings, and the facts read from those sections are the truth. The sections that gave a fact are cut out and the extractor runs again on the rest, so the tool-output, key-value and pattern paths are scored against what the reporter typed into the form. Only failing-side facts on keys the form labelled are scored, and <code>8.1</code> agrees with <code>8.1.0</code>. Recall is the share of form values found again elsewhere in the body. Issues are split by SHA-256 of a seed, repo and number; bases are set on the dev half and reported on the held-out half. Bodies from repos without forms have no truth and only report coverage. <code>-Pdrift.corpus=&lt;file&gt;</code> uses a local file instead of the download.</p>
@@ -4851,12 +5098,12 @@ verify failed: manifest
 ci.provisioner.build-date
 ci.provisioner.version
 </code></pre>
-<p><strong>Determinism and hashing.</strong> These outputs are functions of their inputs, so a hash identifies them. Over the same two capsules <code>diagnose</code> printed the same bytes on every run here (<code>e47bd4ac...cc08</code>), <code>reproduce</code> wrote identical files, <code>pack</code> identical archives and <code>atlas build</code> an identical dataset.</p>
+<p><strong>Determinism and hashing.</strong> These outputs are functions of their inputs, so a hash identifies them. Over the same two capsules <code>diagnose</code> printed the same bytes on every run here (<code>83c35a87...187c</code>), <code>reproduce</code> wrote identical files, <code>pack</code> identical archives and <code>atlas build</code> an identical dataset.</p>
 <pre><code class="language-sh">drift diagnose $G $R | shasum -a 256
 drift diagnose $G $R | shasum -a 256
 </code></pre>
-<pre><code>e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08  -
-e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08  -
+<pre><code>83c35a87e4f48696684ac6817e31b04e5b9b1bf3c37452d6cbc8c12a030c187c  -
+83c35a87e4f48696684ac6817e31b04e5b9b1bf3c37452d6cbc8c12a030c187c  -
 </code></pre>
 <p>The test suite pins these outputs for fixtures on the JVM, macOS Native and Wasm targets (see <a href="technical-report.html">TECHNICAL_REPORT.md</a>, &quot;Reproducing the Numbers&quot;). A capsule from <code>capture</code> is the exception: it describes the machine, so two machines give two hashes.</p>
 <p><strong>CI.</strong> Capture in a failing job and in a passing job, keep both files as artifacts, then diagnose anywhere:</p>
@@ -4874,7 +5121,7 @@ e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08  -
 <tbody>
 <tr>
 <td>0</td>
-<td>the command ran, including <code>diagnose</code> with no cause found, <code>solve</code> or <code>ingest</code> with any verdict (<code>STUCK</code> included) unless <code>--exit-status</code> is given, <code>drift</code> or <code>drift case</code> alone (they print help), <code>install</code> and <code>uninstall</code> (also with <code>--dry-run</code>), <code>uninstall</code> with no receipt, and <code>serve</code> after Ctrl+C or SIGTERM on a native build</td>
+<td>the command ran, including <code>diagnose</code> with no cause found, <code>solve</code> or <code>ingest</code> with any verdict (<code>NEEDS</code> and <code>STUCK</code> included) unless <code>--exit-status</code> is given, <code>drift</code> or <code>drift case</code> alone (they print help), <code>install</code> and <code>uninstall</code> (also with <code>--dry-run</code>), <code>uninstall</code> with no receipt, and <code>serve</code> after Ctrl+C or SIGTERM on a native build</td>
 </tr>
 <tr>
 <td>3</td>
@@ -4895,6 +5142,10 @@ e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08  -
 <tr>
 <td>12</td>
 <td>the same, ended <code>STUCK</code></td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>solve --exit-status</code> ended <code>NEEDS</code></td>
 </tr>
 <tr>
 <td>1</td>
@@ -5150,14 +5401,14 @@ e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08  -
 </tr>
 </tbody>
 </table></div>
-<p>When a <code>solve</code> trial cannot start, the certificate records an infrastructure problem (a failed <code>docker build</code>, a <code>docker run</code> error, a timeout) and the loop retries once before it ends <code>STUCK</code> with reason <code>executor</code>. Check <code>docker info</code> first, and run <code>./repro/run.sh</code> from a <code>reproduce</code> of the same capsule to see the failure by hand.</p>
+<p>When a <code>solve</code> trial cannot start, the certificate records an infrastructure problem (a failed <code>docker build</code>, a <code>docker run</code> error, a timeout) and the loop retries once before it ends <code>NEEDS</code> with reason <code>executor</code>. Check <code>docker info</code> first, and run <code>./repro/run.sh</code> from a <code>reproduce</code> of the same capsule to see the failure by hand.</p>
 <h2 id="limits-1">Limits</h2>
 <ul>
 <li>A container mirrors a part of a machine. Never mirrored: the kernel (<code>kernel.*</code>), the CPU (<code>cpu.*</code>, <code>hw.*</code>), the CI provider's image and provisioner (<code>ci.*</code>), dependencies installed by the test command (<code>deps.*</code>) and the properties of the capturing binary. <code>reproduce</code> lists every unmirrored attribute and its reason, and the certificate carries the list. A <code>solve</code> verdict is about containers built from the capsules, not about the original host.</li>
-<li>The ranking uses hand-set weights (<code>hand-set-1</code>, <code>weights.calibrated: false</code> in <code>diagnose</code> output). A score orders candidates; it is not a probability. On the dev benchmark the <code>plausible</code> tier (a probe differs in the candidate's dimension) was unreliable: 10 of its 19 candidates were wrong, and probes helped no scenario. The numbers and their intervals are in <a href="technical-report.html">TECHNICAL_REPORT.md</a> under &quot;Evaluation and Limits&quot;.</li>
+<li>The ranking uses hand-set weights (<code>hand-set-1</code>, <code>weights.calibrated: false</code> in <code>diagnose</code> output). A score orders candidates; it is not a probability. A ranking whose candidates all rest on attribute changes also prints a probability, read through an isotonic map fitted on the dev split (<code>probability.calibrated: true</code>). On the dev benchmark the <code>plausible</code> tier (a probe differs in the candidate's dimension) was unreliable: 10 of its 19 candidates were wrong, and probes helped no scenario. The numbers and their intervals are in <a href="technical-report.html">TECHNICAL_REPORT.md</a> under &quot;Evaluation and Limits&quot;.</li>
 <li><code>run</code> merges standard error into standard output and keeps only the tail of the output. <code>import</code> reads what a log prints, which is less than a capture: no kernel, CPU or probe data. <code>bisect</code> does not run tests and treats the empty and full sets as known.</li>
 <li><code>ingest</code> can narrow a case or rule a hypothesis out. It never confirms a cause.</li>
-<li><code>solve</code> runs on local Docker only. It does not use a remote host, a CI service or a cluster, and a failure that needs a different kernel, CPU model or CI-owned image cannot be varied by it (the run ends <code>STUCK</code> with reason <code>uncontrollable</code>).</li>
+<li><code>solve</code> runs on local Docker only. It does not use a remote host, a CI service or a cluster, and a failure that needs a different kernel, CPU model or CI-owned image cannot be varied by it (the run ends <code>NEEDS</code> with reason <code>uncontrollable</code> and the manual experiment as its step).</li>
 <li><code>solve</code> assumes a single cause: the first supported experiment ends the loop.</li>
 <li><code>verify</code> checks that an archive agrees with itself. It does not re-run experiments, so it cannot tell a faithful archive from a forged one that was rewritten consistently.</li>
 <li><code>next</code> after <code>ingest</code> skips the experiments that have results but does not re-plan; the order of the rest comes from the plan made before the results (see <a href="#ingest">Ingest</a>).</li>
@@ -5175,5 +5426,6 @@ e47bd4ace69badf351800c7d737dbe58262f5cf1f3445312edce53e9f5b2cc08  -
             <a href="https://github.com/gmitch215/Drift">github.com/gmitch215/Drift</a> &middot;
             <a href="https://github.com/gmitch215/Drift/blob/master/LICENSE">MIT License</a>
         </footer>
+        <script type="module" src="docs-render.js"></script>
     </body>
 </html>

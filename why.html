@@ -1,0 +1,1084 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Why - Drift</title>
+        <meta name="description" content="Every flow of drift why, with real output." />
+        <link rel="icon" href="drift.ico" sizes="any" />
+        <link rel="icon" href="drift_128.png" type="image/png" sizes="128x128" />
+        <link rel="apple-touch-icon" href="drift.png" />
+        <meta property="og:title" content="Why - Drift" />
+        <meta property="og:description" content="Every flow of drift why, with real output." />
+        <meta property="og:image" content="https://drift.gmitch215.dev/drift.png" />
+        <style>
+            :root {
+                color-scheme: light dark;
+                --canvas: #fcfbfe;
+                --surface: #ffffff;
+                --line: #e4def0;
+                                --fg: #1d1a26;
+                --muted: #5b556b;
+                --accent: #8a63f0;
+                --accent-text: #6b3fd4;
+                --tint: #efe8fb;
+                --radius: 6px;
+                --u: 4px;
+            }
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --canvas: #110e17;
+                    --surface: #191521;
+                    --line: #2b2438;
+                    --fg: #ece9f3;
+                    --muted: #a69fb8;
+                    --accent: #9d7bf5;
+                    --accent-text: #b99cff;
+                    --tint: #2a2140;
+                }
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                padding: 0 calc(var(--u) * 4) calc(var(--u) * 20);
+                background: var(--canvas);
+                color: var(--fg);
+                font:
+                    16px/1.65 ui-sans-serif,
+                    system-ui,
+                    -apple-system,
+                    'Segoe UI',
+                    Roboto,
+                    sans-serif;
+                overflow-wrap: break-word;
+            }
+            main,
+            nav .bar,
+            footer {
+                max-width: 52rem;
+                margin: 0 auto;
+            }
+            a:focus-visible {
+                outline: 2px solid var(--accent-text);
+                outline-offset: 2px;
+                border-radius: var(--radius);
+            }
+            nav {
+                margin: 0 calc(var(--u) * -4) calc(var(--u) * 8);
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border-bottom: 1px solid var(--line);
+                background: var(--surface);
+            }
+            nav .bar {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: var(--u) calc(var(--u) * 4);
+            }
+            nav a {
+                color: var(--muted);
+                font-size: 14px;
+                text-decoration: none;
+            }
+            nav a:hover,
+            nav a[aria-current] {
+                color: var(--accent-text);
+            }
+            nav a[aria-current] {
+                text-decoration: underline;
+                text-decoration-color: var(--accent);
+                text-decoration-thickness: 2px;
+                text-underline-offset: 0.5em;
+            }
+            nav a.brand {
+                display: flex;
+                align-items: center;
+                gap: calc(var(--u) * 2);
+                margin-right: auto;
+                color: var(--fg);
+                font-size: 16px;
+                font-weight: 600;
+            }
+            nav a.brand[aria-current] {
+                color: var(--fg);
+                text-decoration: none;
+            }
+            nav a.brand img {
+                width: 28px;
+                height: 28px;
+            }
+            h1 {
+                margin: 0 0 calc(var(--u) * 4);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .hero {
+                margin: 0 0 calc(var(--u) * 8);
+            }
+            .hero img {
+                display: block;
+                margin: 0 0 calc(var(--u) * 4);
+            }
+            .hero h1 {
+                margin: 0 0 var(--u);
+                font-size: 32px;
+                line-height: 40px;
+            }
+            .hero .lead {
+                margin: 0;
+                color: var(--muted);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .steps,
+            .links {
+                display: grid;
+                gap: calc(var(--u) * 3);
+                grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+                margin: 0 0 calc(var(--u) * 4);
+                padding: 0;
+                list-style: none;
+            }
+            .steps {
+                counter-reset: step;
+            }
+            .links {
+                margin-bottom: calc(var(--u) * 12);
+            }
+            .steps li {
+                display: flex;
+                counter-increment: step;
+            }
+            a.card {
+                display: block;
+                flex: 1;
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: var(--surface);
+                color: inherit;
+                text-decoration: none;
+            }
+            a.card:hover {
+                border-color: var(--accent);
+            }
+            a.card strong {
+                display: block;
+                color: var(--accent-text);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .steps a.card strong::before {
+                content: counter(step) '. ';
+            }
+            a.card span {
+                color: var(--muted);
+                font-size: 14px;
+                line-height: 22px;
+            }
+
+            .readme h2 {
+                margin: calc(var(--u) * 12) 0 calc(var(--u) * 3);
+                padding-bottom: calc(var(--u) * 2);
+                border-bottom: 1px solid var(--line);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .readme h3 {
+                margin: calc(var(--u) * 8) 0 calc(var(--u) * 2);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .readme h4 {
+                margin: calc(var(--u) * 6) 0 calc(var(--u) * 2);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .readme a {
+                color: var(--accent-text);
+                text-underline-offset: 0.2em;
+            }
+            .readme hr {
+                margin: calc(var(--u) * 12) 0;
+                border: 0;
+                border-top: 1px solid var(--line);
+            }
+            .readme blockquote {
+                margin: calc(var(--u) * 6) 0;
+                padding: var(--u) 0 var(--u) calc(var(--u) * 4);
+                border-left: 3px solid var(--accent);
+                color: var(--muted);
+            }
+            .readme ul,
+            .readme ol {
+                padding-left: calc(var(--u) * 6);
+            }
+            .readme li {
+                margin: calc(var(--u) * 1.5) 0;
+            }
+            .readme code {
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            }
+            .readme :not(pre) > code {
+                padding: 0.15em 0.4em;
+                border-radius: var(--radius);
+                background: var(--tint);
+                color: var(--accent-text);
+                font-size: 13px;
+                overflow-wrap: anywhere;
+            }
+            .readme pre {
+                margin: calc(var(--u) * 5) 0;
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                overflow-x: auto;
+                background: var(--surface);
+                font-size: 13px;
+                line-height: 20px;
+            }
+            .readme pre code {
+                display: block;
+            }
+            .readme .table {
+                overflow-x: auto;
+                margin: calc(var(--u) * 5) 0;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+            }
+            .readme table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 14px;
+                line-height: 22px;
+            }
+            .readme th,
+            .readme td {
+                padding: calc(var(--u) * 2) calc(var(--u) * 3);
+                border-bottom: 1px solid var(--line);
+                text-align: left;
+                vertical-align: top;
+            }
+            .readme th {
+                background: var(--tint);
+                font-weight: 600;
+            }
+            .readme tbody tr:last-child td {
+                border-bottom: 0;
+            }
+            .readme img {
+                max-width: 100%;
+            }
+
+            .guides {
+                display: flex;
+                flex-wrap: wrap;
+                gap: var(--u) calc(var(--u) * 4);
+                margin: 0 0 calc(var(--u) * 6);
+                padding-bottom: calc(var(--u) * 3);
+                border-bottom: 1px solid var(--line);
+            }
+            .guides a {
+                color: var(--muted);
+                font-size: 14px;
+                text-decoration: none;
+            }
+            .guides a:hover,
+            .guides a[aria-current] {
+                color: var(--accent-text);
+            }
+            .guides a[aria-current] {
+                text-decoration: underline;
+                text-decoration-color: var(--accent);
+                text-decoration-thickness: 2px;
+                text-underline-offset: 0.5em;
+            }
+            .docs-render {
+                margin: calc(var(--u) * 5) 0;
+                overflow-x: auto;
+                text-align: center;
+            }
+            .docs-render svg {
+                max-width: 100%;
+                height: auto;
+            }
+
+            .pager {
+                display: flex;
+                flex-wrap: wrap;
+                gap: calc(var(--u) * 3);
+                margin: calc(var(--u) * 12) 0 0;
+            }
+            .pager a.card {
+                min-width: 13rem;
+            }
+            .pager a.next {
+                margin-left: auto;
+                text-align: right;
+            }
+            .pager a.card span {
+                display: block;
+                font-size: 12px;
+                line-height: 18px;
+            }
+            .pager a.card strong {
+                font-size: 16px;
+            }
+
+            footer {
+                margin-top: calc(var(--u) * 16);
+                padding-top: calc(var(--u) * 6);
+                border-top: 1px solid var(--line);
+                color: var(--muted);
+                font-size: 14px;
+            }
+            footer a {
+                color: inherit;
+            }
+        </style>
+    </head>
+    <body>
+        <nav>
+            <div class="bar"><a class="brand" href="index.html"><img src="drift_128.png" alt="" width="28" height="28">Drift</a>
+<a href="docs.html" aria-current="page">Guides</a>
+<a href="manual.html">Manual</a>
+<a href="advanced-usage.html">Usage</a>
+<a href="technical-report.html">Report</a>
+<a href="atlas/#atlas">Atlas</a>
+<a href="engine/">Engine</a>
+<a href="https://github.com/gmitch215/Drift">GitHub</a></div>
+        </nav>
+        <main>
+            <div class="guides">
+<a href="docs.html">Documentation</a>
+<a href="why.html" aria-current="page">Why</a>
+<a href="install.html">Install</a>
+<a href="try-it.html">Try It</a>
+<a href="portability-atlas.html">Kotlin Portability Atlas</a>
+<a href="architecture.html">Architecture</a>
+<a href="shared-code.html">Shared Code</a>
+<a href="limits.html">Limits</a>
+</div>
+            
+            <div class="readme"><h1 id="why">Why</h1>
+<p><code>drift why</code> says why a program works in one place and fails in another. It needs no capture file, no
+case directory and no flag for a first answer. The first line of its output names the flow it chose
+from what you gave it:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>You type</th>
+<th>Drift compares</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>drift why</code></td>
+<td>this machine with the latest failed CI run of the git checkout you are in</td>
+</tr>
+<tr>
+<td><code>drift why --there PLACE</code></td>
+<td>this machine with a running container, another machine over ssh, or a saved capture</td>
+</tr>
+<tr>
+<td><code>drift why -- COMMAND</code></td>
+<td>this machine now with this machine the last time <code>COMMAND</code> passed</td>
+</tr>
+<tr>
+<td><code>drift why FILE</code></td>
+<td>nothing: it reads an issue or an error report and names the environment fact it points at</td>
+</tr>
+</tbody>
+</table></div>
+<p>Output is from the Linux x64 build. <code>drift help why</code> prints the same manual in the terminal.</p>
+<h2 id="the-answer">The Answer</h2>
+<p>Every answer has three parts: the verdict in one sentence, the evidence in at most three lines (what
+it is, the value on each side) and what to try next. The wording follows how much the data supports:</p>
+<ul>
+<li><strong>A cause:</strong> <code>It fails there because Node is 20.11.1 there and 22.4.0 here.</code> Drift says this only
+when a rule or a measurement ties that one difference to the failure.</li>
+<li><strong>The most likely cause:</strong> one difference is left, or the error text of the failing command points
+at one. The sentence says which of the two it was.</li>
+<li><strong>Several differences that fit:</strong> the verdict lists them, says the data cannot tell them apart and
+gives the fastest way to separate them: change one of them to match the working side and run the
+program again. <code>drift next .drift/why/case</code> prints the full experiment plan.</li>
+<li><strong>Nothing differs:</strong> the answer says so, lists what Drift looked at and what it did not.</li>
+</ul>
+<p>Unless a run decided it, Drift assumes the program works here and fails there. The verdict states
+that assumption, and <code>--fails-here</code> swaps the sides.</p>
+<h2 id="compare-with-a-place">Compare With a Place</h2>
+<p><code>--there PLACE</code> captures this machine and the place, compares them and explains the difference. A
+place is one of:</p>
+<ul>
+<li><code>docker:NAME</code>, a running container. Drift never starts a container and never changes one. It
+checks with <code>docker inspect</code> that the container is running, then reads each fact with one
+<code>docker exec</code> of a command that only reads: file contents, <code>env</code>, and the <code>--version</code> of each tool.
+Nothing is copied into the container, and the image needs only <code>cat</code> and <code>env</code>. <code>docker:NAME:/dir</code>
+reads the project files in <code>/dir</code>.</li>
+<li><code>user@host</code> or <code>ssh://user@host</code>, another machine. This is the read-only ssh capture of
+<code>drift capture --ssh</code>: system files and the environment of a non-login session, with a one-line
+consent notice on standard error. Tool versions and project packages are not read over ssh, and
+the answer says so.</li>
+<li>a file written by <code>drift why --save FILE</code> on that machine, or a directory written by
+<code>drift capture --tools --project --out DIR</code>. Use this when the place cannot be reached from here:
+run <code>drift why --save there.json</code> there, copy the file, pass its path.</li>
+</ul>
+<p>This example compares a machine with a saved capture of a shell that had <code>TZ</code> set and an open-file
+limit of 64:</p>
+<pre><code class="language-sh">drift why --there there
+</code></pre>
+<pre><code>drift why: this machine against the saved capture in there
+
+Assuming it works here and fails there: 2 differences change together, so the data cannot separate
+  them (Time zone (TZ), Open-file limit).
+
+What I found:
+  Time zone (TZ): not set here, America/New_York there
+  Open-file limit: 1024 here, 64 there
+
+What to try next:
+  To tell them apart, change only Time zone (TZ) there so it matches here, and run it again. If it
+    passes, that was the cause.
+  The full experiment plan is saved: drift next .drift/why/case
+  Paste the error message you saw: drift why --there there --error &quot;...&quot;
+</code></pre>
+<p>With a container, add the failing command after <code>--</code> to run it here and there. The two exit codes
+decide the direction, and the error text of the failing side points at the kind of difference it
+fits: &quot;is not a function&quot; fits a runtime version, &quot;Too many open files&quot; fits a limit, &quot;not found&quot;
+fits a tool that is missing. A command can run only in a container. Over ssh and from a saved
+capture Drift runs no repository code, so paste the error message instead (see below).</p>
+<pre><code class="language-sh">drift why --there docker:web -- node test.js
+</code></pre>
+<h2 id="on-the-machine-where-it-fails">On the Machine Where It Fails</h2>
+<p>When you can reach the machine where the program works from the machine where it fails, use
+<code>--there</code>. When you cannot, make a capture on the failing machine and carry it over:</p>
+<ol>
+<li>On the machine where it fails, save it: <code>drift why --save there.json</code>. This captures the
+machine the way <code>drift why</code> does, redacts the same things, and writes one JSON file. The
+command refuses to replace an existing file; add <code>--force</code> to replace it.</li>
+<li>Copy <code>there.json</code> to the machine where the program works.</li>
+<li>On that machine, run the command it prints: <code>drift why --there there.json</code>.</li>
+</ol>
+<pre><code>Saved this machine to there.json.
+Copy it to the machine where the program works.
+Then run this there: drift why --there there.json
+</code></pre>
+<p>The saved file is a plain capture, so <code>drift why --there</code> reads it the same way it reads the
+output of <code>drift capture --tools --project</code>.</p>
+<h3 id="give-it-the-error-text">Give It the Error Text</h3>
+<p>A saved file cannot run the program, so Drift cannot see the error it prints. Pass that text with
+<code>--error</code>, which works wherever Drift compares two machines:</p>
+<pre><code>drift why --there there.json --error @error.txt
+drift why --there there.json --error &quot;TypeError: Object.groupBy is not a function&quot;
+cat error.txt | drift why --there there.json --error -
+</code></pre>
+<p><code>@FILE</code> reads a file and <code>-</code> reads standard input. Drift reads the first 64 KiB of the text and says
+so when it cuts. The text is read the way the output of <code>-- COMMAND</code> is read, so the phrases in the
+error decide which difference is named first. A text with no known phrase leaves the answer as it
+was. <code>--error</code> cannot be combined with <code>-- COMMAND</code>, because the command's own output is already the
+error text.</p>
+<p>A name in the error text also moves that difference to the front. <code>sh: 1: git: not found</code> names
+<code>git</code>, so a missing <code>git</code> is the answer even when other tools are missing too. Environment
+variables, locked packages and limits named in the text work the same way. One name gives the most
+likely cause. Two names stay tied, and Drift says it cannot tell which one causes the failure.</p>
+<p>This is the answer for a missing <code>git</code> in a container, from the saved-capture fixtures in
+<code>fixtures/why</code>:</p>
+<pre><code>drift why: this machine against the saved capture in there.json
+
+Assuming it works here and fails there: it most likely fails there because Git is not installed
+  there (2.39.5 here); the error text points at it.
+
+What I found:
+  Git version: 2.39.5 here, not installed there (your error text names it: git)
+
+What to try next:
+  Install Git there, or put it on the PATH there.
+  To be sure, change only that and run it again there.
+</code></pre>
+<h2 id="read-the-latest-failed-ci-run">Read the Latest Failed CI Run</h2>
+<p><code>drift why</code> with no argument, in a git checkout whose remote is on GitHub or GitLab, reads the latest
+failed run of the current branch through <code>gh</code> or <code>glab</code>, so your own login does the authentication.
+It compares this machine with that run, and compares the failed run with the last passing run of the
+same workflow. A CI log prints only part of a runner's environment, so Drift compares the facts
+present on both sides. When this machine shows no difference, the answer compares the two CI runs.
+If <code>gh</code> or <code>glab</code> is missing or not logged in, the message names the one command that fixes it.</p>
+<p>The output below replays recorded <code>git</code> and <code>gh</code> answers from public runs of this repository
+(<a href="https://github.com/gmitch215/Drift/tree/master/fixtures/ci/live"><code>fixtures/ci/live</code></a>); a live run prints the same layout for your own runs.</p>
+<pre><code>drift why: this machine against the latest failed CI run of gmitch215/Drift, branch master
+
+Nothing on this machine differs from the failing CI run in what its log prints, so I compared the
+  two CI runs. 4 differences change together, so the data cannot separate them (CI runner
+  provisioner.build-date, CI runner provisioner.version, CI runner runner.image.version and 1 more).
+
+What I found:
+  CI runner provisioner.build-date: 2026-10-02T22:28:27Z when CI passed, 2026-10-12T17:48:21Z in CI
+  CI runner provisioner.version: 20261002.596 when CI passed, 20261012.601 in CI
+  CI runner runner.image.version: 20261004.327.1 when CI passed, 20261012.334.1 in CI
+
+What to try next:
+  To tell them apart, change only CI runner provisioner.build-date in CI so it matches when CI
+    passed, and run it again. If it passes, that was the cause.
+  The full experiment plan is saved: drift next .drift/why/case
+</code></pre>
+<h2 id="run-a-command-here">Run a Command Here</h2>
+<p><code>drift why -- COMMAND</code> runs the command. If it passes, Drift saves this machine as the baseline in
+<code>.drift/why/baseline</code>. If it fails and a baseline exists, the answer says what differs from the
+baseline. The output of the command goes to standard error, so the answer stays on standard output.</p>
+<pre><code class="language-sh">drift why -- sh check.sh
+TZ=Asia/Tokyo drift why -- sh check.sh
+</code></pre>
+<pre><code>drift why: running sh check.sh here
+
+It passed. I saved this machine as the baseline in .drift/why/baseline.
+
+What to try next:
+  When it fails, run the same command again: drift why -- sh check.sh
+</code></pre>
+<pre><code>drift why: running sh check.sh here
+
+It most likely fails now because the time zone differs: TZ is Asia/Tokyo now and not set when it
+  last passed; the error text points at it.
+
+What I found:
+  Time zone (TZ): not set when it last passed, Asia/Tokyo now
+
+What to try next:
+  Unset TZ now, or make the code name its time zone.
+  To be sure, change only that and run it again now.
+</code></pre>
+<p>A failure with no baseline says what Drift cannot do yet and what to do next: run the command where
+it passes, or compare with a machine or container with <code>--there</code>.</p>
+<h2 id="read-an-issue">Read an Issue</h2>
+<p><code>drift why FILE</code> reads an issue or an error report, and <code>drift why -</code> reads standard input. It is
+<code>drift triage</code> with the same three-part answer.</p>
+<pre><code class="language-sh">drift why issue.md
+</code></pre>
+<pre><code>drift why: reading the report in issue.md
+
+The report points at git branch --show-current needs Git 2.22: Git 2.22.0 added the --show-current
+  subcommand to &quot;git branch&quot;, so an older Git rejects it as an unknown option.
+
+What I found:
+  Git version: not stated where it works, 2.20.1 where it fails
+
+What to try next:
+  Ask the reporter to check Git version (2.20.1) on the machine where it fails, and to send what is
+    on the machine where it works.
+  To compare the two machines, ask them to run drift why --save there.json on the machine where it
+    fails and drift why --there there.json on the machine where it works.
+  To be sure, change only that and run it again now.
+</code></pre>
+<p>The report states Git 2.20.1 and the error <code>unknown option `show-current'</code>, and a recorded rule
+(<code>git-branch-show-current-needs-2-22</code>) ties the two: the option arrived in Git 2.22. A report that
+names a tool version and no rule explains it gets an ask instead;
+<a href="#what-to-run-next">What To Run Next</a> shows how.</p>
+<p>A CI log is the commonest report. A GitHub Actions log, whether it is <code>gh run view --log</code> output
+(<code>job&lt;TAB&gt;step&lt;TAB&gt;timestamp text</code>) or raw timestamped lines, loses its prefixes and colour codes and
+is read as one block of output, so a version banner (<code>Python 3.9.18</code>, <code>PHP 7.4.33 (cli)</code>,
+<code>ruby 3.0.2p107</code>, <code>go version go1.20.4</code>, <code>rustc 1.70.0</code>, <code>java version &quot;11.0.2&quot;</code>, <code>git version 2.31.1</code>, <code>Docker version 24.0.5</code>, or <code>v18.19.1</code> under <code>node --version</code>) is the version of that tool,
+and a setup input such as <code>python-version: 3.9</code> is read as a stated version at the same confidence
+as one in prose. When the log holds both, the banner wins. A tool version the report states is the
+answer of the failing machine to the version check, so the next step is the same check where it
+works:</p>
+<pre><code class="language-sh">drift why ci-job.log
+</code></pre>
+<pre><code>drift why: reading the report in ci-job.log
+
+The report names Python version 3.9.18 on the machine where it fails. I have no recorded rule that
+  explains this failure from Python version 3.9.18 alone, so I cannot say whether it matters yet.
+
+What I found:
+  Python version: not stated where it works, 3.9.18 where it fails
+  CI runner label: not stated where it works, ubuntu-24.04 where it fails
+
+What to try next:
+  Run python3 --version where it works. If you run it there with `| drift why --reply --works`,
+    Drift prints one line to copy back to where you started; or copy the output, go back to where
+    you started (the folder where you ran drift why), run `drift why --reply --works`, paste it and
+    press Ctrl-D (Ctrl-Z then Enter on Windows).
+  If you can reach that machine by ssh: `ssh USER@HOST python3 --version | drift why --reply
+    --works`
+</code></pre>
+<p>With <code>Python 3.12.15</code> from the machine where it works, <code>drift why --reply --works</code> names the
+difference. The log ends in a <code>SyntaxError: invalid syntax</code> under a Python frame, which also makes
+Python the runtime when the log prints no banner:</p>
+<pre><code>drift why: comparing the answers from where it works and where it fails
+
+It most likely fails where it fails because Python is 3.9.18 where it fails and 3.12.15 where it
+  works; the error text points at it.
+
+What I found:
+  Python version: 3.12.15 where it works, 3.9.18 where it fails (your error text names it: python)
+
+What to try next:
+  Use Python 3.12.15 where it fails. Pin the version so the two stay equal, for example in
+    .tool-versions or your CI image. If there is no version manager where it fails, change the image
+    or package that provides Python.
+  To be sure, change only that and run it again where it fails.
+</code></pre>
+<h2 id="an-error-text-alone">An Error Text Alone</h2>
+<p><code>drift why --error TEXT</code> with no file, no <code>--there</code> and no command reads the error text as a
+report. In a git checkout on GitHub or GitLab the same line still reads the latest failed CI run. In
+a folder that is not a checkout it falls back to the text, and the answer says so in its last line:
+no CI run or second machine was available, so only the text was read, and <code>--there PLACE</code> adds the
+comparison.</p>
+<pre><code class="language-sh">drift why --error &quot;Error: too many open files while running node&quot;
+</code></pre>
+<p>When the error text is all there is, Drift assumes the program works somewhere else (that is why you
+are comparing) and says what to run on the machine in front of you. It does not call a failure
+&quot;not an environment difference&quot; from the text alone in this flow, and the capture is the second step
+after the first answer. The error line below names no tool, but only Python prints it:</p>
+<pre><code class="language-sh">drift why --error &quot;ModuleNotFoundError: No module named 'distutils'&quot;
+</code></pre>
+<pre><code>drift why: reading the error text
+
+I found no environment fact in this error text (no tool version, operating system or setting), so I
+  cannot say what it points at.
+
+What to try next:
+  To tell, run python3 --version where it fails and paste the result: the error text is Python's,
+    but the report does not say which version runs it.
+  In one step: python3 --version | drift why --reply
+  No CI run or second machine was available, so I read only the error text. To compare with another
+    machine, add --there PLACE.
+</code></pre>
+<pre><code class="language-sh">python3 --version | drift why --reply
+</code></pre>
+<pre><code>drift why: reading the report with your answers
+
+The report points at Python 3.12 removes distutils and stops installing setuptools in venvs: Python
+  3.12 deletes the distutils package from the standard library and venv no longer pre-installs
+  setuptools, which still provides distutils when installed.
+
+What I found:
+  Python version: not stated where it works, 3.12.1 where it fails
+
+What to try next:
+  To compare the two machines, run drift why --save there.json on the one where it fails and drift
+    why --there there.json on the one where it works.
+</code></pre>
+<p>When no rule matches the answer, the next step is the capture (<code>drift why --save there.json</code>) with
+its one-step form. A command that is not found is asked for by name, and the answer is read as
+installed or not:</p>
+<pre><code>To tell, run command -v git where it fails and paste the result: the error says git was not found,
+  but not whether it is installed where it fails.
+In one step: command -v git | drift why --reply
+</code></pre>
+<p>An empty answer means the command is not installed; the report then says &quot;Git is not installed on
+the machine where it fails&quot; and lists &quot;Git: not stated where it works, not installed where it
+fails&quot;. With the answer from the machine where it works (<code>command -v git | drift why --reply --works</code>) the line reads &quot;Git: installed where it works, not installed where it fails&quot;.</p>
+<p><code>--error</code> with an issue file is refused, because the two disagree about what to read. Drop
+<code>--error</code> to read the file as a report, or drop the file to read the error text.</p>
+<h2 id="what-to-run-next">What To Run Next</h2>
+<p>A report that names a tool and not its version, a system and not its release, or a limit that was
+hit and not its value leaves facts out. When no rule, no draft rule and no program-side reading
+answers, Drift says which fact it needs and gives the command that prints it. It asks for what the
+text does not state and nothing else: a version the report already gives is never asked for again,
+and the report has to name the tool, the system or the symptom first. A request for &quot;more context&quot;
+is not an ask.</p>
+<p>Every command comes from a fixed table. A variable name is taken from the text only when it is in capitals and does not look like a secret (a name holding key, token, secret or pass is never asked for), and <code>PATH</code>, <code>HOME</code> and similar are left out:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>The report</th>
+<th>Drift asks for</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>names a tool without a version</td>
+<td>the tool's version</td>
+<td>the tool's version command, such as <code>node --version</code> or <code>php -v</code>, the same one <code>drift capture --tools</code> runs</td>
+</tr>
+<tr>
+<td>says too many open files</td>
+<td>the open-file limit</td>
+<td><code>ulimit -n</code></td>
+</tr>
+<tr>
+<td>names Linux, macOS or Windows without a version, or runs a package manager that implies one</td>
+<td>the release</td>
+<td><code>cat /etc/os-release</code>, <code>sw_vers -productVersion</code> or <code>ver</code></td>
+</tr>
+<tr>
+<td>is about the kernel</td>
+<td>the kernel release</td>
+<td><code>uname -r</code></td>
+</tr>
+<tr>
+<td>is about a time zone or a locale</td>
+<td>the setting</td>
+<td><code>printenv TZ</code> or <code>locale</code></td>
+</tr>
+<tr>
+<td>names ssl, tls, curl or a certificate</td>
+<td>the TLS library</td>
+<td><code>openssl version</code></td>
+</tr>
+<tr>
+<td>says no space left on the device or a disk quota was hit</td>
+<td>the disk use</td>
+<td><code>df -h .</code></td>
+</tr>
+<tr>
+<td>says PHP lacks an extension or something is missing</td>
+<td>the PHP extensions</td>
+<td><code>php -m</code></td>
+</tr>
+<tr>
+<td>names an environment variable by its capitals, such as <code>$DATA_DIR</code></td>
+<td>its value</td>
+<td><code>printenv DATA_DIR</code></td>
+</tr>
+<tr>
+<td>names a Bukkit-family server (Paper, Spigot, Purpur)</td>
+<td>its version</td>
+<td><code>/version</code> in the server console</td>
+</tr>
+<tr>
+<td>shows an error that only one runtime prints (a Python <code>ModuleNotFoundError</code>, <code>ImportError</code> or <code>Traceback (most recent call last)</code>; a Node <code>Cannot find module</code> or <code>ERR_</code> code; a PHP <code>Fatal error: Uncaught</code> or <code>Call to undefined function</code>; a JVM <code>Exception in thread</code> or <code>java.lang.</code> name; a Go <code>panic:</code> with <code>goroutine</code> or <code>cannot find package</code>; a Rust <code>error[E</code> or <code>thread 'main' panicked</code>; a Ruby <code>NoMethodError</code> or <code>LoadError</code>; a .NET <code>Unhandled exception. System.</code>)</td>
+<td>that runtime's version</td>
+<td>its version command, such as <code>python3 --version</code>, even when the text never names the runtime</td>
+</tr>
+<tr>
+<td>says a command was not found (<code>bash: git: command not found</code>, <code>command not found: git</code> or <code>No such file or directory: 'git'</code>)</td>
+<td>whether it is installed</td>
+<td><code>command -v git</code></td>
+</tr>
+<tr>
+<td>says it works somewhere else</td>
+<td>a capture of the failing machine</td>
+<td><code>drift why --save there.json</code></td>
+</tr>
+<tr>
+<td>shows a command, a failure signature and a toolchain with an official Docker image</td>
+<td>the same command on a clean machine</td>
+<td>a contained <code>docker run ... IMAGE sh -c 'cp -R /src/. /w/ &amp;&amp; COMMAND' 2&gt;&amp;1</code>, printed and never run</td>
+</tr>
+<tr>
+<td>shows a command and no error</td>
+<td>the error text</td>
+<td><code>COMMAND 2&gt;&amp;1</code>, to pipe to <code>drift why --reply</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>A runtime is inferred only from its own vocabulary, never from a path or a generic word: <code>TypeError: x is not a function</code> alone, <code>panic:</code> without a goroutine, <code>Fatal error: out of memory</code> and <code>/usr/lib/python3/site.py</code> name no runtime. A name with a dot or a slash (<code>'config.json'</code>, <code>'/etc/app/x'</code>) is a file, not a command. Neither ask appears when the text already states that tool's version.</p>
+<p>A text answer shows one ask at a time, the most useful first, with the one-step form:</p>
+<pre><code>To tell, run node --version where it fails and paste the result: the report names Node but not
+  which version fails.
+In one step: node --version | drift why --reply
+</code></pre>
+<p><code>drift why --json</code> and <code>drift triage --json</code> list up to three asks, each as <code>family</code>, <code>command</code> and
+<code>piped</code>, in <code>plain.ask</code> and in a top-level <code>ask</code>, and the clean-run ask beside them when there is one. <code>family</code> is the attribute family the command reads
+(<code>tool.node</code>, <code>limits.nofile</code>, <code>os.release</code>, <code>env.TZ</code>), and the key is absent when there is nothing
+to ask.</p>
+<h3 id="answering">Answering</h3>
+<p><code>drift why</code> writes <code>.drift/why/session.json</code> whenever it asks: the report text with secrets and home
+directories masked, the asks, and the facts each answer gave. <code>--session FILE</code> keeps it somewhere
+else, and the one-step form then carries <code>--session FILE</code>.</p>
+<p><code>drift why --reply</code> reads standard input as the answer to the first ask that has none, reads it the
+way the matching scanner reads that command, adds the fact to the report and answers again. The
+answer is a cause, a not-environment reading or the next single ask.</p>
+<pre><code class="language-sh">node --version | drift why --reply
+npm --version | drift why --reply
+</code></pre>
+<p>Nothing leaves the machine, and the session file keeps the facts it read, never the pasted text. The
+same input gives the same bytes on every target. Input that is not the output of the asked command
+is refused with the command to run, exits with status 1 and leaves the session as it was. An empty
+answer to <code>printenv NAME</code> means the variable is not set. The server console answer cannot be piped, so
+save it to a file and give Drift the file: <code>drift why --reply &lt; console-output.txt</code>. The answer to <code>drift why --save</code> is the saved
+file: <code>drift why --reply &lt; there.json</code> reads the tool, system, limit and time zone facts in it.
+<code>--reply</code> fails with a message that says how to start a session when there is none, and it takes no
+argument other than <code>--session</code>, <code>--json</code> and standard input.</p>
+<h3 id="comparing-one-fact">Comparing One Fact</h3>
+<p>A report that leaves one fact open can be settled without copying a whole capture. After the answer
+from the machine where it fails, and when no rule explains the failure, Drift asks for the same
+check where the program works. With the error line <code>Fatal error: Uncaught Error: Call to undefined function str_contains()</code> and <code>php -v</code> run on both machines:</p>
+<pre><code class="language-sh">php -v | drift why --reply
+</code></pre>
+<pre><code>drift why: reading the report with your answers
+
+The report names PHP version 7.4.33 on the machine where it fails. I have no recorded rule that
+  explains this failure from PHP version 7.4.33 alone, so I cannot say whether it matters yet.
+
+What I found:
+  PHP version: not stated where it works, 7.4.33 where it fails
+  PHP interface (sapi): not stated where it works, cli where it fails
+
+What to try next:
+  Run php -v where it works. If you run it there with `| drift why --reply --works`, Drift prints
+    one line to copy back to where you started; or copy the output, go back to where you started
+    (the folder where you ran drift why), run `drift why --reply --works`, paste it and press Ctrl-D
+    (Ctrl-Z then Enter on Windows).
+  If you can reach that machine by ssh: `ssh USER@HOST php -v | drift why --reply --works`
+</code></pre>
+<p>The session lives in the folder where you ran <code>drift why</code>, which is usually the machine where it
+fails. Run the check where it works and pipe it to <code>drift why --reply --works</code> as the step says. That
+machine has no session, so Drift reads and masks the answer and prints one command that carries it
+back, with the output as quoted arguments (exit status 0):</p>
+<pre><code>There is no session here, so I cannot compare yet. The session is in the folder where you ran drift why. Run this there:
+printf '%s\n' 'PHP 8.3.12 (cli) (built: Sep 24 2024 00:00:00) ( NTS )' 'Copyright (c) The PHP Group' | drift why --reply --works
+</code></pre>
+<p>Run that line in the folder where you ran <code>drift why --error</code>. The text is redacted first and
+control and non-ASCII characters become <code>?</code> or are dropped, so nothing in it can be run by the shell.
+An answer longer than 2 KiB gets no printed command: save it to a file and use
+<code>drift why --reply --works &lt; FILE</code>. An answer that is not the output of a check Drift asks for is
+refused (exit status 1). <code>--session FILE</code> is added to the printed command only when you passed it.
+<code>--reply</code> without <code>--works</code> behaves the same for the failing side. Pasting also works: run the
+command in the folder with the session, paste the output and end the input (Ctrl-D in a terminal,
+Ctrl-Z then Enter on Windows), or pipe it over ssh:</p>
+<pre><code class="language-sh">ssh USER@HOST php -v | drift why --reply --works
+</code></pre>
+<pre><code>drift why: comparing the answers from where it works and where it fails
+
+It most likely fails where it fails because PHP is 7.4.33 where it fails and 8.3.12 where it works;
+  it is the only difference I found.
+
+What I found:
+  PHP version: 8.3.12 where it works, 7.4.33 where it fails
+
+What to try next:
+  Use PHP 8.3.12 where it fails. Pin the version so the two stay equal, for example in
+    .tool-versions or your CI image. If there is no version manager where it fails, change the image
+    or package that provides PHP.
+  To be sure, change only that and run it again where it fails.
+</code></pre>
+<p><code>--works</code> reads standard input as the answer to the first check that has an answer from the failing
+machine and none from the working one, or, when none has, the first check without either, so the two
+sides can come in any order. With <code>--session FILE</code> the form carries it. Run in a folder with no
+session, it prints the one command that carries the answer there (see above). With both
+sides Drift compares them the way <code>--there</code> compares two
+machines, with the same ranking and the same error-text pointers. When the fact is the same on both
+machines it says so and moves on to the next check, then to the capture. <code>--works</code> needs a session
+and a check that can be run on both machines (not the capture, the clean run or a server console
+command); without one it says what to run first. The session keeps the facts each side gave
+(<code>reply</code> for the failing side, <code>works</code> for the working side), never the pasted text, and the piped
+form carries <code>--session FILE</code> as for <code>--reply</code>. When the comparison lists other differences that the
+error text does not point at, one more line says so, for example &quot;12 other differences exist, but the
+error text does not point at them: Git version is the only one it names.&quot;; a single difference keeps
+the wording above.</p>
+<h3 id="asking-a-clean-machine">Asking a Clean Machine</h3>
+<p>When a report shows a command, the failure it printed and a toolchain with an official Docker image,
+the quickest way to rule the machine out is to run the same command on a clean one. Drift prints that
+command and never runs it. The report here has a <code>$ node server.js</code> line and an error:</p>
+<pre><code class="language-sh">drift why issue.md
+</code></pre>
+<pre><code>drift why: reading the report in issue.md
+
+I found no environment fact in this report (no tool version, operating system or setting), so I
+  cannot say what it points at.
+
+What to try next:
+  To tell, run the command from the report in a clean container and paste what it prints (the
+    command comes from the report, so read it before you run it): the report shows the command
+    failing, and a clean node:26.12.1-bookworm-slim container (it states no version, so this is the
+    newest) shows whether the failure depends on your machine.
+  In one step: docker run --rm --user &quot;$(id -u):$(id -g)&quot; --cap-drop ALL --security-opt
+    no-new-privileges --pids-limit 256 --memory 1g --network none -v &quot;$PWD&quot;:/src:ro --tmpfs
+    /w:exec,mode=1777 -w /w node:26.12.1-bookworm-slim sh -c 'cp -R /src/. /w/ &amp;&amp; node server.js'
+    2&gt;&amp;1 | drift why --reply
+</code></pre>
+<p>The command comes from the report, so read it before you run it. Only that command is the report's:
+it goes inside one pair of single quotes, and everything else is fixed text. The container gets the
+working directory read-only at <code>/src</code> and a copy of it in a memory-backed <code>/w</code>, runs as your user with
+no added privileges (<code>--cap-drop ALL</code>, <code>no-new-privileges</code>), at most 256 processes and 1 GB of memory,
+and has no network. The network stays on when the report shows network use (a word such as http, url,
+install, clone, fetch or download) or when the command is a package or build manager (<code>npm</code>, <code>pip</code>,
+<code>cargo</code>, <code>gradle</code> and similar).</p>
+<p>The ask needs three things in the text: a failure signature (an error line such as <code>Error: ...</code> or
+<code>error: ...</code>), a command and a toolchain with an official image, named by the command's program or,
+for a script, by the language the text names. A command is one of:</p>
+<ul>
+<li>a line in a code block that starts with <code>$</code>, <code>&gt;</code> or <code>%</code> (the last two only when the program is a
+known one, so <code>&gt; Task :app:compileJava</code> and <code>&gt; pkg@1.0.0 test</code> do not count);</li>
+<li>the one command of a code block that comes before the block with the error;</li>
+<li>an inline code span that follows a run verb (&quot;run&quot;, &quot;ran&quot;, &quot;running&quot;, &quot;executing&quot;, &quot;typing&quot;,
+&quot;command:&quot;) and whose program Drift knows, as in <code>Run `node server.js` and it stops</code>.</li>
+</ul>
+<p>The command is copied as written. Drift prints no ask for a command that is empty, longer than 400
+characters, holds a backtick, <code>$(</code>, a masked secret or a character outside ASCII, or ends in a
+backslash. The tag is a published one: the version the report states for that toolchain (the newest
+published tag with that prefix, or the nearest one of the same major version), or the newest published
+tag when it states none; a version with no published tag gets no ask.</p>
+<p>A report with a command and no error cannot be compared, so Drift asks for the error text first. The
+<code>COMMAND</code> stands for the command in the report:</p>
+<pre><code>To tell, run the command from the report where it fails and paste what it prints (the command comes
+  from the report, so read it before you run it): the report shows a command but no error it
+  printed, and without one a clean run cannot be compared.
+In one step: COMMAND 2&gt;&amp;1 | drift why --reply
+</code></pre>
+<p>The pasted output is added to the report and Drift answers again, now with the clean-run ask.</p>
+<p>Run the command and pipe what it prints. The answer is compared with the failure in the report, after
+paths, numbers and times are normalised:</p>
+<pre><code>drift why: reading the report with your answers
+
+It fails the same way on a clean machine, so your environment is not the cause; look at the program
+  or the input.
+
+What I found:
+  The clean run printed the same failure as the report: Error: Cannot find module './config'
+
+What to try next:
+  Start from the input the command reads and the code that handles it; the failure does not depend
+    on this machine.
+</code></pre>
+<p>If the clean run prints no error, the difference is on the machine where it failed, and the next ask
+is the capture:</p>
+<pre><code>drift why: reading the report with your answers
+
+It works on a clean machine, so something on your machine differs.
+
+What I found:
+  The clean run printed none of the errors the report shows.
+
+What to try next:
+  To tell, run drift why --save there.json where it fails and feed the file to Drift: it records the
+    tools, settings and limits of that machine, which the clean run shows to differ from yours.
+  In one step: drift why --save there.json &amp;&amp; drift why --reply &lt; there.json
+</code></pre>
+<p>An output with no error line is a pass, including an empty one. An output with an error that is not the
+report's keeps the ask open and says what differed. Docker's own errors (the daemon is not running,
+an image cannot be pulled, docker is not installed) and binary output are refused like any other
+unreadable answer. The session file keeps only the result (<code>same</code> or <code>works</code>), never the pasted
+output; the error text of the first reply is the one exception, since it becomes part of the report
+(with secrets masked).</p>
+<h2 id="when-it-is-not-the-environment">When It Is Not the Environment</h2>
+<p>Some failures come from the program. When the report or the error text points at the program and no
+machine difference explains it, Drift says so in one sentence, with the reason and where to look next.</p>
+<p>The issue flow (<code>drift why FILE</code> and <code>drift triage</code>) reads the text for one of three kinds of signal. Each
+kind has its own condition on what the report may say about the machine:</p>
+<ul>
+<li>Frame, mismatch and regression need a report that states no environment fact on the failing side: no
+tool version, operating system, platform, setting or limit tied to the failure.
+<ul>
+<li>a stack frame in your code, such as <code>at test.js:3:8</code> or <code>File &quot;src/app/parser.py&quot;, line 42</code>.
+Frames in <code>node_modules</code>, <code>site-packages</code>, the JDK or <code>/usr</code> do not count.</li>
+<li>an expected value and an actual value that differ: <code>expected 3 but got 4</code>, an <code>AssertionError</code>,
+or <code>Expected:</code> and <code>Actual:</code> lines. A Markdown heading or a bold label does not count.</li>
+<li>the word regression.</li>
+</ul>
+</li>
+<li>Crash may state the operating system and nothing else about the machine, since every bug template
+asks for it. The report says it crashed and shows an exception, a traceback, a segmentation fault, an
+access violation or a stack trace.</li>
+<li>A statement that the program itself is wrong may state tool versions and the operating system. It
+needs a report that tells no story of change: no passing side, no required version, no limit that was
+hit, no &quot;works on&quot;, &quot;worked before&quot;, &quot;since upgrading&quot; or &quot;after the update&quot;. The statements are:
+<ul>
+<li><code>logic</code>: the program computes the wrong thing (false positives, false negatives, &quot;incorrectly&quot;,
+&quot;silently ignores&quot;, an off-by-one).</li>
+<li><code>null-deref</code>: a null or undefined dereference (<code>Cannot read properties of undefined</code>,
+<code>NullPointerException</code>).</li>
+<li><code>bounds</code>: an index out of range or out of bounds.</li>
+<li><code>memory</code>: a memory leak, a double free or a use after free.</li>
+<li><code>not-shown</code>: an output that does not appear (not rendered, not displayed, not saved, &quot;doesn't
+show&quot;, disappears).</li>
+<li><code>located</code>: the report already names the place in the project: a typo, a wrong link or target,
+<code>line 398 of upload.php</code> or a permalink to a source line.</li>
+</ul>
+</li>
+</ul>
+<p>The capture flows (<code>--there</code>, <code>-- COMMAND</code> and the CI flow) need the same kind of signal in the error
+text, and no difference may fit that text by name or by phrase. Then Drift says
+<code>No environment difference explains this.</code> and names the frame it read.</p>
+<p>The answer stays quiet otherwise. It never overrides a named cause: a difference the error text points
+at, a phrase that names a runtime, module, tool, limit or locale, a rule that matches, or a draft rule. Text with no
+signal keeps the answer &quot;cannot tell&quot;. Most bug reports state a platform or a version, so this answer
+is uncommon. Treat it as a pointer to the code, not a verdict.</p>
+<p>A report with an expected and an actual value and a frame in the project's code gives this answer:</p>
+<pre><code class="language-sh">drift why issue.md
+</code></pre>
+<pre><code>drift why: reading the report in issue.md
+
+This is not an environment difference. The report points at your own code (src/count.js:12): start
+  there.
+
+What I found:
+  The report has a stack frame in your code: src/count.js:12.
+
+What to try next:
+  Open src/count.js:12 and check the values the code gets there.
+</code></pre>
+<p>In JSON, <code>drift why --json</code> adds <code>&quot;kind&quot;: &quot;not-environment&quot;</code> to <code>plain</code>, and <code>drift triage --json</code> adds
+a <code>notEnvironment</code> object with <code>signal</code> (<code>frame</code>, <code>mismatch</code>, <code>regression</code>, <code>crash</code>, <code>logic</code>, <code>null-deref</code>,
+<code>bounds</code>, <code>memory</code>, <code>not-shown</code> or <code>located</code>), <code>line</code>, <code>frame</code> and <code>text</code>. Both are absent when the answer
+does not apply.</p>
+<h2 id="what-drift-reads">What Drift Reads</h2>
+<p><code>drift why</code> turns on the toolchain scanners and the project scan, so a first answer needs neither
+<code>--tools</code> nor <code>--project</code>. It reads tool versions, including the tools the project names in its
+scripts, Makefile, Dockerfile and CI workflows; environment variables; resource limits such as open
+files and process counts; memory and CPU limits; the kernel settings for memory maps, file handles
+and processes; the clock source; the time zone and locale (including the locales the system has
+installed); the operating system release; the shell behind <code>/bin/sh</code>; the file system type of
+<code>/tmp</code>; the host names in <code>/etc/hosts</code>; the network interface names; whether IPv6 addresses are configured; the
+CPU affinity; and the locked package versions of the project in the working directory.</p>
+<p>For DNS it reads only the local resolver file, <code>/etc/resolv.conf</code>, and keeps counts and flags: how
+many nameservers it lists, whether all of them are local, how many search domains it has, and which
+options are set. Drift never queries DNS, and it keeps no address or domain name from that file. It
+does not read your source code or data files, or network traffic. It does not time the disk either:
+the write-and-sync probe runs only with <code>drift capture --probes</code>. When nothing differs, the answer lists what it looked at and what it
+did not. Host names, accounts, terminal variables and
+<code>PATH</code> differ between any two machines and are left out of the comparison, and an environment
+variable such as <code>NODE_VERSION</code> that only repeats a tool version is dropped when the tool fact is
+there.</p>
+<h2 id="options">Options</h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--there PLACE</code></td>
+<td>compare with <code>docker:NAME</code>, <code>user@host</code> or a saved capture</td>
+</tr>
+<tr>
+<td><code>--fails-here</code></td>
+<td>the program fails here and works there</td>
+</tr>
+<tr>
+<td><code>--error TEXT</code></td>
+<td>the error the program printed; alone, outside a checkout, it is read as a report</td>
+</tr>
+<tr>
+<td><code>--reply</code></td>
+<td>read standard input as the answer to the first open ask</td>
+</tr>
+<tr>
+<td><code>--session FILE</code></td>
+<td>the session file (default <code>.drift/why/session.json</code>)</td>
+</tr>
+<tr>
+<td><code>--detail</code></td>
+<td>add the full ranking and plan after the answer, in the terms of <code>drift diagnose --detail</code></td>
+</tr>
+<tr>
+<td><code>--json</code></td>
+<td>print the machine output of <code>drift diagnose</code> with a <code>plain</code> object that holds the same three parts</td>
+</tr>
+</tbody>
+</table></div>
+<p>The same inputs give the same bytes. The exit status is 0 when Drift gave an answer, including &quot;cannot
+tell&quot;, and 1 when it could not reach a place or a tool. Each message of that kind ends with what to
+do next:</p>
+<pre><code>this directory is not inside a git checkout. drift why with no arguments reads the latest failed CI run, which needs a git checkout whose remote is on GitHub or GitLab. Other ways in: drift why --there PLACE, drift why -- COMMAND, or drift why FILE with an issue or an error text.
+</code></pre>
+<pre><code>cannot read make as an issue or error text. To run a command, put -- before it: drift why -- make test
+</code></pre></div>
+            <div class="pager">
+<a class="card" href="docs.html" rel="prev"><span>Prev</span><strong>Documentation</strong></a>
+<a class="card next" href="install.html" rel="next"><span>Next</span><strong>Install</strong></a>
+</div>
+        </main>
+        <footer>
+            <a href="https://github.com/gmitch215/Drift">github.com/gmitch215/Drift</a> &middot;
+            <a href="https://github.com/gmitch215/Drift/blob/master/LICENSE">MIT License</a>
+        </footer>
+        <script type="module" src="docs-render.js"></script>
+    </body>
+</html>

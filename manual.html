@@ -272,6 +272,39 @@
                 max-width: 100%;
             }
 
+            .guides {
+                display: flex;
+                flex-wrap: wrap;
+                gap: var(--u) calc(var(--u) * 4);
+                margin: 0 0 calc(var(--u) * 6);
+                padding-bottom: calc(var(--u) * 3);
+                border-bottom: 1px solid var(--line);
+            }
+            .guides a {
+                color: var(--muted);
+                font-size: 14px;
+                text-decoration: none;
+            }
+            .guides a:hover,
+            .guides a[aria-current] {
+                color: var(--accent-text);
+            }
+            .guides a[aria-current] {
+                text-decoration: underline;
+                text-decoration-color: var(--accent);
+                text-decoration-thickness: 2px;
+                text-underline-offset: 0.5em;
+            }
+            .docs-render {
+                margin: calc(var(--u) * 5) 0;
+                overflow-x: auto;
+                text-align: center;
+            }
+            .docs-render svg {
+                max-width: 100%;
+                height: auto;
+            }
+
             .pager {
                 display: flex;
                 flex-wrap: wrap;
@@ -309,6 +342,7 @@
     <body>
         <nav>
             <div class="bar"><a class="brand" href="index.html"><img src="drift_128.png" alt="" width="28" height="28">Drift</a>
+<a href="docs.html">Guides</a>
 <a href="manual.html" aria-current="page">Manual</a>
 <a href="advanced-usage.html">Usage</a>
 <a href="technical-report.html">Report</a>
@@ -317,6 +351,7 @@
 <a href="https://github.com/gmitch215/Drift">GitHub</a></div>
         </nav>
         <main>
+            
             
             <div class="readme"><h1 id="studio-manual">Studio Manual</h1>
 <p>Studio is the Drift app. It shows what the <code>drift</code> command shows, with buttons instead of flags. This
@@ -339,7 +374,7 @@ the directory once, then serve it:</p>
 <pre><code class="language-sh">./gradlew :cli:stageStudio
 drift serve --dir cli/build/serve/studio
 </code></pre>
-<p>Open the address it prints, for example <code>http://localhost:8080/</code>. The <a href="index.html#studio-on-the-web">README</a>
+<p>Open the address it prints, for example <code>http://localhost:8080/</code>. The <a href="install.html#studio-on-the-web">install guide</a>
 and the <a href="advanced-usage.html#serve">usage guide</a> list the flags.</p>
 </li>
 <li>
@@ -468,7 +503,7 @@ would break that environment if you moved to the versions you type, such as a re
 <p>The result says how many documented changes may break the environment and how many apply to the
 versions you chose. The screen warns that a quiet result does not show a move is safe: many rules
 describe a move in one direction only, and Drift has no rule for features that a newer version only
-adds. A line such as &quot;73 of 426 rules read a setting you moved&quot; tells you how much of the rule set
+adds. A line such as &quot;74 of 429 rules read a setting you moved&quot; tells you how much of the rule set
 looked at your change.</p>
 <h2 id="contract">Contract</h2>
 <p><img src="docs/manual/contract.png" alt="The Contract screen with a failing result" /></p>
@@ -610,13 +645,13 @@ Keep each file under about 400 KB.</p>
 <li>File Check on that case reads &quot;This file is intact: every check passed&quot;.</li>
 <li>The sample set for Node.js and npm versions has 4 capsules and one separating setting, the node version 22.4.0.</li>
 <li>Upgrade accepts <code>name=version</code> pairs and has a Common moves row with PHP 8.3 and PHP 8.3 and Drupal 11.</li>
-<li>With the sample drupal-10-site and <code>php=8.3,drupal=11</code>, the upgrade result reads &quot;73 of 426 rules read a setting you moved&quot;.</li>
+<li>With the sample drupal-10-site and <code>php=8.3,drupal=11</code>, the upgrade result reads &quot;74 of 429 rules read a setting you moved&quot;.</li>
 <li>With the sample contract and Failing Run 36995781138, Contract reports 1 requirement and 1 break.</li>
 <li>With the two sample runs named above, Bisect reports 9 settings that differ and a first test that changes 4.</li>
 <li>The web build is served at <a href="https://drift.gmitch215.dev/atlas/">https://drift.gmitch215.dev/atlas/</a> and by <code>drift serve --dir cli/build/serve/studio</code> after <code>./gradlew :cli:stageStudio</code>.</li>
 </ul></div>
             <div class="pager">
-<a class="card" href="index.html" rel="prev"><span>Prev</span><strong>Drift</strong></a>
+<a class="card" href="limits.html" rel="prev"><span>Prev</span><strong>Limits</strong></a>
 <a class="card next" href="advanced-usage.html" rel="next"><span>Next</span><strong>Advanced Usage</strong></a>
 </div>
         </main>
@@ -624,5 +659,6 @@ Keep each file under about 400 KB.</p>
             <a href="https://github.com/gmitch215/Drift">github.com/gmitch215/Drift</a> &middot;
             <a href="https://github.com/gmitch215/Drift/blob/master/LICENSE">MIT License</a>
         </footer>
+        <script type="module" src="docs-render.js"></script>
     </body>
 </html>

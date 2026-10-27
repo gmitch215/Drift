@@ -93,7 +93,7 @@
   <div class="breadcrumbs"><a href="../../index.html">core</a><span class="delimiter">/</span><a href="../index.html">dev.gmitch215.drift.rank</a><span class="delimiter">/</span><span class="current">Weights</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Weights</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":core/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="index.html">Weights</a><span class="source-link-wrapper"><span class="source-link" data-element-type="source-link">(<a href="https://github.com/gmitch215/Drift/blob/master/core/src/common/main/dev/gmitch215/drift/rank/Weights.kt#L36">source</a>)</span></span></div><p class="paragraph">Every number the ranker uses to compare candidates, in one place. The evidence weights are hand-set guesses and are NOT calibrated: they order candidates and a score is not a probability. The fit on the DriftBench dev split (<code class="lang-kotlin">bench/data/calibration/fit.json</code>) tried fitted dimension priors, a fitted probe and rule ratio and isotonic maps, and none beat these values out of fold, so they stay.</p><p class="paragraph">What the fit did support is a probability for a ranking whose candidates rest on their attribute change alone (<a href="shares.html">shares</a>): each candidate's share of the posterior against its rivals and <a href="-n-o-n-e.html">NONE</a>, the weight of "no listed candidate is the cause". A ranking with a probe, rule or spectrum item gets no probability. Probes occurred in 13 of the 45 dev scenarios; on those rankings the shares with the hand-set probe ratio scored worse out of fold than saying one in n, and a fitted ratio scored no better. No dev scenario has a rule match or a history, so rule and spectrum weights are untested.</p></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":core/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="index.html">Weights</a><span class="source-link-wrapper"><span class="source-link" data-element-type="source-link">(<a href="https://github.com/gmitch215/Drift/blob/master/core/src/common/main/dev/gmitch215/drift/rank/Weights.kt#L39">source</a>)</span></span></div><p class="paragraph">Every number the ranker uses to compare candidates, in one place. The evidence weights are hand-set guesses and are NOT calibrated: they order candidates and a score is not a probability. The fit on the DriftBench dev split (<code class="lang-kotlin">bench/data/calibration/fit.json</code>) tried fitted dimension priors, a fitted probe and rule ratio, a fitted <a href="-n-o-n-e.html">NONE</a> and isotonic maps, and no fitted weight replaced these values, so they stay.</p><p class="paragraph">What the fit did support is a probability for a ranking whose candidates rest on their attribute change alone (<a href="probabilities.html">probabilities</a>): each candidate's share of the posterior against its rivals and <a href="-n-o-n-e.html">NONE</a>, read through the isotonic <a href="map.html">map</a>, which gives the rate at which candidates with that share were the cause. The map is fit on every scenario of <a href="-f-i-t.html">FIT</a> and is not held out; out of fold, over the rankings that print a probability, it scored a Brier of 0.170 against 0.173 for saying one in n and 0.184 for the shares alone. The values are rates, not shares, and a ranking's values need not add up to one. A ranking with a probe, rule or spectrum item gets no probability: on rankings with a probe the shares with the hand-set probe ratio scored worse out of fold than saying one in n, and a fitted ratio scored no better. No dev scenario has a history, so spectrum weights are untested.</p></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
@@ -175,6 +175,21 @@
               </div>
             </div>
           </div>
+<a data-name="-1678624404%2FProperties%2F1239919082" anchor-label="map" id="-1678624404%2FProperties%2F1239919082" data-filterable-set=":core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":core/commonMain" data-filterable-set=":core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="map.html"><span><span>map</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1678624404%2FProperties%2F1239919082"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="map.html">map</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">The isotonic map from a share to a probability, both in micro-units: a share takes the value of the last step whose first share is at most it, the first step if none is.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
 <a data-name="-1625595121%2FProperties%2F1239919082" anchor-label="MAX_RUNS" id="-1625595121%2FProperties%2F1239919082" data-filterable-set=":core/commonMain"></a>
           <div class="table-row table-row_content" data-filterable-current=":core/commonMain" data-filterable-set=":core/commonMain">
             <div class="main-subrow keyValue ">
@@ -230,7 +245,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":core/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-n-o-n-e.html">NONE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">Weight of "no listed candidate is the cause" against the evidence ratios, fit on <a href="-f-i-t.html">FIT</a>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":core/commonMain"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-n-o-n-e.html">NONE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">Weight of "no listed candidate is the cause" in the shares <a href="map.html">map</a> reads; it is not fit.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -329,7 +344,37 @@
       </div>
       <div data-togglable="FUNCTION">
         <h2 class="tableheader">Functions</h2>
-        <div class="table"><a data-name="2073485485%2FFunctions%2F1239919082" anchor-label="shares" id="2073485485%2FFunctions%2F1239919082" data-filterable-set=":core/commonMain"></a>
+        <div class="table"><a data-name="-1370948518%2FFunctions%2F1239919082" anchor-label="mapped" id="-1370948518%2FFunctions%2F1239919082" data-filterable-set=":core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":core/commonMain" data-filterable-set=":core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="mapped.html"><span><span>mapped</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1370948518%2FFunctions%2F1239919082"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":core/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="mapped.html"><span class="token function">mapped</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">share<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">The value of <a href="map.html">map</a> at <a href="mapped.html">share</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1947683146%2FFunctions%2F1239919082" anchor-label="probabilities" id="1947683146%2FFunctions%2F1239919082" data-filterable-set=":core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":core/commonMain" data-filterable-set=":core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="probabilities.html"><span><span>probabilities</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1947683146%2FFunctions%2F1239919082"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":core/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="probabilities.html"><span class="token function">probabilities</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">scores<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph"><a href="shares.html">shares</a> of a ranking's <a href="probabilities.html">scores</a>, each read through <a href="map.html">map</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2073485485%2FFunctions%2F1239919082" anchor-label="shares" id="2073485485%2FFunctions%2F1239919082" data-filterable-set=":core/commonMain"></a>
           <div class="table-row table-row_content" data-filterable-current=":core/commonMain" data-filterable-set=":core/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">

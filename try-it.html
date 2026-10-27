@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Try It - Drift</title>
+        <meta name="description" content="Commands to run against the recorded fixtures, with their output." />
+        <link rel="icon" href="drift.ico" sizes="any" />
+        <link rel="icon" href="drift_128.png" type="image/png" sizes="128x128" />
+        <link rel="apple-touch-icon" href="drift.png" />
+        <meta property="og:title" content="Try It - Drift" />
+        <meta property="og:description" content="Commands to run against the recorded fixtures, with their output." />
+        <meta property="og:image" content="https://drift.gmitch215.dev/drift.png" />
+        <style>
+            :root {
+                color-scheme: light dark;
+                --canvas: #fcfbfe;
+                --surface: #ffffff;
+                --line: #e4def0;
+                                --fg: #1d1a26;
+                --muted: #5b556b;
+                --accent: #8a63f0;
+                --accent-text: #6b3fd4;
+                --tint: #efe8fb;
+                --radius: 6px;
+                --u: 4px;
+            }
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --canvas: #110e17;
+                    --surface: #191521;
+                    --line: #2b2438;
+                    --fg: #ece9f3;
+                    --muted: #a69fb8;
+                    --accent: #9d7bf5;
+                    --accent-text: #b99cff;
+                    --tint: #2a2140;
+                }
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                padding: 0 calc(var(--u) * 4) calc(var(--u) * 20);
+                background: var(--canvas);
+                color: var(--fg);
+                font:
+                    16px/1.65 ui-sans-serif,
+                    system-ui,
+                    -apple-system,
+                    'Segoe UI',
+                    Roboto,
+                    sans-serif;
+                overflow-wrap: break-word;
+            }
+            main,
+            nav .bar,
+            footer {
+                max-width: 52rem;
+                margin: 0 auto;
+            }
+            a:focus-visible {
+                outline: 2px solid var(--accent-text);
+                outline-offset: 2px;
+                border-radius: var(--radius);
+            }
+            nav {
+                margin: 0 calc(var(--u) * -4) calc(var(--u) * 8);
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border-bottom: 1px solid var(--line);
+                background: var(--surface);
+            }
+            nav .bar {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: var(--u) calc(var(--u) * 4);
+            }
+            nav a {
+                color: var(--muted);
+                font-size: 14px;
+                text-decoration: none;
+            }
+            nav a:hover,
+            nav a[aria-current] {
+                color: var(--accent-text);
+            }
+            nav a[aria-current] {
+                text-decoration: underline;
+                text-decoration-color: var(--accent);
+                text-decoration-thickness: 2px;
+                text-underline-offset: 0.5em;
+            }
+            nav a.brand {
+                display: flex;
+                align-items: center;
+                gap: calc(var(--u) * 2);
+                margin-right: auto;
+                color: var(--fg);
+                font-size: 16px;
+                font-weight: 600;
+            }
+            nav a.brand[aria-current] {
+                color: var(--fg);
+                text-decoration: none;
+            }
+            nav a.brand img {
+                width: 28px;
+                height: 28px;
+            }
+            h1 {
+                margin: 0 0 calc(var(--u) * 4);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .hero {
+                margin: 0 0 calc(var(--u) * 8);
+            }
+            .hero img {
+                display: block;
+                margin: 0 0 calc(var(--u) * 4);
+            }
+            .hero h1 {
+                margin: 0 0 var(--u);
+                font-size: 32px;
+                line-height: 40px;
+            }
+            .hero .lead {
+                margin: 0;
+                color: var(--muted);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .steps,
+            .links {
+                display: grid;
+                gap: calc(var(--u) * 3);
+                grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+                margin: 0 0 calc(var(--u) * 4);
+                padding: 0;
+                list-style: none;
+            }
+            .steps {
+                counter-reset: step;
+            }
+            .links {
+                margin-bottom: calc(var(--u) * 12);
+            }
+            .steps li {
+                display: flex;
+                counter-increment: step;
+            }
+            a.card {
+                display: block;
+                flex: 1;
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: var(--surface);
+                color: inherit;
+                text-decoration: none;
+            }
+            a.card:hover {
+                border-color: var(--accent);
+            }
+            a.card strong {
+                display: block;
+                color: var(--accent-text);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .steps a.card strong::before {
+                content: counter(step) '. ';
+            }
+            a.card span {
+                color: var(--muted);
+                font-size: 14px;
+                line-height: 22px;
+            }
+
+            .readme h2 {
+                margin: calc(var(--u) * 12) 0 calc(var(--u) * 3);
+                padding-bottom: calc(var(--u) * 2);
+                border-bottom: 1px solid var(--line);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .readme h3 {
+                margin: calc(var(--u) * 8) 0 calc(var(--u) * 2);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .readme h4 {
+                margin: calc(var(--u) * 6) 0 calc(var(--u) * 2);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .readme a {
+                color: var(--accent-text);
+                text-underline-offset: 0.2em;
+            }
+            .readme hr {
+                margin: calc(var(--u) * 12) 0;
+                border: 0;
+                border-top: 1px solid var(--line);
+            }
+            .readme blockquote {
+                margin: calc(var(--u) * 6) 0;
+                padding: var(--u) 0 var(--u) calc(var(--u) * 4);
+                border-left: 3px solid var(--accent);
+                color: var(--muted);
+            }
+            .readme ul,
+            .readme ol {
+                padding-left: calc(var(--u) * 6);
+            }
+            .readme li {
+                margin: calc(var(--u) * 1.5) 0;
+            }
+            .readme code {
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            }
+            .readme :not(pre) > code {
+                padding: 0.15em 0.4em;
+                border-radius: var(--radius);
+                background: var(--tint);
+                color: var(--accent-text);
+                font-size: 13px;
+                overflow-wrap: anywhere;
+            }
+            .readme pre {
+                margin: calc(var(--u) * 5) 0;
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                overflow-x: auto;
+                background: var(--surface);
+                font-size: 13px;
+                line-height: 20px;
+            }
+            .readme pre code {
+                display: block;
+            }
+            .readme .table {
+                overflow-x: auto;
+                margin: calc(var(--u) * 5) 0;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+            }
+            .readme table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 14px;
+                line-height: 22px;
+            }
+            .readme th,
+            .readme td {
+                padding: calc(var(--u) * 2) calc(var(--u) * 3);
+                border-bottom: 1px solid var(--line);
+                text-align: left;
+                vertical-align: top;
+            }
+            .readme th {
+                background: var(--tint);
+                font-weight: 600;
+            }
+            .readme tbody tr:last-child td {
+                border-bottom: 0;
+            }
+            .readme img {
+                max-width: 100%;
+            }
+
+            .guides {
+                display: flex;
+                flex-wrap: wrap;
+                gap: var(--u) calc(var(--u) * 4);
+                margin: 0 0 calc(var(--u) * 6);
+                padding-bottom: calc(var(--u) * 3);
+                border-bottom: 1px solid var(--line);
+            }
+            .guides a {
+                color: var(--muted);
+                font-size: 14px;
+                text-decoration: none;
+            }
+            .guides a:hover,
+            .guides a[aria-current] {
+                color: var(--accent-text);
+            }
+            .guides a[aria-current] {
+                text-decoration: underline;
+                text-decoration-color: var(--accent);
+                text-decoration-thickness: 2px;
+                text-underline-offset: 0.5em;
+            }
+            .docs-render {
+                margin: calc(var(--u) * 5) 0;
+                overflow-x: auto;
+                text-align: center;
+            }
+            .docs-render svg {
+                max-width: 100%;
+                height: auto;
+            }
+
+            .pager {
+                display: flex;
+                flex-wrap: wrap;
+                gap: calc(var(--u) * 3);
+                margin: calc(var(--u) * 12) 0 0;
+            }
+            .pager a.card {
+                min-width: 13rem;
+            }
+            .pager a.next {
+                margin-left: auto;
+                text-align: right;
+            }
+            .pager a.card span {
+                display: block;
+                font-size: 12px;
+                line-height: 18px;
+            }
+            .pager a.card strong {
+                font-size: 16px;
+            }
+
+            footer {
+                margin-top: calc(var(--u) * 16);
+                padding-top: calc(var(--u) * 6);
+                border-top: 1px solid var(--line);
+                color: var(--muted);
+                font-size: 14px;
+            }
+            footer a {
+                color: inherit;
+            }
+        </style>
+    </head>
+    <body>
+        <nav>
+            <div class="bar"><a class="brand" href="index.html"><img src="drift_128.png" alt="" width="28" height="28">Drift</a>
+<a href="docs.html" aria-current="page">Guides</a>
+<a href="manual.html">Manual</a>
+<a href="advanced-usage.html">Usage</a>
+<a href="technical-report.html">Report</a>
+<a href="atlas/#atlas">Atlas</a>
+<a href="engine/">Engine</a>
+<a href="https://github.com/gmitch215/Drift">GitHub</a></div>
+        </nav>
+        <main>
+            <div class="guides">
+<a href="docs.html">Documentation</a>
+<a href="why.html">Why</a>
+<a href="install.html">Install</a>
+<a href="try-it.html" aria-current="page">Try It</a>
+<a href="portability-atlas.html">Kotlin Portability Atlas</a>
+<a href="architecture.html">Architecture</a>
+<a href="shared-code.html">Shared Code</a>
+<a href="limits.html">Limits</a>
+</div>
+            
+            <div class="readme"><h1 id="try-it">Try It</h1>
+<p>The examples run from the repository root against the files in <code>fixtures/</code>. They assume <code>drift</code> is
+on your path, or the <code>drift</code> alias from <a href="install.html#command-line">Install</a>. Each one needs only the
+executable, except where it says otherwise. Output is from Linux x64.</p>
+<p><strong>Capture this machine.</strong> The capsule is JSON, so the digest changes with the machine.</p>
+<pre><code class="language-sh">drift capture --label ci &gt; ci.json
+sha256sum ci.json
+</code></pre>
+<p>On macOS, use <code>shasum -a 256</code> for the second command.</p>
+<p><strong>Diagnose a real failure.</strong> <code>drift diagnose</code> compares two capsules. <code>--detail</code> prints text
+instead of JSON, at three levels (<code>summary</code>, <code>detail</code>, <code>full</code>). The first lines of <code>detail</code>:</p>
+<pre><code class="language-sh">G=fixtures/drangler/capsules/36702683742.json
+R=fixtures/drangler/capsules/36995781138.json
+drift diagnose --detail detail $G $R | head -9
+</code></pre>
+<pre><code>9 changes differ with the same support, and tool.node.version ranks first only by hand-set weights,
+so the data does not name one cause.
+
+Candidates, best first. Scores come from hand-set weights (hand-set-1, uncalibrated); they order
+  candidates and are not probabilities.
+  1. tool.node.version (tier difference, basis inferred, in bundle-1)
+      evidence: attribute tool.node.version; no run history behind it
+  2. ci.provisioner.build-date (tier difference, basis inferred, in bundle-1)
+      evidence: attribute ci.provisioner.build-date; no run history behind it
+</code></pre>
+<p>The full output also lists the bundle and the proposed next experiment.</p>
+<p><strong>Verify a packed case.</strong> <code>fixtures/lab/cases</code> holds four solved cases. <code>verify</code> runs 14 checks on the
+archive itself.</p>
+<pre><code class="language-sh">drift verify fixtures/lab/cases/locale-tz-date-2.driftcase | tail -3
+</code></pre>
+<pre><code>verdict: CONFIRMED: this dimension causes the failure: env.TZ. Setting it to the failing values moved the failure count from 0 of 5 to 5 of 5 (exact one-sided p 0.003968) and back from 5 of 5 to 0 of 5 when the failing side was set to the passing values (p 0.003968)
+experiments are not re-run; the recorded results are taken as given
+verify: ok
+</code></pre>
+<p><strong>Reproduce an environment.</strong> This writes a <code>Dockerfile</code>, <code>run.sh</code> and <code>manifest.json</code> into <code>repro/</code>
+and does not run Docker. The manifest lists what a container cannot mirror.</p>
+<pre><code class="language-sh">drift reproduce fixtures/lab/node-alpine.json --run &quot;npm test&quot; --out repro
+</code></pre>
+<pre><code>wrote 3 files to repro
+23 attributes: 10 mirrored, 4 partially mirrored, 9 not mirrored; base image node:22.12.0-alpine3.20
+This is not the original environment. Attributes that are not mirrored are listed with their reasons
+  at --detail detail.
+</code></pre>
+<p><strong>Record the Atlas for this machine.</strong> The transcript holds one section per probe. Where an
+executable was linked changes three lines of <code>kotlin.math.transcendental-bits</code> (<code>tan1</code>, <code>asin-half</code>
+and <code>acos-half</code>, in the last digit), and the Linux executable used here differs from
+<code>fixtures/atlas/linux.txt</code> in exactly those lines.</p>
+<pre><code class="language-sh">drift atlas record --out tr
+</code></pre>
+<pre><code>wrote 38 probes for linux on kotlin 2.4.20 to tr/linux.txt
+</code></pre>
+<p><strong>Install into a scratch directory.</strong> <code>--dry-run</code> prints every change and makes none. Without it, the
+same command installs, and <code>drift uninstall</code> removes what the receipt lists.</p>
+<pre><code class="language-sh">drift install --dir &quot;$PWD/scratch-bin&quot; --no-modify-path --dry-run
+</code></pre>
+<pre><code>dry run: nothing is changed
+scope: user
+create directory /path/to/scratch-bin
+write /path/to/scratch-bin/drift (mode 0755, 12102072 bytes)
+create directory ~/.config
+create directory ~/.config/drift
+PATH is not modified
+write receipt ~/.config/drift/install-receipt.json
+</code></pre>
+<p><strong>Serve Studio.</strong> This needs a Studio web build. Stage it once, then serve it on a free port and fetch
+the page headers:</p>
+<pre><code class="language-sh">./gradlew :cli:stageStudio
+drift serve --dir cli/build/serve/studio --port 0
+</code></pre>
+<pre><code>drift serve 1.0.0: serving /path/to/studio
+http://localhost:56990/
+http://127.0.0.1:56990/
+http://[::1]:56990/
+press Ctrl+C to stop
+</code></pre>
+<pre><code class="language-sh">curl -sI http://localhost:56990/
+</code></pre>
+<pre><code>HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Cache-Control: no-cache
+Content-Length: 508
+Connection: close
+X-Content-Type-Options: nosniff
+Cross-Origin-Resource-Policy: same-origin
+</code></pre>
+<p><strong>Flagship cases.</strong> <code>fixtures/cases</code> holds the longer cases that the technical report describes.
+Case B is one Kotlin program that prints different results on Native and Wasm; case C holds six
+incidents, among them Lombok on JDK 21. Verifying them reads the packed certificate and starts no
+container:</p>
+<pre><code class="language-sh">drift verify fixtures/cases/b/resume-offset.driftcase | tail -3
+</code></pre>
+<pre><code>verdict: CONFIRMED: this dimension causes the failure: runtime.platform. Setting it to the failing values moved the failure count from 0 of 5 to 5 of 5 (exact one-sided p 0.003968) and back from 5 of 5 to 0 of 5 when the failing side was set to the passing values (p 0.003968)
+experiments are not re-run; the recorded results are taken as given
+verify: ok
+</code></pre>
+<pre><code class="language-sh">drift verify fixtures/cases/c/INC-11.driftcase | tail -3
+</code></pre>
+<pre><code>verdict: CONFIRMED EFFECT (bundle): the arms differ in 2 attributes, so the effect is the bundle's and not one member's: env.JAVA_VERSION, tool.java.version. Setting tool.java.version moved the failure count from 0 of 5 to 5 of 5 (exact one-sided p 0.003968) and back from 5 of 5 to 0 of 5 when the failing side was set to the passing values (p 0.003968). No bundle-splitting arm was possible: only tool.java.version can be set on its own; the other members travel with the base image.
+experiments are not re-run; the recorded results are taken as given
+verify: ok
+</code></pre></div>
+            <div class="pager">
+<a class="card" href="install.html" rel="prev"><span>Prev</span><strong>Install</strong></a>
+<a class="card next" href="portability-atlas.html" rel="next"><span>Next</span><strong>Kotlin Portability Atlas</strong></a>
+</div>
+        </main>
+        <footer>
+            <a href="https://github.com/gmitch215/Drift">github.com/gmitch215/Drift</a> &middot;
+            <a href="https://github.com/gmitch215/Drift/blob/master/LICENSE">MIT License</a>
+        </footer>
+        <script type="module" src="docs-render.js"></script>
+    </body>
+</html>

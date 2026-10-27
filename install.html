@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Install - Drift</title>
+        <meta name="description" content="Downloads, package managers, the install script and building from source." />
+        <link rel="icon" href="drift.ico" sizes="any" />
+        <link rel="icon" href="drift_128.png" type="image/png" sizes="128x128" />
+        <link rel="apple-touch-icon" href="drift.png" />
+        <meta property="og:title" content="Install - Drift" />
+        <meta property="og:description" content="Downloads, package managers, the install script and building from source." />
+        <meta property="og:image" content="https://drift.gmitch215.dev/drift.png" />
+        <style>
+            :root {
+                color-scheme: light dark;
+                --canvas: #fcfbfe;
+                --surface: #ffffff;
+                --line: #e4def0;
+                                --fg: #1d1a26;
+                --muted: #5b556b;
+                --accent: #8a63f0;
+                --accent-text: #6b3fd4;
+                --tint: #efe8fb;
+                --radius: 6px;
+                --u: 4px;
+            }
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --canvas: #110e17;
+                    --surface: #191521;
+                    --line: #2b2438;
+                    --fg: #ece9f3;
+                    --muted: #a69fb8;
+                    --accent: #9d7bf5;
+                    --accent-text: #b99cff;
+                    --tint: #2a2140;
+                }
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                padding: 0 calc(var(--u) * 4) calc(var(--u) * 20);
+                background: var(--canvas);
+                color: var(--fg);
+                font:
+                    16px/1.65 ui-sans-serif,
+                    system-ui,
+                    -apple-system,
+                    'Segoe UI',
+                    Roboto,
+                    sans-serif;
+                overflow-wrap: break-word;
+            }
+            main,
+            nav .bar,
+            footer {
+                max-width: 52rem;
+                margin: 0 auto;
+            }
+            a:focus-visible {
+                outline: 2px solid var(--accent-text);
+                outline-offset: 2px;
+                border-radius: var(--radius);
+            }
+            nav {
+                margin: 0 calc(var(--u) * -4) calc(var(--u) * 8);
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border-bottom: 1px solid var(--line);
+                background: var(--surface);
+            }
+            nav .bar {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: var(--u) calc(var(--u) * 4);
+            }
+            nav a {
+                color: var(--muted);
+                font-size: 14px;
+                text-decoration: none;
+            }
+            nav a:hover,
+            nav a[aria-current] {
+                color: var(--accent-text);
+            }
+            nav a[aria-current] {
+                text-decoration: underline;
+                text-decoration-color: var(--accent);
+                text-decoration-thickness: 2px;
+                text-underline-offset: 0.5em;
+            }
+            nav a.brand {
+                display: flex;
+                align-items: center;
+                gap: calc(var(--u) * 2);
+                margin-right: auto;
+                color: var(--fg);
+                font-size: 16px;
+                font-weight: 600;
+            }
+            nav a.brand[aria-current] {
+                color: var(--fg);
+                text-decoration: none;
+            }
+            nav a.brand img {
+                width: 28px;
+                height: 28px;
+            }
+            h1 {
+                margin: 0 0 calc(var(--u) * 4);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .hero {
+                margin: 0 0 calc(var(--u) * 8);
+            }
+            .hero img {
+                display: block;
+                margin: 0 0 calc(var(--u) * 4);
+            }
+            .hero h1 {
+                margin: 0 0 var(--u);
+                font-size: 32px;
+                line-height: 40px;
+            }
+            .hero .lead {
+                margin: 0;
+                color: var(--muted);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .steps,
+            .links {
+                display: grid;
+                gap: calc(var(--u) * 3);
+                grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+                margin: 0 0 calc(var(--u) * 4);
+                padding: 0;
+                list-style: none;
+            }
+            .steps {
+                counter-reset: step;
+            }
+            .links {
+                margin-bottom: calc(var(--u) * 12);
+            }
+            .steps li {
+                display: flex;
+                counter-increment: step;
+            }
+            a.card {
+                display: block;
+                flex: 1;
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: var(--surface);
+                color: inherit;
+                text-decoration: none;
+            }
+            a.card:hover {
+                border-color: var(--accent);
+            }
+            a.card strong {
+                display: block;
+                color: var(--accent-text);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .steps a.card strong::before {
+                content: counter(step) '. ';
+            }
+            a.card span {
+                color: var(--muted);
+                font-size: 14px;
+                line-height: 22px;
+            }
+
+            .readme h2 {
+                margin: calc(var(--u) * 12) 0 calc(var(--u) * 3);
+                padding-bottom: calc(var(--u) * 2);
+                border-bottom: 1px solid var(--line);
+                font-size: 20px;
+                line-height: 28px;
+            }
+            .readme h3 {
+                margin: calc(var(--u) * 8) 0 calc(var(--u) * 2);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .readme h4 {
+                margin: calc(var(--u) * 6) 0 calc(var(--u) * 2);
+                font-size: 16px;
+                line-height: 24px;
+            }
+            .readme a {
+                color: var(--accent-text);
+                text-underline-offset: 0.2em;
+            }
+            .readme hr {
+                margin: calc(var(--u) * 12) 0;
+                border: 0;
+                border-top: 1px solid var(--line);
+            }
+            .readme blockquote {
+                margin: calc(var(--u) * 6) 0;
+                padding: var(--u) 0 var(--u) calc(var(--u) * 4);
+                border-left: 3px solid var(--accent);
+                color: var(--muted);
+            }
+            .readme ul,
+            .readme ol {
+                padding-left: calc(var(--u) * 6);
+            }
+            .readme li {
+                margin: calc(var(--u) * 1.5) 0;
+            }
+            .readme code {
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            }
+            .readme :not(pre) > code {
+                padding: 0.15em 0.4em;
+                border-radius: var(--radius);
+                background: var(--tint);
+                color: var(--accent-text);
+                font-size: 13px;
+                overflow-wrap: anywhere;
+            }
+            .readme pre {
+                margin: calc(var(--u) * 5) 0;
+                padding: calc(var(--u) * 3) calc(var(--u) * 4);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                overflow-x: auto;
+                background: var(--surface);
+                font-size: 13px;
+                line-height: 20px;
+            }
+            .readme pre code {
+                display: block;
+            }
+            .readme .table {
+                overflow-x: auto;
+                margin: calc(var(--u) * 5) 0;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+            }
+            .readme table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 14px;
+                line-height: 22px;
+            }
+            .readme th,
+            .readme td {
+                padding: calc(var(--u) * 2) calc(var(--u) * 3);
+                border-bottom: 1px solid var(--line);
+                text-align: left;
+                vertical-align: top;
+            }
+            .readme th {
+                background: var(--tint);
+                font-weight: 600;
+            }
+            .readme tbody tr:last-child td {
+                border-bottom: 0;
+            }
+            .readme img {
+                max-width: 100%;
+            }
+
+            .guides {
+                display: flex;
+                flex-wrap: wrap;
+                gap: var(--u) calc(var(--u) * 4);
+                margin: 0 0 calc(var(--u) * 6);
+                padding-bottom: calc(var(--u) * 3);
+                border-bottom: 1px solid var(--line);
+            }
+            .guides a {
+                color: var(--muted);
+                font-size: 14px;
+                text-decoration: none;
+            }
+            .guides a:hover,
+            .guides a[aria-current] {
+                color: var(--accent-text);
+            }
+            .guides a[aria-current] {
+                text-decoration: underline;
+                text-decoration-color: var(--accent);
+                text-decoration-thickness: 2px;
+                text-underline-offset: 0.5em;
+            }
+            .docs-render {
+                margin: calc(var(--u) * 5) 0;
+                overflow-x: auto;
+                text-align: center;
+            }
+            .docs-render svg {
+                max-width: 100%;
+                height: auto;
+            }
+
+            .pager {
+                display: flex;
+                flex-wrap: wrap;
+                gap: calc(var(--u) * 3);
+                margin: calc(var(--u) * 12) 0 0;
+            }
+            .pager a.card {
+                min-width: 13rem;
+            }
+            .pager a.next {
+                margin-left: auto;
+                text-align: right;
+            }
+            .pager a.card span {
+                display: block;
+                font-size: 12px;
+                line-height: 18px;
+            }
+            .pager a.card strong {
+                font-size: 16px;
+            }
+
+            footer {
+                margin-top: calc(var(--u) * 16);
+                padding-top: calc(var(--u) * 6);
+                border-top: 1px solid var(--line);
+                color: var(--muted);
+                font-size: 14px;
+            }
+            footer a {
+                color: inherit;
+            }
+        </style>
+    </head>
+    <body>
+        <nav>
+            <div class="bar"><a class="brand" href="index.html"><img src="drift_128.png" alt="" width="28" height="28">Drift</a>
+<a href="docs.html" aria-current="page">Guides</a>
+<a href="manual.html">Manual</a>
+<a href="advanced-usage.html">Usage</a>
+<a href="technical-report.html">Report</a>
+<a href="atlas/#atlas">Atlas</a>
+<a href="engine/">Engine</a>
+<a href="https://github.com/gmitch215/Drift">GitHub</a></div>
+        </nav>
+        <main>
+            <div class="guides">
+<a href="docs.html">Documentation</a>
+<a href="why.html">Why</a>
+<a href="install.html" aria-current="page">Install</a>
+<a href="try-it.html">Try It</a>
+<a href="portability-atlas.html">Kotlin Portability Atlas</a>
+<a href="architecture.html">Architecture</a>
+<a href="shared-code.html">Shared Code</a>
+<a href="limits.html">Limits</a>
+</div>
+            
+            <div class="readme"><h1 id="install">Install</h1>
+<p>The first release has not been published. The download links and the <code>brew</code> and <code>choco</code> commands
+below work once it is. Until then, build from source.</p>
+<h2 id="downloads">Downloads</h2>
+<p>Assets are on the <a href="https://github.com/gmitch215/Drift/releases">releases page</a>. Every asset has a
+<code>.sha256</code> file, and <code>SHA256SUMS</code> lists them all.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Studio</th>
+<th>Command line</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>macOS, Apple silicon</td>
+<td><code>drift-1.0.0-macos-arm64.dmg</code>, <code>drift-1.0.0-macos-arm64.pkg</code></td>
+<td><code>drift-1.0.0-macos-arm64.tar.gz</code></td>
+</tr>
+<tr>
+<td>Windows x64</td>
+<td><code>drift-1.0.0-windows-x64.msi</code>, <code>drift-1.0.0-windows-x64.exe</code></td>
+<td><code>drift-1.0.0-windows-x64.zip</code></td>
+</tr>
+<tr>
+<td>Linux x64</td>
+<td><code>drift-1.0.0-linux-x64.AppImage</code>, <code>.deb</code>, <code>.rpm</code></td>
+<td><code>drift-1.0.0-linux-x64.tar.gz</code></td>
+</tr>
+<tr>
+<td>Linux arm64</td>
+<td></td>
+<td><code>drift-1.0.0-linux-arm64.tar.gz</code></td>
+</tr>
+<tr>
+<td>Android</td>
+<td><code>drift-1.0.0-android.apk</code></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>There is no Intel macOS asset. The Linux executables are built for glibc and do not run on musl
+systems such as Alpine. An archive holds <code>drift</code> (<code>drift.exe</code> on Windows), <code>LICENSE</code> and a short
+<code>README.txt</code>.</p>
+<pre><code class="language-sh">shasum -a 256 -c --ignore-missing SHA256SUMS
+</code></pre>
+<p>The <code>.deb</code> and <code>.rpm</code> packages are desktop packages. Their install script needs the standard
+desktop directories, so they do not install on a headless server. Make the AppImage executable with
+<code>chmod +x</code> and run it, or pass <code>--appimage-extract-and-run</code> where FUSE is missing.</p>
+<h2 id="unsigned-apps">Unsigned Apps</h2>
+<p>The macOS and Windows installers are not signed with a developer certificate, so the first launch is
+blocked.</p>
+<ul>
+<li><strong>macOS:</strong> Gatekeeper rejects the app. Open System Settings, Privacy and Security, and choose Open
+Anyway, or run <code>xattr -dr com.apple.quarantine /Applications/Drift.app</code>.</li>
+<li><strong>Windows:</strong> SmartScreen shows &quot;Windows protected your PC&quot;. Choose More info, then Run anyway.</li>
+<li><strong>Android:</strong> the APK is signed with a debug key. Allow installs from your browser or file manager.
+An update over an older sideloaded build needs <code>adb uninstall dev.gmitch215.drift</code> first, because
+each build machine signs with its own key.</li>
+</ul>
+<h2 id="homebrew">Homebrew</h2>
+<pre><code class="language-sh">brew install gmitch215/tap/drift
+brew install --cask gmitch215/tap/drift-studio
+</code></pre>
+<p>Use the full tap path, because other taps carry a formula named <code>drift</code>. The cask is Apple silicon
+only and clears the quarantine attribute after install.</p>
+<h2 id="chocolatey">Chocolatey</h2>
+<pre><code class="language-sh">choco install drift
+choco install drift-studio
+</code></pre>
+<h2 id="install-script">Install Script</h2>
+<pre><code class="language-sh">curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh | sh
+</code></pre>
+<p>On Windows, in PowerShell:</p>
+<pre><code class="language-powershell">irm https://raw.githubusercontent.com/gmitch215/Drift/master/install.ps1 | iex
+</code></pre>
+<p>Each script finds your OS and architecture, downloads the archive and its <code>.sha256</code> file from the
+latest release, checks the digest, runs the executable's <code>--version</code> and hands over to <code>drift install</code>.
+Flags go after <code>sh -s --</code> (<code>install.sh --dry-run</code> from a saved copy): <code>--user</code>, <code>--global</code>, <code>--dir</code>,
+<code>--no-modify-path</code> and <code>--dry-run</code>. <code>DRIFT_VERSION=1.0.0</code> pins a release. <code>install.ps1</code> takes the same
+options as <code>-User</code>, <code>-Global</code>, <code>-Dir</code>, <code>-NoModifyPath</code> and <code>-DryRun</code> when saved with
+<code>irm ... -OutFile install.ps1</code>.</p>
+<h2 id="drift-install">Drift Install</h2>
+<p><code>drift install</code> copies the executable you are running to a directory on your path and records what it
+changed in a receipt. <code>drift uninstall</code> reverses exactly that.</p>
+<pre><code class="language-sh">drift install --dry-run
+</code></pre>
+<p>By default it installs for the current user, into <code>~/.local/bin</code> (<code>%LOCALAPPDATA%\Programs\Drift</code> on
+Windows), and appends a marked block to the shell profiles that exist when the directory is not on
+<code>PATH</code>. Windows edits the user <code>Path</code> value in the registry. <code>--global</code> installs into <code>/usr/local/bin</code>
+(<code>%ProgramFiles%\Drift</code>), never calls <code>sudo</code>, and prints the command to run when the directory is not
+writable. <code>--no-modify-path</code> or <code>DRIFT_NO_MODIFY_PATH=1</code> skips the path edit. The JVM build cannot
+install itself. See <a href="advanced-usage.html#install-and-uninstall">the usage guide</a> for the full
+behavior.</p>
+<h2 id="build-from-source">Build from Source</h2>
+<p>Clone the repository. Every target builds from the Gradle wrapper, and the build downloads the JDK 21
+toolchain if one is missing. A cold build downloads toolchains and dependencies and takes minutes.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Target</th>
+<th>Needs</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CLI on the JVM</td>
+<td>JDK 21</td>
+<td><code>./gradlew :cli:jvmRun --args=--version</code></td>
+</tr>
+<tr>
+<td>CLI, macOS arm64</td>
+<td>macOS, Xcode command line tools</td>
+<td><code>./gradlew :cli:linkReleaseExecutableMacosArm64</code></td>
+</tr>
+<tr>
+<td>CLI, Linux x64 and arm64</td>
+<td>any host Kotlin/Native supports</td>
+<td><code>./gradlew :cli:linkReleaseExecutableLinuxX64</code> and <code>...LinuxArm64</code></td>
+</tr>
+<tr>
+<td>CLI, Windows x64</td>
+<td>any host Kotlin/Native supports</td>
+<td><code>./gradlew :cli:linkReleaseExecutableMingwX64</code></td>
+</tr>
+<tr>
+<td>Studio on the desktop</td>
+<td>JDK 21</td>
+<td><code>./gradlew :studio:run</code></td>
+</tr>
+<tr>
+<td>Studio on the web</td>
+<td>JDK 21, a browser</td>
+<td><code>./gradlew :cli:stageStudio</code>, then <code>drift serve</code></td>
+</tr>
+<tr>
+<td>Wasm tests on Node</td>
+<td>JDK 21 (Gradle fetches Node.js)</td>
+<td><code>./gradlew :core:wasmJsNodeTest</code></td>
+</tr>
+<tr>
+<td>Studio on Android</td>
+<td>Android SDK with platform 37</td>
+<td>see <a href="#android">Android</a></td>
+</tr>
+<tr>
+<td>Studio on iOS</td>
+<td>macOS, Xcode with a simulator runtime</td>
+<td>see <a href="#ios-simulator">iOS Simulator</a></td>
+</tr>
+</tbody>
+</table></div>
+<p>The installers are built by <code>release.yml</code> with <code>./gradlew :studio:packageDmg :studio:packagePkg</code> on
+macOS, <code>:studio:packageDeb :studio:packageRpm :studio:packageAppImage</code> on Linux and
+<code>:studio:packageMsi :studio:packageExe</code> on Windows (WiX Toolset). <code>drift solve</code> also needs Docker.
+Everything else runs without it.</p>
+<p>The wasmJs target builds Studio for the browser (see <a href="#studio-on-the-web">Studio on the Web</a>;
+<code>./gradlew :studio:wasmJsBrowserDistribution</code> builds the bundle without staging it) and runs the
+common <code>core</code> tests under Node.</p>
+<h3 id="command-line">Command Line</h3>
+<p>Executables land in <code>cli/build/bin/&lt;target&gt;/releaseExecutable/</code>. The macOS executable is <code>drift.kexe</code>
+and the Windows one is <code>drift.exe</code>. On Linux, link <code>linkReleaseExecutableLinuxX64</code> (or <code>LinuxArm64</code>) and
+point the alias at <code>linuxX64/releaseExecutable/drift.kexe</code> instead.</p>
+<pre><code class="language-sh">./gradlew :cli:linkReleaseExecutableMacosArm64
+alias drift=$PWD/cli/build/bin/macosArm64/releaseExecutable/drift.kexe
+drift --version
+</code></pre>
+<pre><code>drift version 1.0.0 (macos)
+</code></pre>
+<p>On the JVM, <code>./gradlew :cli:jvmRun --args=--version</code> prints <code>drift version 1.0.0 (jvm)</code>, and any other
+command goes in <code>--args</code>.</p>
+<p>The default path runs offline: <code>drift capture</code> and <code>drift diagnose</code> complete under
+<code>docker run --network none</code>.</p>
+<h2 id="studio-on-the-desktop">Studio on the Desktop</h2>
+<pre><code class="language-sh">./gradlew :studio:run
+</code></pre>
+<p>A window opens on the Home tab, with the Atlas, Investigation, Upgrade, Contract and Bisect views
+beside it.</p>
+<h2 id="studio-on-the-web">Studio on the Web</h2>
+<p><code>drift serve</code> serves the web build from a directory, read-only, on the loopback interface.
+<code>:cli:stageStudio</code> builds the Wasm distribution and copies it to <code>cli/build/serve/studio</code>.</p>
+<pre><code class="language-sh">./gradlew :cli:stageStudio
+drift serve --dir cli/build/serve/studio
+</code></pre>
+<p>Open <code>http://localhost:8080/</code>, or <code>http://localhost:8080/#atlas</code> to start on the Atlas tab. The page
+title is &quot;Drift Studio&quot;. <code>--port 0</code> takes a free port, <code>--cert</code> and <code>--key</code> (or <code>--mkcert</code> with an
+existing mkcert CA) serve HTTPS on the JVM, macOS and Linux builds, and <code>--domain</code> adds names such
+as <code>drift.local</code>. Any static server works too: serve <code>studio/build/dist/wasmJs/productionExecutable</code>
+after <code>./gradlew :studio:wasmJsBrowserDistribution</code>. The documentation site serves the same build at
+<a href="https://drift.gmitch215.dev/atlas/#atlas">https://drift.gmitch215.dev/atlas/#atlas</a>.</p>
+<h2 id="android">Android</h2>
+<p>Android and iOS builds are off by default so that a fresh clone needs only a JDK. Pass
+<code>-Pdrift.mobile=true</code> to turn them on. The Android build is a debug APK for an emulator or a device
+with USB debugging.</p>
+<pre><code class="language-sh">./gradlew -Pdrift.mobile=true :androidApp:assembleDebug
+adb install -r androidApp/build/outputs/apk/debug/androidApp-debug.apk
+adb shell am start -n dev.gmitch215.drift/dev.gmitch215.drift.android.MainActivity
+</code></pre>
+<p><code>./gradlew -Pdrift.mobile=true :androidApp:packageApk</code> writes the release APK that the release
+workflow attaches, <code>androidApp/build/distributions/drift-1.0.0-android.apk</code>. It is signed with the
+debug key. Nothing is published to a store.</p>
+<h2 id="ios-simulator">iOS Simulator</h2>
+<pre><code class="language-sh">xcodebuild -project iosApp/iosApp.xcodeproj -target iosApp -configuration Debug \
+  -sdk iphonesimulator ARCHS=arm64 ONLY_ACTIVE_ARCH=YES SYMROOT=build/xcode build
+xcrun simctl list devices available
+xcrun simctl boot &lt;device-udid&gt;
+xcrun simctl install &lt;device-udid&gt; build/xcode/Debug-iphonesimulator/iosApp.app
+xcrun simctl launch &lt;device-udid&gt; dev.gmitch215.drift
+</code></pre>
+<p>The Xcode project calls <code>./gradlew -Pdrift.mobile=true :studio:embedAndSignAppleFrameworkForXcode</code>
+in a build phase. Its <code>PATH</code> adds <code>/opt/homebrew/opt/openjdk/bin</code>, <code>/opt/homebrew/bin</code> and
+<code>/usr/local/bin</code>; a JDK installed elsewhere needs the script phase edited. No signing or provisioning
+is involved, and the build targets the simulator only.</p>
+<p>On Android and iOS, Studio replays the embedded Atlas transcripts and measures the live this-device
+probes. It does not sample the machine. The iOS host cannot start processes, so process probes are
+unavailable there. See <a href="limits.html">Limits</a> for what else differs by platform.</p></div>
+            <div class="pager">
+<a class="card" href="why.html" rel="prev"><span>Prev</span><strong>Why</strong></a>
+<a class="card next" href="try-it.html" rel="next"><span>Next</span><strong>Try It</strong></a>
+</div>
+        </main>
+        <footer>
+            <a href="https://github.com/gmitch215/Drift">github.com/gmitch215/Drift</a> &middot;
+            <a href="https://github.com/gmitch215/Drift/blob/master/LICENSE">MIT License</a>
+        </footer>
+        <script type="module" src="docs-render.js"></script>
+    </body>
+</html>
