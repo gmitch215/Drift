@@ -4,6 +4,6 @@
 Django==5.1.2  # web
 requests[socks]==2.32.3 ; python_version >= "3.8"
 numpy>=1.26
-pytest==8.*
+pytest==9.*
 Pillow_SIMD==9.0.0.post1 \
     --hash=sha256:abc
