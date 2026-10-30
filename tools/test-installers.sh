@@ -157,4 +157,253 @@ conflicting() {
 
 check "conflicting flags exit 2" code_is 2 conflicting
 
+case "$os-$arch" in
+    macos-arm64) gradle_target=MacosArm64 ;;
+    linux-x64) gradle_target=LinuxX64 ;;
+    linux-arm64) gradle_target=LinuxArm64 ;;
+    *) gradle_target=none ;;
+esac
+case "$exe" in
+    /*) exe_abs=$exe ;;
+    *) exe_abs="$(pwd)/$exe" ;;
+esac
+
+rm -rf "${work:?}"/drift-install.* "${work:?}/source" "${work:?}/archive-site" "${work:?}/gradle"
+rm -rf "${work:?}/tools" "${work:?}/gitbin" "${work:?}/jdk21" "${work:?}/jdk11" "${work:?}/jdk8"
+src="$work/source"
+sgit() {
+    git -C "$src" -c user.name=drift -c user.email=drift@example.invalid -c commit.gpgsign=false "$@"
+}
+
+git init -q -b master "$src"
+cat > "$src/gradlew" <<EOF
+#!/bin/sh
+printf '%s\n' "\$*" > "$work/gradle.args"
+git rev-parse HEAD > "$work/gradle.sha" 2> /dev/null
+pwd > "$work/gradle.dir"
+case "\$*" in
+    *linkReleaseExecutableMacosArm64*) lower=macosArm64 ;;
+    *linkReleaseExecutableLinuxX64*) lower=linuxX64 ;;
+    *linkReleaseExecutableLinuxArm64*) lower=linuxArm64 ;;
+    *) exit 2 ;;
+esac
+if [ -f "$work/gradle.fail" ]; then
+    i=1
+    while [ "\$i" -le 50 ]; do
+        echo "log line \$i"
+        i=\$((i + 1))
+    done
+    exit 1
+fi
+mkdir -p "cli/build/bin/\$lower/releaseExecutable"
+cp "$exe_abs" "cli/build/bin/\$lower/releaseExecutable/drift.kexe"
+EOF
+chmod +x "$src/gradlew"
+printf 'drift\n' > "$src/README.md"
+sgit add -A
+sgit commit -q -m one
+sgit tag v9.9.9
+sgit checkout -q -b exp
+printf 'two\n' > "$src/exp.txt"
+sgit add -A
+sgit commit -q -m two
+sgit checkout -q master
+printf 'three\n' > "$src/master.txt"
+sgit add -A
+sgit commit -q -m three
+c1=$(sgit rev-parse 'v9.9.9^{commit}')
+c2=$(sgit rev-parse exp)
+short=$(sgit rev-parse --short=7 exp)
+
+mkdir -p "$work/archive-site/archive" "$work/jdk21" "$work/jdk11" "$work/jdk8" "$work/tools" "$work/gitbin"
+sgit archive --format=tar.gz --prefix=Drift-master/ -o "$work/archive-site/archive/master.tar.gz" master
+cat > "$work/jdk21/java" <<'EOF'
+#!/bin/sh
+echo 'openjdk version "21.0.8" 2025-07-15' >&2
+EOF
+cat > "$work/jdk11/java" <<'EOF'
+#!/bin/sh
+echo 'openjdk version "11.0.2" 2019-01-15' >&2
+EOF
+cat > "$work/jdk8/java" <<'EOF'
+#!/bin/sh
+echo 'java version "1.8.0_292"' >&2
+EOF
+chmod +x "$work/jdk21/java" "$work/jdk11/java" "$work/jdk8/java"
+for name in env uname sysctl curl tar shasum sha256sum grep sed tr head tail cat mktemp rm mkdir cp chmod id; do
+    path=$(command -v "$name" || true)
+    if [ -n "$path" ]; then ln -sf "$path" "$work/tools/$name"; fi
+done
+ln -sf "$(command -v git)" "$work/gitbin/git"
+
+build_run() {
+    env -i HOME="$home" PATH="${t_path:-$work/jdk21:$work/tools:$work/gitbin}" SHELL=/bin/zsh \
+        TERM=dumb TMPDIR="$work" DRIFT_SOURCE_URL="file://$src" \
+        DRIFT_INSTALL_REPO_URL="${t_repo:-file://$work/no-release}" \
+        DRIFT_INSTALL_BASE_URL="${t_base:-}" DRIFT_VERSION="${t_pin:-}" \
+        DRIFT_FROM_SOURCE="${t_from:-}" DRIFT_REF="${t_ref:-}" \
+        /bin/sh "$root/install.sh" "$@"
+}
+
+source_build() {
+    rm -f "$work/gradle.args" "$work/gradle.sha" "$work/gradle.dir"
+    build_run "$@" > "$work/src.out" 2> "$work/src.err"
+}
+
+built() {
+    [ -f "$work/gradle.args" ]
+}
+
+sha_is() {
+    [ "$(cat "$work/gradle.sha")" = "$1" ]
+}
+
+shown() {
+    grep -qx "$1" "$work/src.err"
+}
+
+hidden() {
+    ! grep -qx "$1" "$work/src.err"
+}
+
+restore() {
+    installed uninstall && unchanged "$work/before.txt"
+}
+
+from_env() {
+    t_from=1 source_build
+}
+
+ref_env() {
+    t_ref=exp source_build
+}
+
+from_release() {
+    t_base="file://$work/release" t_pin="$version" source_build --from-source
+}
+
+not_downloaded() {
+    ! grep -q downloading "$work/src.err"
+}
+
+pinned_missing() {
+    t_pin=9.9.8 source_build
+}
+
+no_java() {
+    t_path="$work/tools:$work/gitbin" source_build
+}
+
+java_11() {
+    t_path="$work/jdk11:$work/tools:$work/gitbin" source_build
+}
+
+java_8() {
+    t_path="$work/jdk8:$work/tools:$work/gitbin" source_build
+}
+
+failing_build() {
+    touch "$work/gradle.fail"
+    source_build
+    code=$?
+    rm -f "$work/gradle.fail"
+    return "$code"
+}
+
+kept() {
+    test -d "$(dirname "$(cat "$work/gradle.dir")")"
+}
+
+unknown_ref() {
+    source_build --ref no-such-ref
+}
+
+dry_source() {
+    source_build --dry-run
+}
+
+no_git() {
+    t_path="$work/jdk21:$work/tools" t_repo="file://$work/archive-site" source_build
+}
+
+check "no release and no ref builds from source" source_build
+check "the fallback says there is no release" grep -q 'no release of drift exists yet' "$work/src.err"
+check "the fallback builds the target for this machine" \
+    grep -q "linkReleaseExecutable$gradle_target" "$work/gradle.args"
+check "the default ref is master" sha_is "$(sgit rev-parse master)"
+check "the fallback installs the built executable" cmp -s "$exe" "$home/.local/bin/drift"
+check "the fallback writes the receipt" test -f "$home/.config/drift/install-receipt.json"
+check "uninstall after the fallback restores every byte" restore
+
+check "--from-source builds when a release exists" from_release
+check "--from-source does not download the release" not_downloaded
+check "--from-source builds the target for this machine" \
+    grep -q "linkReleaseExecutable$gradle_target" "$work/gradle.args"
+check "uninstall after --from-source restores every byte" restore
+
+check "--ref exp builds the branch" source_build --ref exp
+check "--ref exp checks out exp" sha_is "$(sgit rev-parse exp)"
+check "uninstall after --ref exp restores every byte" restore
+
+check "--ref v9.9.9 builds the tag" source_build --ref v9.9.9
+check "--ref v9.9.9 checks out the tag" sha_is "$c1"
+check "uninstall after --ref v9.9.9 restores every byte" restore
+
+check "--ref with a full commit hash builds that commit" source_build --ref "$c1"
+check "a full commit hash checks out that commit" sha_is "$c1"
+check "uninstall after a full commit hash restores every byte" restore
+
+check "--ref with a short commit hash builds that commit" source_build --ref "$short"
+check "a short commit hash checks out that commit" sha_is "$c2"
+check "uninstall after a short commit hash restores every byte" restore
+
+check "DRIFT_FROM_SOURCE=1 builds from source" from_env
+check "DRIFT_FROM_SOURCE=1 checks out master" sha_is "$(sgit rev-parse master)"
+check "uninstall after DRIFT_FROM_SOURCE restores every byte" restore
+
+check "DRIFT_REF=exp builds from source" ref_env
+check "DRIFT_REF=exp checks out exp" sha_is "$c2"
+check "uninstall after DRIFT_REF restores every byte" restore
+
+check "a pinned version with no asset exits 1" code_is 1 pinned_missing
+check "a pinned version names the failed download" grep -q 'cannot download' "$work/src.err"
+check "a pinned version never builds" test ! -f "$work/gradle.args"
+check "a pinned version changed nothing" unchanged "$work/before.txt"
+
+check "no JDK exits 1" code_is 1 no_java
+check "no JDK names the JDK" grep -q 'JDK 17 or newer' "$work/src.err"
+check "no JDK never builds" test ! -f "$work/gradle.args"
+check "no JDK changed nothing" unchanged "$work/before.txt"
+
+check "Java 11 exits 1" code_is 1 java_11
+check "Java 11 is named as too old" grep -q 'is Java 11.0.2' "$work/src.err"
+check "Java 11 changed nothing" unchanged "$work/before.txt"
+
+check "Java 1.8 exits 1" code_is 1 java_8
+check "Java 1.8 is named as too old" grep -q 'is Java 1.8.0_292' "$work/src.err"
+check "Java 1.8 changed nothing" unchanged "$work/before.txt"
+
+check "a failed build exits 1" code_is 1 failing_build
+check "a failed build shows the last 40 lines of the log" shown 'log line 50'
+check "a failed build hides the lines before the last 40" hidden 'log line 10'
+check "a failed build names the kept directory" grep -q "$work/drift-install\." "$work/src.err"
+check "a failed build keeps the temporary directory" kept
+check "a failed build changed nothing" unchanged "$work/before.txt"
+
+check "an unknown ref exits 1" code_is 1 unknown_ref
+check "an unknown ref says it cannot fetch" grep -q 'cannot fetch no-such-ref' "$work/src.err"
+check "an unknown ref never builds" test ! -f "$work/gradle.args"
+check "an unknown ref changed nothing" unchanged "$work/before.txt"
+
+check "--dry-run builds from source" dry_source
+check "--dry-run changed nothing" unchanged "$work/before.txt"
+
+check "without git the archive is built" no_git
+check "without git the build names no SHA" grep -q 'built drift from master$' "$work/src.err"
+check "uninstall after the archive build restores every byte" restore
+
+check "--ref with no value exits 2" code_is 2 build_run --ref
+check "a ref that starts with a dash exits 1" code_is 1 build_run --ref=-x
+check "refused refs changed nothing" unchanged "$work/before.txt"
+
 exit "$failed"

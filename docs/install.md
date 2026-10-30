@@ -1,7 +1,8 @@
 # Install
 
 The first release has not been published. The download links and the `brew` and `choco` commands
-below work once it is. Until then, build from source.
+below work once it is. Until then, the install script builds from source (see
+[No Release Yet](#no-release-yet-or-an-experimental-build)).
 
 ## Downloads
 
@@ -75,6 +76,30 @@ Flags go after `sh -s --` (`install.sh --dry-run` from a saved copy): `--user`, 
 `--no-modify-path` and `--dry-run`. `DRIFT_VERSION=1.0.0` pins a release. `install.ps1` takes the same
 options as `-User`, `-Global`, `-Dir`, `-NoModifyPath` and `-DryRun` when saved with
 `irm ... -OutFile install.ps1`.
+
+## No Release Yet, or an Experimental Build
+
+When no release exists, the install script builds drift from source. It does this only when no
+version is pinned. A pinned `DRIFT_VERSION` or `DRIFT_INSTALL_BASE_URL` whose download fails stops
+the script with an error and never builds.
+
+The build needs a JDK 17 or newer on `PATH` or in `JAVA_HOME`, `curl` or `wget`, and either `git`
+or `tar`. The first build downloads toolchains and dependencies and takes several minutes.
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh | sh -s -- --from-source
+curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh | sh -s -- --ref BRANCH
+```
+
+The first command builds the default branch when there is no release. `--from-source` builds even
+when a release exists. `--ref` takes a branch, a tag or a commit, and implies `--from-source`; the
+default is `master`. `DRIFT_FROM_SOURCE=1` and `DRIFT_REF=REF` do the same. `DRIFT_SOURCE_URL` sets
+the git URL or local path to clone, which builds a fork. The other flags pass through to
+`drift install`. `--dry-run` still builds, and then it installs nothing.
+
+`install.ps1` takes `-FromSource` and `-Ref` with the same meaning. Without git it downloads the
+source archive instead.
 
 ## Drift Install
 
