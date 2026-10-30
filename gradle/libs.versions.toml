@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 spotless = "8.10.3"
 dokka = "2.2.0"
 ktlint = "1.8.0"
@@ -10,8 +10,8 @@ oshi = "7.7.0"
 slf4j = "2.0.20"
 snakeyaml-engine = "3.2"
 commonmark = "0.30.0"
-compose = "1.12.1"
-agp = "9.4.1"
+compose = "1.12.2"
+agp = "9.5.0"
 androidx-activity = "1.13.0"
 
 [libraries]
