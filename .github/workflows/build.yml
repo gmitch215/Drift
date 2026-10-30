@@ -106,6 +106,9 @@ jobs:
         run: ./gradlew ${{ matrix.tasks }} ${{ matrix.link }} --continue
       - name: Check Executable
         run: ${{ matrix.exe }} --version
+      - name: Test Install Script
+        if: ${{ runner.os == 'Windows' }}
+        run: pwsh -NoProfile -File tools/test-install-ps1.ps1
       - name: Test Action Script
         if: ${{ runner.os != 'Windows' }}
         run: .github/action/test-drift.sh ${{ matrix.exe }}
@@ -151,6 +154,13 @@ jobs:
             build/jacocoHtml
             build/jacoco.xml
             build/coverage
+          if-no-files-found: ignore
+      - name: Archive Test Reports
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reports-${{ matrix.name }}
+          path: '*/build/reports/tests'
           if-no-files-found: ignore
       - name: Stop Gradle
         run: ./gradlew --stop
@@ -282,12 +292,21 @@ jobs:
           cache-dependency-path: tools/browsers/package-lock.json
       - name: Build Studio Web
         run: ./gradlew :studio:wasmJsBrowserDistribution
+      - name: Cache Playwright Browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('tools/browsers/package-lock.json') }}
       - name: Install Playwright Browsers
-        timeout-minutes: 10
+        timeout-minutes: 20
         working-directory: tools/browsers
         run: |
           npm ci
-          npx playwright install --with-deps chromium firefox webkit
+          for attempt in 1 2 3; do
+            timeout 360 npx playwright install --with-deps chromium firefox webkit && exit 0
+            echo "playwright install attempt $attempt failed"
+          done
+          exit 1
       - name: Run Browser Smoke Test
         working-directory: tools/browsers
         run: >
