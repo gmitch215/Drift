@@ -219,3 +219,63 @@
   value: 'sebastian@phpunit.de'
   category: email
   reason: 'public Packagist author metadata, copied verbatim from a real lockfile fixture read by the composer scanner tests'
+- path: 'experiments/cold-start/READER.md'
+  value: '/home/reader'
+  category: home-path
+  reason: 'container home of the cold-start reader (cold-up.sh sets HOME to it), not a host account'
+- path: 'experiments/cold-start/cold-cp.sh'
+  value: '/home/reader'
+  category: home-path
+  reason: 'container home of the cold-start reader (cold-up.sh sets HOME to it), not a host account'
+- path: 'experiments/cold-start/cold-sh.sh'
+  value: '/home/reader'
+  category: home-path
+  reason: 'container home of the cold-start reader (cold-up.sh sets HOME to it), not a host account'
+- path: 'experiments/cold-start/cold-up.sh'
+  value: '/home/reader'
+  category: home-path
+  reason: 'container home of the cold-start reader (cold-up.sh sets HOME to it), not a host account'
+- path: 'experiments/cold-start/reader-prompt.sh'
+  value: '/home/reader'
+  category: home-path
+  reason: 'container home of the cold-start reader (cold-up.sh sets HOME to it), not a host account'
+- path: 'experiments/results/cold-start/round3-batch-a.log'
+  value: '/home/reader'
+  category: home-path
+  reason: 'in-container home of the cold-start reader in a recorded transcript, not a host account'
+- path: 'experiments/results/cold-start/round3-batch-b.log'
+  value: '/home/reader'
+  category: home-path
+  reason: 'in-container home of the cold-start reader in a recorded transcript, not a host account'
+- path: 'experiments/results/cold-start/round3-batch-c.log'
+  value: '/home/reader'
+  category: home-path
+  reason: 'in-container home of the cold-start reader in a recorded transcript, not a host account'
+- path: 'experiments/results/cold-start/round3-batch-d.log'
+  value: '/home/reader'
+  category: home-path
+  reason: 'in-container home of the cold-start reader in a recorded transcript, not a host account'
+- path: 'experiments/results/cold-start/round3-batch-e.log'
+  value: '/home/reader'
+  category: home-path
+  reason: 'in-container home of the cold-start reader in a recorded transcript, not a host account'
+- path: 'core/src/common/test/dev/gmitch215/drift/CleanRunTest.kt'
+  value: '10.0.0.1'
+  category: network
+  reason: 'synthetic private address in a test input'
+- path: 'core/src/common/test/dev/gmitch215/drift/TriageTest.kt'
+  value: '172.17.0.3'
+  category: network
+  reason: 'synthetic Docker bridge address in a test input'
+- path: 'scan/src/common/test/dev/gmitch215/drift/scan/CaptureTest.kt'
+  value: '10.0.0.1'
+  category: network
+  reason: 'synthetic private address in a test input'
+- path: 'scan/src/common/test/dev/gmitch215/drift/scan/CaptureTest.kt'
+  value: '10.0.0.2'
+  category: network
+  reason: 'synthetic private address in a test input'
+- path: 'scan/src/common/test/dev/gmitch215/drift/scan/CaptureTest.kt'
+  value: '172.17.0.3'
+  category: network
+  reason: 'synthetic Docker bridge address in a test input'
