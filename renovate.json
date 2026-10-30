@@ -5,18 +5,41 @@
     "group:allNonMajor"
   ],
   "dependencyDashboard": false,
+  "ignorePaths": [
+    "**/node_modules/**",
+    "fixtures/**",
+    "experiments/**",
+    "tools/ladder/**"
+  ],
   "packageRules": [
     {
-      "matchUpdateTypes": [
-        "minor",
-        "patch",
-        "pin",
-        "digest"
-      ]
+      "matchManagers": [
+        "gradle-wrapper"
+      ],
+      "groupName": "build toolchain"
     },
     {
-      "matchFileNames": [
-        "fixtures/**"
+      "matchPackageNames": [
+        "/^org\\.jetbrains\\.kotlin[.:]/",
+        "/^org\\.jetbrains\\.compose/",
+        "/^com\\.android/"
+      ],
+      "groupName": "build toolchain"
+    },
+    {
+      "matchDepNames": [
+        "node",
+        "java-jdk",
+        "ubuntu"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": false
+    },
+    {
+      "matchDatasources": [
+        "github-runners"
       ],
       "enabled": false
     }

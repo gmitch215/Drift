@@ -2,7 +2,7 @@ name: Deploy Documentation
 
 on:
   push:
-    branches: [master, ver/*, feat/*, renovate/*]
+    branches: [master, ver/*, feat/*]
   workflow_dispatch:
 
 concurrency:
