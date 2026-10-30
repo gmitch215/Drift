@@ -1,5 +1,5 @@
 == scenario 8 r1: 8-20261027T112059Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/8-20261027T112059Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/8-20261027T112059Z
 scenario: 8
 commands led by the README (drift and copies): 6 (limit 5); all commands: 11; earlier rule: 7
 seconds: 91 (limit 600)
@@ -17,7 +17,7 @@ confusion:
 - The 2.22 threshold came from drift's output. It matches what I know of Git, but I did not check it against Git's own release notes.
 
 == scenario 8 r2: 8-20261027T112239Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/8-20261027T112239Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/8-20261027T112239Z
 scenario: 8
 commands led by the README (drift and copies): 9 (limit 5); all commands: 13; earlier rule: 9
 seconds: 79 (limit 600)
@@ -35,7 +35,7 @@ confusion:
 - Budget: I used 17 commands, two over the 15-command cap. Command 16 was the failed quoting attempt, and command 17 was the `--error` run.
 
 == scenario 8 r3: 8-20261027T112410Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/8-20261027T112410Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/8-20261027T112410Z
 scenario: 8
 commands led by the README (drift and copies): 4 (limit 5); all commands: 9; earlier rule: 5
 seconds: 71 (limit 600)
@@ -50,7 +50,7 @@ confusion:
 - I stopped at 11 commands. The `git --version` checks at the end were my own, not drift's request.
 
 == scenario 1 r1: 1-20261027T112532Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/1-20261027T112532Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/1-20261027T112532Z
 scenario: 1
 commands led by the README (drift and copies): 5 (limit 5); all commands: 7; earlier rule: 5
 seconds: 54 (limit 600)
@@ -65,7 +65,7 @@ confusion:
 - The README says to change only Node on the failing machine and run it again to confirm. I did not, because that changes the build server. That is the one check left open.
 
 == scenario 1 r2: 1-20261027T112637Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/1-20261027T112637Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/1-20261027T112637Z
 scenario: 1
 commands led by the README (drift and copies): 4 (limit 5); all commands: 7; earlier rule: 4
 seconds: 38 (limit 600)
@@ -79,7 +79,7 @@ confusion:
 - The "change only Node version there" step drift suggested is an experiment on the build server. I did not run it. I explained the cause from `Object.groupBy` support, which is general knowledge of the language: it shipped in Node 21, so Node 20 lacks it.
 
 == scenario 1 r3: 1-20261027T112725Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/1-20261027T112725Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/1-20261027T112725Z
 scenario: 1
 commands led by the README (drift and copies): 3 (limit 5); all commands: 6; earlier rule: 3
 seconds: 43 (limit 600)
@@ -93,7 +93,7 @@ confusion:
 - My first `cold-cp.sh` call used `/home/reader/project/there.json`, which the script rejected with `path must be a plain relative path under /home/reader`. The usage line says `<path under /home/reader>` and does not say the path must be relative. I retried with `project/there.json`.
 
 == scenario 2 r1: 2-20261027T112817Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/2-20261027T112817Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/2-20261027T112817Z
 scenario: 2
 commands led by the README (drift and copies): 3 (limit 5); all commands: 6; earlier rule: 3
 seconds: 42 (limit 600)
@@ -108,7 +108,7 @@ confusion:
 - `which -a python3 python3.11 python3.12 python3.13` exited 2 on there. That is expected when those names are missing, but I read the output from `ls` to confirm only 3.10 is installed.
 
 == scenario 2 r2: 2-20261027T112909Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/2-20261027T112909Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/2-20261027T112909Z
 scenario: 2
 commands led by the README (drift and copies): 5 (limit 5); all commands: 11; earlier rule: 5
 seconds: 67 (limit 600)
@@ -125,7 +125,7 @@ confusion:
 - `To be sure, change only that and run it again there`: I could not do this, because the build server has no 3.11+ interpreter and no version manager to install one with.
 
 == scenario 2 r3: 2-20261027T113025Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/2-20261027T113025Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/2-20261027T113025Z
 scenario: 2
 commands led by the README (drift and copies): 3 (limit 5); all commands: 6; earlier rule: 3
 seconds: 44 (limit 600)
@@ -140,7 +140,7 @@ confusion:
 - `cold-cp.sh ... here` gave no destination path. I assumed `/home/reader/project/there.json` on the laptop; the `ls` in the next command confirmed it.
 
 == scenario 3 r1: 3-20261027T113119Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/3-20261027T113119Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/3-20261027T113119Z
 scenario: 3
 commands led by the README (drift and copies): 3 (limit 5); all commands: 9; earlier rule: 4
 seconds: 60 (limit 600)
@@ -155,7 +155,7 @@ confusion:
 - The `TZ=UTC` run on the build server exited 1 even though all output printed. I think the last command, `cat /etc/timezone`, caused it, since that file does not exist, but I did not confirm this.
 
 == scenario 3 r2: 3-20261027T113229Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/3-20261027T113229Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/3-20261027T113229Z
 scenario: 3
 commands led by the README (drift and copies): 3 (limit 5); all commands: 7; earlier rule: 3
 seconds: 50 (limit 600)
@@ -169,7 +169,7 @@ confusion:
 - Guess: I did not edit `test.py` and run it. I checked the `gmtime` fix with a one-line `python3 -c` on the server. `gmtime` ignores `TZ`, so the result should match the edited test, but I did not run the edited file.
 
 == scenario 3 r3: 3-20261027T113329Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/3-20261027T113329Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/3-20261027T113329Z
 scenario: 3
 commands led by the README (drift and copies): 3 (limit 5); all commands: 9; earlier rule: 3
 seconds: 63 (limit 600)
@@ -184,7 +184,7 @@ confusion:
 - Drift suggested "Set TZ=UTC there." I chose the code change instead, because the code is the same copy on both machines and the change fixes it wherever it runs. I checked the code change with `gmtime` on the failing machine without editing `test.py`. I did not edit `test.py`.
 
 == scenario 4 r1: 4-20261027T113441Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/4-20261027T113441Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/4-20261027T113441Z
 scenario: 4
 commands led by the README (drift and copies): 4 (limit 5); all commands: 9; earlier rule: 4
 seconds: 57 (limit 600)
@@ -199,7 +199,7 @@ confusion:
 - Drift listed "6 other differences exist" (the C compiler, curl, ssh and others) and said the error text does not point at them. I did not check them. None of them affects `test.py`, which only calls git.
 
 == scenario 4 r2: 4-20261027T113548Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/4-20261027T113548Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/4-20261027T113548Z
 scenario: 4
 commands led by the README (drift and copies): 4 (limit 5); all commands: 7; earlier rule: 4
 seconds: 40 (limit 600)
@@ -214,7 +214,7 @@ confusion:
 - I did not check the README claim that the saved file hides secret values.
 
 == scenario 4 r3: 4-20261027T113638Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/4-20261027T113638Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/4-20261027T113638Z
 scenario: 4
 commands led by the README (drift and copies): 4 (limit 5); all commands: 8; earlier rule: 4
 seconds: 61 (limit 600)
@@ -227,7 +227,7 @@ confusion:
 - drift's last step says "Install Git on the machine where it fails" with no method. The README install section covers drift only, so I checked the OS and package manager myself.
 
 == scenario 5 r1: 5-20261027T113749Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/5-20261027T113749Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/5-20261027T113749Z
 scenario: 5
 commands led by the README (drift and copies): 3 (limit 5); all commands: 10; earlier rule: 3
 seconds: 68 (limit 600)
@@ -242,7 +242,7 @@ confusion:
 - The README's sample error text has single quotes around `/dev/null`. My wrapper could not pass them, so I used the error text without the quotes. Drift still matched on "open".
 
 == scenario 5 r2: 5-20261027T113907Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/5-20261027T113907Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/5-20261027T113907Z
 scenario: 5
 commands led by the README (drift and copies): 3 (limit 5); all commands: 9; earlier rule: 3
 seconds: 55 (limit 600)
@@ -257,7 +257,7 @@ confusion:
 - I could not run "change only that and run it again there" on the server. Raising the limit needs root or a change to the container config, which I did not make.
 
 == scenario 5 r3: 5-20261027T114012Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/5-20261027T114012Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/5-20261027T114012Z
 scenario: 5
 commands led by the README (drift and copies): 3 (limit 5); all commands: 8; earlier rule: 5
 seconds: 49 (limit 600)
@@ -271,7 +271,7 @@ confusion:
 - Not tested: rewriting `test.py` to close each file before opening the next. That would also pass, but it changes the check, which the brief did not ask for.
 
 == scenario 6 r1: 6-20261027T114110Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/6-20261027T114110Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/6-20261027T114110Z
 scenario: 6
 commands led by the README (drift and copies): 3 (limit 5); all commands: 7; earlier rule: 3
 seconds: 61 (limit 600)
@@ -286,7 +286,7 @@ confusion:
 - README, drift output: "Install tinyfmt 2.0.0 there and commit the lockfile." "Install" could mean `npm install`, `npm ci`, or editing `node_modules`, and the output doesn't say which. It also doesn't mention that `package.json` already says 2.0.0, so the stale file is the lock.
 
 == scenario 6 r2: 6-20261027T114220Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/6-20261027T114220Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/6-20261027T114220Z
 scenario: 6
 commands led by the README (drift and copies): 3 (limit 5); all commands: 7; earlier rule: 3
 seconds: 146 (limit 600)
@@ -302,7 +302,7 @@ confusion:
 - Drift listed only tinyfmt as a difference. I took "the only difference I found" at face value and did not check Node, the time zone or the locale myself.
 
 == scenario 6 r3: 6-20261027T114455Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/6-20261027T114455Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/6-20261027T114455Z
 scenario: 6
 commands led by the README (drift and copies): 4 (limit 5); all commands: 12; earlier rule: 4
 seconds: 217 (limit 600)

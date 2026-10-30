@@ -1,5 +1,5 @@
 == scenario 1 r1: 1-20261027T092118Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/1-20261027T092118Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/1-20261027T092118Z
 scenario: 1
 commands led by the README (drift and copies): 4 (limit 5); all commands: 9; earlier rule: 4
 seconds: 53 (limit 600)
@@ -17,7 +17,7 @@ confusion:
 - For `cold-cp.sh` I guessed `project/there.json` as the path under `/home/reader`. The script accepted it.
 
 == scenario 1 r2: 1-20261027T092220Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/1-20261027T092220Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/1-20261027T092220Z
 scenario: 1
 commands led by the README (drift and copies): 4 (limit 5); all commands: 11; earlier rule: 6
 seconds: 64 (limit 600)
@@ -31,7 +31,7 @@ confusion:
 - First copy attempt: `cold-cp.sh 1 there /home/reader/there.json here` returned `path must be a plain relative path under /home/reader`. I had passed an absolute path, and `there.json` worked.
 
 == scenario 1 r3: 1-20261027T092333Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/1-20261027T092333Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/1-20261027T092333Z
 scenario: 1
 commands led by the README (drift and copies): 4 (limit 5); all commands: 8; earlier rule: 4
 seconds: 52 (limit 600)
@@ -45,7 +45,7 @@ confusion:
 - The README's example for `--there there.json --error "TypeError: Object.groupBy is not a function"` shows the same answer I got. I ran the command rather than trust the example.
 
 == scenario 2 r1: 2-20261027T092434Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/2-20261027T092434Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/2-20261027T092434Z
 scenario: 2
 commands led by the README (drift and copies): 3 (limit 5); all commands: 7; earlier rule: 3
 seconds: 55 (limit 600)
@@ -61,7 +61,7 @@ confusion:
 - Drift's answer lists only the Python version. Its output does not say whether the other saved facts (OS, time zone, environment) were compared and matched. I checked only the `test.py` hash myself.
 
 == scenario 2 r2: 2-20261027T092540Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/2-20261027T092540Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/2-20261027T092540Z
 scenario: 2
 commands led by the README (drift and copies): 3 (limit 5); all commands: 7; earlier rule: 4
 seconds: 46 (limit 600)
@@ -76,7 +76,7 @@ confusion:
 - Drift: "To be sure, change only that and run it again there." I did not do this. It would mean installing Python on the build server, and the brief limits me to checks.
 
 == scenario 2 r3: 2-20261027T092635Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/2-20261027T092635Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/2-20261027T092635Z
 scenario: 2
 commands led by the README (drift and copies): 3 (limit 5); all commands: 6; earlier rule: 3
 seconds: 45 (limit 600)
@@ -91,7 +91,7 @@ confusion:
 - Side effect: I left `there.json` in `/home/reader/project` on both machines.
 
 == scenario 3 r1: 3-20261027T092730Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/3-20261027T092730Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/3-20261027T092730Z
 scenario: 3
 commands led by the README (drift and copies): 3 (limit 5); all commands: 5; earlier rule: 3
 seconds: 51 (limit 600)
@@ -103,7 +103,7 @@ confusion:
 - Drift's output said `Set TZ=UTC there`, which is a settings change. The `gmtime` fix that keeps the code the only thing that changes came from my reading of `test.py`, not from Drift.
 
 == scenario 3 r2: 3-20261027T092830Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/3-20261027T092830Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/3-20261027T092830Z
 scenario: 3
 commands led by the README (drift and copies): 3 (limit 5); all commands: 8; earlier rule: 3
 seconds: 47 (limit 600)
@@ -116,7 +116,7 @@ confusion:
 - The README's save example did not say which folder to run `--save` from. I ran it from `/home/reader/project`, and the output said where the file went.
 
 == scenario 3 r3: 3-20261027T092928Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/3-20261027T092928Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/3-20261027T092928Z
 scenario: 3
 commands led by the README (drift and copies): 3 (limit 5); all commands: 6; earlier rule: 3
 seconds: 46 (limit 600)
@@ -131,7 +131,7 @@ confusion:
 - I did not find where `TZ=America/New_York` is set on the build server (profile, service unit, CI config). Drift does not say, and I did not search for it, so I cannot say what to remove to fix the server itself.
 
 == scenario 4 r1: 4-20261027T093024Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/4-20261027T093024Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/4-20261027T093024Z
 scenario: 4
 commands led by the README (drift and copies): 4 (limit 5); all commands: 7; earlier rule: 4
 seconds: 54 (limit 600)
@@ -146,7 +146,7 @@ confusion:
 - Drift suggested "change only that and run it again there" to confirm. I did not install git on the build server, because that changes a machine I was only asked to diagnose.
 
 == scenario 4 r2: 4-20261027T093128Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/4-20261027T093128Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/4-20261027T093128Z
 scenario: 4
 commands led by the README (drift and copies): 7 (limit 5); all commands: 10; earlier rule: 7
 seconds: 63 (limit 600)
@@ -160,7 +160,7 @@ confusion:
 - The README says the session lives in the folder where you run drift, so `drift why --error` and `drift why --save` wrote files into `/home/reader/project` on the build server. I did not check that directory afterward, so the leftover `.drift/` and `there.json` are unverified.
 
 == scenario 4 r3: 4-20261027T093240Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/4-20261027T093240Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/4-20261027T093240Z
 scenario: 4
 commands led by the README (drift and copies): 4 (limit 5); all commands: 7; earlier rule: 4
 seconds: 51 (limit 600)
@@ -174,7 +174,7 @@ confusion:
 - Verification is missing: drift says "change only that and run it again there," and I did not install git on the build server, so `python3 test.py` has not been re-run there.
 
 == scenario 5 r1: 5-20261027T093341Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/5-20261027T093341Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/5-20261027T093341Z
 scenario: 5
 commands led by the README (drift and copies): 4 (limit 5); all commands: 9; earlier rule: 5
 seconds: 54 (limit 600)
@@ -188,7 +188,7 @@ confusion:
 - The error text has single quotes, so I had to escape them inside `cold-sh.sh`. No README line led me there.
 
 == scenario 5 r2: 5-20261027T093444Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/5-20261027T093444Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/5-20261027T093444Z
 scenario: 5
 commands led by the README (drift and copies): 3 (limit 5); all commands: 9; earlier rule: 3
 seconds: 56 (limit 600)
@@ -203,7 +203,7 @@ confusion:
 - The container suggestion (`--ulimit nofile=...`) is drift's. I inferred from PID 1 being `sleep` that the server runs in a container and did not confirm it.
 
 == scenario 5 r3: 5-20261027T093550Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/5-20261027T093550Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/5-20261027T093550Z
 scenario: 5
 commands led by the README (drift and copies): 3 (limit 5); all commands: 11; earlier rule: 3
 seconds: 75 (limit 600)
@@ -219,7 +219,7 @@ confusion:
 - Used 12 of 15 commands.
 
 == scenario 6 r1: 6-20261027T093716Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/6-20261027T093716Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/6-20261027T093716Z
 scenario: 6
 commands led by the README (drift and copies): 3 (limit 5); all commands: 11; earlier rule: 3
 seconds: 159 (limit 600)
@@ -234,7 +234,7 @@ confusion:
 - `drift why --save` writes into the current directory. I ran it in the project folder, so `project/there.json` now exists on both machines, and I copied it to here's `project/`. Remove it from the project before committing.
 
 == scenario 6 r2: 6-20261027T094004Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/6-20261027T094004Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/6-20261027T094004Z
 scenario: 6
 commands led by the README (drift and copies): 3 (limit 5); all commands: 8; earlier rule: 3
 seconds: 51 (limit 600)
@@ -249,7 +249,7 @@ confusion:
 - I do not know how the build server installs dependencies. `package.json` says 2.0.0, yet `node_modules` holds 1.1.0. `npm ci` would refuse a lockfile that disagrees with `package.json`, so something installed from the old lock or copied `node_modules` over. The brief's "dependency list has not changed" is true of `package.json` but not of the lockfile.
 
 == scenario 6 r3: 6-20261027T094106Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/6-20261027T094106Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/6-20261027T094106Z
 scenario: 6
 commands led by the README (drift and copies): 3 (limit 5); all commands: 7; earlier rule: 3
 seconds: 53 (limit 600)
@@ -264,7 +264,7 @@ confusion:
 - Nothing I read explains why the server's lock file is 1.1.0 while its `package.json` says 2.0.0. It could be an old checkout or an install that used an old lock. I did not check.
 
 == scenario 8 r1: 8-20261027T094209Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/8-20261027T094209Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/8-20261027T094209Z
 scenario: 8
 commands led by the README (drift and copies): 4 (limit 5); all commands: 13; earlier rule: 6
 seconds: 81 (limit 600)
@@ -280,7 +280,7 @@ confusion:
 - Nothing in the README or drift output pointed to git. The git cause comes from the report and general knowledge.
 
 == scenario 8 r2: 8-20261027T094340Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/8-20261027T094340Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/8-20261027T094340Z
 scenario: 8
 commands led by the README (drift and copies): 5 (limit 5); all commands: 13; earlier rule: 5
 seconds: 71 (limit 600)
@@ -298,7 +298,7 @@ confusion:
 - Commands used: 15 (including one local `ls`), which is the limit. The `Read` attempt on `issue.md` failed as well. I did not guess a cause beyond the report text plus general git knowledge.
 
 == scenario 8 r3: 8-20261027T094501Z
-run: /Users/gamer/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/8-20261027T094501Z
+run: ~/gmitch215/kotlin/Drift/experiments/results/cold-start/runs/8-20261027T094501Z
 scenario: 8
 commands led by the README (drift and copies): 6 (limit 5); all commands: 10; earlier rule: 6
 seconds: 74 (limit 600)
