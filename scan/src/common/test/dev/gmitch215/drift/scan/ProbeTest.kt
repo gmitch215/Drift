@@ -67,8 +67,14 @@ class ProbeTest {
         val host = systemHost()
         val a = ProbeRunner.run(host, Catalog.all)
         val b = ProbeRunner.run(host, Catalog.all)
-        assertEquals(a, b)
+        // the fsync bucket can straddle an edge between two runs
+        assertEquals(a.filterNot { it.id == FSYNC_PROBE }, b.filterNot { it.id == FSYNC_PROBE })
         assertTrue(a.all { it.transcript.endsWith("\n") })
+        val buckets = listOf("<1ms", "1-10ms", "10-100ms", "100ms-1s", ">1s")
+            .map { "fs.tmp.fsync = $it\n" }
+        for (result in listOf(a, b).map { run -> run.single { it.id == FSYNC_PROBE } }) {
+            if (result.status == ProbeStatus.OK) assertTrue(result.transcript in buckets)
+        }
     }
 
     @Test
@@ -224,7 +230,7 @@ class ProbeTest {
 
     @Test
     fun theFsyncProbeReportsTheBucketOrIsUnavailable() {
-        val probe = Catalog.all.single { it.id == "resources.fs-tmp-fsync" }
+        val probe = Catalog.all.single { it.id == FSYNC_PROBE }
         val slow = ProbeRunner.run(FakeHost(sync = List(25) { 40_000_000L }), probe)
         assertEquals(ProbeStatus.OK, slow.status)
         assertEquals("fs.tmp.fsync = 10-100ms\n", slow.transcript)
@@ -234,3 +240,5 @@ class ProbeTest {
         assertEquals("requires write_files\n", wasm.transcript)
     }
 }
+
+private const val FSYNC_PROBE = "resources.fs-tmp-fsync"
