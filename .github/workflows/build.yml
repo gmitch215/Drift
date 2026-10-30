@@ -39,7 +39,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-konan-
             ${{ runner.os }}-konan-
-      - uses: gradle/actions/wrapper-validation@v5
+      - uses: gradle/actions/wrapper-validation@v6
       - name: Check Style and Coverage Rules
         run: ./gradlew spotlessCheck checkLineLength sharedRatio :build-core:check
       - name: Compile Every Target

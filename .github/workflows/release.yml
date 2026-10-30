@@ -61,7 +61,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-      - uses: gradle/actions/wrapper-validation@v5
+      - uses: gradle/actions/wrapper-validation@v6
       - name: Set up JDK 21
         uses: actions/setup-java@v6
         with:
@@ -152,7 +152,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-      - uses: gradle/actions/wrapper-validation@v5
+      - uses: gradle/actions/wrapper-validation@v6
       - name: Set up JDK 21
         uses: actions/setup-java@v6
         with:
@@ -253,7 +253,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-      - uses: gradle/actions/wrapper-validation@v5
+      - uses: gradle/actions/wrapper-validation@v6
       - name: Set up JDK 21
         uses: actions/setup-java@v6
         with:
@@ -373,7 +373,7 @@ jobs:
           HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
         run: test -n "$HOMEBREW_TAP_TOKEN" || { echo "::error::the HOMEBREW_TAP_TOKEN secret is not set"; exit 1; }
       - uses: actions/checkout@v7
-      - uses: gradle/actions/wrapper-validation@v5
+      - uses: gradle/actions/wrapper-validation@v6
       - name: Set up JDK 21
         uses: actions/setup-java@v6
         with:
@@ -470,7 +470,7 @@ jobs:
           CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
         run: test -n "$CHOCOLATEY_API_KEY" || { echo "::error::the CHOCOLATEY_API_KEY secret is not set"; exit 1; }
       - uses: actions/checkout@v7
-      - uses: gradle/actions/wrapper-validation@v5
+      - uses: gradle/actions/wrapper-validation@v6
       - name: Set up JDK 21
         uses: actions/setup-java@v6
         with:
@@ -548,7 +548,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-      - uses: gradle/actions/wrapper-validation@v5
+      - uses: gradle/actions/wrapper-validation@v6
       - name: Set up JDK 21
         uses: actions/setup-java@v6
         with:
