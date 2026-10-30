@@ -54,6 +54,7 @@ fun HomeScreen(
     canOpen: Boolean,
     problem: String?,
     onOpen: () -> Unit,
+    onWhy: () -> Unit,
     onCi: () -> Unit,
     onSample: () -> Unit,
     onAtlas: () -> Unit,
@@ -73,6 +74,7 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(Space.xl),
         ) {
             Intro("Welcome to Drift Studio", HOME_ABOUT, "choose one of the options below.")
+            Way("Ask Why It Fails", WHY_ABOUT_HOME, "Ask Why It Fails", "why", onWhy)
             Way("Find Out Why CI Failed", CI_ABOUT_HOME, "Diagnose My CI", "ci", onCi)
             if (canOpen) {
                 Way("Open a Case", OPEN_ABOUT, "Choose a Case File", "open", onOpen)

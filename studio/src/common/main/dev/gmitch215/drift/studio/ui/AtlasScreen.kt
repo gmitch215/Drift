@@ -67,6 +67,7 @@ private enum class Mode(val label: String) {
 
 private enum class Tab(val label: String) {
     HOME("Home"),
+    WHY("Why"),
     ATLAS("Atlas"),
     INVESTIGATION("Investigation"),
     CI("CI"),
@@ -106,6 +107,7 @@ fun StudioApp(
         )
     }
     var problem by remember { mutableStateOf<String?>(null) }
+    val whyChat = remember { WhyChat() }
     LaunchedEffect(case) {
         if (case != null) {
             opened = case
@@ -145,6 +147,7 @@ fun StudioApp(
                                 }
                             }
                         },
+                        onWhy = { tab = Tab.WHY },
                         onCi = { tab = Tab.CI },
                         onSample = { tab = Tab.INVESTIGATION },
                         onAtlas = { tab = Tab.ATLAS },
@@ -153,6 +156,8 @@ fun StudioApp(
                         onBisect = { tab = Tab.BISECT },
                         onSet = { tab = Tab.SET },
                     )
+
+                    Tab.WHY -> WhyScreen(whyChat)
 
                     Tab.CASE -> opened?.let { CaseScreen(it) }
 
