@@ -1,0 +1,47 @@
+version: 2
+updates:
+  - package-ecosystem: pip
+    directories:
+      - /**/*
+    exclude-paths:
+      - fixtures/**
+      - experiments/**
+    open-pull-requests-limit: 0
+    schedule:
+      interval: monthly
+  - package-ecosystem: npm
+    directories:
+      - /**/*
+    exclude-paths:
+      - fixtures/**
+      - experiments/**
+    open-pull-requests-limit: 0
+    schedule:
+      interval: monthly
+  - package-ecosystem: composer
+    directories:
+      - /**/*
+    exclude-paths:
+      - fixtures/**
+      - experiments/**
+    open-pull-requests-limit: 0
+    schedule:
+      interval: monthly
+  - package-ecosystem: gomod
+    directories:
+      - /**/*
+    exclude-paths:
+      - fixtures/**
+      - experiments/**
+    open-pull-requests-limit: 0
+    schedule:
+      interval: monthly
+  - package-ecosystem: maven
+    directories:
+      - /**/*
+    exclude-paths:
+      - fixtures/**
+      - experiments/**
+    open-pull-requests-limit: 0
+    schedule:
+      interval: monthly
