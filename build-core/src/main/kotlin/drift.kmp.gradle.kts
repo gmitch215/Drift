@@ -1,5 +1,3 @@
-import org.gradle.api.tasks.testing.AbstractTestTask
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
@@ -16,13 +14,5 @@ kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         nodejs()
-    }
-}
-
-tasks.withType<AbstractTestTask>().configureEach {
-    testLogging {
-        events("failed")
-        exceptionFormat = TestExceptionFormat.FULL
-        showCauses = true
     }
 }

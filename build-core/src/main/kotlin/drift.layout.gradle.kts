@@ -1,4 +1,6 @@
 import dev.gmitch215.drift.build.MobileModules
+import org.gradle.api.tasks.testing.AbstractTestTask
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
@@ -46,5 +48,13 @@ kotlin {
 providers.gradleProperty("drift.jvmTarget").orNull?.let { target ->
     tasks.withType<KotlinJvmCompile>().configureEach {
         compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target))
+    }
+}
+
+tasks.withType<AbstractTestTask>().configureEach {
+    testLogging {
+        events("failed")
+        exceptionFormat = TestExceptionFormat.FULL
+        showCauses = true
     }
 }
