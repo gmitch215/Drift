@@ -1,5 +1,5 @@
 pluginManagement {
-    plugins { kotlin("multiplatform") version "2.4.20" }
+    plugins { kotlin("multiplatform") version "2.4.21" }
     repositories { gradlePluginPortal(); mavenCentral() }
 }
 
