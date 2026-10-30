@@ -1,12 +1,12 @@
-package dev.gmitch215.drift.cli.why
+package dev.gmitch215.drift.why
 
 import dev.gmitch215.drift.triage.NotEnvSignal
 import dev.gmitch215.drift.triage.NotEnvironment
 
 /** The sentences for a failure that is not an environment difference. Each one names its signal. */
-internal object NotEnvironmentWording {
+object NotEnvironmentWording {
     const val KIND = "not-environment"
-    const val ISSUE_LEAD = "This is not an environment difference."
+    const val ISSUE_LEAD = "This does not look like an environment difference."
     const val CAPTURE_LEAD = "No environment difference explains this."
 
     fun verdict(n: NotEnvironment, lead: String, noun: String): String = when (n.signal) {

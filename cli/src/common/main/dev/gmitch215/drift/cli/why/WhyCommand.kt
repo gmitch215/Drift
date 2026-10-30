@@ -24,50 +24,47 @@ import dev.gmitch215.drift.cli.rawEcho
 import dev.gmitch215.drift.host.Host
 import dev.gmitch215.drift.host.SshException
 import dev.gmitch215.drift.json.CanonicalJson
-import dev.gmitch215.drift.json.JsonException
 import dev.gmitch215.drift.json.JsonObject
 import dev.gmitch215.drift.know.Rules
-import dev.gmitch215.drift.model.Attribute
 import dev.gmitch215.drift.model.Capsule
 import dev.gmitch215.drift.redact.Redactor
 import dev.gmitch215.drift.scan.Capture
-import dev.gmitch215.drift.scan.Replies
 import dev.gmitch215.drift.scan.ci.CiCheck
 import dev.gmitch215.drift.scan.ci.CiProblemKind
 import dev.gmitch215.drift.scan.ci.CiRequest
 import dev.gmitch215.drift.scan.ci.CiRuns
 import dev.gmitch215.drift.scan.ci.CiStop
+import dev.gmitch215.drift.scan.why.WhyFlow
 import dev.gmitch215.drift.studio.StudioState
 import dev.gmitch215.drift.symptom.Symptom
-import dev.gmitch215.drift.symptom.SymptomExtractor
 import dev.gmitch215.drift.symptom.SymptomKind
 import dev.gmitch215.drift.triage.Ask
-import dev.gmitch215.drift.triage.Asks
-import dev.gmitch215.drift.triage.CleanMatch
-import dev.gmitch215.drift.triage.CleanRun
-import dev.gmitch215.drift.triage.CleanRunReading
-import dev.gmitch215.drift.triage.Side
 import dev.gmitch215.drift.triage.Triage
-import dev.gmitch215.drift.triage.TriageOptions
 import dev.gmitch215.drift.triage.TriageResult
 import dev.gmitch215.drift.triage.TriageText
+import dev.gmitch215.drift.why.Answer
+import dev.gmitch215.drift.why.Certainty
+import dev.gmitch215.drift.why.Explain
+import dev.gmitch215.drift.why.FailurePhrases
+import dev.gmitch215.drift.why.Families
+import dev.gmitch215.drift.why.Inputs
+import dev.gmitch215.drift.why.Noise
+import dev.gmitch215.drift.why.PlainView
+import dev.gmitch215.drift.why.Session
+import dev.gmitch215.drift.why.Sides
 import kotlin.time.TimeSource
 
 private const val BASELINE = ".drift/why/baseline"
 private const val CASE = ".drift/why/case"
 private const val TAIL_LINES = 200
-private const val ERROR_TEXT_BYTES = 64 * 1024
+private const val ERROR_TEXT_BYTES = WhyFlow.ERROR_TEXT_BYTES
 private const val CUT_NOTE = "Your error text is longer than 64 KiB, so only the first 64 KiB " +
     "was read."
 private const val UNMATCHED_NOTE = "Your error text matches no known failure phrase, so the " +
     "answer is the same as without it."
-private const val LAST_LINES = 30
-private const val COMPARED_SHOWN = 4
 private val FAMILIES = listOf("tool.", "project.", "limits.", "cgroup.", "tz.")
 private const val STDIN = "/dev/stdin"
 private const val SESSION = Session.PATH
-private const val CAPTURE_KEEP = "tool. os. kernel. limits. runtime. project. ci. cgroup. tz. " +
-    "locale. env.TZ env.LANG env.LC_ALL"
 private const val ERROR_ONLY = "No CI run or second machine was available, so I read only the " +
     "error text. To compare with another machine, add --there PLACE."
 private const val OTHER_WAYS = "Other ways in: drift why --there PLACE, drift why -- COMMAND, " +
@@ -418,7 +415,7 @@ class WhyCommand(
             works,
             fails,
             sides,
-            failure = symptoms(seen.output),
+            failure = WhyFlow.symptoms(seen.output),
             pin = pin(),
             caseDir = CASE,
             closing = closing + if (bothFail) {
@@ -498,7 +495,7 @@ class WhyCommand(
                 baseline.capsule,
                 here,
                 Sides.BASELINE,
-                failure = symptoms(ran.output),
+                failure = WhyFlow.symptoms(ran.output),
                 pin = pin(),
                 caseDir = CASE,
                 closing = note,
@@ -537,23 +534,10 @@ class WhyCommand(
         note: String? = null,
         self: Boolean = false,
     ) {
-        val result = Triage.run(text, TriageOptions(worksElsewhere = self))
-        val asks = result.ask
-        val phrased = FailurePhrases.pointers(symptoms(text)).isNotEmpty()
-        val stated = if (self) null else statedCheck(result)
-        val view = WhyIssue.view(
-            flow,
-            result,
-            phrased,
-            asks,
-            shownSession(),
-            self = self,
-            worksFor = stated?.ask,
-        ).withNote(note)
-        if ((asks.isNotEmpty() || stated != null) && view.kind == null) {
-            val open = asks.map { SessionAsk(it, null) }
-            saveSession(Session(Triage.clean(text), listOfNotNull(stated) + open, self))
-        }
+        val turn = WhyFlow.report(flow, text, self, note, shownSession())
+        turn.session?.let(::saveSession)
+        val view = turn.view
+        val result = turn.result!!
         if (json) {
             val fields = result.toJson().fields + ("plain" to view.plain())
             rawEcho(CanonicalJson.encode(JsonObject(fields)))
@@ -563,31 +547,17 @@ class WhyCommand(
         if (detail) echo("\n" + TriageText.render(result), trailingNewline = false)
     }
 
-    /**
-     * A report that states a tool version and gets no rule from it: that fact is the answer of the
-     * failing machine to the version check, so the next step is the same check where it works.
-     */
-    private fun statedCheck(result: TriageResult): SessionAsk? {
-        if (result.rules.isNotEmpty() || result.notEnvironment != null || result.draft != null) {
-            return null
-        }
-        val fact = result.facts.filter {
-            it.side == Side.FAILING && it.key.startsWith("tool.") && it.key.endsWith(".version")
-        }.maxByOrNull { it.confidence.permille } ?: return null
-        if (fact.value.firstOrNull()?.isDigit() != true) return null
-        val family = fact.key.removeSuffix(".version")
-        val ask = Asks.known.firstOrNull { it.family == family && it.supportsWorks } ?: return null
-        return SessionAsk(ask, listOf(fact.key to fact.value))
-    }
-
     /** The session path as `--reply` should be told it, or null for the default. */
     private fun shownSession(): String? = sessionFile?.takeIf { it != SESSION }
 
     private fun saveSession(session: Session) {
         val path = sessionFile ?: SESSION
-        if (!files.write(path, session.text())) {
-            throw CliktError("cannot write $path; check the directory")
-        }
+        if (!files.write(path, session.text())) noteUnwritable(path)
+    }
+
+    private fun noteUnwritable(path: String) {
+        val note = "note: I could not write $path; run drift why in a folder you can write to."
+        echo(note, err = true)
     }
 
     private fun replyFlow() {
@@ -605,66 +575,41 @@ class WhyCommand(
             worksFlow(session, path)
             return
         }
-        val waiting = session.open.firstOrNull() ?: throw CliktError(
-            "every question in $path has an answer. Start again with drift why FILE or " +
-                "drift why --error TEXT.",
-        )
+        if (session.open.isEmpty()) {
+            throw CliktError(
+                "every question in $path has an answer. Start again with drift why FILE or " +
+                    "drift why --error TEXT.",
+            )
+        }
         val input = host.readText(STDIN) ?: throw CliktError("cannot read standard input")
-        val unreadable = CliktError(
-            "I could not read that as the output of ${waiting.ask.line}, so the question is " +
-                "still open. Run it where the program fails: ${waiting.ask.piped(shownSession())}",
-        )
-        var base = session
-        val facts = if (waiting.ask.family == CleanRun.ERROR_TEXT) {
-            val text = input.take(ERROR_TEXT_BYTES)
-            if (text.isBlank() || CleanRun.isBinary(text)) throw unreadable
-            base = session.withReport(Triage.clean(session.report + "\n\n```\n" + text + "\n```\n"))
-            emptyList()
-        } else if (waiting.ask.family == CleanRun.FAMILY) {
-            val reading = Replies.cleanRun(session.report, input) ?: throw unreadable
-            if (reading.match == CleanMatch.DIFFERENT) {
-                differed(waiting.ask, reading)
-                return
+        printTurn(WhyFlow.reply(session, input, shownSession()))
+    }
+
+    /** Saves the session of a step and prints it; an unreadable answer leaves the check open. */
+    private fun printTurn(turn: WhyFlow.Turn) {
+        when (turn) {
+            is WhyFlow.Turn.Unreadable -> {
+                val ask = turn.ask
+                throw CliktError(
+                    if (turn.works) {
+                        "I could not read that as the output of ${ask.line} on the machine " +
+                            "where it works, so the question is still open. Run it where it " +
+                            "works: ${ask.pipedWorks(shownSession())}"
+                    } else {
+                        "I could not read that as the output of ${ask.line}, so the question " +
+                            "is still open. Run it where the program fails: " +
+                            ask.piped(shownSession())
+                    },
+                )
             }
-            listOf(CleanRun.KEY to reading.match.id)
-        } else {
-            replyFacts(waiting.ask, input) ?: throw unreadable
+
+            is WhyFlow.Turn.Shown -> {
+                turn.session?.let(::saveSession)
+                printView(turn.view, turn.result)
+            }
+
+            WhyFlow.Turn.Closed -> error("a step with a waiting check cannot be closed")
         }
-        val answered = base.answered(waiting, facts)
-        val paired = answered.asks.firstOrNull {
-            it.ask.family == waiting.ask.family && it.reply != null && it.works != null
-        }
-        if (paired != null) {
-            compareFlow(answered, paired)
-            return
-        }
-        val result = Triage.run(
-            answered.report,
-            TriageOptions(worksElsewhere = answered.elsewhere),
-            known = answered.known,
-        )
-        val taken = answered.asks.filter { it.reply != null }.map { it.ask.family }.toSet()
-        val next = result.ask.filter { it.family !in taken }
-        val final = answered.withOpen(next)
-        saveSession(final)
-        val phrased = FailurePhrases.pointers(symptoms(answered.report)).isNotEmpty()
-        val view = WhyIssue.view(
-            "drift why: reading the report with your answers",
-            result,
-            phrased,
-            next,
-            shownSession(),
-            replied = true,
-            worksFor = waiting.ask.takeIf {
-                it.supportsWorks && result.rules.isEmpty() && result.notEnvironment == null
-            },
-        )
-        if (json) {
-            val fields = result.toJson().fields + ("plain" to view.plain())
-            rawEcho(CanonicalJson.encode(JsonObject(fields)))
-            return
-        }
-        echo(view.text(), trailingNewline = false)
     }
 
     /**
@@ -673,8 +618,7 @@ class WhyCommand(
      */
     private fun noSession() {
         val input = host.readText(STDIN) ?: throw CliktError("cannot read standard input")
-        val readable = input.isNotBlank() && Asks.known.any { Replies.read(it, input) != null }
-        if (!readable) {
+        if (!WhyFlow.readable(input)) {
             throw CliktError(
                 "I could not read that as the output of a check Drift asks for, and there is no " +
                     "session here. The session is in the folder where you ran drift why " +
@@ -706,40 +650,16 @@ class WhyCommand(
      * has neither; with both sides the two are compared.
      */
     private fun worksFlow(session: Session, path: String) {
-        val target = session.asks.firstOrNull {
-            it.works == null && it.ask.supportsWorks && it.reply != null
-        } ?: session.asks.firstOrNull { it.works == null && it.ask.supportsWorks }
-            ?: throw CliktError(
+        if (WhyFlow.worksTarget(session) == null) {
+            throw CliktError(
                 "nothing in $path waits for an answer from the machine where it works. Start " +
                     "with drift why FILE or drift why --error TEXT, answer its first question " +
                     "where it fails with drift why --reply, then run the works-side step it " +
                     "prints.",
             )
-        val input = host.readText(STDIN) ?: throw CliktError("cannot read standard input")
-        val facts = replyFacts(target.ask, input) ?: throw CliktError(
-            "I could not read that as the output of ${target.ask.line} on the machine where it " +
-                "works, so the question is still open. Run it where it works: " +
-                target.ask.pipedWorks(shownSession()),
-        )
-        val updated = session.withWorks(target, facts)
-        val pair = updated.asks.first { it.ask.family == target.ask.family }
-        if (pair.reply != null) {
-            compareFlow(updated, pair)
-            return
         }
-        saveSession(updated)
-        val view = PlainView(
-            "drift why: reading the report with your answers",
-            null,
-            "none",
-            "I have the answer from the machine where it works. The answer from the machine " +
-                "where it fails is still missing.",
-            emptyList(),
-            PlainView.askLines(target.ask, shownSession()),
-            ask = listOf(target.ask),
-            session = shownSession(),
-        )
-        printView(view, null)
+        val input = host.readText(STDIN) ?: throw CliktError("cannot read standard input")
+        printTurn(WhyFlow.works(session, input, shownSession()))
     }
 
     private fun printView(view: PlainView, result: TriageResult?) {
@@ -749,104 +669,6 @@ class WhyCommand(
             return
         }
         echo(view.text(), trailingNewline = false)
-    }
-
-    /** Both sides of one check are known: compare them like `--there` compares two machines. */
-    private fun compareFlow(session: Session, pair: SessionAsk) {
-        fun capsule(label: String, facts: List<Pair<String, String>>) =
-            Capsule(label, facts.map { (key, value) -> Attribute(key, value, "reply") })
-        val sides = Sides("where it works", "where it fails", assumed = false)
-        val works = pair.works.orEmpty()
-        val fails = pair.reply.orEmpty()
-        val failure = symptoms(session.report)
-        val answer = Explain.run(
-            Inputs(
-                capsule("works", works),
-                capsule("fails", fails),
-                sides,
-                failure = failure,
-                errorText = failure.isNotEmpty(),
-                looked = "the answers you gave",
-            ),
-        )
-        val flow = "drift why: comparing the answers from where it works and where it fails"
-        val differs = answer.certainty != Certainty.NONE
-        val result = Triage.run(
-            session.report,
-            TriageOptions(worksElsewhere = session.elsewhere),
-            known = session.known,
-        )
-        val taken = session.asks.filter { it.reply != null }.map { it.ask.family }.toSet()
-        val next = if (differs) emptyList() else result.ask.filter { it.family !in taken }
-        saveSession(session.withOpen(next))
-        val view = if (differs) {
-            PlainView.of(flow, answer)
-        } else {
-            val there = works.toMap()
-            val key = fails.firstOrNull()?.first ?: pair.ask.family
-            val label = Families.describe(key, there[key], fails.toMap()[key], sides).label
-            val lines = fails.map { (k, v) ->
-                val d = Families.describe(k, there[k], v, sides)
-                if (d.works == d.fails) {
-                    "${d.label}: ${d.fails} where it works and where it fails"
-                } else {
-                    "${d.label}: ${d.works} where it works, ${d.fails} where it fails"
-                }
-            }
-            PlainView(
-                flow,
-                sides,
-                "none",
-                "$label is the same where it works and where it fails, so it is not what differs.",
-                lines.take(COMPARED_SHOWN),
-                if (next.isNotEmpty()) {
-                    PlainView.askLines(next.first(), shownSession())
-                } else {
-                    listOf(
-                        "To compare more, run drift why --save there.json where it fails and " +
-                            "drift why --there there.json where it works.",
-                    )
-                },
-                ask = next,
-                session = shownSession(),
-            )
-        }
-        printView(view, result)
-    }
-
-    /** The clean run failed, but not the way the report did: the check stays open. */
-    private fun differed(ask: Ask, reading: CleanRunReading) {
-        val view = PlainView(
-            "drift why: reading the report with your answers",
-            null,
-            "none",
-            "The clean run failed differently from the report (it printed ${reading.seen}, the " +
-                "report shows ${reading.wanted}), so I cannot compare them yet.",
-            emptyList(),
-            PlainView.askLines(ask, shownSession()),
-            ask = listOf(ask),
-            session = shownSession(),
-        )
-        if (json) {
-            rawEcho(CanonicalJson.encode(JsonObject(mapOf("plain" to view.plain()))))
-            return
-        }
-        echo(view.text(), trailingNewline = false)
-    }
-
-    /** The facts [input] gives for [ask]; null when it is not the output of that command. */
-    private fun replyFacts(ask: Ask, input: String): List<Pair<String, String>>? {
-        if (ask.family != Ask.CAPTURE) {
-            return Replies.read(ask, input)?.map { it.path to it.value }
-        }
-        val capsule = try {
-            Capsule.parse(input)
-        } catch (e: JsonException) {
-            return null
-        }
-        val keep = CAPTURE_KEEP.split(' ')
-        return capsule.attributes.filter { a -> keep.any { a.path.startsWith(it) } }
-            .map { it.path to it.value }
     }
 
     // #endregion
@@ -867,17 +689,9 @@ class WhyCommand(
     private fun capture(label: String, on: Host = host): Capsule =
         Capture.run(on, label, tools = true, project = true)
 
-    private fun pin(): (String) -> String? = { Families.pin(host, it) }
+    private fun pin(): (String) -> String? = { Families.pin(host::readText, it) }
 
     private fun tail(output: String) = Execution.tail(output, TAIL_LINES).first
-
-    /** What the log reader finds, plus the last lines as they are: a shell's message is no log. */
-    private fun symptoms(output: String): List<Symptom> {
-        val text = tail(output)
-        val lines = text.lines().map { it.trim() }.filter { it.isNotEmpty() }.takeLast(LAST_LINES)
-        return SymptomExtractor.extract(text) +
-            lines.mapIndexed { i, line -> Symptom(SymptomKind.SIGNATURE, line, i + 1) }
-    }
 
     private fun errorInput(
         arg: String,
@@ -915,7 +729,7 @@ class WhyCommand(
             raw
         }
         errorRaw = text
-        val found = symptoms(text)
+        val found = WhyFlow.symptoms(text)
         unmatched = !json && FailurePhrases.pointers(found).isEmpty()
         if (unmatched && !ciOnly) echo(UNMATCHED_NOTE + "\n")
         return found
@@ -941,13 +755,10 @@ class WhyCommand(
         )
     }
 
-    private fun writeCase(answer: Answer) {
+    private fun writeCase(answer: Answer): String? {
         val name = "${answer.works.label} to ${answer.fails.label}"
         val built = CaseBuilder.build(name, answer.works, answer.fails, answer.ranking, answer.plan)
-        val result = CaseStore.write(files, CASE, built)
-        if (result is CaseWrite.Failed) {
-            throw CliktError("cannot write ${result.path}; check the directory")
-        }
+        return (CaseStore.write(files, CASE, built) as? CaseWrite.Failed)?.path
     }
 
     private fun emit(
@@ -957,7 +768,7 @@ class WhyCommand(
         verdict: String? = null,
     ) {
         val open = answer.certainty == Certainty.ONE_OF || answer.certainty == Certainty.TIE
-        if (open && answer.notEnvironment == null) writeCase(answer)
+        if (open && answer.notEnvironment == null) writeCase(answer)?.let(::noteUnwritable)
         val checks = openChecks(answer)
         val view = PlainView.of(flow, answer).withVerdict(verdict).withAsk(checks, shownSession())
         if (checks.isNotEmpty()) {

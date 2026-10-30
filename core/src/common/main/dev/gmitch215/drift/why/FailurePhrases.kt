@@ -1,4 +1,4 @@
-package dev.gmitch215.drift.cli.why
+package dev.gmitch215.drift.why
 
 import dev.gmitch215.drift.diff.AttributeDiff
 import dev.gmitch215.drift.model.Dimension
@@ -6,7 +6,7 @@ import dev.gmitch215.drift.symptom.FailureSignature
 import dev.gmitch215.drift.symptom.Symptom
 
 /** The kind of difference a failure message points at; each kind says which changes it fits. */
-internal enum class Pointer(val phrases: List<String>) {
+enum class Pointer(val phrases: List<String>) {
     RUNTIME(
         listOf(
             "is not a function",
@@ -133,7 +133,7 @@ internal enum class Pointer(val phrases: List<String>) {
  * Reads failure text for the kinds of difference it points at. The phrases are plain lowercase
  * ASCII matched at a word start, the way [FailureSignature] matches the phrases of a probe.
  */
-internal object FailurePhrases {
+object FailurePhrases {
     fun pointers(failure: List<Symptom>?): List<Pointer> {
         val signature = failure?.takeIf { it.isNotEmpty() }?.let(::FailureSignature)
             ?: return emptyList()

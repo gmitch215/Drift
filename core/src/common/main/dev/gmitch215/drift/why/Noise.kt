@@ -1,4 +1,4 @@
-package dev.gmitch215.drift.cli.why
+package dev.gmitch215.drift.why
 
 import dev.gmitch215.drift.model.Capsule
 
@@ -7,7 +7,7 @@ import dev.gmitch215.drift.model.Capsule
  * account, the terminal, the capture's own bookkeeping. They are removed before the ranking so
  * the verdict, the evidence and the experiment plan all read the same facts.
  */
-internal object Noise {
+object Noise {
     private val NAMES = setOf(
         "HOSTNAME",
         "HOME",

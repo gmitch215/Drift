@@ -1,4 +1,4 @@
-package dev.gmitch215.drift.cli.why
+package dev.gmitch215.drift.why
 
 import dev.gmitch215.drift.case.Detail
 import dev.gmitch215.drift.case.Render
@@ -11,7 +11,7 @@ import dev.gmitch215.drift.json.obj
 import dev.gmitch215.drift.triage.Ask
 
 /** The default view: the flow line, then the verdict, the evidence and the next step. */
-internal class PlainView(
+class PlainView(
     val flow: String,
     val sides: Sides?,
     val certainty: String,

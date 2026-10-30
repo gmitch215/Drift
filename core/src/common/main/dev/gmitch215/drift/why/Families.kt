@@ -1,14 +1,13 @@
-package dev.gmitch215.drift.cli.why
+package dev.gmitch215.drift.why
 
 import dev.gmitch215.drift.diff.AttributeDiff
-import dev.gmitch215.drift.host.Host
 
 /**
  * The two sides of a comparison in the words the answer uses: [works] is where it works and
  * [fails] where it fails. [assumed] is true when Drift chose that direction instead of reading it
  * from a run.
  */
-internal data class Sides(val works: String, val fails: String, val assumed: Boolean = true) {
+data class Sides(val works: String, val fails: String, val assumed: Boolean = true) {
     val direction: String get() = "it works $works and fails $fails"
 
     fun swapped() = Sides(fails, works, assumed)
@@ -21,7 +20,7 @@ internal data class Sides(val works: String, val fails: String, val assumed: Boo
 }
 
 /** One change in the plain words of the answer. */
-internal class Described(
+class Described(
     val label: String,
     val works: String,
     val fails: String,
@@ -30,7 +29,7 @@ internal class Described(
 )
 
 /** The attribute families `drift why` has plain words for; anything else gets [generic]. */
-internal object Families {
+object Families {
     private const val MAX_SHOWN = 60
 
     private val TOOL_NAMES = mapOf(
@@ -89,11 +88,12 @@ internal object Families {
     private val LOCALE_NAMES = setOf("LANG", "LANGUAGE", "LC_ALL", "LC_CTYPE", "LC_TIME")
     private val PROJECT_META = setOf("lockfile-version", "ts-entry", "version")
 
-    /** The project file that pins [tool] where the checkout in [host] shows one. */
-    fun pin(host: Host, tool: String): String? = PIN_FILES[tool].orEmpty().firstOrNull { file ->
-        val text = host.readText(file) ?: return@firstOrNull false
-        file != "package.json" || "\"engines\"" in text
-    }
+    /** The project file that pins [tool] where [read] shows one in the checkout. */
+    fun pin(read: (String) -> String?, tool: String): String? =
+        PIN_FILES[tool].orEmpty().firstOrNull { file ->
+            val text = read(file) ?: return@firstOrNull false
+            file != "package.json" || "\"engines\"" in text
+        }
 
     fun describe(change: AttributeDiff, sides: Sides, pin: (String) -> String? = { null }) =
         describe(change.path, change.before, change.after, sides, pin)

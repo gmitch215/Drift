@@ -1,4 +1,4 @@
-package dev.gmitch215.drift.cli.why
+package dev.gmitch215.drift.why
 
 import dev.gmitch215.drift.triage.Ask
 import dev.gmitch215.drift.triage.CleanMatch
@@ -9,7 +9,7 @@ import dev.gmitch215.drift.triage.Side
 import dev.gmitch215.drift.triage.TriageResult
 
 /** The plain reading of an issue or error report: what environment fact it points at. */
-internal object WhyIssue {
+object WhyIssue {
     private const val SHOWN_FACTS = 2
     private val SIDES = Sides("where it works", "where it fails", assumed = false)
 

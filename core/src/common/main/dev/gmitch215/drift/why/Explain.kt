@@ -1,4 +1,4 @@
-package dev.gmitch215.drift.cli.why
+package dev.gmitch215.drift.why
 
 import dev.gmitch215.drift.diff.AttributeDiff
 import dev.gmitch215.drift.diff.CapsuleDiff
@@ -17,7 +17,7 @@ import dev.gmitch215.drift.symptom.SymptomKind
 import dev.gmitch215.drift.triage.NotEnvironment
 
 /** How far the data goes; the wording of the verdict follows it. */
-internal enum class Certainty(val id: String) {
+enum class Certainty(val id: String) {
     CAUSE("cause"),
     LIKELY("likely"),
     ONE_OF("one-of"),
@@ -25,10 +25,10 @@ internal enum class Certainty(val id: String) {
     NONE("none"),
 }
 
-internal class Finding(val path: String, val described: Described)
+class Finding(val path: String, val described: Described)
 
 /** What one comparison found, in the three parts the default view prints. */
-internal class Answer(
+class Answer(
     val sides: Sides,
     val certainty: Certainty,
     val verdict: String,
@@ -44,7 +44,7 @@ internal class Answer(
 )
 
 /** What the caller knows around two captures; each field only adds to the answer. */
-internal class Inputs(
+class Inputs(
     val works: Capsule,
     val fails: Capsule,
     val sides: Sides,
@@ -60,7 +60,7 @@ internal class Inputs(
     val errorText: Boolean = false,
 )
 
-internal object Explain {
+object Explain {
     private const val SHOWN = 3
 
     fun run(input: Inputs): Answer {

@@ -1,4 +1,4 @@
-package dev.gmitch215.drift.cli.why
+package dev.gmitch215.drift.why
 
 import dev.gmitch215.drift.diff.AttributeDiff
 import dev.gmitch215.drift.symptom.Symptom
@@ -8,7 +8,7 @@ import dev.gmitch215.drift.symptom.SymptomKind
  * Finds the name of a difference in the error text: a tool, an environment variable, a locked
  * package or a limit. Plain words only; the same text always gives the same match.
  */
-internal object NameMatch {
+object NameMatch {
     private val STOP = setOf(
         "the", "and", "for", "not", "set", "version", "limit", "variable", "locked", "package",
         "file", "system", "operating", "error", "failed", "command", "found", "such", "from",

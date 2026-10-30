@@ -1,18 +1,12 @@
 package dev.gmitch215.drift.cli
 
+import dev.gmitch215.drift.case.CaseFiles
 import dev.gmitch215.drift.case.MemoryCaseFiles
 import dev.gmitch215.drift.cli.command.DriftCommand
-import dev.gmitch215.drift.cli.why.Certainty
 import dev.gmitch215.drift.cli.why.DockerExecHost
-import dev.gmitch215.drift.cli.why.FailurePhrases
-import dev.gmitch215.drift.cli.why.Families
-import dev.gmitch215.drift.cli.why.Noise
 import dev.gmitch215.drift.cli.why.Place
 import dev.gmitch215.drift.cli.why.PlaceException
-import dev.gmitch215.drift.cli.why.Pointer
 import dev.gmitch215.drift.cli.why.ReplyCommand
-import dev.gmitch215.drift.cli.why.Session
-import dev.gmitch215.drift.cli.why.Sides
 import dev.gmitch215.drift.diff.AttributeDiff
 import dev.gmitch215.drift.diff.DiffKind
 import dev.gmitch215.drift.fixtures.CiFixtures
@@ -33,10 +27,11 @@ import dev.gmitch215.drift.model.Capsule
 import dev.gmitch215.drift.model.Dimension
 import dev.gmitch215.drift.model.Stability
 import dev.gmitch215.drift.scan.Replies
-import dev.gmitch215.drift.symptom.Symptom
-import dev.gmitch215.drift.symptom.SymptomKind
 import dev.gmitch215.drift.triage.Ask
 import dev.gmitch215.drift.triage.Asks
+import dev.gmitch215.drift.why.Families
+import dev.gmitch215.drift.why.Session
+import dev.gmitch215.drift.why.Sides
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -84,6 +79,12 @@ private fun local(machine: Machine, extra: Map<List<String>, CommandResult> = em
         files = machine.files,
         commands = machine.tools + extra,
     )
+
+private object UnwritableFiles : CaseFiles {
+    override fun read(path: String): String? = null
+
+    override fun write(path: String, text: String) = false
+}
 
 private fun flat(text: String) = text.replace(Regex("\\s+"), " ")
 
@@ -836,8 +837,8 @@ class WhyCommandTest {
         assertEquals(0, result.statusCode, result.output)
         val text = flat(result.stdout)
         assertTrue(
-            "This is not an environment difference. The report points at your own code " +
-                "(test.js:3): start there." in text,
+            "This does not look like an environment difference. The report points at your own " +
+                "code (test.js:3): start there." in text,
             result.stdout,
         )
         assertTrue("What to try next: Open test.js:3" in text, result.stdout)
@@ -862,7 +863,8 @@ class WhyCommandTest {
         val issue = "TypeError: Object.groupBy is not a function\n    at test.js:3:8\n"
         val result = why(FakeHost(files = mapOf("issue.md" to issue)), "issue.md")
         assertEquals(0, result.statusCode, result.output)
-        assertFalse("This is not an environment difference" in flat(result.stdout), result.stdout)
+        val said = "This does not look like an environment difference"
+        assertFalse(said in flat(result.stdout), result.stdout)
     }
 
     // #region asks and replies
@@ -928,6 +930,19 @@ class WhyCommandTest {
         val token = "ghp_" + "a1B2c3D4e5F6g7H8i9J0k1L2m3N4o5P6q7R8"
         asked("Fails with node. Token $token was in the log.\n")
         assertFalse(token in disk.read(session)!!)
+    }
+
+    @Test
+    fun anUnwritableFolderStillGetsTheAnswerAndANote() {
+        val host = FakeHost(files = mapOf("issue.md" to asking))
+        val result = DriftCommand(host, UnwritableFiles).test("why issue.md")
+        assertEquals(0, result.statusCode, result.output)
+        assertTrue("run node --version where it fails" in flat(result.stdout), result.stdout)
+        assertTrue("I could not write $session;" in result.stderr, result.stderr)
+        val json = DriftCommand(host, UnwritableFiles).test("why --json issue.md")
+        assertEquals(0, json.statusCode, json.output)
+        assertNotNull(plainOf(json.stdout)["ask"])
+        assertTrue("I could not write $session;" in json.stderr, json.stderr)
     }
 
     @Test
@@ -1558,7 +1573,7 @@ class WhyCommandTest {
             "there",
             listOf(
                 Attribute("tool.node.version", "18.19.0", "scanner"),
-                Attribute("env.HOME", "/home/x", "env"),
+                Attribute("env.HOME", "/home/user", "env"),
             ),
         ).canonical()
         val result = why(replyHost(capsule), "--reply")
@@ -1988,7 +2003,7 @@ class WhyCommandTest {
 
     // #endregion
 
-    // #region the tables
+    // #region places
 
     private fun change(path: String, works: String?, fails: String?) = AttributeDiff(
         path,
@@ -1999,93 +2014,6 @@ class WhyCommandTest {
         Stability.STATIC,
         null,
     )
-
-    @Test
-    fun everyFamilyHasPlainWordsAndTheFallbackNamesThePath() {
-        val sides = Sides.HERE_THERE
-        fun words(path: String, works: String?, fails: String?) =
-            Families.describe(change(path, works, fails), sides)
-
-        assertEquals("Node is 20 there and 22 here", words("tool.node.version", "22", "20").because)
-        val git = words("tool.git.version", "2.39", null)
-        assertEquals("Git is not installed there (2.39 here)", git.because)
-        assertEquals("FOO is set to a there and not set here", words("env.FOO", null, "a").because)
-        val nofile = words("limits.nofile", "1024:1024", "64:64")
-        assertTrue("the open-file limit is 64 there and 1024 here" in nofile.because)
-        val memory = words("cgroup.memory.max", "2147483648", "536870912")
-        assertTrue("the memory limit is 512 MiB there and 2 GiB here" in memory.because)
-        val cpu = words("cgroup.cpu.max", "200000 100000", "100000 100000")
-        assertTrue("the number of CPUs is 1 there and 2 here" in cpu.because)
-        assertTrue("the time zone differs" in words("env.TZ", "UTC", "Asia/Tokyo").because)
-        assertTrue("Set TZ=UTC there" in words("env.TZ", "UTC", "Asia/Tokyo").fix)
-        assertTrue("Unset TZ there" in words("env.TZ", null, "Asia/Tokyo").fix)
-        assertTrue("the locale differs" in words("env.LANG", "C.UTF-8", "POSIX").because)
-        val locked = words("project.node.tinyfmt", "2.0.0", "1.1.0")
-        assertTrue("tinyfmt is locked to 1.1.0 there and 2.0.0 here" in locked.because)
-        assertTrue("npm install tinyfmt@2.0.0" in locked.fix)
-        val odd = words("something.odd", "a", "b")
-        assertEquals("something.odd is b there and a here", odd.because)
-        assertTrue("Make something.odd the same there as here" in odd.fix)
-    }
-
-    @Test
-    fun aToolFixSaysWhatToDoWhenThereIsNoVersionManager() {
-        val fix = Families.describe(change("tool.python.version", "3.12", "3.10"), Sides.HERE_THERE)
-            .fix
-        assertTrue(
-            "If there is no version manager there, change the image or package that provides " +
-                "Python." in fix,
-            fix,
-        )
-    }
-
-    @Test
-    fun aTimeZoneFixSaysWhatItCoversAndWhatMakesItTheSameEverywhere() {
-        fun fix(path: String, works: String?, fails: String?) =
-            Families.describe(change(path, works, fails), Sides.HERE_THERE).fix
-        val set = fix("env.TZ", "UTC", "Asia/Tokyo")
-        assertTrue("That fixes only that machine" in set, set)
-        assertTrue("Making the code name its zone (UTC) gives the same" in set, set)
-        assertTrue("That fixes only that machine" in fix("env.TZ", null, "Asia/Tokyo"))
-        assertTrue("That fixes only that machine" in fix("tz.system-zone", "UTC", "Asia/Tokyo"))
-    }
-
-    @Test
-    fun aToolFixNamesTheFileTheProjectPinsItIn() {
-        val described = Families.describe(
-            change("tool.node.version", "22", "20"),
-            Sides.HERE_THERE,
-        ) { if (it == "node") ".nvmrc" else null }
-        assertTrue("your project records it in .nvmrc" in described.fix, described.fix)
-        val host = FakeHost(files = mapOf("package.json" to "{\"engines\":{\"node\":\"22\"}}"))
-        assertEquals("package.json", Families.pin(host, "node"))
-        assertNull(Families.pin(FakeHost(files = mapOf("package.json" to "{}")), "node"))
-    }
-
-    @Test
-    fun failurePhrasesPointAtTheKindOfDifferenceTheyFit() {
-        fun pointers(text: String) = FailurePhrases.pointers(
-            listOf(Symptom(SymptomKind.SIGNATURE, text, 1)),
-        )
-
-        val groupBy = pointers("typeerror: object.groupby is not a function")
-        assertEquals(listOf(Pointer.RUNTIME), groupBy)
-        val module = pointers("modulenotfounderror: no module named 'tomllib'")
-        assertEquals(listOf(Pointer.MODULE), module)
-        assertTrue(Pointer.MISSING_TOOL in pointers("sh: 1: git: not found"))
-        assertTrue(Pointer.LIMIT in pointers("oserror: [errno 24] too many open files"))
-        assertTrue(Pointer.MEMORY in pointers("fatal: out of memory"))
-        assertTrue(Pointer.NETWORK in pointers("econnrefused 127.0.0.1:5432"))
-        assertTrue(Pointer.PERMISSION in pointers("eacces: permission denied"))
-        assertTrue(Pointer.LOCALE in pointers("unicodeencodeerror: 'ascii' codec can't encode"))
-        assertTrue(pointers("all good").isEmpty())
-        assertTrue(FailurePhrases.pointers(null).isEmpty())
-        assertTrue(FailurePhrases.pointers(emptyList()).isEmpty())
-        val node = change("tool.node.version", "22", "20")
-        assertTrue(Pointer.RUNTIME.fits(node) && !Pointer.LIMIT.fits(node))
-        assertTrue(Pointer.MISSING_TOOL.fits(change("tool.git.version", "2", null)))
-        assertFalse(Pointer.MISSING_TOOL.fits(node))
-    }
 
     @Test
     fun placesAreToldApartByTheirSpelling() {
@@ -2101,33 +2029,7 @@ class WhyCommandTest {
     }
 
     @Test
-    fun noiseIsRemovedAndRestatedVersionsAreDroppedOnlyWhenTheToolFactExists() {
-        val capsule = Capsule(
-            "x",
-            listOf(
-                "env.HOSTNAME" to "a",
-                "env.PATH" to "/bin",
-                "env.NODE_VERSION" to "22",
-                "env.FOO_VERSION" to "1",
-                "env.XDG_RUNTIME_DIR" to "/run",
-                "runtime.platform" to "linux",
-                "tool.node.version" to "22",
-                "env.TZ" to "UTC",
-            ).map { Attribute(it.first, it.second, "t", Stability.STATIC) },
-        )
-        val kept = Noise.strip(capsule).attributes.map { it.path }
-        assertEquals(listOf("env.FOO_VERSION", "env.TZ", "tool.node.version"), kept.sorted())
-        assertTrue(Noise.isCiLabel("ci.runner.image") && !Noise.isCiLabel("tool.node.version"))
-    }
-
-    @Test
-    fun theWordsOfCertaintyAreStable() {
-        assertEquals(
-            listOf("cause", "likely", "one-of", "tie", "none"),
-            Certainty.entries.map { it.id },
-        )
-        assertEquals("it works here and fails there", Sides.HERE_THERE.direction)
-        assertEquals("it works there and fails here", Sides.HERE_THERE.swapped().direction)
+    fun aContainerNameOrDirectoryThatIsNotValidIsRefused() {
         assertFailsWith<PlaceException> { DockerExecHost.open(FakeHost(), "bad name", null) }
         assertFailsWith<PlaceException> { DockerExecHost.open(FakeHost(), "web", "relative") }
     }

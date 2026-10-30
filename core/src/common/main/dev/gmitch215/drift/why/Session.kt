@@ -1,4 +1,4 @@
-package dev.gmitch215.drift.cli.why
+package dev.gmitch215.drift.why
 
 import dev.gmitch215.drift.json.CanonicalJson
 import dev.gmitch215.drift.json.JsonArray
@@ -25,7 +25,7 @@ import dev.gmitch215.drift.triage.Via
  * One check the session asked for. [reply] is null while it waits and holds the facts of the
  * machine where it fails after; [works] holds the facts the same check gave where it works.
  */
-internal class SessionAsk(
+class SessionAsk(
     val ask: Ask,
     val reply: List<Pair<String, String>>?,
     val works: List<Pair<String, String>>? = null,
@@ -36,11 +36,7 @@ internal class SessionAsk(
  * and the facts each reply gave. The reply text itself is never kept, only the facts read from
  * it. It is written to [PATH] whenever `drift why` asks.
  */
-internal class Session(
-    val report: String,
-    val asks: List<SessionAsk>,
-    val elsewhere: Boolean = false,
-) {
+class Session(val report: String, val asks: List<SessionAsk>, val elsewhere: Boolean = false) {
     val open: List<SessionAsk> get() = asks.filter { it.reply == null }
 
     /** The facts the replies gave, as facts of the failing machine. */
