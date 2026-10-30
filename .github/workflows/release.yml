@@ -595,7 +595,7 @@ jobs:
             type=raw,value=${{ env.VERSION }}
             type=raw,value=latest,enable={{is_default_branch}}
       - name: Build Image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: build/docker-ctx
           file: docker/Dockerfile
@@ -615,7 +615,7 @@ jobs:
       - name: Push Image
         if: ${{ env.PUSH == 'true' }}
         id: push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: build/docker-ctx
           file: docker/Dockerfile
