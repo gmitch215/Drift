@@ -62,7 +62,9 @@ class NotEnvironmentTest {
             ),
         )
         assertNull(
-            notEnv("  File \"/home/u/.venv/lib/python3.12/site-packages/requests/api.py\", line 9"),
+            notEnv(
+                "  File \"/home/user/.venv/lib/python3.12/site-packages/requests/api.py\", line 9",
+            ),
         )
         assertNull(notEnv("Exception\n    at java.base/java.util.HashMap.get(HashMap.java:1)"))
         assertNull(notEnv("Exception\n    at kotlin.collections.CollectionsKt.first(Coll.kt:9)"))

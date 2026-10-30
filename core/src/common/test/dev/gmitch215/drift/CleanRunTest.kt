@@ -406,8 +406,9 @@ class CleanRunTest {
         assertEquals(CleanMatch.SAME, read("$failure\n").match)
         assertEquals(CleanMatch.SAME, read("\u001b[31m$failure\u001b[0m\nat x\n").match)
         assertEquals(CleanMatch.SAME, read("2024-01-02T03:04:05Z $failure\n").match)
-        val paths =
-            CleanRun.failure("Error: ENOENT: no such file or directory, open '/home/u/app/x.json'")
+        val paths = CleanRun.failure(
+            "Error: ENOENT: no such file or directory, open '/home/user/app/x.json'",
+        )
         val there = "Error: ENOENT: no such file or directory, open '/w/x.json'"
         assertEquals(CleanMatch.SAME, CleanRun.read(paths, there).match)
         val numbers = CleanRun.failure("Error: connect ECONNREFUSED 10.0.0.1:5432")
