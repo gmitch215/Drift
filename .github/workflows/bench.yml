@@ -19,7 +19,7 @@ on:
 jobs:
   prepare:
     name: Prepare Scenarios
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 30
 
     permissions:
@@ -81,7 +81,7 @@ jobs:
 
   link-arm64:
     name: Link Executable (linux-arm64)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 60
     needs: prepare
     if: ${{ needs.prepare.outputs.arm64 == 'true' }}

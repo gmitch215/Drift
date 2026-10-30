@@ -14,7 +14,7 @@ concurrency:
 jobs:
   lint:
     name: Lint Project
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 30
 
     permissions:
@@ -167,7 +167,7 @@ jobs:
 
   link-arm64:
     name: Link Tests (linux-arm64)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 60
     needs: lint
 
@@ -208,7 +208,7 @@ jobs:
 
   test-arm64:
     name: Test Project (linux-arm64)
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     timeout-minutes: 60
     needs: link-arm64
 
@@ -258,7 +258,7 @@ jobs:
 
   browsers:
     name: Test Browsers
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 45
     needs: lint
 

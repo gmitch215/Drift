@@ -14,7 +14,7 @@ concurrency:
 jobs:
   mirror:
     name: Mirror to GitLab
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     if: ${{ github.repository == 'gmitch215/Drift' }}
 

@@ -76,7 +76,7 @@ jobs:
 
   link-arm64:
     name: Link Executable (linux-arm64)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 60
 
     permissions:
@@ -114,7 +114,7 @@ jobs:
 
   record-arm64:
     name: Record Transcripts (linux-arm64)
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     timeout-minutes: 30
     needs: link-arm64
 
@@ -140,7 +140,7 @@ jobs:
 
   link-jvm:
     name: Build JVM Classes
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 30
 
     permissions:
@@ -244,7 +244,7 @@ jobs:
 
   record-browsers:
     name: Record Transcripts (browsers)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 45
 
     permissions:
@@ -301,7 +301,7 @@ jobs:
 
   record-cloudflare:
     name: Record Transcripts (Cloudflare)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 45
 
     permissions:
@@ -343,7 +343,7 @@ jobs:
 
   site:
     name: Build Atlas Site
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 60
     needs: [record, record-arm64, record-jvm, record-browsers, record-cloudflare]
 
