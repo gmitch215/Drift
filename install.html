@@ -364,7 +364,8 @@
             
             <div class="readme"><h1 id="install">Install</h1>
 <p>The first release has not been published. The download links and the <code>brew</code> and <code>choco</code> commands
-below work once it is. Until then, build from source.</p>
+below work once it is. Until then, the install script builds from source (see
+<a href="#no-release-yet-or-an-experimental-build">No Release Yet</a>).</p>
 <h2 id="downloads">Downloads</h2>
 <p>Assets are on the <a href="https://github.com/gmitch215/Drift/releases">releases page</a>. Every asset has a
 <code>.sha256</code> file, and <code>SHA256SUMS</code> lists them all.</p>
@@ -445,6 +446,23 @@ Flags go after <code>sh -s --</code> (<code>install.sh --dry-run</code> from a s
 <code>--no-modify-path</code> and <code>--dry-run</code>. <code>DRIFT_VERSION=1.0.0</code> pins a release. <code>install.ps1</code> takes the same
 options as <code>-User</code>, <code>-Global</code>, <code>-Dir</code>, <code>-NoModifyPath</code> and <code>-DryRun</code> when saved with
 <code>irm ... -OutFile install.ps1</code>.</p>
+<h2 id="no-release-yet-or-an-experimental-build">No Release Yet, or an Experimental Build</h2>
+<p>When no release exists, the install script builds drift from source. It does this only when no
+version is pinned. A pinned <code>DRIFT_VERSION</code> or <code>DRIFT_INSTALL_BASE_URL</code> whose download fails stops
+the script with an error and never builds.</p>
+<p>The build needs a JDK 17 or newer on <code>PATH</code> or in <code>JAVA_HOME</code>, <code>curl</code> or <code>wget</code>, and either <code>git</code>
+or <code>tar</code>. The first build downloads toolchains and dependencies and takes several minutes.</p>
+<pre><code class="language-sh">curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh | sh -s -- --from-source
+curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh | sh -s -- --ref BRANCH
+</code></pre>
+<p>The first command builds the default branch when there is no release. <code>--from-source</code> builds even
+when a release exists. <code>--ref</code> takes a branch, a tag or a commit, and implies <code>--from-source</code>; the
+default is <code>master</code>. <code>DRIFT_FROM_SOURCE=1</code> and <code>DRIFT_REF=REF</code> do the same. <code>DRIFT_SOURCE_URL</code> sets
+the git URL or local path to clone, which builds a fork. The other flags pass through to
+<code>drift install</code>. <code>--dry-run</code> still builds, and then it installs nothing.</p>
+<p><code>install.ps1</code> takes <code>-FromSource</code> and <code>-Ref</code> with the same meaning. Without git it downloads the
+source archive instead.</p>
 <h2 id="drift-install">Drift Install</h2>
 <p><code>drift install</code> copies the executable you are running to a directory on your path and records what it
 changed in a receipt. <code>drift uninstall</code> reverses exactly that.</p>

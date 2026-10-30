@@ -993,8 +993,8 @@ is uncommon. Treat it as a pointer to the code, not a verdict.</p>
 </code></pre>
 <pre><code>drift why: reading the report in issue.md
 
-This is not an environment difference. The report points at your own code (src/count.js:12): start
-  there.
+This does not look like an environment difference. The report points at your own code
+  (src/count.js:12): start there.
 
 What I found:
   The report has a stack frame in your code: src/count.js:12.
@@ -1024,6 +1024,14 @@ did not. Host names, accounts, terminal variables and
 <code>PATH</code> differ between any two machines and are left out of the comparison, and an environment
 variable such as <code>NODE_VERSION</code> that only repeats a tool version is dropped when the tool fact is
 there.</p>
+<h2 id="in-drift-studio">In Drift Studio</h2>
+<p>The Why tab in Studio runs the same logic as a conversation. Paste an error message, an issue text, a
+CI log or a saved capture, and the answer comes back in the same three parts with how sure Drift is.
+Each paste shows what Drift took it for, and an error message or issue text can be read the other way
+with one button. A browser cannot run the check Drift asks for, so the check appears in a card: copy
+the command, run it where the program fails and paste what it prints, or paste what it prints where
+the program works. Two CI logs are compared like <code>drift import</code> does. Nothing is written to disk or
+sent anywhere; Export Conversation copies the transcript and New Conversation clears it.</p>
 <h2 id="options">Options</h2>
 <div class="table"><table>
 <thead>

@@ -366,7 +366,7 @@
 <p>Kotlin common code holds most of the program. <code>core</code> and <code>scan</code> have no platform source sets, and
 <code>host</code> holds every <code>expect</code> and <code>actual</code> pair. The share of non-comment lines under <code>src/common/main</code>
 in each module, as <code>./gradlew sharedRatio</code> measures it:</p>
-<p data-shared-ratio>Shared code 93.8%: host 58.1%, core 100.0%, scan 100.0%, cli 83.7%, studio 95.0%, bench 82.5%</p>
+<p data-shared-ratio>Shared code 93.9%: host 58.1%, core 100.0%, scan 100.0%, cli 79.7%, studio 95.7%, bench 82.5%</p>
 <p><code>./gradlew sharedRatio</code> prints the common and platform line counts per module and fails the build
 when the total falls below its floor, when <code>host</code> exceeds its platform-line budget or when <code>core</code> has
 any platform lines. It also fails when the line above is out of date; <code>./gradlew sharedRatioReadme</code>

@@ -34,6 +34,7 @@ dev.gmitch215.drift.studio
 dev.gmitch215.drift.symptom
 dev.gmitch215.drift.triage
 dev.gmitch215.drift.upgrade
+dev.gmitch215.drift.why
 module:host
 dev.gmitch215.drift.host
 module:scan
@@ -45,6 +46,7 @@ dev.gmitch215.drift.scan.probe
 dev.gmitch215.drift.scan.probe.kotlin
 dev.gmitch215.drift.scan.project
 dev.gmitch215.drift.scan.scanner
+dev.gmitch215.drift.scan.why
 module:studio
 dev.gmitch215.drift.studio.ui
 module:tools
