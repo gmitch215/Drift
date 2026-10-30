@@ -21,6 +21,8 @@ Drift is a Kotlin Multiplatform application, version 1.0.0: the `drift` command 
 - `./gradlew atlasSite` writes the static Atlas site to `build/atlas-site`; `./gradlew :cli:stageStudio` stages the Studio web build for `drift serve --dir cli/build/serve/studio`
 - `./gradlew renderPackaging -Pdrift.sums=<SHA256SUMS>` fills the Homebrew and Chocolatey templates in `packaging/` into `build/packaging`
 - `.github/release/stage.sh archive <exe> <name>` and `stage.sh sums <dir>` build a CLI archive and `SHA256SUMS`; `sh tools/test-installers.sh <drift executable>` runs `drift install` and `uninstall` in a scratch home directory
+- `tools/simulate-release.sh <linux x64 drift> <linux arm64 drift>` stages the archives and `SHA256SUMS` the way `release.yml` does, serves them from a local stand-in for GitHub releases, runs `install.sh` against it and builds and runs the Docker image; run it on a Linux host with Docker
+- `install.sh --from-source [--ref REF]` builds the CLI from a branch, tag or commit; the installer does the same when no release exists, and `tools/test-install-ps1.ps1` tests `install.ps1` with PowerShell
 - `drift install`, `drift uninstall` and `drift serve` are CLI commands, tested in `cli/src/*/test`; run the release workflow by hand with `dry-run` set to build every asset without attesting or publishing
 - `node tools/browsers/run.mjs` records the browser Atlas columns with Playwright `serve.mjs` loads a served URL in each engine and `layout.mjs` captures a page's computed layout into capsules (all need `npm ci` in `tools/browsers`)
 - `tools/capture-transcripts.sh` regenerates `fixtures/transcripts` by running toolchain images in Docker
