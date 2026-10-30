@@ -4,7 +4,7 @@ Kotlin common code holds most of the program. `core` and `scan` have no platform
 `host` holds every `expect` and `actual` pair. The share of non-comment lines under `src/common/main`
 in each module, as `./gradlew sharedRatio` measures it:
 
-<p data-shared-ratio>Shared code 93.8%: host 58.1%, core 100.0%, scan 100.0%, cli 83.7%, studio 95.0%, bench 82.5%</p>
+<p data-shared-ratio>Shared code 93.9%: host 58.1%, core 100.0%, scan 100.0%, cli 79.7%, studio 95.7%, bench 82.5%</p>
 
 `./gradlew sharedRatio` prints the common and platform line counts per module and fails the build
 when the total falls below its floor, when `host` exceeds its platform-line budget or when `core` has

@@ -497,7 +497,8 @@ class DocsSiteTest {
         for (page in DocsSiteBuilder.PAGES) {
             val html = out.resolve(page.file).readText()
             assertFalse("<!--" in html, page.file)
-            if (!page.guide) assertTrue("<table>" in html && "language-" in html, page.file)
+            if (!page.guide) assertTrue("language-" in html, page.file)
+            if (!page.guide && page.file != "index.html") assertTrue("<table>" in html, page.file)
         }
     }
 }

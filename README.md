@@ -13,21 +13,27 @@
 
 ---
 
+
 Drift tells you why your program works in one place and fails in another.
 
 Give it the machine where the program fails and the machine where it works, a CI log, or an error message. Drift compares what differs, names the cause when the data supports one, and says what to try next.
 
 ## Try It
 
-Install Drift. Open a new terminal if `drift` is not found afterwards.
-
 ```sh
 curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh | sh
 ```
 
-There are two ways in. If you can run commands on the machine where the program fails and on the machine where it works, skip to **Compare two machines** further down: it needs three commands. If you have only the error message, or only the failing machine, start with the error.
+It installs to `~/.local/bin`; open a new terminal if `drift` is not found afterwards. The first release is not published yet, so until it is the installer builds Drift from source: it needs git, a JDK 17 or newer to start Gradle (Gradle downloads the JDK 21 it builds with), and several minutes. The script is [install.sh](install.sh) if you want to read it first. Add `| sh -s -- --from-source --ref BRANCH` to the command to build a branch, tag or commit on purpose. From a clone with JDK 21 you can also run `./gradlew :cli:jvmRun --args='why --error "TEXT"'`.
 
-**Start with the error.** On the machine where the program fails, paste the line that says what failed: for a Python traceback, the last line; for Node, the first line that starts with the error name.
+Pick the case you have:
+
+- A bug report someone sent you, with no access to their machine: `drift why issue.md`.
+- A failed CI run: `drift why` inside the project's git checkout (needs the GitHub CLI `gh` or the GitLab CLI `glab`, logged in).
+- Two machines you can reach: see Compare Two Machines.
+- Only an error message: start below.
+
+Start with the error. The outputs below are copied from real runs. On the machine where the program fails, paste the line that says what failed:
 
 ```sh
 drift why --error "Fatal error: Uncaught Error: Call to undefined function str_contains()"
@@ -47,42 +53,14 @@ What to try next:
     machine, add --there PLACE.
 ```
 
-Drift does not stop at "I don't know". It names one check, and you pipe the result back to continue the same session. Run the check where the program fails:
+Drift does not stop at "I don't know". It names one check, and you pipe the result back to continue the same session. Run the check where the program fails, then where it works:
 
 ```sh
 php -v | drift why --reply
-```
-
-```
-drift why: reading the report with your answers
-
-The report names PHP version 7.4.33 on the machine where it fails. I have no recorded rule that
-  explains this failure from PHP version 7.4.33 alone, so I cannot say whether it matters yet.
-
-What I found:
-  PHP version: not stated where it works, 7.4.33 where it fails
-  PHP interface (sapi): not stated where it works, cli where it fails
-
-What to try next:
-  Run php -v where it works. If you run it there with `| drift why --reply --works`, Drift prints
-    one line to copy back to where you started; or copy the output, go back to where you started
-    (the folder where you ran drift why), run `drift why --reply --works`, paste it and press Ctrl-D
-    (Ctrl-Z then Enter on Windows).
-  If you can reach that machine by ssh: `ssh USER@HOST php -v | drift why --reply --works`
-```
-
-The program works on another machine, so Drift asks for the same check there. Run it on that machine and pipe it into Drift. The session lives in the folder where you started, so Drift prints one line for you to copy back:
-
-```sh
 php -v | drift why --reply --works
 ```
 
-```
-There is no session here, so I cannot compare yet. The session is in the folder where you ran drift why. Run this there:
-printf '%s\n' 'PHP 8.3.12 (cli)' | drift why --reply --works
-```
-
-Run that line on the machine where you started. Drift then compares the two sides:
+`--reply` continues the session that `drift why` saved in `.drift/why/session.json` in the folder where you started, so run it from that folder. If you run the second command on another machine, Drift prints one line to copy back to the first. It stores what it read from your answers, not the text you piped in. Once both sides are known, Drift compares them:
 
 ```
 drift why: comparing the answers from where it works and where it fails
@@ -100,15 +78,17 @@ What to try next:
   To be sure, change only that and run it again where it fails.
 ```
 
-Drift keeps the session in `.drift/why/session.json` in the current directory, so each `--reply` picks up where the last command stopped. It stores what it read from your answer, not the text you piped in.
+The answer has three parts: the verdict, what Drift found, and what to try next.
 
-**Compare two machines.** Use this when a program passes on your laptop and fails on a server, or when Drift asks for the second machine. Install Drift on both, then run `drift why --save there.json` on the machine where the program fails, copy the file to the machine where the program works, and run `drift why --there there.json` there. The saved file holds the tool versions, environment variables and limits of the failing machine, with secret values hidden. Drift writes it in the current directory and prints its full path.
+## Compare Two Machines
+
+Use this when a program passes on your laptop and fails on a server. Install Drift on both. On the failing machine, save what Drift can read, with secret values hidden:
 
 ```sh
 drift why --save there.json
 ```
 
-Use the command below on the machine where the program works. A saved file cannot run the program, so pass the error message the program printed. Paste the line that says what failed: for a Python traceback, the last line; for Node, the first line that starts with the error name.
+Copy the file to the machine where the program works and pass the error message the program printed:
 
 ```sh
 drift why --there there.json --error "TypeError: Object.groupBy is not a function"
@@ -131,33 +111,7 @@ What to try next:
   To be sure, change only that and run it again there.
 ```
 
-In the output, "here" is the machine you run the command on, and "there" is the saved capture of the machine where the program fails. The answer has three parts: the verdict, which states the assumption that the program works here and fails there; what Drift found; and what to try next.
-
-Without an error message, run the command without `--error`. Drift then lists every difference that fits:
-
-```sh
-drift why --there there.json
-```
-
-```
-drift why: this machine against the saved capture in there.json
-
-Assuming it works here and fails there: 3 differences fit and the data cannot say which one causes
-  it (Node version, Time zone database, npm version).
-
-What I found:
-  Node version: 22.23.3 here, 20.20.2 there
-  Time zone database: 2026b here, 2025b there
-  npm version: 10.9.9 here, 10.8.2 there
-
-What to try next:
-  To tell them apart, change only Node version there so it matches here, and run it again. If it
-    passes, that was the cause.
-  The full experiment plan is saved: drift next .drift/why/case
-  Paste the error message you saw: drift why --there there.json --error "..."
-```
-
-Three differences fit in that output, so the check is to make one of them match on the failing machine and run the program again.
+In Drift's answer, "here" is the machine where you ran the command, which is the one where the program works, and "there" is the saved capture of the machine where it fails. Without `--error`, Drift lists every difference that fits and names the one change that tells them apart.
 
 ## Other Ways In
 
@@ -170,41 +124,15 @@ drift why -- make test          # runs here; a later failure is explained agains
 drift why issue.md              # an issue or error report (no machine access)
 ```
 
+Drift Studio does the same in an app: its Why screen takes a pasted error, bug report or CI log and asks you for the same checks. `./gradlew :studio:run` opens it on the desktop, and the web build is at [drift.gmitch215.dev/atlas](https://drift.gmitch215.dev/atlas/).
+
 ## When Drift Cannot Tell
 
-When the report lacks the facts, Drift asks for one check at a time, as in the first example, and you pipe the result to `drift why --reply`. When the report reads like a fault in the program, such as a crash inside the project's own code, Drift may say it does not look like an environment difference. Treat that as a hint to check the code first. On 141 real issue reports it made 24 such calls: 8 matched a code fault or user error the maintainers named, 2 were environment problems, and 14 were threads where the maintainers named no cause.
-
-When several differences fit, the answer lists them and says the data cannot separate them. Change one of them on the failing machine to match the working machine, and run the program again. If it passes, that difference is the cause. For the full experiment plan, run:
-
-```sh
-drift next .drift/why/case
-```
-
-The solve command runs those experiments in containers, and it needs Docker. When nothing differs, the answer says so and lists what Drift looked at. Causes outside that list need checking by hand.
+When the report lacks the facts, Drift asks for one check at a time. When several differences fit, the answer lists them and says the data cannot separate them: change one on the failing machine to match the working machine and run the program again. When the report reads like a fault in the program, Drift may say it does not look like an environment difference. Treat that as a hint to check the code first. On 141 real issue reports it made 24 such calls: 8 matched a code fault or user error the maintainers named, 2 were environment problems, and 14 were threads where the maintainers named no cause.
 
 ## What It Looks At
 
-- Tool versions, such as Node, Python, Git and npm.
-- Environment variables, with secret values hidden.
-- Open-file limits and other resource limits, plus memory and CPU limits.
-- Time zone and locale, and the operating system release.
-- Package versions locked in the project folder you run it from.
-
-A tool that is missing on the failing machine is reported as "not installed there". It does not read your source code, your data files or your network traffic.
-
-## Install
-
-The first release is not published yet. Until it is, build from source.
-
-| Method | Platform | Command |
-| --- | --- | --- |
-| Installer | macOS, Linux | `curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh \| sh` |
-| Installer | Windows, PowerShell | `irm https://raw.githubusercontent.com/gmitch215/Drift/master/install.ps1 \| iex` |
-| Homebrew | macOS | `brew install gmitch215/tap/drift` |
-| Chocolatey | Windows | `choco install drift` |
-| Source | Any with JDK 21 | `./gradlew :cli:jvmRun --args=--version` in a clone |
-
-None of these needs Docker. Only the solve command does.
+Tool versions (Node, Python, PHP, Git, npm and others), environment variables with secret values hidden, resource limits, time zone, locale, the operating system release, and package versions locked in the project folder. A tool that is missing on the failing machine is reported as "not installed there". Drift does not read your source code, your data files or your network traffic. None of this needs Docker.
 
 ## Learn More
 
@@ -215,7 +143,6 @@ None of these needs Docker. Only the solve command does.
 - [Architecture](docs/architecture.md) and [Limits](docs/limits.md).
 - [ADVANCED_USAGE.md](ADVANCED_USAGE.md): every command and flag.
 - [TECHNICAL_REPORT.md](TECHNICAL_REPORT.md): design, evidence and numbers.
-- [Studio](https://drift.gmitch215.dev/atlas/): the Drift app, which runs in a browser.
 - [License](LICENSE): MIT.
 
 Drift is written in Kotlin Multiplatform, so most of its code is shared across targets. See [Shared Code](docs/shared-code.md).
