@@ -30,7 +30,7 @@ class HomeScreenTest {
         onNodeWithText(SAMPLE_ABOUT).assertExists()
         onNodeWithText(ATLAS_ABOUT).assertExists()
         onNodeWithTag("home:open").assertExists()
-        onNodeWithTag("home:sample").performClick()
+        onNodeWithTag("home:sample").performScrollTo().performClick()
         onNodeWithText("Investigation").assertIsSelected()
         onNodeWithText("Home").performClick()
         onNodeWithTag("home:atlas").performScrollTo().performClick()
@@ -68,7 +68,7 @@ class HomeScreenTest {
     fun theDiagnoseActionOpensTheCiScreen() = runComposeUiTest {
         setContent { StudioApp(dark = false) }
         onNodeWithText(CI_ABOUT_HOME).assertExists()
-        onNodeWithTag("home:ci").performClick()
+        onNodeWithTag("home:ci").performScrollTo().performClick()
         onNodeWithText("CI").assertIsSelected()
         onNodeWithTag("ci:sample").assertExists()
     }
@@ -101,7 +101,7 @@ class HomeScreenTest {
             it(loadCase(path))
         }
         setContent { StudioApp(dark = false, picker = picker) }
-        onNodeWithTag("home:open").performClick()
+        onNodeWithTag("home:open").performScrollTo().performClick()
         assertEquals(1, asked)
         onNodeWithText("Case").assertIsSelected()
         onNodeWithTag("case-headline").assertTextContains("the time zone (TZ)", substring = true)
@@ -111,7 +111,7 @@ class HomeScreenTest {
     fun aFileThatCannotBeReadStaysOnHomeWithAnExplanation() = runComposeUiTest {
         val picker = CasePicker { it(CaseView.unreadable("junk.driftcase", "not a tar archive")) }
         setContent { StudioApp(dark = false, picker = picker) }
-        onNodeWithTag("home:open").performClick()
+        onNodeWithTag("home:open").performScrollTo().performClick()
         onNodeWithText("Home").assertIsSelected()
         onNodeWithTag("home-problem").assertTextContains(
             "cannot read junk.driftcase: not a tar archive. Choose a .driftcase file made by " +

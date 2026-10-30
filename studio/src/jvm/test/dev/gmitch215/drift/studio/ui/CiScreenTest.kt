@@ -64,10 +64,10 @@ class CiScreenTest {
         var clicks = 0
         setContent { StudioApp(dark = false) }
         onNodeWithText("Home").assertIsSelected()
-        onNodeWithTag("home:ci").performClick()
+        onNodeWithTag("home:ci").performScrollTo().performClick()
         clicks++
         onNodeWithText("CI").assertIsSelected()
-        onNodeWithTag("ci:sample").performClick()
+        onNodeWithTag("ci:sample").performScrollTo().performClick()
         clicks++
         onNodeWithTag("summary").performScrollTo()
             .assertTextEquals(sampleHeadline)
@@ -247,8 +247,8 @@ class CiScreenTest {
         )
         try {
             setContent { StudioApp(dark = false) }
-            onNodeWithTag("home:ci").performClick()
-            onNodeWithTag("ci:sample").performClick()
+            onNodeWithTag("home:ci").performScrollTo().performClick()
+            onNodeWithTag("ci:sample").performScrollTo().performClick()
             onNodeWithTag("summary").performScrollTo().assertExists()
         } finally {
             ProxySelector.setDefault(previous)
@@ -263,7 +263,7 @@ class CiScreenTest {
         onNodeWithTag("ci-pass:text").performScrollTo().assertIsDisplayed()
         onNodeWithTag("ci-fail:text").performScrollTo().assertIsDisplayed()
         onNodeWithTag("ci:run").performScrollTo().assertIsDisplayed()
-        onNodeWithTag("ci:sample").performClick()
+        onNodeWithTag("ci:sample").performScrollTo().performClick()
         onNodeWithTag("ci:limit").performScrollTo().assertIsDisplayed()
         onNodeWithTag("summary").performScrollTo().assertIsDisplayed()
     }
