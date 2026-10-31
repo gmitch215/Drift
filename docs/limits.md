@@ -42,7 +42,7 @@ See [Install](install.md) for the downloads and the steps for each platform.
 
 ## Building from Source
 
-The build uses Gradle 9.8.0 and AGP 9.4.1, newer than the Gradle 7.6.3 to 9.7.0 and AGP 8.5.2 to
+The build uses Gradle 9.8.2 and AGP 9.5.0, newer than the Gradle 7.6.3 to 9.7.0 and AGP 8.5.2 to
 9.3.1 that the
 [Kotlin Multiplatform compatibility guide](https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html)
 lists for Kotlin 2.4.20. Coverage measures JVM code only, because Kotlin/Native and Wasm have no

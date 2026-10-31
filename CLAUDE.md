@@ -49,7 +49,7 @@ Drift is a Kotlin Multiplatform application, version 1.0.0: the `drift` command 
 - Four spaces, no tabs, 100 columns, LF, following the Kotlin coding conventions. ktlint runs through spotless
 - `checkLineLength` is the 100-column gate for Kotlin
 - Warnings are errors, with `extraWarnings` and `progressiveMode`
-- Toolchain: Kotlin 2.4.20, Gradle 9.8.0, AGP 9.4.1, JDK 21. Gradle and AGP are newer than the Kotlin Multiplatform compatibility guide's range for 2.4.20 (Gradle 7.6.3-9.7.0, AGP 8.5.2-9.3.1); this is documented in `docs/limits.md` and TECHNICAL_REPORT Architecture, so update both when a version changes
+- Toolchain: Kotlin 2.4.20, Gradle 9.8.2, AGP 9.5.0, JDK 21. Gradle and AGP are newer than the Kotlin Multiplatform compatibility guide's range for 2.4.20 (Gradle 7.6.3-9.7.0, AGP 8.5.2-9.3.1); this is documented in `docs/limits.md` and TECHNICAL_REPORT Architecture, so update both when a version changes
 - Coverage measures JVM only. Native and wasm have no coverage tool in Kotlin 2.4.20: `konanc` ignores `-Xcoverage`
 - No Maven publication or signing; Drift is an application. Dokka builds engine documentation only, and the modules are not a public API
 - Workflows: `build.yml` (lint, tests, coverage, browsers), `atlas.yml` (records Atlas transcripts per OS and builds the site), `docs.yml` (publishes the documentation site to drift.gmitch215.dev), `gitlab.yml` (mirrors to gitlab.com/gmitch215/Drift), `bench.yml` (manual dispatch; runs DriftBench host arms natively on macOS, Windows and arm64 Linux) and `release.yml` (archives, installers, APK, tap and Chocolatey push); all but `bench.yml` and `release.yml` have run on GitHub

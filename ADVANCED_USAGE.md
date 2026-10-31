@@ -900,7 +900,7 @@ ecosystems
     files        build.gradle.kts, settings.gradle.kts
     manager      gradle wrapper
     lockfiles    none
-    pin          gradle 9.8.0 (gradle wrapper, gradle/wrapper/gradle-wrapper.properties:3)
+    pin          gradle 9.8.2 (gradle wrapper, gradle/wrapper/gradle-wrapper.properties:3)
     note         Gradle tasks and Maven goals are not read
 not read: any ecosystem not listed above (for example Cargo, Gemfile, .NET project files)
 
@@ -911,10 +911,10 @@ ci
   image        not set
   services     none
   actions, not run
-    .github/workflows/build.yml:24  actions/checkout@v6
-    .github/workflows/build.yml:25  actions/setup-java@v5  (distribution: temurin, java-version: 21, cache: gradle)
-    .github/workflows/build.yml:31  actions/cache@v5  (path: ~/.konan/caches ~/.konan/dependencies ~/.konan/kotlin-native-prebuilt-*, key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}, restore-keys: ${{ runner.os }}-${{ runner.arch }}-konan- ${{ runner.os }}-konan-)
-    .github/workflows/build.yml:42  gradle/actions/wrapper-validation@v5
+    .github/workflows/build.yml:24  actions/checkout@v7
+    .github/workflows/build.yml:25  actions/setup-java@v6  (distribution: temurin, java-version: 21, cache: gradle)
+    .github/workflows/build.yml:31  actions/cache@v6  (path: ~/.konan/caches ~/.konan/dependencies ~/.konan/kotlin-native-prebuilt-*, key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ github.job }}-${{ hashFiles('gradle/libs.versions.toml') }}, restore-keys: ${{ runner.os }}-${{ runner.arch }}-konan- ${{ runner.os }}-konan-)
+    .github/workflows/build.yml:42  gradle/actions/wrapper-validation@v6
   steps, in order
     step 5 [Check Style and Coverage Rules]  ./gradlew spotlessCheck checkLineLength sharedRatio :build-core:check  (.github/workflows/build.yml:44)
     step 6 [Compile Every Target]  ./gradlew compileKotlinJvm compileKotlinLinuxX64 compileKotlinLinuxArm64 compileKotlinMingwX64 compileKotlinWasmJs  (.github/workflows/build.yml:46)
@@ -1781,7 +1781,7 @@ manifest results-chain counts fisher
 
 A `.driftcase` is a tar archive, so a text editor shows binary noise. Studio opens it and shows what `drift verify` finds: the check list, the first failure and the verdict. A tampered or truncated archive shows the failing check in the Case tab and does not crash Studio.
 
-Studio Desktop takes a case three ways: as a launch argument (`Drift /path/x.driftcase`; Windows and Linux pass a double-clicked file this way, not run here), through the macOS open-file event (`java.awt.Desktop.setOpenFileHandler`), and through `drift open`. The packages declare the association for `.driftcase` (MIME type `application/x-driftcase`) with the `fileAssociation` call that the Compose Multiplatform Gradle plugin offers in its `macOS`, `windows` and `linux` blocks (`PlatformSettings.kt` in compose-gradle-plugin 1.12.1). On macOS the generated `Info.plist` of `createDistributable` carries a `CFBundleDocumentTypes` entry for the `driftcase` extension.
+Studio Desktop takes a case three ways: as a launch argument (`Drift /path/x.driftcase`; Windows and Linux pass a double-clicked file this way, not run here), through the macOS open-file event (`java.awt.Desktop.setOpenFileHandler`), and through `drift open`. The packages declare the association for `.driftcase` (MIME type `application/x-driftcase`) with the `fileAssociation` call that the Compose Multiplatform Gradle plugin offers in its `macOS`, `windows` and `linux` blocks (`PlatformSettings.kt` in compose-gradle-plugin 1.12.2). On macOS the generated `Info.plist` of `createDistributable` carries a `CFBundleDocumentTypes` entry for the `driftcase` extension.
 
 ```sh
 open fixtures/lab/cases/locale-tz-date-2.driftcase

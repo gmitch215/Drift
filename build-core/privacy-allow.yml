@@ -279,3 +279,14 @@
   value: '172.17.0.3'
   category: network
   reason: 'synthetic Docker bridge address in a test input'
+- path: 'studio/src/common/test/dev/gmitch215/drift/studio/ui/WhyChatTest.kt'
+  value: 'ghp_0123456789abcdefghijklmnopqrstuvwxyz'
+  category: token
+  reason: 'fake token that the secret-hiding test pastes into a CI log'
+- path: 'studio/src/jvm/test/dev/gmitch215/drift/studio/ui/WhyScreenTest.kt'
+  value: 'ghp_0123456789abcdefghijklmnopqrstuvwxyz'
+  category: token
+  reason: 'fake token that the secret-hiding test pastes into a CI log'
+- path: 'tools/test-installers.sh'
+  category: capture-attribute
+  reason: 'throwaway git identity for a scratch repository in the installer test'
