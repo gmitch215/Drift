@@ -59,6 +59,7 @@ internal object Examples {
             "why --save there.json",
             "why --there there.json --error @error.txt",
         ),
+        "demo" to listOf("demo"),
         "capture" to listOf("capture --label demo", "capture --label demo --project"),
         "run" to listOf(
             "run --out green-run --label green -- make test",

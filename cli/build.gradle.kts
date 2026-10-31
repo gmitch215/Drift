@@ -47,6 +47,18 @@ val embedWhy = tasks.register<EmbedFixtures>("embedWhy") {
     outputDir = layout.buildDirectory.dir("generated/why")
 }
 
+val embedDemo = tasks.register<EmbedFixtures>("embedDemo") {
+    fixtures = rootProject.layout.projectDirectory.dir("fixtures/demo/node-groupby")
+    objectName = "DemoFixtures"
+    outputDir = layout.buildDirectory.dir("generated/demo")
+}
+
+val embedDemoGolden = tasks.register<EmbedFixtures>("embedDemoGolden") {
+    fixtures = rootProject.layout.projectDirectory.dir("fixtures/demo/golden")
+    objectName = "DemoGolden"
+    outputDir = layout.buildDirectory.dir("generated/demo-golden")
+}
+
 tasks.register<Sync>("stageStudio") {
     dependsOn(":studio:wasmJsBrowserDistribution")
     from(rootProject.layout.projectDirectory.dir("studio/build/dist/wasmJs/productionExecutable")) {
@@ -78,6 +90,7 @@ kotlin {
     sourceSets {
         commonMain {
             kotlin.srcDir(embedAtlas)
+            kotlin.srcDir(embedDemo)
         }
         commonMain.dependencies {
             implementation(project(":core"))
@@ -92,6 +105,7 @@ kotlin {
             kotlin.srcDir(embedHandsoff)
             kotlin.srcDir(embedSet)
             kotlin.srcDir(embedWhy)
+            kotlin.srcDir(embedDemoGolden)
         }
         macosMain { kotlin.srcDir("src/posix/main") }
         linuxMain { kotlin.srcDir("src/posix/main") }

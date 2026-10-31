@@ -36,6 +36,7 @@ class DriftCommand(
         versionOption("$DRIFT_VERSION (${host.platform})")
         subcommands(
             WhyCommand(host, files),
+            DemoCommand(),
             CaptureCommand(host),
             RunCommand(host, files),
             ImportCommand(host, files),
@@ -80,6 +81,7 @@ private const val INTRO = "Drift compares a run that passed with a run that fail
     "differs and, with Docker, tests which difference causes the failure.\n\n" +
     "Start with one of these:$LINE" +
     "drift why: say why it works in one place and fails in another$LINE" +
+    "drift demo: watch Drift explain one recorded failure, with nothing else needed$LINE" +
     "drift ci: check this repository's CI$LINE" +
     "drift doctor: check that this machine can run Drift$LINE" +
     "drift diagnose: compare the capsules of a passing and a failing run\n\n" +
@@ -88,6 +90,6 @@ private const val INTRO = "Drift compares a run that passed with a run that fail
     "Capture: capture, run, compare, import$LINE" +
     "Lab: solve, reproduce, ingest, next, case, pack, verify, report, open$LINE" +
     "Atlas: atlas, probe$LINE" +
-    "Utilities: doctor, help, completion, install, uninstall, serve\n\n" +
+    "Utilities: doctor, demo, help, completion, install, uninstall, serve\n\n" +
     "Run drift help TERM to learn what capsule, diagnose, solve, certificate, verify, Atlas " +
     "or probe mean, and drift COMMAND --help for examples. Manual: https://drift.gmitch215.dev"
