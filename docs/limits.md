@@ -37,6 +37,8 @@ The measurements behind these statements are in the
 - **Android and iOS:** Studio replays the embedded Atlas transcripts and measures the live
   this-device probes. It does not sample the machine.
 - **Wasm:** the Wasm host has no filesystem and no process access.
+- **Source scan:** the project scan reads source files through `find`, so it adds no import or
+  call-site facts on Windows or Wasm. A rule that depends on those facts cannot fire there.
 
 See [Install](install.md) for the downloads and the steps for each platform.
 

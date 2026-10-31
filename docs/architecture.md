@@ -74,4 +74,16 @@ flowchart TD
     run --> certify["pack and verify: certificate"]
 ```
 
+## What Each Step Shows
+
+Each step claims only what its method supports. `capture` observes: it records what a host reports,
+and a missing fact stays missing. `diagnose` infers: the ranking weights are hand-set, so scores
+order the candidates and are not probabilities. `solve` measures: a treatment and a control run in
+containers, and a cause is confirmed only when the measurements isolate it under a rule fixed before
+the first trial. Otherwise Drift reports the effect of a bundle of changes, narrows the candidates,
+or says it is stuck.
+`verify` certifies the record: it re-derives the counts and the verdict from the archive, and it does
+not show that the experiments ran or would repeat. [Limits](limits.md) lists the same boundaries
+with their measurements.
+
 [Shared Code](shared-code.md) lists how much of this code is common to every target.
