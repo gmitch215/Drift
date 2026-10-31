@@ -381,6 +381,7 @@
 <li>A failed CI run: <code>drift why</code> inside the project's git checkout (needs the GitHub CLI <code>gh</code> or the GitLab CLI <code>glab</code>, logged in).</li>
 <li>Two machines you can reach: see Compare Two Machines.</li>
 <li>Only an error message: start below.</li>
+<li>Nothing broken right now: <code>drift demo</code> replays one recorded failure through <code>drift why</code>, offline.</li>
 </ul>
 <p>Start with the error. The outputs below are copied from real runs. On the machine where the program fails, paste the line that says what failed:</p>
 <pre><code class="language-sh">drift why --error &quot;Fatal error: Uncaught Error: Call to undefined function str_contains()&quot;
@@ -448,11 +449,11 @@ drift why --there user@host     # another machine over ssh, read only (needs ssh
 drift why -- make test          # runs here; a later failure is explained against the last pass
 drift why issue.md              # an issue or error report (no machine access)
 </code></pre>
-<p>Drift Studio does the same in an app: its Why screen takes a pasted error, bug report or CI log and asks you for the same checks. <code>./gradlew :studio:run</code> opens it on the desktop, and the web build is at <a href="https://drift.gmitch215.dev/atlas/">drift.gmitch215.dev/atlas</a>.</p>
+<p>Drift Studio does the same in an app: its Why screen takes a pasted error, bug report or CI log and asks you for the same checks. <code>./gradlew :studio:run</code> opens it on the desktop, and the web build is at <a href="https://drift.gmitch215.dev/atlas/">drift.gmitch215.dev/atlas</a>, where Try a Sample loads a recorded failing CI run with nothing to install. Studio also builds for Android with <code>./gradlew -Pdrift.mobile=true :androidApp:assembleDebug</code> and for the iOS simulator through <code>iosApp/iosApp.xcodeproj</code>. The CLI installs on Linux (x64 and arm64), macOS (Apple silicon) and Windows (x64). <a href="install.html">Install</a> has the steps and prerequisites for every target.</p>
 <h2 id="when-drift-cannot-tell">When Drift Cannot Tell</h2>
 <p>When the report lacks the facts, Drift asks for one check at a time. When several differences fit, the answer lists them and says the data cannot separate them: change one on the failing machine to match the working machine and run the program again. When the report reads like a fault in the program, Drift may say it does not look like an environment difference. Treat that as a hint to check the code first. On 141 real issue reports it made 24 such calls: 8 matched a code fault or user error the maintainers named, 2 were environment problems, and 14 were threads where the maintainers named no cause.</p>
 <h2 id="what-it-looks-at">What It Looks At</h2>
-<p>Tool versions (Node, Python, PHP, Git, npm and others), environment variables with secret values hidden, resource limits, time zone, locale, the operating system release, and package versions locked in the project folder. A tool that is missing on the failing machine is reported as &quot;not installed there&quot;. Drift does not read your source code, your data files or your network traffic. None of this needs Docker.</p>
+<p>Tool versions (Node, Python, PHP, Git, npm and others), environment variables with secret values hidden, resource limits, time zone, locale, the operating system release, and package versions locked in the project folder. A tool that is missing on the failing machine is reported as &quot;not installed there&quot;. In a project folder, Drift also reads your source files to note the module names they import and a few fixed call patterns, such as a function that older PHP lacks. It keeps those names and a few short values, such as a script engine or keystore type, and not the source text, so a saved capture lists what your code imports. It skips this step on Windows. Drift does not read your data files or your network traffic. None of this needs Docker.</p>
 <h2 id="learn-more">Learn More</h2>
 <ul>
 <li><a href="why.html">Why</a>: every flow of <code>drift why</code>, with real output.</li>

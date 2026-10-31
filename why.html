@@ -1015,10 +1015,16 @@ and processes; the clock source; the time zone and locale (including the locales
 installed); the operating system release; the shell behind <code>/bin/sh</code>; the file system type of
 <code>/tmp</code>; the host names in <code>/etc/hosts</code>; the network interface names; whether IPv6 addresses are configured; the
 CPU affinity; and the locked package versions of the project in the working directory.</p>
+<p>It also reads the project's source files (Python, Java and Kotlin, PHP and JavaScript, 500 files per
+language at most, skipping <code>node_modules</code>, <code>build</code> and similar folders) to note the module names they
+import and a few fixed call patterns. It keeps those names and a few short values, such as a script
+engine or keystore type, and not the source text. A file saved with <code>drift why --save</code> lists the
+import names, so look at it before you send it to someone outside your team. Windows and the Wasm
+build skip this step.</p>
 <p>For DNS it reads only the local resolver file, <code>/etc/resolv.conf</code>, and keeps counts and flags: how
 many nameservers it lists, whether all of them are local, how many search domains it has, and which
 options are set. Drift never queries DNS, and it keeps no address or domain name from that file. It
-does not read your source code or data files, or network traffic. It does not time the disk either:
+does not read your data files or network traffic. It does not time the disk either:
 the write-and-sync probe runs only with <code>drift capture --probes</code>. When nothing differs, the answer lists what it looked at and what it
 did not. Host names, accounts, terminal variables and
 <code>PATH</code> differ between any two machines and are left out of the comparison, and an environment

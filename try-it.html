@@ -366,6 +366,8 @@
 <p>The examples run from the repository root against the files in <code>fixtures/</code>. They assume <code>drift</code> is
 on your path, or the <code>drift</code> alias from <a href="install.html#command-line">Install</a>. Each one needs only the
 executable, except where it says otherwise. Output is from Linux x64.</p>
+<p>With nothing but the executable, <code>drift demo</code> replays one recorded failure through <code>drift why</code>
+and needs no repository, Docker or network.</p>
 <p><strong>Capture this machine.</strong> The capsule is JSON, so the digest changes with the machine.</p>
 <pre><code class="language-sh">drift capture --label ci &gt; ci.json
 sha256sum ci.json

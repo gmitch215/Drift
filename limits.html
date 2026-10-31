@@ -399,6 +399,8 @@ probes are unavailable there.</li>
 <li><strong>Android and iOS:</strong> Studio replays the embedded Atlas transcripts and measures the live
 this-device probes. It does not sample the machine.</li>
 <li><strong>Wasm:</strong> the Wasm host has no filesystem and no process access.</li>
+<li><strong>Source scan:</strong> the project scan reads source files through <code>find</code>, so it adds no import or
+call-site facts on Windows or Wasm. A rule that depends on those facts cannot fire there.</li>
 </ul>
 <p>See <a href="install.html">Install</a> for the downloads and the steps for each platform.</p>
 <h2 id="building-from-source">Building from Source</h2>

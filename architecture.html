@@ -476,6 +476,16 @@ fixed before the first trial. <code>drift pack</code> writes the result as a <co
     plan --&gt; run[&quot;solve: run the chosen experiment&quot;]
     run --&gt; certify[&quot;pack and verify: certificate&quot;]
 </code></pre>
+<h2 id="what-each-step-shows">What Each Step Shows</h2>
+<p>Each step claims only what its method supports. <code>capture</code> observes: it records what a host reports,
+and a missing fact stays missing. <code>diagnose</code> infers: the ranking weights are hand-set, so scores
+order the candidates and are not probabilities. <code>solve</code> measures: a treatment and a control run in
+containers, and a cause is confirmed only when the measurements isolate it under a rule fixed before
+the first trial. Otherwise Drift reports the effect of a bundle of changes, narrows the candidates,
+or says it is stuck.
+<code>verify</code> certifies the record: it re-derives the counts and the verdict from the archive, and it does
+not show that the experiments ran or would repeat. <a href="limits.html">Limits</a> lists the same boundaries
+with their measurements.</p>
 <p><a href="shared-code.html">Shared Code</a> lists how much of this code is common to every target.</p></div>
             <div class="pager">
 <a class="card" href="portability-atlas.html" rel="prev"><span>Prev</span><strong>Kotlin Portability Atlas</strong></a>
