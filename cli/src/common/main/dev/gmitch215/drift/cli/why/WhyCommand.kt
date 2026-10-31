@@ -37,9 +37,6 @@ import dev.gmitch215.drift.scan.ci.CiStop
 import dev.gmitch215.drift.scan.why.WhyFlow
 import dev.gmitch215.drift.studio.StudioState
 import dev.gmitch215.drift.symptom.Symptom
-import dev.gmitch215.drift.symptom.SymptomKind
-import dev.gmitch215.drift.triage.Ask
-import dev.gmitch215.drift.triage.Triage
 import dev.gmitch215.drift.triage.TriageResult
 import dev.gmitch215.drift.triage.TriageText
 import dev.gmitch215.drift.why.Answer
@@ -55,7 +52,7 @@ import dev.gmitch215.drift.why.Sides
 import kotlin.time.TimeSource
 
 private const val BASELINE = ".drift/why/baseline"
-private const val CASE = ".drift/why/case"
+private const val CASE = WhyView.CASE
 private const val TAIL_LINES = 200
 private const val ERROR_TEXT_BYTES = WhyFlow.ERROR_TEXT_BYTES
 private const val CUT_NOTE = "Your error text is longer than 64 KiB, so only the first 64 KiB " +
@@ -65,8 +62,7 @@ private const val UNMATCHED_NOTE = "Your error text matches no known failure phr
 private val FAMILIES = listOf("tool.", "project.", "limits.", "cgroup.", "tz.")
 private const val STDIN = "/dev/stdin"
 private const val SESSION = Session.PATH
-private const val ERROR_ONLY = "No CI run or second machine was available, so I read only the " +
-    "error text. To compare with another machine, add --there PLACE."
+private const val ERROR_ONLY = WhyView.ERROR_ONLY
 private const val OTHER_WAYS = "Other ways in: drift why --there PLACE, drift why -- COMMAND, " +
     "or drift why FILE with an issue or an error text."
 private const val SAVED_NO_DIFFERENCE = "Nothing I can read differs between this machine and " +
@@ -201,7 +197,7 @@ class WhyCommand(
         } catch (e: CiStop) {
             val text = errorRaw
             if (e.kind == CiProblemKind.NOT_A_CHECKOUT && text != null) {
-                reportFlow("drift why: reading the error text", text, ERROR_ONLY, self = true)
+                reportFlow(WhyView.ERROR_TEXT_FLOW, text, ERROR_ONLY, self = true)
                 return
             }
             throw CliktError(ciMessage(e))
@@ -327,7 +323,7 @@ class WhyCommand(
                 }
 
                 is Place.File -> {
-                    flow = "drift why: this machine against the saved capture in ${place.path}"
+                    flow = WhyView.savedCaptureFlow(place.path)
                     val loaded = readCapture(place.path)
                     val full = capture("here")
                     val absent = FAMILIES.filter { f ->
@@ -359,22 +355,20 @@ class WhyCommand(
             "Add the failing command so its error text can narrow this: " +
                 "drift why --there $target -- COMMAND"
         } else {
-            "Paste the error message you saw: drift why --there $target --error \"...\""
+            WhyView.errorHint(target)
         }
         if (command.isEmpty() || docker == null) {
             val sides = if (failsHere) Sides.HERE_THERE.swapped() else Sides.HERE_THERE
             val (works, fails) = if (failsHere) there to here else here to there
-            val inputs = Inputs(
+            val inputs = WhyView.compareInputs(
                 works,
                 fails,
                 sides,
-                failure = failure,
-                pin = pin(),
-                errorText = failure != null,
-                failureHint = hint,
-                caseDir = CASE,
-                closing = closing,
-                looked = looked,
+                failure,
+                pin(),
+                hint,
+                closing,
+                looked,
             )
             val answer = Explain.run(inputs)
             val none = place is Place.File && answer.certainty == Certainty.NONE
@@ -769,11 +763,10 @@ class WhyCommand(
     ) {
         val open = answer.certainty == Certainty.ONE_OF || answer.certainty == Certainty.TIE
         if (open && answer.notEnvironment == null) writeCase(answer)?.let(::noteUnwritable)
-        val checks = openChecks(answer)
-        val view = PlainView.of(flow, answer).withVerdict(verdict).withAsk(checks, shownSession())
+        val checks = WhyView.openChecks(answer)
+        val view = WhyView.view(flow, answer, checks, verdict, shownSession())
         if (checks.isNotEmpty()) {
-            val report = Triage.clean(failureLines(answer).joinToString("\n"))
-            saveSession(Session.start(report, checks))
+            saveSession(WhyView.session(answer, checks))
         }
         if (json) {
             val state = StudioState.of(
@@ -790,24 +783,6 @@ class WhyCommand(
         if (detail) {
             echo(PlainView.detail(answer), trailingNewline = false)
             failingOutput?.let { echo("\nOutput of the failing run (last lines):\n$it") }
-        }
-    }
-
-    private fun failureLines(answer: Answer) =
-        answer.failure.orEmpty().filter { it.kind == SymptomKind.SIGNATURE }.map { it.value }
-
-    /**
-     * The checks an answer of "cannot tell" can still ask for: those the error text calls for
-     * and the comparison did not already cover.
-     */
-    private fun openChecks(answer: Answer): List<Ask> {
-        if (answer.certainty != Certainty.NONE || answer.notEnvironment != null) return emptyList()
-        val lines = failureLines(answer)
-        if (lines.isEmpty()) return emptyList()
-        val compared = (answer.works.attributes + answer.fails.attributes).map { it.path }
-        return Triage.run(lines.joinToString("\n")).ask.filter { ask ->
-            ask.family != Ask.CAPTURE &&
-                compared.none { it == ask.family || it.startsWith(ask.family + ".") }
         }
     }
 
