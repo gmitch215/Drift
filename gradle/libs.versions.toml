@@ -9,15 +9,9 @@ junit = "6.1.3"
 oshi = "7.7.2"
 slf4j = "2.0.20"
 snakeyaml-engine = "3.2"
-<<<<<<< Updated upstream
 commonmark = "0.31.0"
-compose = "1.12.1"
-agp = "9.4.1"
-=======
-commonmark = "0.30.0"
 compose = "1.12.2"
 agp = "9.5.0"
->>>>>>> Stashed changes
 androidx-activity = "1.13.0"
 
 [libraries]
