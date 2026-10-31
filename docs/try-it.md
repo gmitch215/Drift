@@ -4,6 +4,9 @@ The examples run from the repository root against the files in `fixtures/`. They
 on your path, or the `drift` alias from [Install](install.md#command-line). Each one needs only the
 executable, except where it says otherwise. Output is from Linux x64.
 
+With nothing but the executable, `drift demo` replays one recorded failure through `drift why`
+and needs no repository, Docker or network.
+
 **Capture this machine.** The capsule is JSON, so the digest changes with the machine.
 
 ```sh

@@ -11,6 +11,7 @@ The executable is `cli/build/bin/macosArm64/releaseExecutable/drift.kexe`; the [
 | Command | Reads | Writes | Needs Docker |
 | --- | --- | --- | --- |
 | [`why`](#why) | this machine and a container, a machine over ssh, a saved capture, the latest failed CI run, a command or an issue text | text or JSON; `.drift/why` | no (`docker:` places use `docker exec`) |
+| [`demo`](#demo) | recordings inside the binary | text | no |
 | [`capture`](#capture) | this machine | a capsule on standard output | no |
 | [`diagnose`](#diagnose) | two capsules | JSON or text, optionally a case directory | no |
 | [`diagnose --against`](#against-a-baseline) | a baseline and a capsule, or this machine | JSON or text, optionally a case directory | no |
@@ -148,6 +149,83 @@ What to try next:
 ```
 
 Problems end in one sentence and exit code 1: a container that is not running (`docker start NAME` is yours to run), a name that is not a container, no Docker, an ssh host that cannot be reached (the ssh messages of [When ssh Fails](#when-ssh-fails)), a saved capture that cannot be read, no git checkout or remote for the CI flow, `gh` or `glab` missing or not logged in, and a bare command without `--`.
+
+## Demo
+
+`drift demo` takes no argument and no option. It replays one recorded failure through the same code as `drift why --error`, `drift why --reply` and `drift why --there`, and exits 0. The recordings are two captures made on 2026-10-31, one in `node:20-slim` and one in `node:22-slim`, and they sit inside the binary. The command reads no file, starts no process and opens no socket, so it prints the same bytes on every target. The lines that start with `$` and the text around them are narration; everything else is what `drift why` prints for those inputs.
+
+```sh
+drift demo
+```
+
+```
+A script calls Object.groupBy. It passes on Node 22 and fails on Node 20 with
+TypeError: Object.groupBy is not a function
+
+Every input below is a recording of real runs in the node:20-slim and node:22-slim
+Docker images on 2026-10-31. Drift reads the recordings the way it reads your own
+machines, so this demo needs no repository, no Docker and no network.
+
+Step 1: only the error text
+$ drift why --error "TypeError: Object.groupBy is not a function"
+
+drift why: reading the error text
+
+I found no environment fact in this error text (no tool version, operating system or setting), so I
+  cannot say what it points at.
+
+What to try next:
+  To tell, run drift why --save there.json where it fails and feed the file to Drift: it records the
+    tools, settings and limits of that machine, which the report does not state.
+  In one step: drift why --save there.json && drift why --reply < there.json
+  No CI run or second machine was available, so I read only the error text. To compare with another
+    machine, add --there PLACE.
+
+Step 2: the machine where it fails
+Step 1 asked for a capture of the failing machine. This is that check, with the
+recording of the failing machine as its output:
+$ drift why --save there.json && drift why --reply < there.json
+
+drift why: reading the report with your answers
+
+The report points at Node 21 adds Object.groupBy: Node 21.0.0 ships Object.groupBy, so a call to it
+  fails on earlier Node versions.
+
+What I found:
+  coreutils version: not stated where it works, 9.1 where it fails
+  libc version: not stated where it works, 2.36 where it fails
+
+What to try next:
+  To compare the two machines, run drift why --save there.json on the one where it fails and drift
+    why --there there.json on the one where it works.
+
+Step 3: the machine where it works
+Now compare. The recording of the working machine stands in for this machine, and
+there.json is the file from the failing one:
+$ drift why --save there.json
+$ drift why --there there.json --error "TypeError: Object.groupBy is not a function"
+
+drift why: this machine against the saved capture in there.json
+
+Assuming it works here and fails there: it most likely fails there because Node is 20.20.2 there and
+  22.23.3 here; the error text points at it.
+
+What I found:
+  your error text points at this: is not a function
+  Node version: 22.23.3 here, 20.20.2 there
+  2 other differences exist, but the error text does not point at them: Node version is the only one
+    it names.
+
+What to try next:
+  Use Node 22.23.3 there. Pin the version so the two stay equal, for example in .tool-versions or
+    your CI image. If there is no version manager there, change the image or package that provides
+    Node.
+  To be sure, change only that and run it again there.
+
+Next: drift why with your own error text, or drift why issue.md with a bug report.
+In the browser: https://drift.gmitch215.dev/atlas
+The guide is docs/why.md.
+```
 
 ## Capture
 

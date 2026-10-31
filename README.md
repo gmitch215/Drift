@@ -32,6 +32,7 @@ Pick the case you have:
 - A failed CI run: `drift why` inside the project's git checkout (needs the GitHub CLI `gh` or the GitLab CLI `glab`, logged in).
 - Two machines you can reach: see Compare Two Machines.
 - Only an error message: start below.
+- Nothing broken right now: `drift demo` replays one recorded failure through `drift why`, offline.
 
 Start with the error. The outputs below are copied from real runs. On the machine where the program fails, paste the line that says what failed:
 
