@@ -590,11 +590,11 @@
 </tr>
 <tr>
 <td><code>studio</code></td>
-<td>Compose Multiplatform 1.12.1 app for JVM Desktop and for the browser as Wasm, plus the Android and iOS builds when <code>-Pdrift.mobile=true</code> is set.</td>
+<td>Compose Multiplatform 1.12.2 app for JVM Desktop and for the browser as Wasm, plus the Android and iOS builds when <code>-Pdrift.mobile=true</code> is set.</td>
 </tr>
 <tr>
 <td><code>androidApp</code></td>
-<td>The Android application module (AGP 9.4.1), present only with <code>-Pdrift.mobile=true</code>.</td>
+<td>The Android application module (AGP 9.5.0), present only with <code>-Pdrift.mobile=true</code>.</td>
 </tr>
 <tr>
 <td><code>iosApp</code></td>
@@ -615,7 +615,7 @@
 </tbody>
 </table></div>
 <p>The remaining directories are data and delivery, not modules: <code>rules</code> (429 YAML rule files in 51 folders), <code>triage</code> (the corpus manifest and the claim-check labels), <code>notices</code> (third-party notices that ship in every artifact), <code>atlas</code> (the hand-maintained classification of every Atlas probe), <code>fixtures</code> (recorded capsules, Atlas transcripts, solved cases, project trees, issue bodies and upgrade-check captures), <code>packaging</code> (templates for the Homebrew and Chocolatey packages), <code>assets</code> (the icon), and <code>install.sh</code> and <code>install.ps1</code> at the root. <code>.github/release</code> holds the scripts the release workflow runs. The version is <code>version=1.0.0</code> in <code>gradle.properties</code>; <code>core</code> embeds it for <code>--version</code>, the Studio and Android packages read it, and the Xcode project carries its own copy of the marketing version.</p>
-<p><strong>Toolchain.</strong> Drift builds with Kotlin 2.4.20, Gradle 9.8.0 and, for <code>androidApp</code>, AGP 9.4.1, on JDK 21 in every workflow. The <a href="https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html">Kotlin Multiplatform compatibility guide</a> lists Kotlin 2.4.20 and 2.4.21 with Gradle 7.6.3 to 9.7.0 and AGP 8.5.2 to 9.3.1 (read 2026-10-13). Drift's Gradle and AGP are newer than that range, so the combination is outside what the guide lists; <code>build.yml</code>, <code>atlas.yml</code> and <code>docs.yml</code> build and test on it without a failure, on Linux, macOS and Windows runners. Nothing more than that is claimed for it.</p>
+<p><strong>Toolchain.</strong> Drift builds with Kotlin 2.4.20, Gradle 9.8.2 and, for <code>androidApp</code>, AGP 9.5.0, on JDK 21 in every workflow. The <a href="https://kotlinlang.org/docs/multiplatform/multiplatform-compatibility-guide.html">Kotlin Multiplatform compatibility guide</a> lists Kotlin 2.4.20 and 2.4.21 with Gradle 7.6.3 to 9.7.0 and AGP 8.5.2 to 9.3.1 (read 2026-10-13). Drift's Gradle and AGP are newer than that range, so the combination is outside what the guide lists; <code>build.yml</code>, <code>atlas.yml</code> and <code>docs.yml</code> build and test on it without a failure, on Linux, macOS and Windows runners. Nothing more than that is claimed for it.</p>
 <p>Sources sit at <code>src/&lt;set&gt;/main</code> and <code>src/&lt;set&gt;/test</code>. The shared-code ratio counts non-comment lines under <code>src/common/main</code> against every other source set's <code>main</code>.</p>
 <div class="table"><table>
 <thead>
