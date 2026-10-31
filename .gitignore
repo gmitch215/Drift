@@ -13,7 +13,6 @@ node_modules/
 kotlin-js-store
 local.properties
 tools/perf/stage/
-docs/submission/
 !fixtures/projects/**/node_modules/
 experiments/results/*/runs/
 experiments/corpus-id/runs/
