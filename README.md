@@ -124,7 +124,7 @@ drift why -- make test          # runs here; a later failure is explained agains
 drift why issue.md              # an issue or error report (no machine access)
 ```
 
-Drift Studio does the same in an app: its Why screen takes a pasted error, bug report or CI log and asks you for the same checks. `./gradlew :studio:run` opens it on the desktop, and the web build is at [drift.gmitch215.dev/atlas](https://drift.gmitch215.dev/atlas/).
+Drift Studio does the same in an app: its Why screen takes a pasted error, bug report or CI log and asks you for the same checks. `./gradlew :studio:run` opens it on the desktop, and the web build is at [drift.gmitch215.dev/atlas](https://drift.gmitch215.dev/atlas/), where Try a Sample loads a recorded failing CI run with nothing to install. Studio also builds for Android with `./gradlew -Pdrift.mobile=true :androidApp:assembleDebug` and for the iOS simulator through `iosApp/iosApp.xcodeproj`. The CLI installs on Linux (x64 and arm64), macOS (Apple silicon) and Windows (x64). [Install](docs/install.md) has the steps and prerequisites for every target.
 
 ## When Drift Cannot Tell
 
@@ -132,7 +132,7 @@ When the report lacks the facts, Drift asks for one check at a time. When severa
 
 ## What It Looks At
 
-Tool versions (Node, Python, PHP, Git, npm and others), environment variables with secret values hidden, resource limits, time zone, locale, the operating system release, and package versions locked in the project folder. A tool that is missing on the failing machine is reported as "not installed there". Drift does not read your source code, your data files or your network traffic. None of this needs Docker.
+Tool versions (Node, Python, PHP, Git, npm and others), environment variables with secret values hidden, resource limits, time zone, locale, the operating system release, and package versions locked in the project folder. A tool that is missing on the failing machine is reported as "not installed there". In a project folder, Drift also reads your source files to note the module names they import and a few fixed call patterns, such as a function that older PHP lacks. It keeps those names and a few short values, such as a script engine or keystore type, and not the source text, so a saved capture lists what your code imports. It skips this step on Windows. Drift does not read your data files or your network traffic. None of this needs Docker.
 
 ## Learn More
 
