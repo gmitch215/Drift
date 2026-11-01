@@ -16,7 +16,7 @@
 
 Drift tells you why your program works in one place and fails in another.
 
-Give it the machine where the program fails and the machine where it works, a CI log, or an error message. Drift compares what differs, names the cause when the data supports one, and says what to try next.
+Give it the machine where the program fails and the machine where it works, a CI log, or an error message. Drift compares what differs, names the cause when the data supports one, and says what to try next. The [essay](docs/submission/essay.md) explains why it exists.
 
 ## Try It
 
