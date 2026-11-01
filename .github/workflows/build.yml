@@ -41,7 +41,7 @@ jobs:
             ${{ runner.os }}-konan-
       - uses: gradle/actions/wrapper-validation@v6
       - name: Check Style and Coverage Rules
-        run: ./gradlew spotlessCheck checkLineLength sharedRatio :build-core:check
+        run: ./gradlew spotlessCheck checkLineLength checkPrivacy sharedRatio :build-core:check
       - name: Compile Every Target
         run: ./gradlew compileKotlinJvm compileKotlinLinuxX64 compileKotlinLinuxArm64 compileKotlinMingwX64 compileKotlinWasmJs
       - name: Stop Gradle
