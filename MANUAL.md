@@ -2,8 +2,8 @@
 
 Studio is the Drift app. It shows what the `drift` command shows, with buttons instead of flags. This
 manual walks through each screen in the order you meet it, with a picture of each. The pictures are
-of the web build, taken in a desktop-sized window (1280 by 800 pixels) and, for the first two
-screens, in a phone-sized one (390 by 844).
+of the web build, taken in a desktop-sized window (1280 by 800 pixels) and, for Home and the Atlas,
+in a phone-sized one (390 by 844).
 
 Studio only reads. It never changes your files and never sends anything anywhere. Every screen has a
 one-paragraph explanation at the top, and a line that starts with "What to do next".
@@ -36,17 +36,76 @@ are the operating system's own.
 ![The Home screen](docs/manual/home.png)
 
 Home is the first screen. Each box is a way in, with one line on what it does and one button.
-**Open a Case** reads a saved investigation from a file. **Try a Sample** uses recorded runs that
-come with Studio. The next four boxes open Upgrade, Contract, Bisect and Set. **Browse the Atlas**
-opens the Atlas.
+**Ask Why It Fails** opens the Why screen, where you paste an error message, an issue text or a CI
+log. **Find Out Why CI Failed** opens the CI screen for a passing and a failing run. **Open a Case**
+reads a saved investigation from a file. **Try a Sample** uses recorded runs that come with Studio.
+The next four boxes open Upgrade, Contract, Bisect and Set. **Browse the Atlas** opens the Atlas.
 
-If you have nothing to open yet, choose **Show a Sample**. It needs no file.
+If you have a failure and nothing else, start with **Ask Why It Fails**. If you have nothing at all
+yet, choose **Show a Sample**. It needs no file.
 
-The row of buttons at the top (Home, Atlas, Investigation, Upgrade, Contract, Bisect, Set) stays on
-every screen. A Case button joins the row once you open a case. On a phone the row wraps onto
-several lines and the boxes stack in one column.
+The row of buttons at the top (Home, Why, Atlas, Investigation, CI, Upgrade, Contract, Bisect, Set)
+stays on every screen. A Case button joins the row once you open a case. On a phone the row wraps
+onto several lines and the boxes stack in one column.
 
 ![Home on a phone](docs/manual/home-phone.png)
+
+## Why
+
+![The Why screen after an error message was sent](docs/manual/why.png)
+
+Why is the screen to start from when something fails and you do not know where to look. It does
+what `drift why` does, as a conversation. You paste what you have: an error message, an issue text,
+a CI log or a saved capture of one machine (`drift why --save there.json` writes one). Drift says
+how it read what you pasted, what it found, how sure it is and what to try next.
+
+What to do:
+
+1. Paste into **Your Message** and choose **Send**.
+2. Check the line that says how Drift read it, for example "I read this as an error message". If it
+   guessed wrong, choose the button that reads it as something else, such as **Read It as an Issue
+   Text Instead**.
+3. Read the answer. The picture shows what happens when the text names no tool, version or setting:
+   Drift says "Not sure: nothing I can read explains it" and does not guess.
+4. When Drift needs more, it shows **The Check to Run**, a command with a **Copy the Command**
+   button. Run it where the program fails and paste what it prints into **Output where it fails**,
+   then choose **Send the Answer**. Drift may then ask for the same check where the program works,
+   in **Output where it works**.
+5. Once both sides are known, Drift compares them and gives the verdict, the differences it found and
+   what to try next. When one difference stands out, the verdict says "most likely": Drift has not
+   run an experiment, so it does not state a cause as fact. When several fit, it lists them and says
+   the data cannot tell them apart.
+
+**New Conversation** clears the screen. **Export Conversation** copies the conversation as text. What
+you paste is read on your device and kept only until you start a new conversation or close Studio.
+Secrets are masked first.
+
+The same answers come from the command: `drift why --error "TEXT"`, then `drift why --reply` with the
+output of the check. [Why](docs/why.md) lists every flow with real output, and `drift demo` replays
+one recorded failure from start to finish.
+
+## CI
+
+![The CI screen with the sample logs diagnosed](docs/manual/ci.png)
+
+CI compares the logs of a passing and a failing CI run. Drift reads GitHub Actions and GitLab CI
+logs, finds the runner environment in each and ranks the differences. Everything happens on your
+device, and secrets are masked before anything is shown.
+
+What to do:
+
+1. Choose **Try With Sample Logs** to use a pair of recorded runs of one public project, or choose or
+   paste your own logs under **1. Passing Run Log** and **2. Failing Run Log**.
+2. If a GitHub Actions log holds more than one job, type the job's name under **3. Job Name
+   (Optional)**. Leave it empty to use the first job with a runner environment.
+3. Choose **Diagnose These Logs** (the sample runs by itself). The Result box says in one sentence
+   what Drift found, and the list below it ranks the differences by evidence level.
+
+The sample result reads "Drift cannot name one cause: 3 differences tie for the top place". The three
+are the runner's provisioner build date and version and the runner image version, all at level 1
+(Difference), and the screen says "This is a ranking, not a confirmed cause." Drift compares the
+environments of two runs, so it cannot find an ordinary code regression. If the code changed between
+the runs, check that change first.
 
 ## Investigation
 
@@ -243,6 +302,8 @@ rows marked "scrolled" need the page moved down by the stated number of wheel st
 | --- | --- | --- | --- |
 | `home.png` | 1280 x 800 | `/` | Home, nothing clicked. |
 | `home-phone.png` | 390 x 844 | `/` | Home on a mobile viewport, after a reload. |
+| `why.png` | 1280 x 800 | `/` | **Why** tab, click the message box, type `TypeError: Object.groupBy is not a function`, choose **Send**. |
+| `ci.png` | 1280 x 800 | `/` | **CI** tab, **Try With Sample Logs**, then press PageDown twice so the Result box shows. |
 | `investigation.png` | 1280 x 800 | `/` | **Show a Sample**, then select the first difference ("Node version"). |
 | `atlas-device.png` | 1280 x 800 | `/` | **Atlas** tab. Wait for "measured in" to appear in the This Device panel. |
 | `atlas-device-phone.png` | 390 x 844 | `/` | **Atlas** tab on a mobile viewport, then scrolled 4 steps so the This Device panel shows. |
@@ -262,8 +323,11 @@ Keep each file under about 400 KB.
 Each sentence below states something this manual says that a later change to Studio could make false.
 
 - Studio reads files and sends nothing anywhere (the Atlas footer says so on screen).
-- The Home screen has boxes titled Open a Case, Try a Sample, Check an Upgrade, Check a Contract, Plan a Bisect, Compare a Set and Browse the Atlas.
-- The top row has the buttons Home, Atlas, Investigation, Upgrade, Contract, Bisect and Set, and a Case button once a case is open.
+- The Home screen has boxes titled Ask Why It Fails, Find Out Why CI Failed, Open a Case, Try a Sample, Check an Upgrade, Check a Contract, Plan a Bisect, Compare a Set and Browse the Atlas.
+- The top row has the buttons Home, Why, Atlas, Investigation, CI, Upgrade, Contract, Bisect and Set, and a Case button once a case is open.
+- The Why screen reads a pasted error message, issue text, CI log or saved capture, says how it read it, and asks for one check at a time with **Output where it fails** and **Output where it works**.
+- The error `TypeError: Object.groupBy is not a function` alone gets "Not sure: nothing I can read explains it" and a request for a saved capture of the failing machine.
+- The CI screen's sample logs give a result that says 3 differences tie for the top place, at evidence level 1 of 4.
 - **Show a Sample** opens the Investigation screen with three failing runs compared with passing run 36702683742.
 - The sample investigation says that 9 differences tie for the top place and that the first is the node version.
 - The Atlas measures the device when Studio opens, and **Run on This Device** measures again.
