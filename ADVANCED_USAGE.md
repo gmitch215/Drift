@@ -3455,7 +3455,7 @@ curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh |
 
 **What it does.** `install.sh` maps `uname` to an asset name (`macos-arm64`, `linux-x64` or `linux-arm64`; Rosetta counts as arm64), downloads `drift-<version>-<os>-<arch>.tar.gz` and its `.sha256` file with `curl` or `wget`, and compares the 64-hex digest with `sha256sum` or `shasum -a 256`. It extracts into a temporary directory, runs `drift --version`, runs `drift install` with your flags, and removes the directory on exit and on signals. It refuses a musl Linux (`ldd --version` or `/lib/ld-musl-*`), because the Linux executable is built for glibc. macOS on Intel has no asset. `install.ps1` takes `-User`, `-Global`, `-Dir`, `-NoModifyPath`, `-DryRun` and `-Help`, downloads `drift-<version>-windows-x64.zip`, checks it with `Get-FileHash`, and extracts it with `Expand-Archive`.
 
-**An example that ran.** No release exists, so the example builds a release directory from the local executable with the layout the script expects and points the script at it:
+**An example that ran.** Before the release existed, the example built a release directory from the local executable with the layout the script expects and pointed the script at it:
 
 ```sh
 mkdir -p release/v1.0.0 stage
@@ -3799,7 +3799,7 @@ Set `DRIFT_RUNNER_LABEL` in the job to record the runner. Do not use `--keep-ide
 | `warning: leaf-key.pem is readable by other users; run: chmod 600 leaf-key.pem` | the key file has loose permissions |
 | `403` from `serve` | the Host header is not `localhost`, `127.0.0.1`, `[::1]` or a `--domain` name |
 | `drift-install: error: checksum mismatch for <asset> ...; nothing was installed` | the download is corrupt or changed; fetch it again |
-| `drift-install: error: cannot download <url>` | no such asset; no release has been published yet, or the base URL or version is wrong |
+| `drift-install: error: cannot download <url>` | no such asset; the base URL or version is wrong |
 | `drift-install: error: set DRIFT_VERSION when DRIFT_INSTALL_BASE_URL is set` | a custom base needs an explicit version |
 | `the Linux executable is built for glibc and this system uses musl; no asset is available` | `install.sh` on Alpine and other musl systems (from the installer's Alpine run) |
 
@@ -3818,4 +3818,4 @@ When a `solve` trial cannot start, the certificate records an infrastructure pro
 - The Atlas columns are single runs on the hardware named in [`atlas/columns.yml`](./atlas/columns.yml). A column recorded on other hardware can differ, and `atlas compare` against a column from another machine reports a difference without saying whether hardware caused it. A Linux executable linked on Ubuntu prints different last digits for three lines of `kotlin.math.transcendental-bits` than one linked on macOS, so the `linux` columns come from the macOS-linked build and a CI recording can differ. The `wasm` column on Node comes from a test harness, because the Wasm CLI has no file writer, and the `mingw` and `jvm-windows` columns are not recorded yet. The classification rests on the pages its authors read, and 16 of the 38 probes are `unclassified`. Generated repro text needs a person's review before it goes into an issue.
 - `install` and `uninstall` were run on macOS only. The Linux behavior comes from the installer's Debian run, and the Windows registry and `drift.old` behavior from a run under Wine. A real Windows machine has not run `drift install`, and package-manager awareness is absent: it does not refuse to run inside a Homebrew or Chocolatey tree.
 - `serve` is a development server for a local Studio build. It binds to loopback, has no range requests, compression or directory listing, reads each file whole, and has no TLS on Windows. The embedded-asset option (a CLI that carries Studio inside it) is not built.
-- No release has been published. The asset names, the `brew` and `choco` commands and the install scripts' default download URL are what the workflows and templates say, and they have not been exercised against GitHub.
+- On 2026-11-01 `install.sh` and `brew install gmitch215/tap/drift` were run against the published 1.0.0 release on Linux x64 and macOS arm64. `install.ps1`, `choco` and the APK have not been run from the release.

@@ -24,7 +24,7 @@ Give it the machine where the program fails and the machine where it works, a CI
 curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh | sh
 ```
 
-It installs to `~/.local/bin`; open a new terminal if `drift` is not found afterwards. The first release is not published yet, so until it is the installer builds Drift from source: it needs git, a JDK 17 or newer to start Gradle (Gradle downloads the JDK 21 it builds with), and several minutes. The script is [install.sh](install.sh) if you want to read it first. Add `| sh -s -- --from-source --ref BRANCH` to the command to build a branch, tag or commit on purpose. From a clone with JDK 21 you can also run `./gradlew :cli:jvmRun --args='why --error "TEXT"'`.
+It installs to `~/.local/bin`; open a new terminal if `drift` is not found afterwards. It downloads the 1.0.0 release archive and checks its SHA-256. The script is [install.sh](install.sh) if you want to read it first. Add `| sh -s -- --from-source --ref BRANCH` to the command to build a branch, tag or commit instead; that needs git, a JDK 17 or newer and several minutes. From a clone with JDK 21 you can also run `./gradlew :cli:jvmRun --args='why --error "TEXT"'`.
 
 Pick the case you have:
 

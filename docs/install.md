@@ -1,8 +1,9 @@
 # Install
 
-The first release has not been published. The download links and the `brew` and `choco` commands
-below work once it is. Until then, the install script builds from source (see
-[No Release Yet](#no-release-yet-or-an-experimental-build)).
+Release 1.0.0 is published. The install script, the Docker image and `brew install` were run
+against it on Linux x64 and macOS arm64. The Windows scripts, `choco` and the APK were not run
+from the release. To build from source or from a branch, see
+[Build From Source](#build-from-source-or-an-experimental-build).
 
 ## Downloads
 
@@ -77,9 +78,9 @@ Flags go after `sh -s --` (`install.sh --dry-run` from a saved copy): `--user`, 
 options as `-User`, `-Global`, `-Dir`, `-NoModifyPath` and `-DryRun` when saved with
 `irm ... -OutFile install.ps1`.
 
-## No Release Yet, or an Experimental Build
+## Build From Source, or an Experimental Build
 
-When no release exists, the install script builds drift from source. It does this only when no
+The install script builds drift from source when you ask it to, or when no release exists and no
 version is pinned. A pinned `DRIFT_VERSION` or `DRIFT_INSTALL_BASE_URL` whose download fails stops
 the script with an error and never builds.
 
@@ -92,8 +93,8 @@ curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh |
 curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh | sh -s -- --ref BRANCH
 ```
 
-The first command builds the default branch when there is no release. `--from-source` builds even
-when a release exists. `--ref` takes a branch, a tag or a commit, and implies `--from-source`; the
+The first command installs the release, and builds the default branch only when there is none.
+`--from-source` builds even when a release exists. `--ref` takes a branch, a tag or a commit, and implies `--from-source`; the
 default is `master`. `DRIFT_FROM_SOURCE=1` and `DRIFT_REF=REF` do the same. `DRIFT_SOURCE_URL` sets
 the git URL or local path to clone, which builds a fork. The other flags pass through to
 `drift install`. `--dry-run` still builds, and then it installs nothing.
