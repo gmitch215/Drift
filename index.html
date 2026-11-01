@@ -374,7 +374,7 @@
 <h2 id="try-it">Try It</h2>
 <pre><code class="language-sh">curl -fsSL https://raw.githubusercontent.com/gmitch215/Drift/master/install.sh | sh
 </code></pre>
-<p>It installs to <code>~/.local/bin</code>; open a new terminal if <code>drift</code> is not found afterwards. The first release is not published yet, so until it is the installer builds Drift from source: it needs git, a JDK 17 or newer to start Gradle (Gradle downloads the JDK 21 it builds with), and several minutes. The script is <a href="https://github.com/gmitch215/Drift/blob/master/install.sh">install.sh</a> if you want to read it first. Add <code>| sh -s -- --from-source --ref BRANCH</code> to the command to build a branch, tag or commit on purpose. From a clone with JDK 21 you can also run <code>./gradlew :cli:jvmRun --args='why --error &quot;TEXT&quot;'</code>.</p>
+<p>It installs to <code>~/.local/bin</code>; open a new terminal if <code>drift</code> is not found afterwards. It downloads the 1.0.0 release archive and checks its SHA-256. The script is <a href="https://github.com/gmitch215/Drift/blob/master/install.sh">install.sh</a> if you want to read it first. Add <code>| sh -s -- --from-source --ref BRANCH</code> to the command to build a branch, tag or commit instead; that needs git, a JDK 17 or newer and several minutes. From a clone with JDK 21 you can also run <code>./gradlew :cli:jvmRun --args='why --error &quot;TEXT&quot;'</code>.</p>
 <p>Pick the case you have:</p>
 <ul>
 <li>A bug report someone sent you, with no access to their machine: <code>drift why issue.md</code>.</li>
