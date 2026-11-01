@@ -356,8 +356,8 @@
             <div class="readme"><h1 id="studio-manual">Studio Manual</h1>
 <p>Studio is the Drift app. It shows what the <code>drift</code> command shows, with buttons instead of flags. This
 manual walks through each screen in the order you meet it, with a picture of each. The pictures are
-of the web build, taken in a desktop-sized window (1280 by 800 pixels) and, for the first two
-screens, in a phone-sized one (390 by 844).</p>
+of the web build, taken in a desktop-sized window (1280 by 800 pixels) and, for Home and the Atlas,
+in a phone-sized one (390 by 844).</p>
 <p>Studio only reads. It never changes your files and never sends anything anywhere. Every screen has a
 one-paragraph explanation at the top, and a line that starts with &quot;What to do next&quot;.</p>
 <h2 id="opening-studio">Opening Studio</h2>
@@ -387,14 +387,64 @@ are the operating system's own.</p>
 <h2 id="home">Home</h2>
 <p><img src="docs/manual/home.png" alt="The Home screen" /></p>
 <p>Home is the first screen. Each box is a way in, with one line on what it does and one button.
-<strong>Open a Case</strong> reads a saved investigation from a file. <strong>Try a Sample</strong> uses recorded runs that
-come with Studio. The next four boxes open Upgrade, Contract, Bisect and Set. <strong>Browse the Atlas</strong>
-opens the Atlas.</p>
-<p>If you have nothing to open yet, choose <strong>Show a Sample</strong>. It needs no file.</p>
-<p>The row of buttons at the top (Home, Atlas, Investigation, Upgrade, Contract, Bisect, Set) stays on
-every screen. A Case button joins the row once you open a case. On a phone the row wraps onto
-several lines and the boxes stack in one column.</p>
+<strong>Ask Why It Fails</strong> opens the Why screen, where you paste an error message, an issue text or a CI
+log. <strong>Find Out Why CI Failed</strong> opens the CI screen for a passing and a failing run. <strong>Open a Case</strong>
+reads a saved investigation from a file. <strong>Try a Sample</strong> uses recorded runs that come with Studio.
+The next four boxes open Upgrade, Contract, Bisect and Set. <strong>Browse the Atlas</strong> opens the Atlas.</p>
+<p>If you have a failure and nothing else, start with <strong>Ask Why It Fails</strong>. If you have nothing at all
+yet, choose <strong>Show a Sample</strong>. It needs no file.</p>
+<p>The row of buttons at the top (Home, Why, Atlas, Investigation, CI, Upgrade, Contract, Bisect, Set)
+stays on every screen. A Case button joins the row once you open a case. On a phone the row wraps
+onto several lines and the boxes stack in one column.</p>
 <p><img src="docs/manual/home-phone.png" alt="Home on a phone" /></p>
+<h2 id="why">Why</h2>
+<p><img src="docs/manual/why.png" alt="The Why screen after an error message was sent" /></p>
+<p>Why is the screen to start from when something fails and you do not know where to look. It does
+what <code>drift why</code> does, as a conversation. You paste what you have: an error message, an issue text,
+a CI log or a saved capture of one machine (<code>drift why --save there.json</code> writes one). Drift says
+how it read what you pasted, what it found, how sure it is and what to try next.</p>
+<p>What to do:</p>
+<ol>
+<li>Paste into <strong>Your Message</strong> and choose <strong>Send</strong>.</li>
+<li>Check the line that says how Drift read it, for example &quot;I read this as an error message&quot;. If it
+guessed wrong, choose the button that reads it as something else, such as <strong>Read It as an Issue
+Text Instead</strong>.</li>
+<li>Read the answer. The picture shows what happens when the text names no tool, version or setting:
+Drift says &quot;Not sure: nothing I can read explains it&quot; and does not guess.</li>
+<li>When Drift needs more, it shows <strong>The Check to Run</strong>, a command with a <strong>Copy the Command</strong>
+button. Run it where the program fails and paste what it prints into <strong>Output where it fails</strong>,
+then choose <strong>Send the Answer</strong>. Drift may then ask for the same check where the program works,
+in <strong>Output where it works</strong>.</li>
+<li>Once both sides are known, Drift compares them and gives the verdict, the differences it found and
+what to try next. When one difference stands out, the verdict says &quot;most likely&quot;: Drift has not
+run an experiment, so it does not state a cause as fact. When several fit, it lists them and says
+the data cannot tell them apart.</li>
+</ol>
+<p><strong>New Conversation</strong> clears the screen. <strong>Export Conversation</strong> copies the conversation as text. What
+you paste is read on your device and kept only until you start a new conversation or close Studio.
+Secrets are masked first.</p>
+<p>The same answers come from the command: <code>drift why --error &quot;TEXT&quot;</code>, then <code>drift why --reply</code> with the
+output of the check. <a href="why.html">Why</a> lists every flow with real output, and <code>drift demo</code> replays
+one recorded failure from start to finish.</p>
+<h2 id="ci">CI</h2>
+<p><img src="docs/manual/ci.png" alt="The CI screen with the sample logs diagnosed" /></p>
+<p>CI compares the logs of a passing and a failing CI run. Drift reads GitHub Actions and GitLab CI
+logs, finds the runner environment in each and ranks the differences. Everything happens on your
+device, and secrets are masked before anything is shown.</p>
+<p>What to do:</p>
+<ol>
+<li>Choose <strong>Try With Sample Logs</strong> to use a pair of recorded runs of one public project, or choose or
+paste your own logs under <strong>1. Passing Run Log</strong> and <strong>2. Failing Run Log</strong>.</li>
+<li>If a GitHub Actions log holds more than one job, type the job's name under <strong>3. Job Name
+(Optional)</strong>. Leave it empty to use the first job with a runner environment.</li>
+<li>Choose <strong>Diagnose These Logs</strong> (the sample runs by itself). The Result box says in one sentence
+what Drift found, and the list below it ranks the differences by evidence level.</li>
+</ol>
+<p>The sample result reads &quot;Drift cannot name one cause: 3 differences tie for the top place&quot;. The three
+are the runner's provisioner build date and version and the runner image version, all at level 1
+(Difference), and the screen says &quot;This is a ranking, not a confirmed cause.&quot; Drift compares the
+environments of two runs, so it cannot find an ordinary code regression. If the code changed between
+the runs, check that change first.</p>
 <h2 id="investigation">Investigation</h2>
 <p><img src="docs/manual/investigation.png" alt="The Investigation screen with one difference selected" /></p>
 <p>Choose <strong>Show a Sample</strong> on Home to open this screen. It is titled &quot;What Changed Between Two Runs&quot;.
@@ -567,6 +617,18 @@ rows marked &quot;scrolled&quot; need the page moved down by the stated number o
 <td>Home on a mobile viewport, after a reload.</td>
 </tr>
 <tr>
+<td><code>why.png</code></td>
+<td>1280 x 800</td>
+<td><code>/</code></td>
+<td><strong>Why</strong> tab, click the message box, type <code>TypeError: Object.groupBy is not a function</code>, choose <strong>Send</strong>.</td>
+</tr>
+<tr>
+<td><code>ci.png</code></td>
+<td>1280 x 800</td>
+<td><code>/</code></td>
+<td><strong>CI</strong> tab, <strong>Try With Sample Logs</strong>, then press PageDown twice so the Result box shows.</td>
+</tr>
+<tr>
 <td><code>investigation.png</code></td>
 <td>1280 x 800</td>
 <td><code>/</code></td>
@@ -634,8 +696,11 @@ Keep each file under about 400 KB.</p>
 <p>Each sentence below states something this manual says that a later change to Studio could make false.</p>
 <ul>
 <li>Studio reads files and sends nothing anywhere (the Atlas footer says so on screen).</li>
-<li>The Home screen has boxes titled Open a Case, Try a Sample, Check an Upgrade, Check a Contract, Plan a Bisect, Compare a Set and Browse the Atlas.</li>
-<li>The top row has the buttons Home, Atlas, Investigation, Upgrade, Contract, Bisect and Set, and a Case button once a case is open.</li>
+<li>The Home screen has boxes titled Ask Why It Fails, Find Out Why CI Failed, Open a Case, Try a Sample, Check an Upgrade, Check a Contract, Plan a Bisect, Compare a Set and Browse the Atlas.</li>
+<li>The top row has the buttons Home, Why, Atlas, Investigation, CI, Upgrade, Contract, Bisect and Set, and a Case button once a case is open.</li>
+<li>The Why screen reads a pasted error message, issue text, CI log or saved capture, says how it read it, and asks for one check at a time with <strong>Output where it fails</strong> and <strong>Output where it works</strong>.</li>
+<li>The error <code>TypeError: Object.groupBy is not a function</code> alone gets &quot;Not sure: nothing I can read explains it&quot; and a request for a saved capture of the failing machine.</li>
+<li>The CI screen's sample logs give a result that says 3 differences tie for the top place, at evidence level 1 of 4.</li>
 <li><strong>Show a Sample</strong> opens the Investigation screen with three failing runs compared with passing run 36702683742.</li>
 <li>The sample investigation says that 9 differences tie for the top place and that the first is the node version.</li>
 <li>The Atlas measures the device when Studio opens, and <strong>Run on This Device</strong> measures again.</li>

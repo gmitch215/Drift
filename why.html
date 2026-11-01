@@ -397,10 +397,12 @@ from what you gave it:</p>
 <p>Every answer has three parts: the verdict in one sentence, the evidence in at most three lines (what
 it is, the value on each side) and what to try next. The wording follows how much the data supports:</p>
 <ul>
-<li><strong>A cause:</strong> <code>It fails there because Node is 20.11.1 there and 22.4.0 here.</code> Drift says this only
-when a rule or a measurement ties that one difference to the failure.</li>
-<li><strong>The most likely cause:</strong> one difference is left, or the error text of the failing command points
-at one. The sentence says which of the two it was.</li>
+<li><strong>The most likely cause:</strong> one difference stands out, one is all that is left, or the error text
+of the failing command points at one. The sentence says which it was. Drift has not run an
+experiment, so it never states a cause without &quot;most likely&quot;: <code>drift solve</code> is the command that
+can confirm one. On the recorded development scenarios, a candidate that a verified rule matched
+was the cause 10 times in 13, and one that only a probe or an unverified rule supported was the
+cause 22 times in 62.</li>
 <li><strong>Several differences that fit:</strong> the verdict lists them, says the data cannot tell them apart and
 gives the fastest way to separate them: change one of them to match the working side and run the
 program again. <code>drift next .drift/why/case</code> prints the full experiment plan.</li>
