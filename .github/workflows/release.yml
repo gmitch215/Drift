@@ -639,5 +639,5 @@ jobs:
         run: |
           for tag in $TAGS; do
             docker buildx imagetools create \
-              --tag "docker.io/${DOCKERHUB_USERNAME}/drift:${tag##*:}" "${IMAGE}@${DIGEST}"
+              --tag "docker.io/${DOCKERHUB_USERNAME}/drift:${tag##*:}" "${IMAGE,,}@${DIGEST}"
           done
