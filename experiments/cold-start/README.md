@@ -8,7 +8,7 @@ Each run gives a fresh reader one broken scenario. The reader has the README, th
 
 A run passes when the reader's `answer.md` names the cause in the answer key (its attribute path or a listed plain-language equivalent), the reader used at most 5 commands that the README led to, and the run took at most 10 minutes. Anything else fails. `SCORING.md` defines each check.
 
-The gate for the batch is at least 80% of runs passing, across 8 scenarios with 3 independent readers each.
+The gate for the batch is at least 80% of runs passing, across 14 scenarios with 3 independent readers each, 42 runs. It began as 8 scenarios (1 to 8) with 3 readers each; the reporter scenarios 9 to 14 were added on 2026-10-27 and the threshold stayed at 80%. `SCORING.md` has the history.
 
 ## Inputs
 
@@ -48,7 +48,7 @@ Scenarios 7 and 12 set `MODE=single` in `scenario.env`. They start only the repo
 
 ## Run All Scenarios
 
-Run the eight scenarios one after another, three readers each. `cold-up.sh` refuses to start a second scenario while one is up, so no two run at once.
+Run the fourteen scenarios one after another, three readers each. `cold-up.sh` refuses to start a second scenario while one is up, so no two run at once.
 
 ## Check Mode
 

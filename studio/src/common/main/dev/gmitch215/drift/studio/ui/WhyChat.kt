@@ -437,7 +437,7 @@ class WhyChat(private val store: SessionStore = MemorySessionStore()) {
          */
         fun certainty(id: String, kind: String?): String = when {
             kind == NotEnvironmentWording.KIND -> "A hint only: Drift is not certain of this."
-            id == "cause" -> "Cause: the data points at one difference."
+            id == "cause" -> "Likely: one difference stands out, but nothing has tested it."
             id == "likely" -> "Likely: this is the best fit, but it is not proven."
             id == "one-of" -> "One of several: the data cannot say which one."
             id == "tie" -> "Tied: these differences change together, so they cannot be told apart."

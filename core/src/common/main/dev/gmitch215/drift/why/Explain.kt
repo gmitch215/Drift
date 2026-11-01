@@ -220,7 +220,7 @@ object Explain {
         }
     }
 
-    private fun verdict(
+    internal fun verdict(
         certainty: Certainty,
         findings: List<Finding>,
         sides: Sides,
@@ -237,13 +237,11 @@ object Explain {
                 "Nothing I can read differs between ${sides.works} and ${sides.fails}, so the " +
                     "cause is not in what Drift compares."
 
-            Certainty.CAUSE -> sentence("it fails ${sides.fails} because $because.")
-
-            Certainty.LIKELY -> {
-                val why = if (pointed) {
-                    "the error text points at it"
-                } else {
-                    "it is the only difference I found"
+            Certainty.CAUSE, Certainty.LIKELY -> {
+                val why = when {
+                    pointed -> "the error text points at it"
+                    findings.size > 1 -> "it is the strongest difference I found"
+                    else -> "it is the only difference I found"
                 }
                 sentence("it most likely fails ${sides.fails} because $because; $why.")
             }
@@ -286,12 +284,7 @@ object Explain {
                 out += "If it fails only sometimes, repeat it: drift run --repeat 10 -- COMMAND"
             }
 
-            Certainty.CAUSE -> {
-                out += findings.first().described.fix
-                out += "Then run it again ${sides.fails} to check."
-            }
-
-            Certainty.LIKELY -> {
+            Certainty.CAUSE, Certainty.LIKELY -> {
                 out += findings.first().described.fix
                 out += "To be sure, change only that and run it again ${sides.fails}."
             }

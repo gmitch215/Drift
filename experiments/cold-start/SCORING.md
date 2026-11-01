@@ -24,7 +24,9 @@ A key whose first line after the title reads `Status: UNVERIFIED` is not scored.
 
 ## Gate
 
-The gate is at least 80% of scored runs passing, across 8 scenarios with 3 readers each. A run that is not scored counts as a failure of the gate until the key is verified.
+The gate is at least 80% of scored runs passing, across 14 scenarios with 3 readers each, 42 runs. A run that is not scored counts as a failure of the gate until the key is verified.
+
+History. The gate was first set across 8 scenarios (1 to 8) with 3 readers each, 24 runs, and the baseline and round 2 of 2026-10-26 ran only those scenarios. The reporter scenarios 9 to 14 were added on 2026-10-27 and the gate now covers them. The 80% threshold did not change. The accepted table, round 3 in `experiments/results/cold-start/latest.md`, counts 42 runs.
 
 ## Reporter Variant
 

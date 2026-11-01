@@ -193,7 +193,7 @@ class WhyChatTest {
         val words = (Certainty.entries.map { it.id } + "fact").map { WhyChat.certainty(it, null) }
         assertEquals(words.size, words.toSet().size)
         assertTrue(words.all { it.isNotBlank() && "capsule" !in it && "attribute" !in it })
-        assertTrue(WhyChat.certainty("cause", null).startsWith("Cause"))
+        assertTrue(WhyChat.certainty("cause", null).startsWith("Likely"))
         assertTrue(WhyChat.certainty("likely", null).startsWith("Likely"))
         assertTrue(WhyChat.certainty("one-of", null).startsWith("One of several"))
         assertTrue(WhyChat.certainty("tie", null).startsWith("Tied"))
