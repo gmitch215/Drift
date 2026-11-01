@@ -1,8 +1,9 @@
 # Install
 
 Release 1.0.0 is published. The install script, the Docker image and `brew install` were run
-against it on Linux x64 and macOS arm64. The Windows scripts, `choco` and the APK were not run
-from the release. To build from source or from a branch, see
+against it on Linux x64 and macOS arm64. The Chocolatey verifier installed and uninstalled the
+`drift` and `drift-studio` packages on Windows Server 2019 on 2026-11-01. `install.ps1` and the
+APK were not run from the release. To build from source or from a branch, see
 [Build From Source](#build-from-source-or-an-experimental-build).
 
 ## Downloads
