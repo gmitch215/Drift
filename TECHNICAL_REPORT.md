@@ -2,19 +2,25 @@
 
 Drift is a Kotlin Multiplatform command line tool and desktop, web and mobile app, version 1.0.0. It records an environment as a capsule, compares two capsules, ranks what changed between a passing run and a failing one, proposes the experiments that would separate the candidates, and writes a container description that mirrors a capsule. Its Lab runs those experiments in containers under a rule fixed before the first trial, reports a verdict, and packs the evidence into an archive that a second command re-checks. It also works from one capsule or one issue text without a second environment: `drift upgrade-check` lists what a move to other versions breaks, `drift triage` reads an issue body offline, and `drift contract` writes what a program needs from an environment. It ships two measured data sets: the Kotlin Portability Atlas, a table of Kotlin behavior across targets and compiler versions, with a static site and a viewer in the app, and DriftBench, a seeded benchmark of container pairs with an injected cause. The release pipeline builds a CLI archive per platform, consumer installers for the app, a Homebrew formula and cask, and two Chocolatey packages.
 
-This document is the engineering reference for what the working tree does today, what it costs, and what was measured. Each table names its instrument. The section Reproducing the Numbers lists the command or file behind every figure. Test counts, line counts, coverage, rule counts, Atlas hashes and command output describe the tree on 2026-10-13 and were read again from a clean build on that day on a Mac; they move with the tree. Figures from other machines or earlier days (the Docker and paisley-park runs, Wine, the installers, the browsers and the performance sweep) name where and when they were taken and were not repeated. Build Project, Record Atlas, Deploy Documentation and Mirror to GitLab have run on GitHub, and Bench Host Arms ran once; Release Project has not run (GitHub run status read on 2026-10-26). Every workflow is checked with `actionlint` and its steps were exercised by hand on a Mac and on a Linux host, and no Windows machine was available.
+This document is the engineering reference for what the working tree does, what it costs, and what was measured. Each table names its instrument. The section Reproducing the Numbers lists the command or file behind every figure.
+
+Two kinds of figure appear, and each is dated. A figure marked 2026-11-01 was read from the working tree on top of commit `150223e9` (test counts, coverage, the shared-code ratio, the rule and fixture counts, and the CI status below). Every other figure is dated by its row or sentence, and most are from 2026-10-13 or earlier: they describe the tree on that day, were read from a clean build on a Mac, and were not repeated, so they move with the tree. Figures from other machines or days (the Docker and paisley-park runs, Wine, the installers, the browsers and the performance sweep) name where and when they were taken.
+
+CI status, read on 2026-11-01: the latest Build Project run on `master` (`150223e9`) passed all 7 jobs, including the Windows x64 and macOS arm64 test jobs, and Record Atlas, Deploy Documentation and Mirror to GitLab passed on the same commit. Over the life of the repository `build.yml` has 8 successful, 105 failed and 60 cancelled runs, most of the failures from the first weeks of work. Bench Host Arms ran once and passed; Release Project has not run. Every workflow is checked with `actionlint`.
 
 ---
 
 ## Summary
 
+A row that carries a date was measured then. A row without one was measured on 2026-10-13 or earlier and was not repeated. Where a row shows two dates, the later one is current and the earlier one is kept for comparison.
+
 | | measured | instrument |
 | --- | --- | --- |
 | Targets built | 6: JVM, macOS arm64, Linux x64, Linux arm64, Windows x64 (mingw), Wasm on Node; `-Pdrift.mobile=true` adds Android and the iOS simulator for the app | `drift.kmp` plugin |
-| Test runs in the tree | JVM, macOS arm64 Native and Wasm on Node by Gradle on a Mac; Studio in Chrome by Gradle and in Firefox by Karma; Linux x64 and Linux arm64 Native in containers; mingw under Wine, and JVM and mingw on GitHub's `windows-2025` runner in `build.yml` | `*/build/test-results/*/*.xml`, container logs (see Platform and CPU Findings) |
-| Core tests, each of the 3 Gradle targets | 638 passed, 0 failed, on every target | `*/build/test-results/*/*.xml` |
-| Shared-code ratio, all modules | 91.1% common lines (27,626 common, 2,697 platform); `core` and `scan` 100%, `cli` 72.1%, `host` 43.7% | `./gradlew sharedRatio` |
-| JVM line coverage | 96.0% (20,448 of 21,293 lines); floor 95% | `build/coverage/summary.txt` |
+| Test runs in the tree | In `build.yml` on every push (all 7 jobs passed on `master` at `150223e9`, 2026-11-01): Linux x64, Linux arm64 (cross-linked on x64, run on an arm64 runner), macOS arm64 and Windows x64 (`windows-2025`) test jobs, a browser job and a lint job. By hand, 2026-10-13 and earlier: JVM, macOS arm64 Native and Wasm on Node on a Mac; Studio in Chrome by Gradle and in Firefox by Karma; Linux x64 and arm64 Native in containers; mingw under Wine. A Linux x64 host ran the JVM, Native and Wasm suites on 2026-11-01 | `*/build/test-results/*/*.xml`, container logs (see Platform and CPU Findings) |
+| Core tests, each of the JVM, Linux x64 and Wasm targets | 908 passed, 0 failed, on every target (2026-11-01; 638 on 2026-10-13) | `*/build/test-results/*/*.xml` |
+| Shared-code ratio, all modules | 93.9% common lines (45,263 common, 2,947 platform); `core` and `scan` 100%, `cli` 80.0%, `host` 58.1% (2026-11-01; 91.1% on 2026-10-13) | `./gradlew sharedRatio` |
+| JVM line coverage | 96.1% (32,362 of 33,671 lines); floor 95% (2026-11-01; 96.0% on 2026-10-13) | `build/coverage/summary.txt` |
 | `core` and `bench` common code using `Double` or `Float` | 0 occurrences | `grep -rn` |
 | macOS arm64 CLI, release executable | 9,866,776 bytes (executable built 2026-10-15, before `drift why`; 28 subcommands then, 29 in the current tree; the Linux x64 executable of the current tree is 15,616,968 bytes) | `ls -l`, `drift --help` |
 | Probes in the catalog | 71: 33 general, 38 Kotlin | `drift capture --probes` |
@@ -113,32 +119,34 @@ The remaining directories are data and delivery, not modules: `rules` (429 YAML 
 
 Sources sit at `src/<set>/main` and `src/<set>/test`. The shared-code ratio counts non-comment lines under `src/common/main` against every other source set's `main`.
 
-| module | common lines | platform lines | shared |
-| --- | --- | --- | --- |
-| `host` | 423 | 545 | 43.7% |
-| `core` | 13,540 | 0 | 100.0% |
-| `scan` | 4,928 | 0 | 100.0% |
-| `cli` | 3,697 | 1,431 | 72.1% |
-| `studio` | 2,959 | 159 | 94.9% |
-| `bench` | 2,079 | 562 | 78.7% |
-| total | 27,626 | 2,697 | 91.1% |
+Measured 2026-11-01, with the figures of 2026-10-13 beside them:
 
-`host` is where the platform code lives, at 545 of its 545-line budget, and its own shared share is 43.7%. The budget was 400 until the process runners were rewritten and 630 after: the POSIX runner (`posix_spawn` through a small cinterop definition, with a drained pipe, shared by Linux and macOS in one intermediate source set; it replaced a `fork` whose child could stop before `execvp` while another thread was collecting garbage), the Windows `CreateProcessW` runner with batch-file escaping, and the JVM child wrapper account for the 230 added lines, which fixed a hang in which a grandchild holding the output pipe blocked the run forever. It dropped to 545 when the host class that wraps the native runners, the environment parsing, the wait-status decoding, the `PATH` search and the chunked file read moved into common code. `cli` holds the per-target file, binary file and stdout writers and the installer and server actuals: the registry and process code for Windows, the profile edits on Unix, the sockets of `serve` for POSIX and Winsock, and the OpenSSL loader; its share is 72.1%. The listener setup, the send loop, PEM decoding, address text and the cleanup command line are common. The total is 91.1% and the floor is 80%. `bench` keeps its platform lines in JVM-only code: YAML reading, scenario preparation, result ingest and an exact binomial test with `BigInteger`.
+| module | common lines | platform lines | shared | shared on 2026-10-13 |
+| --- | --- | --- | --- | --- |
+| `host` | 814 | 586 | 58.1% | 43.7% |
+| `core` | 21,316 | 0 | 100.0% | 100.0% |
+| `scan` | 9,472 | 0 | 100.0% | 100.0% |
+| `cli` | 5,738 | 1,431 | 80.0% | 72.1% |
+| `studio` | 4,477 | 200 | 95.7% | 94.9% |
+| `bench` | 3,446 | 730 | 82.5% | 78.7% |
+| total | 45,263 | 2,947 | 93.9% | 91.1% |
+
+`host` is where the platform code lives. On 2026-11-01 it has 586 platform lines against a budget of 590, and its own shared share is 58.1%; the budget was 545 from 2026-10-15 and 590 from 2026-10-27 (commit `38c24764`). The history to 2026-10-15: the budget was 400 until the process runners were rewritten and 630 after: the POSIX runner (`posix_spawn` through a small cinterop definition, with a drained pipe, shared by Linux and macOS in one intermediate source set; it replaced a `fork` whose child could stop before `execvp` while another thread was collecting garbage), the Windows `CreateProcessW` runner with batch-file escaping, and the JVM child wrapper account for the 230 added lines, which fixed a hang in which a grandchild holding the output pipe blocked the run forever. It dropped to 545 when the host class that wraps the native runners, the environment parsing, the wait-status decoding, the `PATH` search and the chunked file read moved into common code. `cli` holds the per-target file, binary file and stdout writers and the installer and server actuals: the registry and process code for Windows, the profile edits on Unix, the sockets of `serve` for POSIX and Winsock, and the OpenSSL loader; its share was 72.1% on 2026-10-13 and is 80.0% on 2026-11-01. The listener setup, the send loop, PEM decoding, address text and the cleanup command line are common. The total is 93.9% on 2026-11-01 (91.1% on 2026-10-13) and the floor is 80%. `bench` keeps its platform lines in JVM-only code: YAML reading, scenario preparation, result ingest and an exact binomial test with `BigInteger`.
 
 JVM line coverage comes from JaCoCo. No coverage tool exists for Kotlin/Native or Wasm in Kotlin 2.4.20, so no coverage figure exists for those targets. The same common tests run on them.
 
-| module | covered | missed | lines |
-| --- | --- | --- | --- |
-| `bench` | 1,714 | 75 | 95.8% |
-| `cli` | 2,302 | 100 | 95.8% |
-| `core` | 9,102 | 384 | 96.0% |
-| `host` | 302 | 5 | 98.4% |
-| `scan` | 3,080 | 39 | 98.7% |
-| `studio` | 2,022 | 74 | 96.5% |
-| `tools` | 1,203 | 147 | 89.1% |
-| total | 20,448 | 845 | 96.0% |
+| module | covered | missed | lines | on 2026-10-13 |
+| --- | --- | --- | --- | --- |
+| `bench` | 2,892 | 141 | 95.4% | 95.8% |
+| `cli` | 3,596 | 125 | 96.6% | 95.8% |
+| `core` | 13,869 | 558 | 96.1% | 96.0% |
+| `host` | 637 | 6 | 99.1% | 98.4% |
+| `scan` | 6,196 | 162 | 97.5% | 98.7% |
+| `studio` | 3,060 | 101 | 96.8% | 96.5% |
+| `tools` | 1,232 | 196 | 86.3% | 89.1% |
+| total | 32,362 | 1,309 | 96.1% | 96.0% |
 
-`build/coverage/summary.txt` was written by `coverageSummary` on 2026-10-13 and `verifyCoverage` passed in the same run. The total, 96.0%, sits one point above the 95% floor, and `tools` is below it alone (89.1%) because the floor applies to the total.
+`build/coverage/summary.txt` was written by `coverageSummary` on 2026-11-01 and `verifyCoverage` passed in the same run (the 2026-10-13 column is the earlier run, 20,448 of 21,293 lines). The total, 96.1%, sits one point above the 95% floor, and `tools` is below it alone (86.3%) because the floor applies to the total.
 
 Targets and what ran:
 
@@ -1436,7 +1444,7 @@ The group split that followed (see Upgrade Check) rerun on the same capture give
 - `correlated` needs the history to carry step data. Without the run JSON joined to the logs, every green's steps are unknown, all five are excluded as `NO_STEP_EVIDENCE`, and all eight drangler candidates drop to `difference` (`withoutStepEvidenceInTheGreensTheDranglerFallsBackToDifferences`).
 - The history ranking assumes the failing runs share one failure signature; the caller must group them.
 - Atlas cells are single runs, and the 16 columns come from five machines and two CPU families, so a column describes a machine as much as a target (see Platform and CPU Findings). The Wasm Node column was recorded on Apple Silicon and the browser columns on x86-64, which confounds engine and CPU. Linux Native columns depend on the host that linked the executable. The displayed source of a probe and the code that runs are two hand-written copies; the ladder measured 1 of 38 probes differing between them, by a class name. Probe classification rests on the pages the authors read, with at most the first 8 tracker results of each query; Native's Unicode table version and whether Native and Wasm call libm or the JS engine for math are unverified.
-- Build Project (`build.yml`), Record Atlas (`atlas.yml`), Deploy Documentation (`docs.yml`) and Mirror to GitLab (`gitlab.yml`) have run on GitHub. On 2026-10-26, 3 of 65 Build Project runs had succeeded and the latest one failed. Bench Host Arms (`bench.yml`) ran once and passed; Release Project (`release.yml`) has not run. The workflow steps are checked with `actionlint` and ran by hand. The Linux test suites ran in containers and the mingw ones under Wine, which is not Windows; real Windows ran nothing (no test, no installer, no registry edit), and neither did Safari or a signed or notarized build. The Linux arm64 executable was cross-linked, and a Kotlin/Native build on an arm64 Linux host was not run.
+- Build Project (`build.yml`), Record Atlas (`atlas.yml`), Deploy Documentation (`docs.yml`) and Mirror to GitLab (`gitlab.yml`) have run on GitHub. On 2026-10-26, 3 of 65 Build Project runs had succeeded and the latest one failed; on 2026-11-01 the latest run on `master` passed all 7 jobs, and the counts over all runs are in the opening of this report. Bench Host Arms (`bench.yml`) ran once and passed; Release Project (`release.yml`) has not run, so no release asset was built by the workflow, and `tools/simulate-release.sh` is the stand-in (11 of 11 checks on 2026-10-30). The workflow steps are checked with `actionlint`. Real Windows now runs the JVM and mingw tests on GitHub's `windows-2025` runner in `build.yml`; the earlier Wine runs and the container runs for Linux are kept as history. No Windows installer was run, no registry edit was tried, and neither Safari nor a signed or notarized build ran. The Linux arm64 test binaries are cross-linked on an x64 runner and run on GitHub's arm64 runner in `build.yml`; a Kotlin/Native build on an arm64 Linux host was not run.
 - Capture removes the account name, the host name and the home path only where they appear in the capturing host's own `env.*`. Probe transcripts and labels are not rewritten, and emails and account ids are not recognized. `--keep-identifiers` keeps everything.
 - The Lab ran each of the 45 dev scenarios four times (180 runs, three reseeded). 0 false CONFIRMED bounds the per-run rate at 1.65% with 95% confidence on these synthetic scenarios and says nothing about real failures; an exact repeat of the original draws was not run. The loop needs two `SUPPORTED` tests to confirm (forward and reverse), which makes a false CONFIRMED on a decoy rare by design (about 0.25% at alpha 0.05 if the two tests are independent), but that figure is arithmetic and was not measured.
 - The pilot of 8 trials sizes the arms, and for intermittent scenarios its estimate moved 2 of 45 scenarios between STUCK, NARROWED and CONFIRMED across four runs. A larger or sequential pilot was not tested.
@@ -1452,26 +1460,28 @@ The group split that followed (see Upgrade Check) rerun on the same capture give
 
 ### Tests
 
-Counts from the test result files of the last run of each task (`*/build/test-results/*/*.xml`), read on 2026-10-13 after the final clean build:
+Counts from the test result files of the last run of each task (`*/build/test-results/*/*.xml`), read on 2026-11-01 from a run on a Linux x64 host (JVM, Linux x64 Native and Wasm on Node) on top of commit `150223e9`:
 
-| module | JVM | macOS arm64 Native | Wasm on Node |
+| module | JVM | Linux x64 Native | Wasm on Node |
 | --- | --- | --- | --- |
-| `core` | 639 | 639 | 639 |
-| `scan` | 152 | 152 | 152 |
-| `bench` | 108 | 76 | 76 |
-| `cli` | 335 | 311 | 290 |
-| `host` | 37 | 40 | 31 |
-| `studio` | 114 | - | 69 in Chrome |
-| `tools` | 82 | - | - |
-| `build-core` | 101 | - | - |
+| `core` | 908 | 908 | 908 |
+| `scan` | 296 | 296 | 296 |
+| `bench` | 193 | 131 | 131 |
+| `cli` | 563 | 534 | 517 |
+| `host` | 85 | 87 | 79 |
+| `studio` | 205 | - | not run on 2026-11-01 |
+| `tools` | 87 | - | - |
+| `build-core` | 123 | - | - |
 
-Every count has 0 failures and 0 skipped. The platform columns differ for `host` and `cli` because some tests exist only for the targets that can write files, run commands or open sockets, and for `bench` because the YAML, Docker and binomial tests are JVM-only. The Lab's tests run in common code on all three targets: `SolveTest` 29, `IngestTest` 10, `ArchiveTest` 18 and `VerifyTest` 23 in `core`, and `SolveCommandTest` 9, `ArchiveCommandTest` 12 and `DockerExecutorTest` 7 in `cli`. Other new domains: `TriageTest` 39, `LearnedTest` 6, `CalibrateTest` 7, `UpgradeCheckTest` 19, `ContractTest` 21 in `core`; `TriageCommandTest` 16, `UpgradeCheckCommandTest` 9, `ContractCommandTest` 14 in `cli`; `ProjectScannerTest` 33 in `scan`; `CommandLineTest` 14 and `HostRunTest` 7 in `host`. They run against a fake executor; no test builds an image or starts a container. The installer tests (classes with `Install` in the name) number 64 on the JVM, 49 on macOS Native and 43 on Wasm, and the serve tests 51, 50 and 37.
+On 2026-10-13, on a Mac with macOS arm64 Native in place of the Linux column, `core` had 639 tests on each target, `scan` 152, `bench` 108, 76 and 76, `cli` 335, 311 and 290, `host` 37, 40 and 31, `studio` 114 on the JVM and 69 in Chrome, `tools` 82 and `build-core` 101. The macOS and Windows test jobs run in `build.yml` and passed on `master` on 2026-11-01; their counts were not read.
+
+Every count has 0 failures. Skipped tests were not counted on 2026-11-01; on 2026-10-13 there were none. The platform columns differ for `host` and `cli` because some tests exist only for the targets that can write files, run commands or open sockets, and for `bench` because the YAML, Docker and binomial tests are JVM-only. The Lab's tests run in common code on all three targets: `SolveTest` 29, `IngestTest` 10, `ArchiveTest` 18 and `VerifyTest` 23 in `core`, and `SolveCommandTest` 9, `ArchiveCommandTest` 12 and `DockerExecutorTest` 7 in `cli`. Other new domains: `TriageTest` 39, `LearnedTest` 6, `CalibrateTest` 7, `UpgradeCheckTest` 19, `ContractTest` 21 in `core`; `TriageCommandTest` 16, `UpgradeCheckCommandTest` 9, `ContractCommandTest` 14 in `cli`; `ProjectScannerTest` 33 in `scan`; `CommandLineTest` 14 and `HostRunTest` 7 in `host`. They run against a fake executor; no test builds an image or starts a container. The installer tests (classes with `Install` in the name) number 64 on the JVM, 49 on macOS Native and 43 on Wasm, and the serve tests 51, 50 and 37.
 
 ---
 
 ## Reproducing the Numbers
 
-Build and gates, from the repository root with JDK 25 (the build's toolchain here is Temurin 25):
+Build and gates, from the repository root with JDK 21 (the toolchain that `drift.layout` sets):
 
 ```sh
 ./gradlew build spotlessCheck checkLineLength
@@ -1498,10 +1508,10 @@ matches data/split.json
 
 | figure | value | command or file |
 | --- | --- | --- |
-| core tests per target | 639, 639, 639 | sum of `tests` in `core/build/test-results/<task>/*.xml` |
+| core tests per target | 908, 908, 908 (2026-11-01; 639 each on 2026-10-13) | sum of `tests` in `core/build/test-results/<task>/*.xml` |
 | other module test counts | table in Tests | same files, one directory per task |
-| shared-code ratio | 91.1% (27,626 and 2,697 lines); `host` 423 and 545 (43.7%) | `./gradlew sharedRatio` |
-| JVM line coverage | 96.0%, 20,448 of 21,293 | `./gradlew jvmJacocoAggregateReport verifyCoverage coverageSummary`, then `build/coverage/summary.txt` |
+| shared-code ratio | 93.9% (45,263 and 2,947 lines); `host` 814 and 586 (58.1%) on 2026-11-01; 91.1% and `host` 423 and 545 on 2026-10-13 | `./gradlew sharedRatio` |
+| JVM line coverage | 96.1%, 32,362 of 33,671 (2026-11-01); 96.0%, 20,448 of 21,293 (2026-10-13) | `./gradlew jvmJacocoAggregateReport verifyCoverage coverageSummary`, then `build/coverage/summary.txt` |
 | no `Double` or `Float` in common code | 1 (a string literal in `triage/Claims.kt`) | `grep -rn "Double\|Float" core/src/common/main bench/src/common/main` |
 | fixed-point and hash goldens | table in Design Principles | `core/src/common/test/.../GoldenTest.kt` |
 | `drift diagnose` hash | `99f637b2...38f7` | `drift diagnose fixtures/drangler/capsules/36702683742.json fixtures/drangler/capsules/37114464625.json \| shasum -a 256`; `DriftCommandTest.DIAGNOSE_SHA` |
@@ -1513,8 +1523,8 @@ matches data/split.json
 | masked and identifier-bearing env attributes | 13 masked of 81; with `--keep-identifiers` 22 hold the account name and 20 the home path; by default 0 and 0 | `drift capture` and `drift capture --keep-identifiers`, then count `env.*` values equal to `<redacted>`, containing the account name, containing `$HOME` |
 | capture stdout bytes | strict JSON parse succeeds; 1 raw U+0085 and 1 raw U+2028 | `drift capture --probes --tools > c.json; python3 -c "import json; json.load(open('c.json'))"`; count the UTF-8 bytes of both code points in `c.json` |
 | rules, status, fixtures, sources, severities | 429; 376 active and 53 pending-scanner; 1493 (469/1024); 497 entries, 315 distinct; 134/240/55 | `find rules -name '*.yml' \| wc -l`; `grep -rh '^status:' rules --include='*.yml' \| sort \| uniq -c`; `grep -rh '^severity:' rules --include='*.yml' \| sort \| uniq -c`; `- name:` under `fixtures:` and `kind:` under `provenance:` per file |
-| rule symptom basis | 133 verified, 265 inferred, 52 range (450 symptoms) | `grep -rh "basis:" rules --include="*.yml"` |
-| transcript fixtures | 77 files, 23 tool folders | `find fixtures/transcripts -type f`; `ls fixtures/transcripts` |
+| rule symptom basis | 133 verified, 268 inferred, 52 range (453 symptoms), read 2026-11-01 | `grep -rh "basis:" rules --include="*.yml"` |
+| transcript fixtures | 88 files, 32 tool folders (2026-11-01); 77 files, 23 tool folders (2026-10-13) | `find fixtures/transcripts -type f`; `ls fixtures/transcripts` |
 | probes | 71 = 33 + 38 | `drift capture --probes` |
 | probe links | 33 entries | `core/src/common/main/.../rank/ProbeLinks.kt`; `ProbeTest.everyCatalogProbeHasALinkEntryNamingRealAttributes` |
 | Atlas, 16 columns | 38 probes, 32 divergent, 6 identical, sha256 `27de9a7f...78cd` | `drift atlas build fixtures/atlas/*.txt --out atlas16.json` |
