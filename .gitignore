@@ -18,3 +18,4 @@ experiments/results/*/runs/
 experiments/corpus-id/runs/
 experiments/corpus-id/batches/
 __pycache__/
+bin/
