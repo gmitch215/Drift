@@ -1,3 +1,0 @@
-From: https://github.com/gmitch215/Drift/blob/v@version@/LICENSE
-
-@license@

@@ -169,8 +169,10 @@ class RenderPackagingTest {
         )
         val studio = out.resolve("chocolatey/drift-studio/tools/chocolateyInstall.ps1").readText()
         assertTrue(studio.contains("'${known.getValue("drift-$version-windows-x64.msi")}'"))
-        assertTrue(
-            out.resolve("chocolatey/drift/tools/LICENSE.txt").readText().contains("MIT License"),
-        )
+        for (pkg in listOf("drift", "drift-studio")) {
+            for (name in listOf("VERIFICATION.txt", "LICENSE.txt")) {
+                assertFalse(out.resolve("chocolatey/$pkg/tools/$name").exists())
+            }
+        }
     }
 }
